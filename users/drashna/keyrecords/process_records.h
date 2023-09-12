@@ -101,7 +101,7 @@ bool process_record_unicode(uint16_t keycode, keyrecord_t *record);
 #elif defined(DRASHNA_LP)
 #    define KC_C1R3 TG(_GAMEPAD)
 #else // SWAP_HANDS_ENABLE
-#    define KC_C1R3 KC_TAB
+#    define KC_C1R3 LALT_T(KC_TAB)
 #endif // SWAP_HANDS_ENABLE
 
 #define BK_LWER LT(_LOWER, KC_BSPC)

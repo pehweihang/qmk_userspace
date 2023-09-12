@@ -30,7 +30,7 @@ enum more_custom_keycodes {
     ) \
     LAYOUT_moonlander_wrapper( \
         KC_ESC,  ________________NUMBER_LEFT________________, UC_FLIP,        UC_TABL, ________________NUMBER_RIGHT_______________, KC_MINS, \
-        KC_TAB,  K01,     K02,     K03,     K04,     K05,     TG_DBLO,        TG_DBLO, K06,     K07,     K08,     K09,     K0A,     KC_BSLS, \
+        SH_TT,   K01,     K02,     K03,     K04,     K05,     TG_DBLO,        TG_DBLO, K06,     K07,     K08,     K09,     K0A,     SH_TT, \
         KC_C1R3, K11,     K12,     K13,     K14,     K15,     TG_GAME,        TG_GAME, K16,     K17,     K18,     K19,     K1A,     RALT_T(K1B), \
         KC_MLSF, CTL_T(K21), K22,  K23,     K24,     K25,                              K26,     K27,     K28,     K29,  RCTL_T(K2A),KC_MRSF, \
         KC_GRV,  OS_MEH,  OS_HYPR, KC_LBRC, KC_RBRC,          UC_CLUE,        KC_DEL,           KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, UC_IRNY, \
@@ -100,8 +100,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_RAISE] = LAYOUT_moonlander_wrapper(
         KC_F12,  _________________FUNC_LEFT_________________, _______,        _______, _________________FUNC_RIGHT________________, KC_F11,
-        _______, _________________RAISE_L1__________________, _______,        _______, _________________RAISE_R1__________________, KC_BSLS,
-        _______, _________________RAISE_L2__________________, _______,        _______, _________________RAISE_R2__________________, KC_QUOT,
+        _______, _________________RAISE_L1__________________, _______,        _______, _________________RAISE_R1__________________, _______,
+        _______, _________________RAISE_L2__________________, _______,        _______, _________________RAISE_R2__________________, KC_BSLS,
         _______, _________________RAISE_L3__________________,                          _________________RAISE_R3__________________, KC_PSCR,
         _______, _______, _______, _______, _______,          _______,        _______,          KC_HOME, KC_PGDN, KC_PGUP, KC_END,  KC_PAUS,
                                             _______, _______, _______,        _______, _______, _______

@@ -1015,7 +1015,7 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     kittoken = defer_exec(3000, pet_animation_phases, NULL);
 
     oled_clear();
-    oled_render();
+    oled_render_dirty(true);
     has_run = true;
     return rotation;
 }
@@ -1114,5 +1114,5 @@ void oled_shutdown(bool jump_to_bootloader) {
     } else {
         oled_write_P(PSTR("   Please stand by   "), false);
     }
-    oled_render();
+    oled_render_dirty(true);
 }

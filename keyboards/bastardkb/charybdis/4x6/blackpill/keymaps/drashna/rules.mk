@@ -14,7 +14,7 @@ ifeq ($(strip $(KEYBOARD)), bastardkb/charybdis/4x6/blackpill)
 
     BACKLIGHT_DRIVER      = pwm
 
-    VBUS_PIN_ENABLE ?= yes
+    VBUS_PIN_ENABLE ?= no
     ifeq ($(strip $(VBUS_PIN_ENABLE)), yes)
         OPT_DEFS += -DUSB_VBUS_PIN=B10
     endif

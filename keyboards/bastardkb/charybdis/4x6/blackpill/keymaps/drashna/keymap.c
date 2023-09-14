@@ -126,7 +126,7 @@ void keyboard_post_init_keymap(void) {
 #endif
 }
 
-#if defined(KEYBOARD_bastardkb_charybdis_4x6_blackpill) && defined(BOOTLOADER_RESET_PIN)
+#if defined(BOOTLOADER_RESET_PIN)
 
 void keyboard_pre_init_keymap(void) {
     setPinOutput(BOOTLOADER_RESET_PIN);
@@ -146,7 +146,7 @@ const keypos_t PROGMEM hand_swap_config[MATRIX_ROWS][MATRIX_COLS] = {
     {{0, 1}, {1, 1}, {2, 1}, {3, 1}, {4, 1}, {5, 1}},
     {{0, 2}, {1, 2}, {2, 2}, {3, 2}, {4, 2}, {5, 2}},
     {{0, 3}, {1, 3}, {2, 3}, {3, 3}, {4, 3}, {5, 3}},
-    {{0, 4}, {3, 4}, {2, 4}, {5, 4}, {4, 4}, {2, 4}}
+    {{0, 4}, {3, 4}, {2, 4}, {5, 4}, {4, 4}, {2, 4}},
 };
 
 #    ifdef ENCODER_MAP_ENABLE

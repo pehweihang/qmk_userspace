@@ -74,11 +74,6 @@ ifeq ($(strip $(I2C_SCANNER_ENABLE)), yes)
     CONSOLE_ENABLE := yes
 endif
 
--include $(USER_PATH)/oled/rules.mk
--include $(USER_PATH)/pointing/rules.mk
--include $(USER_PATH)/split/rules.mk
--include $(USER_PATH)/painter/rules.mk
--include $(USER_PATH)/rgb/rules.mk
 
 CUSTOM_BOOTMAGIC_ENABLE ?= yes
 ifeq ($(strip $(CUSTOM_BOOTMAGIC_ENABLE)), yes)
@@ -99,5 +94,12 @@ ifeq ($(strip $(HARDWARE_DEBUG_ENABLE)), yes)
     OPT_DEFS += -g
 endif
 
--include $(USER_PATH)/rtc/rtc.mk
+include $(USER_PATH)/oled/rules.mk
+include $(USER_PATH)/pointing/rules.mk
+include $(USER_PATH)/split/rules.mk
+include $(USER_PATH)/painter/rules.mk
+include $(USER_PATH)/rgb/rules.mk
+include $(USER_PATH)/rtc/rtc.mk
+
+# Ignore if not found
 -include $(KEYMAP_PATH)/post_rules.mk

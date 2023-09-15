@@ -97,19 +97,7 @@ ifeq ($(strip $(I2C_SCANNER_ENABLE)), yes)
 endif
 
 -include $(USER_PATH)/oled/rules.mk
-
-CUSTOM_POINTING_DEVICE ?= yes
-ifeq ($(strip $(POINTING_DEVICE_ENABLE)), yes)
-    ifeq ($(strip $(CUSTOM_POINTING_DEVICE)), yes)
-        SRC += $(USER_PATH)/pointing/pointing.c
-        OPT_DEFS += -DCUSTOM_POINTING_DEVICE
-        OPT_DEFS += -DPOINTING_DEVICE_AUTO_MOUSE_ENABLE
-    endif
-    POINTING_DEVICE_MOUSE_JIGGLER_ENABLE ?= yes
-    ifeq ($(strip $(POINTING_DEVICE_MOUSE_JIGGLER_ENABLE)), yes)
-        OPT_DEFS += -DPOINTING_DEVICE_MOUSE_JIGGLER_ENABLE
-    endif
-endif
+-include $(USER_PATH)/pointing/rules.mk
 
 CUSTOM_SPLIT_TRANSPORT_SYNC ?= yes
 ifeq ($(strip $(CUSTOM_SPLIT_TRANSPORT_SYNC)), yes)

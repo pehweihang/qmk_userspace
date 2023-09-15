@@ -98,15 +98,7 @@ endif
 
 -include $(USER_PATH)/oled/rules.mk
 -include $(USER_PATH)/pointing/rules.mk
-
-CUSTOM_SPLIT_TRANSPORT_SYNC ?= yes
-ifeq ($(strip $(CUSTOM_SPLIT_TRANSPORT_SYNC)), yes)
-    ifeq ($(strip $(SPLIT_KEYBOARD)), yes)
-        QUANTUM_LIB_SRC += $(USER_PATH)/split/transport_sync.c
-        OPT_DEFS += -DCUSTOM_SPLIT_TRANSPORT_SYNC
-    endif
-
-endif
+-include $(USER_PATH)/split/rules.mk
 
 CUSTOM_BOOTMAGIC_ENABLE ?= yes
 ifeq ($(strip $(CUSTOM_BOOTMAGIC_ENABLE)), yes)

@@ -99,6 +99,7 @@ endif
 -include $(USER_PATH)/oled/rules.mk
 -include $(USER_PATH)/pointing/rules.mk
 -include $(USER_PATH)/split/rules.mk
+-include $(USER_PATH)/painter/rules.mk
 
 CUSTOM_BOOTMAGIC_ENABLE ?= yes
 ifeq ($(strip $(CUSTOM_BOOTMAGIC_ENABLE)), yes)
@@ -117,10 +118,6 @@ ifeq ($(strip $(HARDWARE_DEBUG_ENABLE)), yes)
     LTO_ENABLE := no
     OPT := 0
     OPT_DEFS += -g
-endif
-
-ifeq ($(strip $(QUANTUM_PAINTER_ENABLE)), yes)
-    include $(USER_PATH)/painter/painter.mk
 endif
 
 -include $(USER_PATH)/rtc/rtc.mk

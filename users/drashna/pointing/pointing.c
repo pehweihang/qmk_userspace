@@ -121,3 +121,30 @@ bool is_mouse_record_user(uint16_t keycode, keyrecord_t* record) {
     return false;
 }
 #endif
+
+#ifdef POINTING_MODE_MAP_ENABLE
+enum keymap_pointing_mode_ids {
+    PM_BROW = POINTING_MODE_MAP_START,  // BROWSER TAB Manipulation                      [mode id  6]
+    PM_APP,                             // Open App browsing                             [mode id  7]
+    POSTMAP_PM_SAFE_RANGE               // To avoid overlap when adding additional modes [mode id  8]
+};
+// (optional) enum to make things easier to read (index numbers can be used directly)
+// Must be in the same order as the above modes
+enum keymap_pointing_mode_maps_index {
+    _PM_BROW, // first mode map  [index  0]
+    _PM_APP   // second mode map [index  1]
+};
+
+const uint16_t PROGMEM pointing_mode_maps[POINTING_MODE_MAP_COUNT][POINTING_NUM_DIRECTIONS] = {
+    [_PM_BROW] = POINTING_MODE_LAYOUT(
+                C(S(KC_PGUP)),
+        C(S(KC_TAB)),       C(KC_TAB),
+                C(S(KC_PGDN))
+    ),
+    [_PM_APP] = POINTING_MODE_LAYOUT(
+                     KC_NO,
+        A(S(KC_TAB)),       A(KC_TAB),
+                     KC_NO
+    )
+};
+#endif

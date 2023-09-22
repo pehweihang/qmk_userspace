@@ -194,3 +194,59 @@ bool oled_task_keymap(void) {
     return false;
 }
 #endif
+
+
+void keyboard_post_init_keymap(void) {
+#ifdef RGB_MATRIX_ENABLE
+    g_led_config.flags[48] = g_led_config.flags[50] = g_led_config.flags[51] =
+        g_led_config.flags[100] = g_led_config.flags[101] = g_led_config.flags[102] = g_led_config.flags[103] = LED_FLAG_MODIFIER;
+#endif
+}
+
+#ifdef RGB_MATRIX_ENABLE
+void check_default_layer(uint8_t mode, uint8_t type, uint8_t led_min, uint8_t led_max) {
+    switch (get_highest_layer(default_layer_state)) {
+        case _QWERTY:
+            rgb_matrix_layer_helper(DEFAULT_LAYER_1_HSV, mode, rgb_matrix_config.speed, type, led_min, led_max);
+            break;
+        case _COLEMAK_DH:
+            rgb_matrix_layer_helper(DEFAULT_LAYER_2_HSV, mode, rgb_matrix_config.speed, type, led_min, led_max);
+            break;
+        case _COLEMAK:
+            rgb_matrix_layer_helper(DEFAULT_LAYER_3_HSV, mode, rgb_matrix_config.speed, type, led_min, led_max);
+            break;
+        case _DVORAK:
+            rgb_matrix_layer_helper(DEFAULT_LAYER_4_HSV, mode, rgb_matrix_config.speed, type, led_min, led_max);
+            break;
+    }
+}
+
+bool rgb_matrix_indicators_advanced_keymap(uint8_t led_min, uint8_t led_max) {
+    if (userspace_config.rgb_layer_change) {
+        switch (get_highest_layer(layer_state)) {
+            case _GAMEPAD:
+                rgb_matrix_layer_helper(HSV_ORANGE, 0, rgb_matrix_config.speed, LED_FLAG_UNDERGLOW, led_min, led_max);
+                break;
+            case _DIABLO:
+                rgb_matrix_layer_helper(HSV_RED, 0, rgb_matrix_config.speed, LED_FLAG_UNDERGLOW, led_min, led_max);
+                break;
+            case _RAISE:
+                rgb_matrix_layer_helper(HSV_YELLOW, 0, rgb_matrix_config.speed, LED_FLAG_UNDERGLOW, led_min, led_max);
+                break;
+            case _LOWER:
+                rgb_matrix_layer_helper(HSV_GREEN, 0, rgb_matrix_config.speed, LED_FLAG_UNDERGLOW, led_min, led_max);
+                break;
+            case _ADJUST:
+                rgb_matrix_layer_helper(HSV_RED, 0, rgb_matrix_config.speed, LED_FLAG_UNDERGLOW, led_min, led_max);
+                break;
+            default:
+                {
+                    check_default_layer(0, LED_FLAG_UNDERGLOW, led_min, led_max);
+                    break;
+                }
+        }
+        check_default_layer(0, LED_FLAG_MODIFIER, led_min, led_max);
+    }
+    return false;
+}
+#endif

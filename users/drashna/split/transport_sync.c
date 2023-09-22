@@ -29,6 +29,7 @@ extern bool swap_hands;
 
 extern userspace_config_t userspace_config;
 _Static_assert(sizeof(userspace_config_t) <= RPC_M2S_BUFFER_SIZE, "userspace_config_t is larger than split buffer size!");
+_Static_assert(sizeof(user_runtime_config_t) <= RPC_M2S_BUFFER_SIZE, "user_runtime_config_t is larger than split buffer size!");
 
 uint16_t transport_keymap_config    = 0;
 uint32_t transport_userspace_config = 0, transport_user_state = 0;
@@ -95,7 +96,7 @@ void keyboard_post_init_transport_sync(void) {
 #ifdef CUSTOM_OLED_DRIVER
     transaction_register_rpc(RPC_ID_USER_OLED_KEYLOG_STR, keylogger_string_sync);
 #endif
-    transaction_register_rpc(RPC_ID_USER_SUSPEND_STATE_SYNC, suspend_state_sync);
+//    transaction_register_rpc(RPC_ID_USER_SUSPEND_STATE_SYNC, suspend_state_sync);
 }
 
 void user_transport_update(void) {

@@ -13,7 +13,6 @@
 #    endif
 #endif
 #define OLED_DISABLE_TIMEOUT
-#define OLED_UPDATE_PROCESS_LIMIT 10
 #ifdef OLED_FONT_H
 #    undef OLED_FONT_H
 #endif

@@ -35,7 +35,7 @@
 #    define OLED_BRIGHTNESS_STEP 32
 #endif
 
-bool is_oled_enabled = true, is_oled_locked = false, is_oled_force_off = false;
+bool is_oled_enabled = true, is_oled_force_off = false;
 
 uint32_t oled_timer                                 = 0;
 char     oled_keylog_str[OLED_KEYLOGGER_LENGTH + 1] = {0};
@@ -132,8 +132,9 @@ bool process_record_user_oled(uint16_t keycode, keyrecord_t *record) {
             oled_set_brightness(userspace_config.oled_brightness);
             eeconfig_update_user_config(&userspace_config.raw);
         } else if (keycode == OLED_LOCK) {
-            is_oled_locked = !is_oled_locked;
-            if (is_oled_locked) {
+            userspace_config.oled_lock = !userspace_config.oled_lock;
+            eeconfig_update_user_config(&userspace_config.raw);
+            if (userspace_config.oled_lock) {
                 oled_on();
             }
         }
@@ -1020,7 +1021,7 @@ bool oled_task_user(void) {
 
 void housekeeping_task_oled(void) {
     is_oled_enabled = false;
-    if ((is_oled_locked || (last_input_activity_elapsed() < 60000)) && !(is_oled_force_off || is_device_suspended())) {
+    if ((userspace_config.oled_lock || (last_input_activity_elapsed() < 60000)) && !(is_oled_force_off || is_device_suspended())) {
         is_oled_enabled = true;
     }
     if (oled_get_brightness() != userspace_config.oled_brightness) {

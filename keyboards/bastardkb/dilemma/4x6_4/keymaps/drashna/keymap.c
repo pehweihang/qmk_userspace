@@ -250,3 +250,11 @@ bool rgb_matrix_indicators_advanced_keymap(uint8_t led_min, uint8_t led_max) {
     return false;
 }
 #endif
+
+
+uint16_t get_tapping_term_keymap(uint16_t keycode, keyrecord_t *record) {
+    if ((record->event.key.row == 4 || record->event.key.row == 9) && record->event.key.col == 3) {
+        return 400;
+    }
+    return TAPPING_TERM;
+}

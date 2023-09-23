@@ -103,7 +103,8 @@ typedef union {
         bool     matrix_scan_print    :1;
         bool     align_reserved       :1;
         uint8_t  oled_brightness      :8;
-        uint32_t reserved             :15;
+        bool     oled_lock            :1;
+        uint32_t reserved             :14;
         bool     check                :1;
     };
 } userspace_config_t;

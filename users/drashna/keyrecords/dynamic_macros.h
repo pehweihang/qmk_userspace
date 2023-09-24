@@ -1,7 +1,7 @@
 // Copyright 2016 Jack Humbert
 // Copyright 2019 Wojciech Siewierski < wojciech dot siewierski at onet dot pl >
 // Copyright 2023 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
-// SPDX-License-Identifier: GPL-2.0-or-later
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #pragma once
 

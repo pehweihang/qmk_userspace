@@ -1,5 +1,7 @@
-#include "drashna.h"
+// Copyright 2023 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
+// SPDX-License-Identifier: GPL-3.0-or-later
 
+#include "drashna.h"
 
 #define LAYOUT_rockon_bp_wrapper(...) LAYOUT_rockon_bp(__VA_ARGS__)
 #define LAYOUT_rockon_bp_base( \

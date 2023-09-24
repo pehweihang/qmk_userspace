@@ -1,6 +1,6 @@
 // Copyright 2023 HorrorTroll <https://github.com/HorrorTroll>
 // Copyright 2023 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
-// SPDX-License-Identifier: GPL-2.0-or-later
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 
 RGB_MATRIX_EFFECT(FLOWER_BLOOMING)

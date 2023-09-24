@@ -1,6 +1,6 @@
 // Copyright 2022 Jose Pablo Ramirez <jp.ramangulo@gmail.com>
 // Copyright 2023 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
-// SPDX-License-Identifier: GPL-2.0-or-later
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "rtc/pcf8523.h"
 #include "i2c_master.h"

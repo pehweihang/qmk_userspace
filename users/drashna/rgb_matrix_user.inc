@@ -1,5 +1,5 @@
 // Copyright 2023 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
-// SPDX-License-Identifier: GPL-2.0-or-later
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "rgb/anim/flower_blooming.h" // super pretty
 // #include "rgb/anim/startup_swirl_anim.h" // doesn't work correctly. Not sure why.

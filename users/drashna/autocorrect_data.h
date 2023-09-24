@@ -1,5 +1,5 @@
 // Copyright 2023 QMK
-// SPDX-License-Identifier: GPL-2.0-or-later
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 /*******************************************************************************
   88888888888 888      d8b                .d888 d8b 888               d8b

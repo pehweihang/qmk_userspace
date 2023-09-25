@@ -38,11 +38,11 @@ jobs:
         git config user.email drashna@live.com
         git rebase origin/master
 
-    - name: Create Pull Request
-      if: always() && steps.update.conclusion == 'failure'
-      run: |
-        git rebase --abort
-        gh pr create -B develop -H master --title 'Manually update develop branch after master merge' --body 'Created by Github action'
+#    - name: Create Pull Request
+#      if: always() && steps.update.conclusion == 'failure'
+#      run: |
+#        git rebase --abort
+#        gh pr create -B develop -H master --title 'Manually update develop branch after master merge' --body 'Created by Github action'
 
     - name: Push updates to develop
       if: steps.update.conclusion != 'failure'

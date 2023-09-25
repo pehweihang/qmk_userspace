@@ -235,7 +235,7 @@ void oled_driver_render_logo_right(void) {
 #endif
 
 #ifdef TAPPING_TERM_PER_KEY
-uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
+uint16_t get_tapping_term_keymap(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case ALT_T(KC_A):
             return TAPPING_TERM + 100;

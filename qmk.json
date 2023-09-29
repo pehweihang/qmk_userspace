@@ -1,4 +1,13 @@
 {
     "userspace_version": "1.0",
-    "build_targets": []
+    "build_targets": [
+        ["adafruit/macropad", "drashna"],
+        ["handwired/tractyl_manuform/5x6_right/f411", "drashna"],
+        ["moonlander", "drashna"],
+        ["bastardkb/charybdis/4x6/blackpill", "drashna"],
+        ["bastardkb/dilemma/4x6_4", "drashna"],
+        ["splitkb/kyria/rev3", "drashna"],
+        ["crkbd/rev1", "drashna"],
+        ["splitkb/zima", "drashna"]
+    ]
 }

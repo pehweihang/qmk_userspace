@@ -123,6 +123,11 @@ extern bool is_oled_enabled;
 
 
 bool oled_task_keymap(void) {
+    // No right side oled, so just exit.
+    if (!is_keyboard_left()) {
+        return false;
+    }
+
     oled_write_raw_P(header_image, sizeof(header_image));
     oled_set_cursor(4, 0);
     oled_write_P(PSTR(" Dilemma Max"), true);

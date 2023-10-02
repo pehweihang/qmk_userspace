@@ -12,6 +12,9 @@
 #ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
 #    include "painter/ili9341_display.h"
 #endif
+#ifdef ACHORDION_ENABLE
+#    include "keyrecordsachordion.h"
+#endif
 
 uint16_t copy_paste_timer;
 // Defines actions tor my global custom keycodes. Defined in drashna.h file
@@ -52,6 +55,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }
     }
 #endif
+  if (!process_achordion(keycode, record)) { return false; }
 
     // If console is enabled, it will print the matrix position and status of each key pressed
 #ifdef KEYLOGGER_ENABLE

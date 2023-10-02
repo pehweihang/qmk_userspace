@@ -61,6 +61,11 @@ ifeq ($(strip $(CUSTOM_TAP_DANCE)), yes)
     endif
 endif
 
+ACHORDION_ENABLE ?= yes
+ifeq ($(strip $(ACHORDION_ENABLE)), yes)
+    SRC += $(USER_PATH)/keyrecords/achordion.c
+    OPT_DEFS += -DACHORDION_ENABLE
+endif
 
 KEYLOGGER_ENABLE ?= no
 ifdef CONSOLE_ENABLE

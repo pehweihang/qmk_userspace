@@ -16,9 +16,6 @@ void keyboard_post_init_i2c(void);
 #ifdef RTC_ENABLE
 #    include "rtc/rtc.h"
 #endif
-#ifdef ACHORDION_ENABLE
-#    include "keyrecords/achordion.h"
-#endif
 
 static uint32_t matrix_timer           = 0;
 static uint32_t matrix_scan_count      = 0;

@@ -3,6 +3,9 @@
 
 #pragma once
 #include "drashna.h"
+#ifdef ACHORDION_ENABLE
+#    include "keyrecords/achordion.h"
+#endif
 
 enum userspace_custom_keycodes {
     VRSN = QK_USER,  // Prints QMK Firmware and board info

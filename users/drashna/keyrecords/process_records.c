@@ -12,9 +12,6 @@
 #ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
 #    include "painter/ili9341_display.h"
 #endif
-#ifdef ACHORDION_ENABLE
-#    include "keyrecordsachordion.h"
-#endif
 
 uint16_t copy_paste_timer;
 // Defines actions tor my global custom keycodes. Defined in drashna.h file

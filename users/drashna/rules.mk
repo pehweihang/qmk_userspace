@@ -61,7 +61,7 @@ ifeq ($(strip $(CUSTOM_TAP_DANCE)), yes)
     endif
 endif
 
-ACHORDION_ENABLE ?= yes
+ACHORDION_ENABLE ?= no
 ifeq ($(strip $(ACHORDION_ENABLE)), yes)
     SRC += $(USER_PATH)/keyrecords/achordion.c
     OPT_DEFS += -DACHORDION_ENABLE

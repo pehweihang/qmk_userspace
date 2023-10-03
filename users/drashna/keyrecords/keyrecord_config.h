@@ -26,8 +26,9 @@
 #    define RETRO_TAPPING_PER_KEY
 #    define HOLD_ON_OTHER_KEY_PRESS_PER_KEY
 #    define TAPPING_TERM_PER_KEY
-#else
-#    undef PERMISSIVE_HOLD
+#elif defined(ACHORDION_ENABLE)
+#    define PERMISSIVE_HOLD
+#    define QUICK_TAP_TERM_PER_KEY
 #endif
 
 #ifndef TAPPING_TOGGLE

@@ -52,7 +52,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }
     }
 #endif
+#ifdef ACHORDION_ENABLE
   if (!process_achordion(keycode, record)) { return false; }
+#endif
 
     // If console is enabled, it will print the matrix position and status of each key pressed
 #ifdef KEYLOGGER_ENABLE

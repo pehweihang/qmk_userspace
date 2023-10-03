@@ -200,6 +200,7 @@ __attribute__((weak)) bool achordion_chord(uint16_t tap_hold_keycode, keyrecord_
     // are on the same hand in Dvorak.
     switch (tap_hold_keycode) {
         case QK_LAYER_TAP ... QK_LAYER_TAP_MAX:
+        case QK_LAYER_TAP_TOGGLE ... QK_LAYER_TAP_TOGGLE_MAX:
             return true;
     }
 

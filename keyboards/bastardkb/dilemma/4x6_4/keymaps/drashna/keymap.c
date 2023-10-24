@@ -149,28 +149,26 @@ bool oled_task_keymap(void) {
     render_keylock_status(host_keyboard_led_state(), 1, 11);
     render_unicode_mode(1, 12);
 
-//    render_rgb_hsv(1, 13);
     oled_set_cursor(1, 13);
     oled_write_P(PSTR("OS: "), false);
     os_variant_t os_type = detected_host_os();
-        switch (os_type) {
-            case OS_LINUX:
-                oled_write_ln_P(PSTR("Linux"), false);
-                break;
-            case OS_WINDOWS:
-                oled_write_ln_P(PSTR("Windows"), false);
-                break;
-            case OS_MACOS:
-                oled_write_ln_P(PSTR("MacOS"), false);
-                break;
-            case OS_IOS:
-                oled_write_ln_P(PSTR("iOS"), false);
-                break;
-            default:
-                break;
-        }
-
-    render_keylogger_status(1, 14);
+    switch (os_type) {
+        case OS_LINUX:
+            oled_write_ln_P(PSTR("Linux"), false);
+            break;
+        case OS_WINDOWS:
+            oled_write_ln_P(PSTR("Windows"), false);
+            break;
+        case OS_MACOS:
+            oled_write_ln_P(PSTR("MacOS"), false);
+            break;
+        case OS_IOS:
+            oled_write_ln_P(PSTR("iOS"), false);
+            break;
+        default:
+            break;
+    }
+    render_rgb_mode(1, 14);
 
     for (uint8_t i = 1; i < 15; i++) {
         oled_set_cursor(0, i);
@@ -180,7 +178,9 @@ bool oled_task_keymap(void) {
     }
 
     oled_set_cursor(0, 15);
-    oled_write_raw_P(footer_image, sizeof(footer_image));
+    oled_write_raw_P(footer_image2, sizeof(footer_image2));
+    oled_set_cursor(4, 15);
+    oled_write(oled_keylog_str, true);
 
     return false;
 }

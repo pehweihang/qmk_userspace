@@ -938,6 +938,12 @@ __attribute__((weak)) oled_rotation_t oled_init_keymap(oled_rotation_t rotation)
 }
 
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
+    static bool has_run = false;
+
+    if (has_run) {
+        return oled_init_keymap(rotation);
+    }
+
     if (is_keyboard_master()) {
         memset(oled_keylog_str, ' ', OLED_KEYLOGGER_LENGTH);
         oled_keylog_str[OLED_KEYLOGGER_LENGTH] = '\0';
@@ -947,6 +953,7 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
 
     oled_clear();
     oled_render();
+    has_run = true;
     return oled_init_keymap(rotation);
 }
 

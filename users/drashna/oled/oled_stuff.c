@@ -37,8 +37,9 @@
 
 bool is_oled_enabled = true, is_oled_force_off = false;
 
-uint32_t oled_timer                                 = 0;
-char     oled_keylog_str[OLED_KEYLOGGER_LENGTH + 1] = {0};
+uint32_t               oled_timer                                 = 0;
+char                   oled_keylog_str[OLED_KEYLOGGER_LENGTH + 1] = {0};
+static oled_rotation_t oled_rotation;
 
 deferred_token kittoken;
 
@@ -123,20 +124,58 @@ void add_keylog(uint16_t keycode, keyrecord_t *record) {
 bool process_record_user_oled(uint16_t keycode, keyrecord_t *record) {
     if (record->event.pressed) {
         add_keylog(keycode, record);
-        if (keycode == OLED_BRIGHTNESS_INC) {
-            userspace_config.oled_brightness = qadd8(userspace_config.oled_brightness, OLED_BRIGHTNESS_STEP);
-            oled_set_brightness(userspace_config.oled_brightness);
-            eeconfig_update_user_config(&userspace_config.raw);
-        } else if (keycode == OLED_BRIGHTNESS_DEC) {
-            userspace_config.oled_brightness = qsub8(userspace_config.oled_brightness, OLED_BRIGHTNESS_STEP);
-            oled_set_brightness(userspace_config.oled_brightness);
-            eeconfig_update_user_config(&userspace_config.raw);
-        } else if (keycode == OLED_LOCK) {
-            userspace_config.oled_lock = !userspace_config.oled_lock;
-            eeconfig_update_user_config(&userspace_config.raw);
-            if (userspace_config.oled_lock) {
-                oled_on();
-            }
+        switch (keycode) {
+            case OLED_BRIGHTNESS_INC:
+                userspace_config.oled_brightness = qadd8(userspace_config.oled_brightness, OLED_BRIGHTNESS_STEP);
+                oled_set_brightness(userspace_config.oled_brightness);
+                eeconfig_update_user_config(&userspace_config.raw);
+                break;
+            case OLED_BRIGHTNESS_DEC:
+                userspace_config.oled_brightness = qsub8(userspace_config.oled_brightness, OLED_BRIGHTNESS_STEP);
+                oled_set_brightness(userspace_config.oled_brightness);
+                eeconfig_update_user_config(&userspace_config.raw);
+                break;
+            case OLED_LOCK:
+                userspace_config.oled_lock = !userspace_config.oled_lock;
+                eeconfig_update_user_config(&userspace_config.raw);
+                if (userspace_config.oled_lock) {
+                    oled_on();
+                }
+                break;
+            case OLED_ROTATE_CW:
+                switch (oled_rotation) {
+                    case OLED_ROTATION_0:
+                        oled_rotation = OLED_ROTATION_90;
+                        break;
+                    case OLED_ROTATION_90:
+                        oled_rotation = OLED_ROTATION_180;
+                        break;
+                    case OLED_ROTATION_180:
+                        oled_rotation = OLED_ROTATION_270;
+                        break;
+                    default:
+                        oled_rotation = OLED_ROTATION_0;
+                        break;
+                }
+                oled_init(oled_rotation);
+                break;
+            case OLED_ROTATE_CCW:
+                switch (oled_rotation) {
+                    case OLED_ROTATION_0:
+                        oled_rotation = OLED_ROTATION_270;
+                        break;
+                    case OLED_ROTATION_90:
+                        oled_rotation = OLED_ROTATION_0;
+                        break;
+                    case OLED_ROTATION_180:
+                        oled_rotation = OLED_ROTATION_90;
+                        break;
+                    default:
+                        oled_rotation = OLED_ROTATION_180;
+                        break;
+                }
+                oled_init(oled_rotation);
+                break;
         }
     }
     return true;
@@ -396,7 +435,7 @@ void render_user_status(uint8_t col, uint8_t line) {
     l_is_clicky_on = user_state.audio_clicky_enable;
 #        endif
 #    else
-    is_audio_on    = is_audio_on();
+    is_audio_on = is_audio_on();
 #        ifdef AUDIO_CLICKY
     l_is_clicky_on = is_clicky_on();
 #        endif
@@ -582,7 +621,7 @@ void render_wpm_graph(uint8_t start_offset, uint8_t cutoff, uint8_t max_lines_gr
         uint8_t y_start  = ceil(vertical_offset / 8);
         uint8_t y_length = y_start + ceil(max_lines_graph / 8);
         oled_pan_section(false, y_start, y_length, start_offset, cutoff); // then move the entire graph one pixel to the right
-        timer = timer_read();                               // refresh the timer for the next iteration
+        timer = timer_read();                                             // refresh the timer for the next iteration
     }
 #endif
 }
@@ -603,16 +642,16 @@ void render_pointing_dpi_status(uint16_t cpi, uint8_t padding, uint8_t col, uint
 
 // WPM-responsive animation stuff here
 #ifndef OLED_SLEEP_SPEED
-#define OLED_SLEEP_SPEED 10
+#    define OLED_SLEEP_SPEED 10
 #endif
 #ifndef OLED_KAKI_SPEED
-#define OLED_KAKI_SPEED 40
+#    define OLED_KAKI_SPEED 40
 #endif
 #ifndef OLED_MATI_SPEED
-#define OLED_MATI_SPEED 60
+#    define OLED_MATI_SPEED 60
 #endif
 #ifndef OLED_PET_ARRAY
-#define OLED_PET_ARRAY tora_the_cat_animation
+#    define OLED_PET_ARRAY tora_the_cat_animation
 #endif
 
 // #define ANIM_FRAME_DURATION 500 // how long each frame lasts in ms
@@ -859,16 +898,16 @@ void oled_render_time(uint8_t col, uint8_t line) {
 #ifdef RTC_ENABLE
     oled_set_cursor(col, line);
     if (rtc_is_connected()) {
-#ifdef DS3231_RTC_DRIVER_ENABLE
+#    ifdef DS3231_RTC_DRIVER_ENABLE
         oled_write_P(PSTR("RTC Temp: "), false);
         oled_write(ds3231_read_temp_imperial_str(), false);
         oled_write_char(0xF8, false);
         oled_write_P(PSTR("F\n "), false);
-#else
+#    else
         oled_write_ln_P(PSTR("RTC Temp: N/A"), false);
-#endif
-    oled_set_cursor(col, line+1);
-    oled_write(rtc_read_date_time_str(), false);
+#    endif
+        oled_set_cursor(col, line + 1);
+        oled_write(rtc_read_date_time_str(), false);
     } else {
         oled_write_ln_P(PSTR("RTC not found"), false);
         oled_advance_page(true);
@@ -933,15 +972,16 @@ __attribute__((weak)) void render_oled_title(bool side) {
     // oled_write_P(PSTR(    "1234567890123"         "1234567890123"), true);
 }
 
-__attribute__((weak)) oled_rotation_t oled_init_keymap(oled_rotation_t rotation) {
+__attribute__((weak)) oled_rotation_t oled_init_keymap(oled_rotation_t rotation, bool has_run) {
     return rotation;
 }
 
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     static bool has_run = false;
+    oled_rotation       = oled_init_keymap(rotation, has_run);
 
     if (has_run) {
-        return oled_init_keymap(rotation);
+        return oled_rotation;
     }
 
     if (is_keyboard_master()) {
@@ -954,7 +994,7 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     oled_clear();
     oled_render();
     has_run = true;
-    return oled_init_keymap(rotation);
+    return oled_rotation;
 }
 
 __attribute__((weak)) bool oled_task_keymap(void) {
@@ -1038,13 +1078,13 @@ void housekeeping_task_oled(void) {
 
 void oled_shutdown(bool jump_to_bootloader) {
     oled_clear();
-#    if defined(OLED_DISPLAY_128X128)
+#if defined(OLED_DISPLAY_128X128)
     oled_set_cursor(0, 4);
     oled_write_raw_P(qmk_large_logo, sizeof(qmk_large_logo));
     oled_set_cursor(0, 15);
-#   else
+#else
     oled_set_cursor(0, 0);
-#   endif
+#endif
     if (jump_to_bootloader) {
         oled_write_P(PSTR("Jumping to bootloader"), false);
     } else {

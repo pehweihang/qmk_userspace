@@ -51,6 +51,21 @@ void bootmagic_lite(void) {
 #endif
 
     if (perform_reset) {
+#ifdef RGBLIGHT_ENABLE
+        rgblight_init();
+#endif
+#ifdef RGB_MATRIX_ENABLE
+        rgb_matrix_init();
+#endif
+#ifdef LED_MATRIX_ENABLE
+    led_matrix_init();
+#endif
+#ifdef BACKLIGHT_ENABLE
+    backlight_init_ports();
+#endif
+#ifdef OLED_ENABLE
+        oled_init(OLED_ROTATION_O);
+#endif
         reset_keyboard();
     }
 }

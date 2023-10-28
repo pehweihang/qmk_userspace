@@ -132,16 +132,16 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
     [_DIABLO]          = { ENCODER_CCW_CW( _______, _______ ), ENCODER_CCW_CW( _______, _______ ) },
     [_MOUSE]           = { ENCODER_CCW_CW( _______, _______ ), ENCODER_CCW_CW( _______, _______ ) },
     [_MEDIA]           = { ENCODER_CCW_CW( _______, _______ ), ENCODER_CCW_CW( _______, _______ ) },
-    [_RAISE]           = { ENCODER_CCW_CW( OL_BINC, OL_BDEC ), ENCODER_CCW_CW( KC_PGDN, KC_PGUP ) },
+    [_RAISE]           = { ENCODER_CCW_CW( OL_BINC, OL_BDEC ), ENCODER_CCW_CW( OL_CCW,  OL_CW   ) },
     [_LOWER]           = { ENCODER_CCW_CW( RGB_MOD, RGB_RMOD), ENCODER_CCW_CW( RGB_HUI, RGB_HUD ) },
-    [_ADJUST]          = { ENCODER_CCW_CW( CK_UP,   CK_DOWN ), ENCODER_CCW_CW( _______, _______ ) },
+    [_ADJUST]          = { ENCODER_CCW_CW( CK_UP,   CK_DOWN ), ENCODER_CCW_CW( KC_PGDN, KC_PGUP ) },
 };
 // clang-format on
 #endif
 
 #ifdef OLED_ENABLE
-oled_rotation_t oled_init_keymap(oled_rotation_t rotation) {
-    return OLED_ROTATION_180;
+oled_rotation_t oled_init_keymap(oled_rotation_t rotation, bool has_run) {
+    return has_run ? rotation : OLED_ROTATION_180;
 }
 
 void render_oled_title(bool side) {

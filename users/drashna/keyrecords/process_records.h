@@ -36,9 +36,12 @@ enum userspace_custom_keycodes {
     KC_SUPER,
     KC_COMIC,
     KC_ACCEL,
+
     OLED_LOCK,
     OLED_BRIGHTNESS_INC,
     OLED_BRIGHTNESS_DEC,
+    OLED_ROTATE_CW,
+    OLED_ROTATE_CCW,
 
     STORE_SETUPS,
     PRINT_SETUPS,
@@ -152,6 +155,8 @@ We use custom codes here, so we can substitute the right stuff
 #define OL_LOCK OLED_LOCK
 #define OL_BINC OLED_BRIGHTNESS_INC
 #define OL_BDEC OLED_BRIGHTNESS_DEC
+#define OL_CW   OLED_ROTATE_CW
+#define OL_CCW  OLED_ROTATE_CCW
 
 #define US_MSRP US_MATRIX_SCAN_RATE_PRINT
 #define PD_JIGG PD_JIGGLER

@@ -25,7 +25,7 @@ extern deferred_token kittoken;
 
 void            oled_driver_render_logo(void);
 bool            process_record_user_oled(uint16_t keycode, keyrecord_t *record);
-oled_rotation_t oled_init_keymap(oled_rotation_t rotation);
+oled_rotation_t oled_init_keymap(oled_rotation_t rotation, bool has_run);
 void            oled_timer_reset(void);
 void            render_keylogger_status(uint8_t col, uint8_t line);
 void            render_default_layer_state(uint8_t col, uint8_t line);

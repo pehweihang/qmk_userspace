@@ -64,7 +64,7 @@ void bootmagic_lite(void) {
     backlight_init_ports();
 #endif
 #ifdef OLED_ENABLE
-        oled_init(OLED_ROTATION_O);
+        oled_init(OLED_ROTATION_0);
 #endif
         reset_keyboard();
     }

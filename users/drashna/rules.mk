@@ -39,40 +39,8 @@ ifeq ($(strip $(PROTOCOL)), VUSB)
     NKRO_ENABLE       := no
 endif
 
-ifeq ($(strip $(PER_KEY_TAPPING)), yes)
-    OPT_DEFS += -DPER_KEY_TAPPING
-endif
 
-UNICODE_ENABLE        := no
-UNICODEMAP_ENABLE     := no
-UCIS_ENABLE           := no
-ifeq ($(strip $(CUSTOM_UNICODE_ENABLE)), yes)
-    UNICODE_COMMON        := yes
-    OPT_DEFS += -DCUSTOM_UNICODE_ENABLE
-    SRC += $(USER_PATH)/keyrecords/unicode.c
-else
-    UNICODE_COMMON        := no
-endif
 
-CUSTOM_TAP_DANCE ?= yes
-ifeq ($(strip $(CUSTOM_TAP_DANCE)), yes)
-    ifeq ($(strip $(TAP_DANCE_ENABLE)), yes)
-        SRC += $(USER_PATH)/keyrecords/tap_dances.c
-    endif
-endif
-
-ACHORDION_ENABLE ?= no
-ifeq ($(strip $(ACHORDION_ENABLE)), yes)
-    SRC += $(USER_PATH)/keyrecords/achordion.c
-    OPT_DEFS += -DACHORDION_ENABLE
-endif
-
-KEYLOGGER_ENABLE ?= no
-ifdef CONSOLE_ENABLE
-    ifeq ($(strip $(KEYLOGGER_ENABLE)), yes)
-        OPT_DEFS += -DKEYLOGGER_ENABLE
-    endif
-endif
 
 ifeq ($(strip $(I2C_SCANNER_ENABLE)), yes)
     OPT_DEFS += -DI2C_SCANNER_ENABLE
@@ -87,11 +55,6 @@ ifeq ($(strip $(CUSTOM_BOOTMAGIC_ENABLE)), yes)
     endif
 endif
 
-CUSTOM_DYNAMIC_MACROS_ENABLE ?= no
-ifeq ($(strip $(CUSTOM_DYNAMIC_MACROS_ENABLE)), yes)
-    SRC += $(USER_PATH)/keyrecords/dynamic_macros.c
-    OPT_DEFS += -DCUSTOM_DYNAMIC_MACROS_ENABLE
-endif
 
 ifeq ($(strip $(HARDWARE_DEBUG_ENABLE)), yes)
     LTO_ENABLE := no
@@ -105,6 +68,6 @@ include $(USER_PATH)/split/rules.mk
 include $(USER_PATH)/painter/rules.mk
 include $(USER_PATH)/rgb/rules.mk
 include $(USER_PATH)/rtc/rtc.mk
-
+include $(USER_PATH)/keyrecords/rules.mk
 # Ignore if not found
 -include $(KEYMAP_PATH)/post_rules.mk

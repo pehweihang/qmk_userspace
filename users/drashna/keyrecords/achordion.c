@@ -22,12 +22,6 @@
 
 #include "achordion.h"
 
-#if !defined(IS_QK_MOD_TAP)
-// Attempt to detect out-of-date QMK installation, which would fail with
-// implicit-function-declaration errors in the code below.
-#    error "achordion: QMK version is too old to build. Please update QMK."
-#else
-
 // Copy of the `record` and `keycode` args for the current active tap-hold key.
 static keyrecord_t tap_hold_record;
 static uint16_t    tap_hold_keycode = KC_NO;
@@ -79,11 +73,11 @@ bool process_achordion(uint16_t keycode, keyrecord_t* record) {
     const bool is_mt       = IS_QK_MOD_TAP(keycode);
     const bool is_tap_hold = is_mt || IS_QK_LAYER_TAP(keycode);
     // Check that this is a normal key event, don't act on combos.
-#    ifdef IS_KEYEVENT
+#ifdef IS_KEYEVENT
     const bool is_key_event = IS_KEYEVENT(record->event);
-#    else
+#else
     const bool is_key_event = (record->event.key.row < 254 && record->event.key.col < 254);
-#    endif
+#endif
 
     if (achordion_state == STATE_RELEASED) {
         if (is_tap_hold && record->tap.count == 0 && record->event.pressed && is_key_event) {
@@ -156,9 +150,9 @@ bool process_achordion(uint16_t keycode, keyrecord_t* record) {
             recursively_process_record(&tap_hold_record, STATE_TAPPING);
 
             send_keyboard_report();
-#    if TAP_CODE_DELAY > 0
+#if TAP_CODE_DELAY > 0
             wait_ms(TAP_CODE_DELAY);
-#    endif // TAP_CODE_DELAY > 0
+#endif // TAP_CODE_DELAY > 0
 
             dprintln("Achordion: Plumbing tap release.");
             tap_hold_record.event.pressed = false;
@@ -182,11 +176,11 @@ void achordion_task(void) {
 
 // Returns true if `pos` on the left hand of the keyboard, false if right.
 static bool on_left_hand(keypos_t pos) {
-#    ifdef SPLIT_KEYBOARD
+#ifdef SPLIT_KEYBOARD
     return pos.row < MATRIX_ROWS / 2;
-#    else
+#else
     return (MATRIX_COLS > MATRIX_ROWS) ? pos.col < MATRIX_COLS / 2 : pos.row < MATRIX_ROWS / 2;
-#    endif
+#endif
 }
 
 bool achordion_opposite_hands(const keyrecord_t* tap_hold_record, const keyrecord_t* other_record) {
@@ -223,5 +217,3 @@ __attribute__((weak)) uint16_t achordion_timeout(uint16_t tap_hold_keycode) {
 __attribute__((weak)) bool achordion_eager_mod(uint8_t mod) {
     return (mod & (MOD_LALT | MOD_LGUI)) == 0;
 }
-
-#endif // version check

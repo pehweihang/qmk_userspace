@@ -12,6 +12,12 @@
 #ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
 #    include "painter/ili9341_display.h"
 #endif
+#ifdef SELECT_WORD_ENABLE
+#    include "keyrecords/select_word.h"
+#endif
+#ifdef SENTENCE_CASE_ENABLE
+#    include "keyrecords/sentence_case.h"
+#endif
 
 uint16_t copy_paste_timer;
 // Defines actions tor my global custom keycodes. Defined in drashna.h file

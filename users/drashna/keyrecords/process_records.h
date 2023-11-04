@@ -6,6 +6,9 @@
 #ifdef ACHORDION_ENABLE
 #    include "keyrecords/achordion.h"
 #endif
+#ifdef CUSTOM_SHIFT_KEYS_ENABLE
+#    include "keyrecords/custom_shift_keys.h"
+#endif
 
 enum userspace_custom_keycodes {
     VRSN = QK_USER,  // Prints QMK Firmware and board info
@@ -155,8 +158,8 @@ We use custom codes here, so we can substitute the right stuff
 #define OL_LOCK OLED_LOCK
 #define OL_BINC OLED_BRIGHTNESS_INC
 #define OL_BDEC OLED_BRIGHTNESS_DEC
-#define OL_CW   OLED_ROTATE_CW
-#define OL_CCW  OLED_ROTATE_CCW
+#define OL_CW OLED_ROTATE_CW
+#define OL_CCW OLED_ROTATE_CCW
 
 #define US_MSRP US_MATRIX_SCAN_RATE_PRINT
 #define PD_JIGG PD_JIGGLER

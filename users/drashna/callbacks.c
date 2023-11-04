@@ -7,7 +7,7 @@
 #endif
 
 #ifdef CUSTOM_DYNAMIC_MACROS_ENABLE
-#    include "keyrecords/dynamic_macros.h"
+#    include "keyrecords/custom_dynamic_macros.h"
 #endif
 #ifdef I2C_SCANNER_ENABLE
 void housekeeping_task_i2c_scanner(void);
@@ -15,6 +15,9 @@ void keyboard_post_init_i2c(void);
 #endif
 #ifdef RTC_ENABLE
 #    include "rtc/rtc.h"
+#endif
+#ifdef CUSTOM_UNICODE_ENABLE
+void keyboard_post_init_unicode(void);
 #endif
 
 static uint32_t matrix_timer           = 0;
@@ -92,26 +95,26 @@ void rgb_matrix_update_pwm_buffers(void);
 __attribute__((weak)) bool shutdown_keymap(bool jump_to_bootloader) {
     return true;
 }
-void shutdown_user(void) {
-    if (!shutdown_keymap(jump_to_bootloader)) {
-        return;
-    }
-#ifdef RGBLIGHT_ENABLE
-    rgblight_enable_noeeprom();
-    rgblight_mode_noeeprom(1);
-    rgblight_setrgb(rgblight_get_val(), 0x00, 0x00);
-#endif // RGBLIGHT_ENABLE
-#ifdef RGB_MATRIX_ENABLE
-    rgb_matrix_set_color_all(rgb_matrix_get_val(), 0x00, 0x00);
-    rgb_matrix_update_pwm_buffers();
-#endif // RGB_MATRIX_ENABLE
-#if defined(OLED_ENABLE) && defined(CUSTOM_OLED_DRIVER)
-    oled_shutdown(jump_to_bootloader);
-#endif
-#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
-    shutdown_quantum_painter();
-#endif
-}
+// void shutdown_user(void) {
+//     if (!shutdown_keymap(jump_to_bootloader)) {
+//         return;
+//     }
+// #ifdef RGBLIGHT_ENABLE
+//     rgblight_enable_noeeprom();
+//     rgblight_mode_noeeprom(1);
+//     rgblight_setrgb(rgblight_get_val(), 0x00, 0x00);
+// #endif // RGBLIGHT_ENABLE
+// #ifdef RGB_MATRIX_ENABLE
+//     rgb_matrix_set_color_all(rgb_matrix_get_val(), 0x00, 0x00);
+//     rgb_matrix_update_pwm_buffers();
+// #endif // RGB_MATRIX_ENABLE
+// #if defined(OLED_ENABLE) && defined(CUSTOM_OLED_DRIVER)
+//     oled_shutdown(jump_to_bootloader);
+// #endif
+// #ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+//     shutdown_quantum_painter();
+// #endif
+// }
 
 __attribute__((weak)) void suspend_power_down_keymap(void) {}
 
@@ -271,11 +274,11 @@ void                       eeconfig_init_user(void) {
 #endif
 
     // ensure that nkro is enabled
-    keymap_config.raw = eeconfig_read_keymap();
+    keymap_config.raw  = eeconfig_read_keymap();
     keymap_config.nkro = true;
     eeconfig_update_keymap(keymap_config.raw);
     // ensure that default layer is properly set
-    default_layer_state = (layer_state_t)1<<_QWERTY;
+    default_layer_state = (layer_state_t)1 << _QWERTY;
     eeconfig_update_default_layer(default_layer_state);
 
     eeconfig_update_user_config(&userspace_config.raw);
@@ -327,9 +330,9 @@ void                       matrix_slave_scan_user(void) {
 
 __attribute__((weak)) void housekeeping_task_keymap(void) {}
 void                       housekeeping_task_user(void) {
-#ifdef TAP_DANCE_ENABLE // Run Diablo 3 macro checking code.
+#if defined(CUSTOM_TAP_DANCE_ENABLE) // Run Diablo 3 macro checking code.
     run_diablo_macro_check();
-#endif // TAP_DANCE_ENABLE
+#endif // CUSTOM_TAP_DANCE_ENABLE
 #if defined(CUSTOM_RGB_MATRIX)
     housekeeping_task_rgb_matrix();
 #endif
@@ -347,6 +350,12 @@ void                       housekeeping_task_user(void) {
 #endif
 #ifdef RTC_ENABLE
     rtc_task();
+#endif
+#ifdef SENTENCE_CASE_ENABLE
+    sentence_case_task();
+#endif
+#ifdef SELECT_WORD_ENABLE
+    select_word_task();
 #endif
 #ifdef ACHORDION_ENABLE
     achordion_task();

@@ -3,7 +3,7 @@
 // Copyright 2023 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "keyrecords/dynamic_macros.h"
+#include "keyrecords/custom_dynamic_macros.h"
 #include "keyrecords/process_records.h"
 #include "wait.h"
 #include "debug.h"

@@ -22,6 +22,10 @@
 
 #include "custom_shift_keys.h"
 
+__attribute__((weak)) const custom_shift_key_t custom_shift_keys[] = {};
+
+const uint8_t NUM_CUSTOM_SHIFT_KEYS = sizeof(custom_shift_keys) / sizeof(custom_shift_key_t);
+
 bool process_custom_shift_keys(uint16_t keycode, keyrecord_t *record) {
     static uint16_t registered_keycode = KC_NO;
 

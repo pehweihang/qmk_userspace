@@ -7,16 +7,10 @@
 #    include "os_detection.h"
 #endif
 #ifdef CUSTOM_DYNAMIC_MACROS_ENABLE
-#    include "keyrecords/dynamic_macros.h"
+#    include "keyrecords/custom_dynamic_macros.h"
 #endif
 #ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
 #    include "painter/ili9341_display.h"
-#endif
-#ifdef SELECT_WORD_ENABLE
-#    include "keyrecords/select_word.h"
-#endif
-#ifdef SENTENCE_CASE_ENABLE
-#    include "keyrecords/sentence_case.h"
 #endif
 
 uint16_t copy_paste_timer;
@@ -89,6 +83,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #ifdef CUSTOM_DYNAMIC_MACROS_ENABLE
           && process_record_dynamic_macro(keycode, record)
 #endif
+#ifdef CUSTOM_SHIFT_KEYS_ENABLE
+          && process_custom_shift_keys(keycode, record)
+#endif
+#ifdef SELECT_WORD_ENABLE
+          && process_select_word(keycode, record, US_SELECT_WORD)
+#endif
+#ifdef SENTENCE_CASE_ENABLE
+          && process_sentence_case(keycode, record)
+#endif
           && true)) {
         return false;
     }
@@ -105,13 +108,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             break;
 
         case KC_DIABLO_CLEAR: // reset all Diablo timers, disabling them
-#ifdef TAP_DANCE_ENABLE
+#ifdef CUSTOM_TAP_DANCE_ENABLE
             if (record->event.pressed) {
                 for (uint8_t index = 0; index < 4; index++) {
                     diablo_timer[index].key_interval = 0;
                 }
             }
-#endif // TAP_DANCE_ENABLE
+#endif // CUSTOM_TAP_DANCE_ENABLE
             break;
 
         case KC_CCCV: // One key copy/paste

@@ -95,26 +95,26 @@ void rgb_matrix_update_pwm_buffers(void);
 __attribute__((weak)) bool shutdown_keymap(bool jump_to_bootloader) {
     return true;
 }
-// void shutdown_user(void) {
-//     if (!shutdown_keymap(jump_to_bootloader)) {
-//         return;
-//     }
-// #ifdef RGBLIGHT_ENABLE
-//     rgblight_enable_noeeprom();
-//     rgblight_mode_noeeprom(1);
-//     rgblight_setrgb(rgblight_get_val(), 0x00, 0x00);
-// #endif // RGBLIGHT_ENABLE
-// #ifdef RGB_MATRIX_ENABLE
-//     rgb_matrix_set_color_all(rgb_matrix_get_val(), 0x00, 0x00);
-//     rgb_matrix_update_pwm_buffers();
-// #endif // RGB_MATRIX_ENABLE
-// #if defined(OLED_ENABLE) && defined(CUSTOM_OLED_DRIVER)
-//     oled_shutdown(jump_to_bootloader);
-// #endif
-// #ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
-//     shutdown_quantum_painter();
-// #endif
-// }
+void shutdown_user(void) {
+    if (!shutdown_keymap(jump_to_bootloader)) {
+        return;
+    }
+#ifdef RGBLIGHT_ENABLE
+    rgblight_enable_noeeprom();
+    rgblight_mode_noeeprom(1);
+    rgblight_setrgb(rgblight_get_val(), 0x00, 0x00);
+#endif // RGBLIGHT_ENABLE
+#ifdef RGB_MATRIX_ENABLE
+    rgb_matrix_set_color_all(rgb_matrix_get_val(), 0x00, 0x00);
+    rgb_matrix_update_pwm_buffers();
+#endif // RGB_MATRIX_ENABLE
+#if defined(OLED_ENABLE) && defined(CUSTOM_OLED_DRIVER)
+    oled_shutdown(jump_to_bootloader);
+#endif
+#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+    shutdown_quantum_painter();
+#endif
+}
 
 __attribute__((weak)) void suspend_power_down_keymap(void) {}
 

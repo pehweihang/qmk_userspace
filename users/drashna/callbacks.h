@@ -18,9 +18,6 @@ void          led_set_keymap(uint8_t usb_led);
 void          eeconfig_init_keymap(void);
 void          housekeeping_task_keymap(void);
 
-#ifdef CUSTOM_UNICODE_ENABLE
-void keyboard_post_init_unicode(void);
-#endif
 #ifdef SPLIT_KEYBOARD
 void matrix_slave_scan_keymap(void);
 #endif

@@ -75,8 +75,6 @@ typedef struct {
 
 /** Table of custom shift keys. */
 extern const custom_shift_key_t custom_shift_keys[];
-/** Number of entries in the `custom_shift_keys` table. */
-extern uint8_t NUM_CUSTOM_SHIFT_KEYS;
 
 /**
  * Handler function for custom shift keys.

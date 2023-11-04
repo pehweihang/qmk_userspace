@@ -6,9 +6,24 @@
 #ifdef ACHORDION_ENABLE
 #    include "keyrecords/achordion.h"
 #endif
+#ifdef CUSTOM_TAP_DANCE_ENABLE
+#    include "keyrecords/custom_tap_dance.h"
+#endif // CUSTOM_TAP_DANCE_ENABLE
 #ifdef CUSTOM_SHIFT_KEYS_ENABLE
 #    include "keyrecords/custom_shift_keys.h"
 #endif
+#ifdef SELECT_WORD_ENABLE
+#    include "keyrecords/select_word.h"
+#endif
+#ifdef SENTENCE_CASE_ENABLE
+#    include "keyrecords/sentence_case.h"
+#endif
+#ifdef UNICODE_COMMON_ENABLE
+#    include "keyrecords/unicode.h"
+#endif
+
+
+
 
 enum userspace_custom_keycodes {
     VRSN = QK_USER,  // Prints QMK Firmware and board info
@@ -70,6 +85,9 @@ enum userspace_custom_keycodes {
     DYN_MACRO_KEY15,
 
     US_MATRIX_SCAN_RATE_PRINT,
+
+    US_SELECT_WORD,
+
     USER_SAFE_RANGE,
 };
 
@@ -143,17 +161,17 @@ Custom Keycodes for Diablo 3 layer
 But since TD() doesn't work when tap dance is disabled
 We use custom codes here, so we can substitute the right stuff
 */
-#ifdef TAP_DANCE_ENABLE
+#ifdef CUSTOM_TAP_DANCE_ENABLE
 #    define KC_D3_1 TD(TD_D3_1)
 #    define KC_D3_2 TD(TD_D3_2)
 #    define KC_D3_3 TD(TD_D3_3)
 #    define KC_D3_4 TD(TD_D3_4)
-#else // TAP_DANCE_ENABLE
+#else // CUSTOM_TAP_DANCE_ENABLE
 #    define KC_D3_1 KC_1
 #    define KC_D3_2 KC_2
 #    define KC_D3_3 KC_3
 #    define KC_D3_4 KC_4
-#endif // TAP_DANCE_ENABLE
+#endif // CUSTOM_TAP_DANCE_ENABLE
 
 #define OL_LOCK OLED_LOCK
 #define OL_BINC OLED_BRIGHTNESS_INC
@@ -162,4 +180,5 @@ We use custom codes here, so we can substitute the right stuff
 #define OL_CCW OLED_ROTATE_CCW
 
 #define US_MSRP US_MATRIX_SCAN_RATE_PRINT
+#define US_SELW US_SELECT_WORD
 #define PD_JIGG PD_JIGGLER

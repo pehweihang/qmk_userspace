@@ -1,7 +1,7 @@
 // Copyright 2020 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "tap_dances.h"
+#include "custom_tap_dance.h"
 
 #define NUM_OF_DIABLO_KEYS 4
 // define diablo macro timer variables

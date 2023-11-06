@@ -22,7 +22,8 @@ static uint8_t recording_state = STATE_NOT_RECORDING;
 #endif
 
 dynamic_macro_t dynamic_macros[DYNAMIC_MACRO_COUNT];
-_Static_assert((sizeof(dynamic_macros)) <= (EECONFIG_USER_DATA_SIZE - 4), "User Data Size must be large enough to host all macros");
+_Static_assert((sizeof(dynamic_macros)) <= (EECONFIG_USER_DATA_SIZE - 4),
+               "User Data Size must be large enough to host all macros");
 
 __attribute__((weak)) void dynamic_macro_record_start_user(void) {}
 

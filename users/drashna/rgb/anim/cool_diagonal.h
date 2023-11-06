@@ -2,7 +2,6 @@
 // Copyright 2023 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-
 RGB_MATRIX_EFFECT(COOL_DIAGONAL)
 
 #ifdef RGB_MATRIX_CUSTOM_EFFECT_IMPLS

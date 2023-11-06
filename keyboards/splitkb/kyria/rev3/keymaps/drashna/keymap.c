@@ -1,7 +1,6 @@
 // Copyright 2023 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-
 #include "drashna.h"
 
 /*
@@ -125,12 +124,14 @@ oled_rotation_t oled_init_keymap(oled_rotation_t rotation, bool has_run) {
 #endif
 
 #if defined(RGBLIGHT_ENABLE) && defined(RGBLIGHT_LAYERS)
-const rgblight_segment_t PROGMEM shift_layers[]   = RGBLIGHT_LAYER_SEGMENTS({8, 1, 120, 255, 255}, {18, 1, 120, 255, 255});
+const rgblight_segment_t PROGMEM shift_layers[] =
+    RGBLIGHT_LAYER_SEGMENTS({8, 1, 120, 255, 255}, {18, 1, 120, 255, 255});
 const rgblight_segment_t PROGMEM control_layers[] = RGBLIGHT_LAYER_SEGMENTS({6, 1, 0, 255, 255}, {16, 1, 0, 255, 255});
-const rgblight_segment_t PROGMEM alt_layers[]     = RGBLIGHT_LAYER_SEGMENTS({2, 1, 240, 255, 255}, {17, 1, 250, 255, 255});
-const rgblight_segment_t PROGMEM gui_layers[]     = RGBLIGHT_LAYER_SEGMENTS({7, 1, 51, 255, 255}, {12, 1, 51, 255, 255});
+const rgblight_segment_t PROGMEM alt_layers[] = RGBLIGHT_LAYER_SEGMENTS({2, 1, 240, 255, 255}, {17, 1, 250, 255, 255});
+const rgblight_segment_t PROGMEM gui_layers[] = RGBLIGHT_LAYER_SEGMENTS({7, 1, 51, 255, 255}, {12, 1, 51, 255, 255});
 
-const rgblight_segment_t* const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(shift_layers, control_layers, alt_layers, gui_layers);
+const rgblight_segment_t* const PROGMEM my_rgb_layers[] =
+    RGBLIGHT_LAYERS_LIST(shift_layers, control_layers, alt_layers, gui_layers);
 
 void keyboard_post_init_keymap(void) {
     rgblight_layers = my_rgb_layers;
@@ -146,7 +147,12 @@ void housekeeping_task_keymap(void) {
 #elif defined(RGB_MATRIX_ENABLE) && defined(KEYBOARD_splitkb_kyria_rev3)
 void keyboard_post_init_keymap(void) {
     extern led_config_t g_led_config;
-    g_led_config.flags[30] = g_led_config.flags[24] = g_led_config.flags[18] = g_led_config.flags[12] = g_led_config.flags[11] = g_led_config.flags[10] = g_led_config.flags[9] = g_led_config.flags[8] = g_led_config.flags[7] = g_led_config.flags[6] = g_led_config.flags[37] = g_led_config.flags[38] = g_led_config.flags[39] = g_led_config.flags[40] = g_led_config.flags[41] = g_led_config.flags[42] = g_led_config.flags[43] = g_led_config.flags[49] = g_led_config.flags[55] = g_led_config.flags[61] = LED_FLAG_MODIFIER;
+    g_led_config.flags[30] = g_led_config.flags[24] = g_led_config.flags[18] = g_led_config.flags[12] =
+        g_led_config.flags[11] = g_led_config.flags[10] = g_led_config.flags[9] = g_led_config.flags[8] =
+            g_led_config.flags[7] = g_led_config.flags[6] = g_led_config.flags[37] = g_led_config.flags[38] =
+                g_led_config.flags[39] = g_led_config.flags[40] = g_led_config.flags[41] = g_led_config.flags[42] =
+                    g_led_config.flags[43] = g_led_config.flags[49] = g_led_config.flags[55] = g_led_config.flags[61] =
+                        LED_FLAG_MODIFIER;
 }
 
 void check_default_layer(uint8_t mode, uint8_t type, uint8_t led_min, uint8_t led_max) {

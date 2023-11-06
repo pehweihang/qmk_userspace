@@ -16,7 +16,7 @@
 #pragma once
 
 #if defined(KEYBOARD_crkbd) || defined(KEYBOARD_splitkb_aurora_corne)
-#    define HAL_USE_PWM TRUE
+#    define HAL_USE_PWM    TRUE
 #    define HAL_USE_SERIAL TRUE
 #endif
 

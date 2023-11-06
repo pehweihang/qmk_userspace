@@ -28,25 +28,30 @@ extern bool swap_hands;
 #endif
 
 extern userspace_config_t userspace_config;
-_Static_assert(sizeof(userspace_config_t) <= RPC_M2S_BUFFER_SIZE, "userspace_config_t is larger than split buffer size!");
-_Static_assert(sizeof(user_runtime_config_t) <= RPC_M2S_BUFFER_SIZE, "user_runtime_config_t is larger than split buffer size!");
+_Static_assert(sizeof(userspace_config_t) <= RPC_M2S_BUFFER_SIZE,
+               "userspace_config_t is larger than split buffer size!");
+_Static_assert(sizeof(user_runtime_config_t) <= RPC_M2S_BUFFER_SIZE,
+               "user_runtime_config_t is larger than split buffer size!");
 
 uint16_t transport_keymap_config    = 0;
 uint32_t transport_userspace_config = 0, transport_user_state = 0;
 
 user_runtime_config_t user_state;
 
-void user_state_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer, uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
+void user_state_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
+                     uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
     if (initiator2target_buffer_size == sizeof(transport_user_state)) {
         memcpy(&transport_user_state, initiator2target_buffer, initiator2target_buffer_size);
     }
 }
-void user_keymap_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer, uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
+void user_keymap_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
+                      uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
     if (initiator2target_buffer_size == sizeof(transport_keymap_config)) {
         memcpy(&transport_keymap_config, initiator2target_buffer, initiator2target_buffer_size);
     }
 }
-void user_config_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer, uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
+void user_config_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
+                      uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
     if (initiator2target_buffer_size == sizeof(transport_userspace_config)) {
         memcpy(&transport_userspace_config, initiator2target_buffer, initiator2target_buffer_size);
     }
@@ -56,21 +61,24 @@ void user_config_sync(uint8_t initiator2target_buffer_size, const void* initiato
 extern char autocorrected_str[2][22];
 _Static_assert(sizeof(autocorrected_str) <= RPC_M2S_BUFFER_SIZE, "Autocorrect array larger than buffer size!");
 
-void autocorrect_string_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer, uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
+void autocorrect_string_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
+                             uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
     if (initiator2target_buffer_size == (sizeof(autocorrected_str))) {
         memcpy(&autocorrected_str, initiator2target_buffer, initiator2target_buffer_size);
     }
 }
 #endif
 #ifdef CUSTOM_OLED_DRIVER
-void keylogger_string_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer, uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
-    if (initiator2target_buffer_size == (OLED_KEYLOGGER_LENGTH+1)) {
+void keylogger_string_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
+                           uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
+    if (initiator2target_buffer_size == (OLED_KEYLOGGER_LENGTH + 1)) {
         memcpy(&oled_keylog_str, initiator2target_buffer, initiator2target_buffer_size);
     }
 }
 #endif
 
-void suspend_state_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer, uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
+void suspend_state_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
+                        uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
     bool suspend_state;
     memcpy(&suspend_state, initiator2target_buffer, initiator2target_buffer_size);
     if (suspend_state != is_device_suspended()) {
@@ -96,7 +104,7 @@ void keyboard_post_init_transport_sync(void) {
 #ifdef CUSTOM_OLED_DRIVER
     transaction_register_rpc(RPC_ID_USER_OLED_KEYLOG_STR, keylogger_string_sync);
 #endif
-//    transaction_register_rpc(RPC_ID_USER_SUSPEND_STATE_SYNC, suspend_state_sync);
+    //    transaction_register_rpc(RPC_ID_USER_SUSPEND_STATE_SYNC, suspend_state_sync);
 }
 
 void user_transport_update(void) {
@@ -118,7 +126,7 @@ void user_transport_update(void) {
         user_state.swap_hands = swap_hands;
 #endif
         user_state.host_driver_disabled = get_keyboard_lock();
-        transport_user_state = user_state.raw;
+        transport_user_state            = user_state.raw;
     } else {
         keymap_config.raw    = transport_keymap_config;
         userspace_config.raw = transport_userspace_config;
@@ -183,7 +191,8 @@ void user_transport_sync(void) {
 
         // Perform the sync if requested
         if (needs_sync) {
-            if (transaction_rpc_send(RPC_ID_USER_KEYMAP_SYNC, sizeof(transport_keymap_config), &transport_keymap_config)) {
+            if (transaction_rpc_send(RPC_ID_USER_KEYMAP_SYNC, sizeof(transport_keymap_config),
+                                     &transport_keymap_config)) {
                 last_sync[1] = timer_read32();
             }
             needs_sync = false;
@@ -202,7 +211,8 @@ void user_transport_sync(void) {
 
         // Perform the sync if requested
         if (needs_sync) {
-            if (transaction_rpc_send(RPC_ID_USER_CONFIG_SYNC, sizeof(transport_userspace_config), &transport_userspace_config)) {
+            if (transaction_rpc_send(RPC_ID_USER_CONFIG_SYNC, sizeof(transport_userspace_config),
+                                     &transport_userspace_config)) {
                 last_sync[2] = timer_read32();
             }
             needs_sync = false;

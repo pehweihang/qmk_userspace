@@ -1,7 +1,6 @@
 // Copyright 2023 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-
 #include QMK_KEYBOARD_H
 
 // clang-format off
@@ -38,7 +37,8 @@ const uint16_t PROGMEM encoder_map[MAX_LAYER][NUM_ENCODERS][NUM_DIRECTIONS] = {
 #endif
 
 bool wpm_keycode_user(uint16_t keycode) {
-    if ((keycode >= QK_MOD_TAP && keycode <= QK_MOD_TAP_MAX) || (keycode >= QK_LAYER_TAP && keycode <= QK_LAYER_TAP_MAX) || (keycode >= QK_MODS && keycode <= QK_MODS_MAX)) {
+    if ((keycode >= QK_MOD_TAP && keycode <= QK_MOD_TAP_MAX) ||
+        (keycode >= QK_LAYER_TAP && keycode <= QK_LAYER_TAP_MAX) || (keycode >= QK_MODS && keycode <= QK_MODS_MAX)) {
         keycode = keycode & 0xFF;
     } else if (keycode > 0xFF) {
         keycode = 0;
@@ -54,23 +54,24 @@ deferred_token kittoken;
 
 // WPM-responsive animation stuff here
 #define OLED_SLEEP_FRAMES 2
-#define OLED_SLEEP_SPEED 20 // below this wpm value your animation will idle
+#define OLED_SLEEP_SPEED  20 // below this wpm value your animation will idle
 
-#define OLED_WAKE_FRAMES 2               // uncomment if >1
-#define OLED_WAKE_SPEED OLED_SLEEP_SPEED // below this wpm value your animation will idle
+#define OLED_WAKE_FRAMES 2                // uncomment if >1
+#define OLED_WAKE_SPEED  OLED_SLEEP_SPEED // below this wpm value your animation will idle
 
 #define OLED_KAKI_FRAMES 2
-#define OLED_KAKI_SPEED 60 // above this wpm value typing animation to triggere
+#define OLED_KAKI_SPEED  60 // above this wpm value typing animation to triggere
 
 #define OLED_RTOGI_FRAMES 2
 #define OLED_LTOGI_FRAMES 2
 
 // #define ANIM_FRAME_DURATION 500 // how long each frame lasts in ms
 //  #define SLEEP_TIMER 60000 // should sleep after this period of 0 wpm, needs fixing
-#define OLED_ANIM_SIZE 32
-#define OLED_ANIM_ROWS 3
+#define OLED_ANIM_SIZE       32
+#define OLED_ANIM_ROWS       3
 #define OLED_ANIM_MAX_FRAMES 2
-#if (OLED_SLEEP_FRAMES > OLED_ANIM_MAX_FRAMES) || (OLED_WAKE_FRAMES > OLED_ANIM_MAX_FRAMES) || (OLED_KAKI_FRAMES > OLED_ANIM_MAX_FRAMES) || (OLED_RTOGI_FRAMES > OLED_ANIM_MAX_FRAMES)
+#if (OLED_SLEEP_FRAMES > OLED_ANIM_MAX_FRAMES) || (OLED_WAKE_FRAMES > OLED_ANIM_MAX_FRAMES) || \
+    (OLED_KAKI_FRAMES > OLED_ANIM_MAX_FRAMES) || (OLED_RTOGI_FRAMES > OLED_ANIM_MAX_FRAMES)
 #    error frame size too large
 #endif
 
@@ -219,14 +220,16 @@ void add_keylog(uint16_t keycode, keyrecord_t *record) {
         if (record->tap.count) {
             keycode = keycode_config(QK_MOD_TAP_GET_TAP_KEYCODE(keycode));
         } else {
-            keycode = keycode_config(0xE0 + biton(QK_MOD_TAP_GET_MODS(keycode) & 0xF) + biton(QK_MOD_TAP_GET_MODS(keycode) & 0x10));
+            keycode = keycode_config(0xE0 + biton(QK_MOD_TAP_GET_MODS(keycode) & 0xF) +
+                                     biton(QK_MOD_TAP_GET_MODS(keycode) & 0x10));
         }
     } else if (IS_QK_LAYER_TAP(keycode) && record->tap.count) {
         keycode = keycode_config(QK_LAYER_TAP_GET_TAP_KEYCODE(keycode));
     } else if (IS_QK_MODS(keycode)) {
         keycode = keycode_config(QK_MODS_GET_BASIC_KEYCODE(keycode));
     } else if (IS_QK_ONE_SHOT_MOD(keycode)) {
-        keycode = keycode_config(0xE0 + biton(QK_ONE_SHOT_MOD_GET_MODS(keycode) & 0xF) + biton(QK_ONE_SHOT_MOD_GET_MODS(keycode) & 0x10));
+        keycode = keycode_config(0xE0 + biton(QK_ONE_SHOT_MOD_GET_MODS(keycode) & 0xF) +
+                                 biton(QK_ONE_SHOT_MOD_GET_MODS(keycode) & 0x10));
     } else if (IS_QK_BASIC(keycode)) {
         keycode = keycode_config(keycode);
     }
@@ -397,7 +400,7 @@ void render_layer(uint8_t col, uint8_t line) {
     oled_set_cursor(col, line);
     if (layer_state_is(2)) {
         static const char PROGMEM audio_clicky_status[3] = {0xF6, 0xF7, 0};
-        static const char PROGMEM audio_status[3] = {0xE2, 0xE3, 0};
+        static const char PROGMEM audio_status[3]        = {0xE2, 0xE3, 0};
         oled_write_P(audio_clicky_status, false);
         oled_write_P(PSTR("  "), false);
         oled_write_P(audio_status, false);
@@ -428,7 +431,13 @@ bool oled_task_user(void) {
         return false;
     }
 
-    static const char PROGMEM header_image[] = {0, 192, 32, 16, 8, 4, 2, 1, 1, 1, 1, 1, 1, 1, 1, 3, 7, 15, 31, 63, 127, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 127, 63, 31, 15, 7, 3, 1, 1, 1, 1, 1, 1, 1, 1, 2, 4, 8, 16, 32, 192, 0};
+    static const char PROGMEM header_image[] = {
+        0,   192, 32,  16,  8,   4,   2,   1,   1,   1,   1,   1,   1,   1,   1,   3,   7,   15,  31,  63,  127, 255,
+        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 127, 63,  31,
+        15,  7,   3,   1,   1,   1,   1,   1,   1,   1,   1,   2,   4,   8,   16,  32,  192, 0};
 
     oled_write_raw_P(header_image, sizeof(header_image));
 
@@ -449,7 +458,6 @@ bool oled_task_user(void) {
     static const char PROGMEM rgb_layer_status[2][3] = {{0xEE, 0xEF, 0}, {0xF0, 0xF1, 0}};
     oled_write_P(rgb_layer_status[(bool)rgb_matrix_is_enabled()], false);
 
-
     render_keylogger_status(1, 5);
 
     oled_set_cursor(1, 6);
@@ -469,7 +477,13 @@ bool oled_task_user(void) {
         oled_write_raw_P(display_border, sizeof(display_border));
     }
 
-    static const char PROGMEM footer_image[] = {0, 3, 4, 8, 16, 32, 64, 128, 128, 128, 128, 128, 128, 128, 192, 224, 240, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 240, 224, 192, 128, 128, 128, 128, 128, 128, 128, 64, 32, 16, 8, 4, 3, 0};
+    static const char PROGMEM footer_image[] = {
+        0,   3,   4,   8,   16,  32,  64,  128, 128, 128, 128, 128, 128, 128, 192, 224, 240, 248, 248, 248, 248, 248,
+        248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248,
+        248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248,
+        248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248,
+        248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248, 248,
+        248, 240, 224, 192, 128, 128, 128, 128, 128, 128, 128, 64,  32,  16,  8,   4,   3,   0};
     oled_set_cursor(0, 7);
     oled_write_raw_P(footer_image, sizeof(footer_image));
 

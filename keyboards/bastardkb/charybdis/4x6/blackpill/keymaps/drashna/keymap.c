@@ -109,7 +109,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 void keyboard_post_init_keymap(void) {
 #ifdef RGB_MATRIX_ENABLE
-    g_led_config.flags[53] = g_led_config.flags[54] = g_led_config.flags[55] = g_led_config.flags[0] = g_led_config.flags[1] = g_led_config.flags[2] = g_led_config.flags[3] = g_led_config.flags[29] = g_led_config.flags[30] = g_led_config.flags[31] = g_led_config.flags[32] = LED_FLAG_MODIFIER;
+    g_led_config.flags[53] = g_led_config.flags[54] = g_led_config.flags[55] = g_led_config.flags[0] =
+        g_led_config.flags[1] = g_led_config.flags[2] = g_led_config.flags[3] = g_led_config.flags[29] =
+            g_led_config.flags[30] = g_led_config.flags[31] = g_led_config.flags[32] = LED_FLAG_MODIFIER;
 #endif
 }
 

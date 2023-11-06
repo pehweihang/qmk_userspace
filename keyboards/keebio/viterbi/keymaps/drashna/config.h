@@ -10,12 +10,12 @@
 #    undef RGBLED_NUM
 #    define RGBLED_NUM 16
 
-#    define RGBLIGHT_HUE_STEP 8
-#    define RGBLIGHT_SAT_STEP 8
-#    define RGBLIGHT_VAL_STEP 8
+#    define RGBLIGHT_HUE_STEP             8
+#    define RGBLIGHT_SAT_STEP             8
+#    define RGBLIGHT_VAL_STEP             8
 #    define RGBLIGHT_EFFECT_KNIGHT_LENGTH 2
-#    define RGBLIGHT_EFFECT_SNAKE_LENGTH 2
-#endif  // RGBLIGHT_ENABLE
+#    define RGBLIGHT_EFFECT_SNAKE_LENGTH  2
+#endif // RGBLIGHT_ENABLE
 
 #undef PRODUCT
 #define PRODUCT "Drashnas Viterbi Macro Pad"
@@ -42,7 +42,7 @@
   }
 // clang-format on
 
-#define QMK_ESC_OUTPUT F5  // usually COL
-#define QMK_ESC_INPUT D4   // usually ROW
-#define QMK_LED B0
-#define QMK_SPEAKER C6
+#define QMK_ESC_OUTPUT F5 // usually COL
+#define QMK_ESC_INPUT  D4 // usually ROW
+#define QMK_LED        B0
+#define QMK_SPEAKER    C6

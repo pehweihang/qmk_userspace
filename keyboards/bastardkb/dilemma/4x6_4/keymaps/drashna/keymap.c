@@ -121,7 +121,6 @@ extern const char PROGMEM display_border[3];
 
 extern bool is_oled_enabled;
 
-
 bool oled_task_keymap(void) {
     // No right side oled, so just exit.
     if (!is_keyboard_left()) {
@@ -136,8 +135,10 @@ bool oled_task_keymap(void) {
     render_layer_state(1, 2);
     render_pet(0, 5);
     render_wpm(1, 7, 5);
-#   if defined(POINTING_DEVICE_ENABLE)
-    render_pointing_dpi_status(dilemma_get_pointer_sniping_enabled() ? dilemma_get_pointer_sniping_dpi() : dilemma_get_pointer_default_dpi(), 1, 7, 6);
+#    if defined(POINTING_DEVICE_ENABLE)
+    render_pointing_dpi_status(
+        dilemma_get_pointer_sniping_enabled() ? dilemma_get_pointer_sniping_dpi() : dilemma_get_pointer_default_dpi(),
+        1, 7, 6);
     render_mouse_mode(17, 6);
 #    else
     render_matrix_scan_rate(1, 7, 6);
@@ -186,11 +187,10 @@ bool oled_task_keymap(void) {
 }
 #endif
 
-
 void keyboard_post_init_keymap(void) {
 #ifdef RGB_MATRIX_ENABLE
-    g_led_config.flags[48] = g_led_config.flags[50] = g_led_config.flags[51] =
-        g_led_config.flags[100] = g_led_config.flags[101] = g_led_config.flags[102] = g_led_config.flags[103] = LED_FLAG_MODIFIER;
+    g_led_config.flags[48] = g_led_config.flags[50] = g_led_config.flags[51] = g_led_config.flags[100] =
+        g_led_config.flags[101] = g_led_config.flags[102] = g_led_config.flags[103] = LED_FLAG_MODIFIER;
 #endif
 }
 
@@ -241,7 +241,6 @@ bool rgb_matrix_indicators_advanced_keymap(uint8_t led_min, uint8_t led_max) {
     return false;
 }
 #endif
-
 
 uint16_t get_tapping_term_keymap(uint16_t keycode, keyrecord_t *record) {
     if ((record->event.key.row == 4 || record->event.key.row == 9) && record->event.key.col == 3) {

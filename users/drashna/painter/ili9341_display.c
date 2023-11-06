@@ -60,8 +60,9 @@ void draw_ui_user(void) {
 
 #ifdef POINTING_DEVICE_ENABLE
     static uint16_t last_cpi[ILI9341_NUM_DEVICES] = {0xFFFF};
-    uint16_t        curr_cpi                      = charybdis_get_pointer_sniping_enabled() ? charybdis_get_pointer_sniping_dpi() : charybdis_get_pointer_default_dpi();
-    bool            cpi_redraw                    = false;
+    uint16_t        curr_cpi   = charybdis_get_pointer_sniping_enabled() ? charybdis_get_pointer_sniping_dpi()
+                                                                         : charybdis_get_pointer_default_dpi();
+    bool            cpi_redraw = false;
 #endif
 
     uint16_t width;
@@ -160,9 +161,12 @@ void draw_ui_user(void) {
         // static led_t last_led_state = {0};
         // if (hue_redraw || last_led_state.raw != host_keyboard_led_state().raw) {
         //     last_led_state.raw = host_keyboard_led_state().raw;
-        //     qp_drawimage_recolor(ili9341_display, 128 - (32 * 3), 0, last_led_state.caps_lock ? lock_caps_on : lock_caps_off, curr_hue, 255, last_led_state.caps_lock ? 255 : 32, curr_hue, 255, 0);
-        //     qp_drawimage_recolor(ili9341_display, 128 - (32 * 2), 0, last_led_state.num_lock ? lock_num_on : lock_num_off, curr_hue, 255, last_led_state.num_lock ? 255 : 32, curr_hue, 255, 0);
-        //     qp_drawimage_recolor(ili9341_display, 128 - (32 * 1), 0, last_led_state.scroll_lock ? lock_scrl_on : lock_scrl_off, curr_hue, 255, last_led_state.scroll_lock ? 255 : 32, curr_hue, 255, 0);
+        //     qp_drawimage_recolor(ili9341_display, 128 - (32 * 3), 0, last_led_state.caps_lock ? lock_caps_on :
+        //     lock_caps_off, curr_hue, 255, last_led_state.caps_lock ? 255 : 32, curr_hue, 255, 0);
+        //     qp_drawimage_recolor(ili9341_display, 128 - (32 * 2), 0, last_led_state.num_lock ? lock_num_on :
+        //     lock_num_off, curr_hue, 255, last_led_state.num_lock ? 255 : 32, curr_hue, 255, 0);
+        //     qp_drawimage_recolor(ili9341_display, 128 - (32 * 1), 0, last_led_state.scroll_lock ? lock_scrl_on :
+        //     lock_scrl_off, curr_hue, 255, last_led_state.scroll_lock ? 255 : 32, curr_hue, 255, 0);
         // }
 
         ypos += font->line_height + 4;
@@ -194,7 +198,9 @@ void draw_ui_user(void) {
         if (hue_redraw || cpi_redraw) {
             static int max_cpi_xpos = 0;
             xpos                    = 110;
-            snprintf(buf, sizeof(buf), "CPI: %d", (int)charybdis_get_pointer_sniping_enabled() ? charybdis_get_pointer_sniping_dpi() : charybdis_get_pointer_default_dpi());
+            snprintf(buf, sizeof(buf), "CPI: %d",
+                     (int)charybdis_get_pointer_sniping_enabled() ? charybdis_get_pointer_sniping_dpi()
+                                                                  : charybdis_get_pointer_default_dpi());
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_cpi_xpos < xpos) {
                 max_cpi_xpos = xpos;
@@ -212,7 +218,9 @@ void draw_ui_user(void) {
             static int max_dss_xpos = 0;
             xpos                    = 5;
             const char* buf         = charybdis_get_pointer_dragscroll_enabled() ? "DS:ACTIVE" : "DS:OFF";
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, charybdis_get_pointer_dragscroll_enabled() ? 153 : 255, 255, 255, charybdis_get_pointer_dragscroll_enabled() ? 153 : 255, 255, 0);
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf,
+                                        charybdis_get_pointer_dragscroll_enabled() ? 153 : 255, 255, 255,
+                                        charybdis_get_pointer_dragscroll_enabled() ? 153 : 255, 255, 0);
             if (max_dss_xpos < xpos) {
                 max_dss_xpos = xpos;
             }
@@ -223,7 +231,8 @@ void draw_ui_user(void) {
             static int max_ams_xpos = 0;
             xpos                    = 50;
             const char* buf         = get_auto_mouse_enable() ? "AM:ACTIVE" : "AM:OFF";
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, get_auto_mouse_enable() ? 34 : 255, 255, 255, charybdis_get_pointer_sniping_enabled() ? 34 : 255, 255, 0);
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, get_auto_mouse_enable() ? 34 : 255, 255,
+                                        255, charybdis_get_pointer_sniping_enabled() ? 34 : 255, 255, 0);
             if (max_ams_xpos < xpos) {
                 max_ams_xpos = xpos;
             }
@@ -234,7 +243,9 @@ void draw_ui_user(void) {
             static int max_sps_xpos = 0;
             xpos                    = 110;
             const char* buf         = charybdis_get_pointer_sniping_enabled() ? "SN:ACTIVE" : "SN:OFF";
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, charybdis_get_pointer_sniping_enabled() ? 153 : 255, 255, 255, charybdis_get_pointer_sniping_enabled() ? 153 : 255, 255, 0);
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf,
+                                        charybdis_get_pointer_sniping_enabled() ? 153 : 255, 255, 255,
+                                        charybdis_get_pointer_sniping_enabled() ? 153 : 255, 255, 0);
             if (max_sps_xpos < xpos) {
                 max_sps_xpos = xpos;
             }
@@ -253,11 +264,16 @@ void draw_ui_user(void) {
             const char* buf1        = "CRCT ";
             const char* buf2        = "1SHOT";
             qp_drawimage(ili9341_display, 0, ypos, last_keymap_config.swap_lctl_lgui ? cg_on : cg_off);
-            temp_pos = qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf0, last_keymap_config.nkro ? 153 : 255, 255, 255, last_keymap_config.nkro ? 153 : 255, 255, 0);
+            temp_pos = qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf0, last_keymap_config.nkro ? 153 : 255,
+                                           255, 255, last_keymap_config.nkro ? 153 : 255, 255, 0);
             xpos += MAX(temp_pos, 30);
-            temp_pos = qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf1, last_keymap_config.autocorrect_enable ? 153 : 255, 255, 255, last_keymap_config.autocorrect_enable ? 153 : 255, 255, 0);
+            temp_pos = qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf1,
+                                           last_keymap_config.autocorrect_enable ? 153 : 255, 255, 255,
+                                           last_keymap_config.autocorrect_enable ? 153 : 255, 255, 0);
             xpos += MAX(temp_pos, 30);
-            temp_pos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf2, last_keymap_config.oneshot_enable ? 153 : 255, 255, 255, last_keymap_config.oneshot_enable ? 153 : 255, 255, 0);
+            temp_pos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf2,
+                                            last_keymap_config.oneshot_enable ? 153 : 255, 255, 255,
+                                            last_keymap_config.oneshot_enable ? 153 : 255, 255, 0);
             xpos += MAX(temp_pos, 30);
             if (max_bpm_xpos < xpos) {
                 max_bpm_xpos = xpos;
@@ -401,7 +417,9 @@ void draw_ui_user(void) {
     qp_flush(ili9341_display);
 }
 
-void housekeeping_task_quantum_painter(void) { draw_ui_user(); }
+void housekeeping_task_quantum_painter(void) {
+    draw_ui_user();
+}
 
 void keyboard_post_init_quantum_painter(void) {
     font = qp_load_font_mem(font_thintel15);
@@ -432,7 +450,8 @@ void keyboard_post_init_quantum_painter(void) {
 #endif
     wait_ms(150);
 
-    ili9341_display = qp_ili9341_make_spi_device(240, 320, DISPLAY_CS_PIN_ILI9341, DISPLAY_DC_PIN_ILI9341, DISPLAY_RST_PIN_ILI9341, 4, 0);
+    ili9341_display = qp_ili9341_make_spi_device(240, 320, DISPLAY_CS_PIN_ILI9341, DISPLAY_DC_PIN_ILI9341,
+                                                 DISPLAY_RST_PIN_ILI9341, 4, 0);
     init_and_clear(ili9341_display, QP_ROTATION_0);
     qp_power(ili9341_display, true);
 

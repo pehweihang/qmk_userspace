@@ -8,11 +8,11 @@
 #    define RGBLIGHT_SAT_STEP 12
 
 #    define RGBLIGHT_EFFECT_KNIGHT_LENGTH 3
-#    define RGBLIGHT_EFFECT_SNAKE_LENGTH 3
+#    define RGBLIGHT_EFFECT_SNAKE_LENGTH  3
 #    ifdef RGB_MATRIX_ENABLE
 #        define RGBLIGHT_DISABLE_KEYCODES
 #    endif
-#endif  // RGBLIGHT_ENABLE
+#endif // RGBLIGHT_ENABLE
 
 #undef PRODUCT
 #define PRODUCT "DrashnaDox - Hacked ErgoDox EZ Hybrid Monstrosity"

@@ -11,5 +11,5 @@ layer_state_t layer_state_set_rgb_light(layer_state_t state);
 layer_state_t default_layer_state_set_rgb_light(layer_state_t state);
 void          rgblight_sethsv_default_helper(uint8_t index);
 
-const char* rgblight_name(uint8_t effect);
-bool is_rgblight_startup_running(void);
+const char *rgblight_name(uint8_t effect);
+bool        is_rgblight_startup_running(void);

@@ -23,12 +23,12 @@
 #    undef RGBLIGHT_SAT_STEP
 #    define RGBLIGHT_SAT_STEP 8
 #    undef RGBLIGHT_VAL_STEP
-#    define RGBLIGHT_VAL_STEP 8
+#    define RGBLIGHT_VAL_STEP  8
 #    define RGBLIGHT_LIMIT_VAL 175
 #    define RGBLIGHT_SLEEP
 
-#    define RGBLIGHT_EFFECT_KNIGHT_OFFSET 3
+#    define RGBLIGHT_EFFECT_KNIGHT_OFFSET  3
 #    define RGBLIGHT_EFFECT_KNIGHT_LED_NUM 14
-#    define AUDIO_PIN B7
+#    define AUDIO_PIN                      B7
 #    define NO_MUSIC_MODE
 #endif

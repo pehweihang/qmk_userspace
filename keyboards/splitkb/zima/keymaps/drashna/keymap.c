@@ -63,19 +63,22 @@ void render_user_status(void) {
     oled_write_P(nukem_good[0], haptic_config.enable);
 }
 
-void keyboard_post_init_user(void) { oled_scroll_set_speed(0); }
+void keyboard_post_init_user(void) {
+    oled_scroll_set_speed(0);
+}
 
 bool oled_task_user(void) {
     if (is_asleep) {
         oled_off();
-        return false;;
+        return false;
+        ;
     }
 
     if (timer_elapsed32(oled_timer) < 30000) {
         oled_on();
         oled_scroll_off();
         oled_write_P(PSTR("SplitKB's Zima"), false);
-        char layer[2] = {0};
+        char    layer[2] = {0};
         uint8_t n        = get_highest_layer(layer_state);
         layer[1]         = '\0';
         layer[0]         = '0' + n % 10;
@@ -121,9 +124,13 @@ bool oled_task_user(void) {
     return false;
 }
 
-void suspend_power_down_user(void) { is_asleep = true; }
+void suspend_power_down_user(void) {
+    is_asleep = true;
+}
 
-void suspend_wakeup_init_user(void) { is_asleep = false; }
+void suspend_wakeup_init_user(void) {
+    is_asleep = false;
+}
 
 bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     oled_timer = timer_read32();

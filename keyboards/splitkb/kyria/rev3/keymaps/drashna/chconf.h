@@ -17,8 +17,8 @@
 #pragma once
 
 #if defined(KEYBOARD_splitkb_kyria_rev3)
-#define CH_CFG_ST_RESOLUTION 16
-#define CH_CFG_ST_FREQUENCY  10000
+#    define CH_CFG_ST_RESOLUTION 16
+#    define CH_CFG_ST_FREQUENCY  10000
 #endif
 
 #include_next <chconf.h>

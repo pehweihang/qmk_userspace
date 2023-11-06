@@ -20,9 +20,9 @@
 /**
  * @brief register definition
  */
-#define DS1307_TIME_REG 0x00
+#define DS1307_TIME_REG    0x00
 #define DS1307_CONTROL_REG 0x07
-#define DS1307_NVRAM_REG 0x08
+#define DS1307_NVRAM_REG   0x08
 
 /**
  * @brief Functions Prototypes

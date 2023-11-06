@@ -20,7 +20,8 @@ static bool SINGLE_COLOR_RAINDROPS(effect_params_t* params) {
             return;
         }
 
-        // Take matrix color, add between -5 and +5 to hue, random brightness between 0 and val, set to 0 if val between 0 and 5, then write to LED
+        // Take matrix color, add between -5 and +5 to hue, random brightness between 0 and val, set to 0 if val between
+        // 0 and 5, then write to LED
         HSV hsv = rgb_matrix_get_hsv();
         hsv.h   = rgb_matrix_get_hue() - 2 + random8() % 5;
         hsv.v   = random8() % rgb_matrix_get_val();

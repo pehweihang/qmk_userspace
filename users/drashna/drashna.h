@@ -47,7 +47,7 @@ enum userspace_layers {
     _ADJUST,
 };
 
-#define _MACROS _MOUSE
+#define _MACROS          _MOUSE
 #define _DEFAULT_LAYER_1 FIRST_DEFAULT_LAYER
 #define _DEFAULT_LAYER_2 (FIRST_DEFAULT_LAYER + 1)
 #define _DEFAULT_LAYER_3 (FIRST_DEFAULT_LAYER + 2)
@@ -81,7 +81,7 @@ bool mod_key_press_timer(uint16_t code, uint16_t mod_code, bool pressed);
 bool mod_key_press(uint16_t code, uint16_t mod_code, bool pressed, uint16_t this_timer);
 bool hasAllBitsInMask(uint8_t value, uint8_t mask);
 void tap_code16_nomods(uint16_t kc);
-void format_layer_bitmap_string(char* buffer, layer_state_t state, layer_state_t default_state);
+void format_layer_bitmap_string(char *buffer, layer_state_t state, layer_state_t default_state);
 void center_text(const char *text, char *output, uint8_t width);
 
 // clang-format off
@@ -111,7 +111,7 @@ extern userspace_config_t userspace_config;
 void        set_keyboard_lock(bool enable);
 bool        get_keyboard_lock(void);
 void        toggle_keyboard_lock(void);
-const char* get_layer_name_string(layer_state_t state, bool alt_name);
+const char *get_layer_name_string(layer_state_t state, bool alt_name);
 
 bool is_device_suspended(void);
 void set_is_device_suspended(bool status);

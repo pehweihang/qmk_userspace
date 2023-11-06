@@ -17,23 +17,23 @@
 
 #ifdef RGBLIGHT_ENABLE
 #    define WS2812_DI_PIN D3
-#    define RGBLED_NUM 16  // Number of LEDs
+#    define RGBLED_NUM    16 // Number of LEDs
 #    define RGBLED_SPLIT \
         { 8, 8 }
 
-#    define RGBLIGHT_HUE_STEP 12
-#    define RGBLIGHT_SAT_STEP 12
-#    define RGBLIGHT_VAL_STEP 12
+#    define RGBLIGHT_HUE_STEP             12
+#    define RGBLIGHT_SAT_STEP             12
+#    define RGBLIGHT_VAL_STEP             12
 #    define RGBLIGHT_EFFECT_KNIGHT_LENGTH 2
-#    define RGBLIGHT_EFFECT_SNAKE_LENGTH 2
-#endif  // RGBLIGHT_ENABLE
+#    define RGBLIGHT_EFFECT_SNAKE_LENGTH  2
+#endif // RGBLIGHT_ENABLE
 
 #ifdef AUDIO_ENABLE
 #    define AUDIO_PIN C6
 #    ifdef RGBLIGHT_ENABLE
 #        define NO_MUSIC_MODE
 #    endif
-#endif  // AUDIO_ENABLE
+#endif // AUDIO_ENABLE
 
 #ifdef KEYBOARD_orthodox_rev1
 #    undef PRODUCT
@@ -43,13 +43,13 @@
 #    define PRODUCT "Drashna Hacked Orthodox Rev .3"
 #endif
 
-#define QMK_ESC_OUTPUT D7  // usually COL
+#define QMK_ESC_OUTPUT D7 // usually COL
 #ifdef KEYBOARD_orthodox_rev1
-#    define QMK_ESC_INPUT D4  // usually ROW
+#    define QMK_ESC_INPUT D4 // usually ROW
 #else
-#    define QMK_ESC_INPUT D2  // usually ROW
+#    define QMK_ESC_INPUT D2 // usually ROW
 #endif
-#define QMK_LED B0
+#define QMK_LED     B0
 #define QMK_SPEAKER C6
 
 #define SHFT_LED1 5

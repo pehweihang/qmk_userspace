@@ -28,7 +28,8 @@ void bootmagic_lite(void) {
     if (!is_keyboard_left()) {
         row = BOOTMAGIC_LITE_ROW_RIGHT;
         col = BOOTMAGIC_LITE_COLUMN_RIGHT;
-#    if defined(BOOTMAGIC_LITE_EEPROM_ROW) && defined(BOOTMAGIC_LITE_EEPROM_COLUMN) && defined(BOOTMAGIC_LITE_EEPROM_ROW_RIGHT) && defined(BOOTMAGIC_LITE_EEPROM_COLUMN_RIGHT)
+#    if defined(BOOTMAGIC_LITE_EEPROM_ROW) && defined(BOOTMAGIC_LITE_EEPROM_COLUMN) && \
+        defined(BOOTMAGIC_LITE_EEPROM_ROW_RIGHT) && defined(BOOTMAGIC_LITE_EEPROM_COLUMN_RIGHT)
         row_e = BOOTMAGIC_LITE_EEPROM_ROW_RIGHT;
         col_e = BOOTMAGIC_LITE_EEPROM_COLUMN_RIGHT;
 #    endif
@@ -58,10 +59,10 @@ void bootmagic_lite(void) {
         rgb_matrix_init();
 #endif
 #ifdef LED_MATRIX_ENABLE
-    led_matrix_init();
+        led_matrix_init();
 #endif
 #ifdef BACKLIGHT_ENABLE
-    backlight_init_ports();
+        backlight_init_ports();
 #endif
 #ifdef OLED_ENABLE
         oled_init(OLED_ROTATION_0);

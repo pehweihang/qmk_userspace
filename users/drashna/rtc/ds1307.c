@@ -32,7 +32,8 @@ i2c_status_t ds1307_set_time(rtc_time_t t) {
     };
     // clang-format on
 
-    if (i2c_writeReg(DS1307_I2C_ADDRESS << 1, DS1307_TIME_REG, data, ARRAY_SIZE(data), DS1307_I2C_TIMEOUT) != I2C_STATUS_SUCCESS) {
+    if (i2c_writeReg(DS1307_I2C_ADDRESS << 1, DS1307_TIME_REG, data, ARRAY_SIZE(data), DS1307_I2C_TIMEOUT) !=
+        I2C_STATUS_SUCCESS) {
         uprintf("Error while sending time to RTC!\n");
         return I2C_STATUS_ERROR;
     }
@@ -49,7 +50,8 @@ i2c_status_t ds1307_set_time(rtc_time_t t) {
 i2c_status_t ds1307_get_time(rtc_time_t *time) {
     uint8_t data[7] = {0, 0, 0, 0, 0, 0, 0};
 
-    i2c_status_t status = i2c_readReg(DS1307_I2C_ADDRESS << 1, DS1307_TIME_REG, data, ARRAY_SIZE(data), DS1307_I2C_TIMEOUT);
+    i2c_status_t status =
+        i2c_readReg(DS1307_I2C_ADDRESS << 1, DS1307_TIME_REG, data, ARRAY_SIZE(data), DS1307_I2C_TIMEOUT);
     if (status != I2C_STATUS_SUCCESS) {
         return status;
     }

@@ -24,7 +24,6 @@
 
 #include <string.h>
 
-
 #if defined(NO_ACTION_ONESHOT)
 // One-shot keys must be enabled for Sentence Case. One-shot keys are enabled
 // by default, but are disabled by `#define NO_ACTION_ONESHOT` in config.h. If
@@ -293,7 +292,8 @@ bool sentence_case_just_typed_P(const uint16_t* buffer, const uint16_t* pattern,
 __attribute__((weak)) bool sentence_case_check_ending(const uint16_t* buffer) {
 #    if SENTENCE_CASE_BUFFER_SIZE >= 5
     // Don't consider the abbreviations "vs." and "etc." to end the sentence.
-    if (SENTENCE_CASE_JUST_TYPED(KC_SPC, KC_V, KC_S, KC_DOT) || SENTENCE_CASE_JUST_TYPED(KC_SPC, KC_E, KC_T, KC_C, KC_DOT)) {
+    if (SENTENCE_CASE_JUST_TYPED(KC_SPC, KC_V, KC_S, KC_DOT) ||
+        SENTENCE_CASE_JUST_TYPED(KC_SPC, KC_E, KC_T, KC_C, KC_DOT)) {
         return false; // Not a real sentence ending.
     }
 #    endif // SENTENCE_CASE_BUFFER_SIZE >= 5

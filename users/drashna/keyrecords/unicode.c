@@ -7,17 +7,10 @@
 #include "unicode.h"
 #include "process_unicode_common.h"
 
-uint8_t unicode_typing_mode = UCTM_NO_MODE;
+uint8_t    unicode_typing_mode                            = UCTM_NO_MODE;
 const char unicode_mode_str[UNCODES_MODE_END][13] PROGMEM = {
-    "      Normal\0",
-    "        Wide\0",
-    "      Script\0",
-    "      Blocks\0",
-    "    Regional\0",
-    "      Aussie\0",
-    "       Zalgo\0",
-    "Super Script\0",
-    "       Comic\0",
+    "      Normal\0", "        Wide\0", "      Script\0", "      Blocks\0", "    Regional\0",
+    "      Aussie\0", "       Zalgo\0", "Super Script\0", "       Comic\0",
 };
 
 /**
@@ -35,26 +28,27 @@ void tap_unicode_glyph_nomods(uint32_t glyph) {
 
 typedef uint32_t (*translator_function_t)(bool is_shifted, uint32_t keycode);
 
-#define DEFINE_UNICODE_RANGE_TRANSLATOR(translator_name, lower_alpha, upper_alpha, zero_glyph, number_one, space_glyph) \
-    static inline uint32_t translator_name(bool is_shifted, uint32_t keycode) {                                         \
-        switch (keycode) {                                                                                              \
-            case KC_A ... KC_Z:                                                                                         \
-                return (is_shifted ? upper_alpha : lower_alpha) + keycode - KC_A;                                       \
-            case KC_0:                                                                                                  \
-                return zero_glyph;                                                                                      \
-            case KC_1 ... KC_9:                                                                                         \
-                return (number_one + keycode - KC_1);                                                                   \
-            case KC_SPACE:                                                                                              \
-                return space_glyph;                                                                                     \
-        }                                                                                                               \
-        return keycode;                                                                                                 \
+#define DEFINE_UNICODE_RANGE_TRANSLATOR(translator_name, lower_alpha, upper_alpha, zero_glyph, number_one, \
+                                        space_glyph)                                                       \
+    static inline uint32_t translator_name(bool is_shifted, uint32_t keycode) {                            \
+        switch (keycode) {                                                                                 \
+            case KC_A ... KC_Z:                                                                            \
+                return (is_shifted ? upper_alpha : lower_alpha) + keycode - KC_A;                          \
+            case KC_0:                                                                                     \
+                return zero_glyph;                                                                         \
+            case KC_1 ... KC_9:                                                                            \
+                return (number_one + keycode - KC_1);                                                      \
+            case KC_SPACE:                                                                                 \
+                return space_glyph;                                                                        \
+        }                                                                                                  \
+        return keycode;                                                                                    \
     }
 
 #define DEFINE_UNICODE_LUT_TRANSLATOR(translator_name, ...)                     \
     static inline uint32_t translator_name(bool is_shifted, uint32_t keycode) { \
         static const uint32_t translation[] = {__VA_ARGS__};                    \
         uint32_t              ret           = keycode;                          \
-        if ((keycode - KC_A) < ARRAY_SIZE(translation)) {      \
+        if ((keycode - KC_A) < ARRAY_SIZE(translation)) {                       \
             ret = translation[keycode - KC_A];                                  \
         }                                                                       \
         return ret;                                                             \
@@ -230,9 +224,9 @@ DEFINE_UNICODE_LUT_TRANSLATOR(unicode_lut_translator_comic,
                               0x210D, // h
                               0x2148, // i
                               0x2111, // j
-                              'k', // k
+                              'k',    // k
                               0x2143, // l
-                              'm', // m
+                              'm',    // m
                               0x2115, // n
                               0x2134, // o
                               0x2119, // p
@@ -241,21 +235,21 @@ DEFINE_UNICODE_LUT_TRANSLATOR(unicode_lut_translator_comic,
                               0x20B7, // s
                               0x20B8, // t
                               0x2127, // u
-                              'v', // v
+                              'v',    // v
                               0x20A9, // w
-                              'x', // x
+                              'x',    // x
                               0x213D, // y
-                              'z', // z
-                              '1', // 1
-                              '2', // 2
-                              '3', // 3
-                              '4', // 4
-                              '5', // 5
-                              '6', // 6
-                              '7', // 7
-                              '8', // 8
-                              '9', // 9
-                              '0'  // 0
+                              'z',    // z
+                              '1',    // 1
+                              '2',    // 2
+                              '3',    // 3
+                              '4',    // 4
+                              '5',    // 5
+                              '6',    // 6
+                              '7',    // 7
+                              '8',    // 8
+                              '9',    // 9
+                              '0'     // 0
 );
 
 bool process_record_aussie(uint16_t keycode, keyrecord_t *record) {

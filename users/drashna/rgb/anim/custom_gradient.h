@@ -13,7 +13,8 @@ static HSV INTERPOLATE_HSV(float step, HSV gradient_0, HSV gradient_100) {
     uint8_t cw, ccw;
     HSV     color;
 
-    cw  = (gradient_0.h >= gradient_100.h) ? 255 + gradient_100.h - gradient_0.h : gradient_100.h - gradient_0.h; // Hue range is 0 to 255.
+    cw  = (gradient_0.h >= gradient_100.h) ? 255 + gradient_100.h - gradient_0.h
+                                           : gradient_100.h - gradient_0.h; // Hue range is 0 to 255.
     ccw = (gradient_0.h >= gradient_100.h) ? gradient_0.h - gradient_100.h : 255 + gradient_0.h - gradient_100.h;
 
     if (cw < ccw) { // going clockwise

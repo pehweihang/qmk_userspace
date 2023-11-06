@@ -55,7 +55,8 @@ tap_dance_action_t tap_dance_actions[] = {
 void run_diablo_macro_check(void) {
     for (uint8_t index = 0; index < NUM_OF_DIABLO_KEYS; index++) {
         // if key_interval is 0, it's disabled, so only run if it's set.  If it's set, check the timer.
-        if (diablo_timer[index].key_interval && timer_elapsed(diablo_timer[index].timer) > (diablo_timer[index].key_interval * 1000)) {
+        if (diablo_timer[index].key_interval &&
+            timer_elapsed(diablo_timer[index].timer) > (diablo_timer[index].key_interval * 1000)) {
             // reset the timer, since enough time has passed
             diablo_timer[index].timer = timer_read();
             // send keycode ONLY if we're on the diablo layer.

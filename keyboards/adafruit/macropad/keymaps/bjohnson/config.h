@@ -4,13 +4,13 @@
 #pragma once
 
 #define OLED_DISABLE_TIMEOUT
-#define OLED_TIMEOUT 0
+#define OLED_TIMEOUT         0
 #define OLED_UPDATE_INTERVAL 15
 
 #ifdef OLED_FONT_H
 #    undef OLED_FONT_H
 #endif
-#define OLED_FONT_H "my_oled_font.h"
+#define OLED_FONT_H   "my_oled_font.h"
 #define OLED_FONT_END 255
 // #    define OLED_FONT_5X5
 // #    define OLED_FONT_AZTECH
@@ -33,6 +33,5 @@
 // #    define OLED_LOGO_SETS3N
 // #    define OLED_LOGO_SKEEB
 
-
-#    define STARTUP_SONG SONG(RICK_ROLL)
-#    define GOODBYE_SONG SONG(SONIC_RING)
+#define STARTUP_SONG SONG(RICK_ROLL)
+#define GOODBYE_SONG SONG(SONIC_RING)

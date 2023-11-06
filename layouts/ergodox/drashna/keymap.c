@@ -197,7 +197,7 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
-void housekeeping_task_keymap(void) {  // runs frequently to update info
+void housekeeping_task_keymap(void) { // runs frequently to update info
 #ifdef KEYBOARD_ergodox_ez
     uint8_t modifiers = get_mods();
     led_t   led_state = host_keyboard_led_state();
@@ -240,29 +240,33 @@ bool indicator_is_this_led_used_keyboard(uint8_t index) {
 
 #ifdef RGB_MATRIX_ENABLE
 
-void suspend_power_down_keymap(void) { rgb_matrix_set_suspend_state(true); }
+void suspend_power_down_keymap(void) {
+    rgb_matrix_set_suspend_state(true);
+}
 
-void suspend_wakeup_init_keymap(void) { rgb_matrix_set_suspend_state(false); }
+void suspend_wakeup_init_keymap(void) {
+    rgb_matrix_set_suspend_state(false);
+}
 
 bool rgb_matrix_indicators_advanced_keymap(uint8_t led_min, uint8_t led_max) {
     if (layer_state_is(_GAMEPAD)) {
-        RGB_MATRIX_INDICATOR_SET_COLOR(32, 0x00, 0xFF, 0x00);  // Q
-        RGB_MATRIX_INDICATOR_SET_COLOR(31, 0x00, 0xFF, 0xFF);  // W
-        RGB_MATRIX_INDICATOR_SET_COLOR(30, 0xFF, 0x00, 0x00);  // E
-        RGB_MATRIX_INDICATOR_SET_COLOR(29, 0xFF, 0x80, 0x00);  // R
-        RGB_MATRIX_INDICATOR_SET_COLOR(37, 0x00, 0xFF, 0xFF);  // A
-        RGB_MATRIX_INDICATOR_SET_COLOR(36, 0x00, 0xFF, 0xFF);  // S
-        RGB_MATRIX_INDICATOR_SET_COLOR(35, 0x00, 0xFF, 0xFF);  // D
-        RGB_MATRIX_INDICATOR_SET_COLOR(34, 0x7A, 0x00, 0xFF);  // F
+        RGB_MATRIX_INDICATOR_SET_COLOR(32, 0x00, 0xFF, 0x00); // Q
+        RGB_MATRIX_INDICATOR_SET_COLOR(31, 0x00, 0xFF, 0xFF); // W
+        RGB_MATRIX_INDICATOR_SET_COLOR(30, 0xFF, 0x00, 0x00); // E
+        RGB_MATRIX_INDICATOR_SET_COLOR(29, 0xFF, 0x80, 0x00); // R
+        RGB_MATRIX_INDICATOR_SET_COLOR(37, 0x00, 0xFF, 0xFF); // A
+        RGB_MATRIX_INDICATOR_SET_COLOR(36, 0x00, 0xFF, 0xFF); // S
+        RGB_MATRIX_INDICATOR_SET_COLOR(35, 0x00, 0xFF, 0xFF); // D
+        RGB_MATRIX_INDICATOR_SET_COLOR(34, 0x7A, 0x00, 0xFF); // F
 
-        RGB_MATRIX_INDICATOR_SET_COLOR((userspace_config.swapped_numbers ? 26 : 27), 0xFF, 0xFF, 0xFF);  // 1
-        RGB_MATRIX_INDICATOR_SET_COLOR((userspace_config.swapped_numbers ? 27 : 26), 0x00, 0xFF, 0x00);  // 2
-        RGB_MATRIX_INDICATOR_SET_COLOR(25, 0x7A, 0x00, 0xFF);                                            // 3
+        RGB_MATRIX_INDICATOR_SET_COLOR((userspace_config.swapped_numbers ? 26 : 27), 0xFF, 0xFF, 0xFF); // 1
+        RGB_MATRIX_INDICATOR_SET_COLOR((userspace_config.swapped_numbers ? 27 : 26), 0x00, 0xFF, 0x00); // 2
+        RGB_MATRIX_INDICATOR_SET_COLOR(25, 0x7A, 0x00, 0xFF);                                           // 3
     }
     return true;
 }
 
-#endif  // RGB_MATRIX_INIT
+#endif // RGB_MATRIX_INIT
 
 #ifdef TAPPING_TERM_PER_KEY
 uint16_t get_tapping_term_keymap(uint16_t keycode, keyrecord_t *record) {

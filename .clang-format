@@ -2,9 +2,13 @@
 BasedOnStyle: Google
 AlignAfterOpenBracket: Align
 AlignConsecutiveAssignments: 'true'
+AlignConsecutiveBitFields: AcrossEmptyLinesAndComments
 AlignConsecutiveDeclarations: 'true'
+AlignConsecutiveMacros: AcrossComments
+AlignEscapedNewlines: Left
 AlignOperands: 'true'
 AllowAllParametersOfDeclarationOnNextLine: 'false'
+AllowShortBlocksOnASingleLine: Never
 AllowShortCaseLabelsOnASingleLine: 'false'
 AllowShortFunctionsOnASingleLine: Empty
 AllowShortLoopsOnASingleLine: 'false'
@@ -13,8 +17,9 @@ AlwaysBreakAfterReturnType: None
 AlwaysBreakBeforeMultilineStrings: 'false'
 BinPackArguments: 'true'
 BinPackParameters: 'true'
-ColumnLimit: '1000'
+ColumnLimit: '120'
 IndentCaseLabels: 'true'
+IndentCaseBlocks: 'true'
 IndentPPDirectives: AfterHash
 IndentWidth: '4'
 MaxEmptyLinesToKeep: '1'

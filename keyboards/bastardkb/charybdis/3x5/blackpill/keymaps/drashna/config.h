@@ -43,14 +43,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #    define WS2812_DI_PIN A1
 #    undef RGB_MATRIX_MAXIMUM_BRIGHTNESS
 #    define RGB_MATRIX_MAXIMUM_BRIGHTNESS 150
-#    define WS2812_PWM_DRIVER PWMD2 // default: PWMD2
-#    define WS2812_PWM_CHANNEL 2    // default: 2
-#    define WS2812_PWM_PAL_MODE 1   // Pin "alternate function", see the respective datasheet for the appropriate values for your MCU. default: 2
+#    define WS2812_PWM_DRIVER PWMD2
+#    define WS2812_PWM_CHANNEL 2
+#    define WS2812_PWM_PAL_MODE 1
 #    define WS2812_EXTERNAL_PULLUP
-//#define WS2812_PWM_COMPLEMENTARY_OUTPUT // Define for a complementary timer output (TIMx_CHyN); omit for a normal timer output (TIMx_CHy).
+//#define WS2812_PWM_COMPLEMENTARY_OUTPUT
 #    undef WS2812_DMA_STREAM
-#    define WS2812_DMA_STREAM STM32_DMA1_STREAM7 // DMA Stream for TIMx_UP, see the respective reference manual for the appropriate values for your MCU.
-#    define WS2812_DMA_CHANNEL 3                 // DMA Channel for TIMx_UP, see the respective reference manual for the appropriate values for your MCU.
+#    define WS2812_DMA_STREAM STM32_DMA1_STREAM7
+#    define WS2812_DMA_CHANNEL 3
 #    define WS2812_PWM_TARGET_PERIOD 800000
 
 #    define DEBUG_LED_PIN C13
@@ -63,15 +63,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* serial.c configuration for split keyboard */
 #    undef SOFT_SERIAL_PIN
-#    define SERIAL_USART_FULL_DUPLEX // Enable full duplex operation mode.
+#    define SERIAL_USART_FULL_DUPLEX
 #    undef SERIAL_USART_TX_PIN
 #    define SERIAL_USART_TX_PIN A2
 #    undef SERIAL_USART_RX_PIN
 #    define SERIAL_USART_RX_PIN A3
 #    define SERIAL_USART_DRIVER SD2
-#    define SERIAL_USART_TX_PAL_MODE 7 // Pin "alternate function", see the respective datasheet for the appropriate values for your MCU. default: 7
-#    define SERIAL_USART_RX_PAL_MODE 7 // Pin "alternate function", see the respective datasheet for the appropriate values for your MCU. default: 7
-#    define SERIAL_USART_TIMEOUT 100   // USART driver timeout. default 100
+#    define SERIAL_USART_TX_PAL_MODE 7
+#    define SERIAL_USART_RX_PAL_MODE 7
+#    define SERIAL_USART_TIMEOUT 100
 #    define SERIAL_USART_SPEED 921600
 // #define SERIAL_USART_PIN_SWAP // swap RX and TX pins on master
 // To use the highest possible baudrate (3.75Mbit/s) uncomment the following

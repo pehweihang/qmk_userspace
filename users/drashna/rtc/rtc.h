@@ -37,6 +37,7 @@ typedef struct {
     uint8_t                    second;          /**< second */
     rtc_time_format_t          format;          /**< data format */
     rtc_time_am_pm_t           am_pm;           /**< am pm */
+    bool                       is_dst;          /**< daylight saving time */
     uint32_t                   unixtime;        /**< Unix Time */
 } rtc_time_t;
 

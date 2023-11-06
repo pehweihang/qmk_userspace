@@ -17,8 +17,8 @@ void convert_halrtc_to_local_rtc_struct(RTCDateTime *halrtc, rtc_time_t *local) 
     local->day_of_the_week = halrtc->dayofweek;
     local->date            = halrtc->day;
     local->second          = (halrtc->millisecond / 1000) % 60;
-    local->minute          = (local->second / 60) % 60;
-    local->hour            = (local->minute / 60) % 24;
+    local->minute          = (halrtc->millisecond / (1000 * 60)) % 60;
+    local->hour            = (halrtc->millisecond / (1000 * 60 * 60)) % 24;
 
     local->unixtime = convert_to_unixtime(*local);
 }
@@ -34,12 +34,14 @@ void convert_local_rtc_to_halrtc_struct(rtc_time_t *local, RTCDateTime *halrtc) 
 void vendor_rtc_set_time(rtc_time_t time) {
     RTCDateTime timespec = {0};
     convert_local_rtc_to_halrtc_struct(&time, &timespec);
+    timespec.dstflag = (uint32_t)time.is_dst;
     rtcSetTime(&RTCD1, &timespec);
 }
 
 void vendor_rtc_get_time(rtc_time_t *time) {
     RTCDateTime timespec = {0};
     rtcGetTime(&RTCD1, &timespec);
+    time->is_dst = (bool)timespec.dstflag;
     convert_halrtc_to_local_rtc_struct(&timespec, time);
 }
 

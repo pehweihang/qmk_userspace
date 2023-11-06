@@ -8,12 +8,11 @@
 // Layer names don't all need to be of the same length, obviously, and you can also skip them
 // entirely and just use numbers.
 #define _BASE 0
-#define _FN1 1
+#define _FN1  1
 
 enum custom_keycodes {
-  QWERTY = SAFE_RANGE,
+    QWERTY = SAFE_RANGE,
 };
-
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {

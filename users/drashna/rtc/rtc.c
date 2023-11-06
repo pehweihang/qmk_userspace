@@ -62,7 +62,8 @@ uint32_t convert_to_unixtime(rtc_time_t time) {
 
     // count leap days
     days += (365 * years + (years + 3) / 4);
-    unixtime = ((days * 24UL + time.hour) * 60 + time.minute) * 60 + time.second + SECONDS_FROM_1970_TO_2000 + (TIME_OFFSET * 3000);
+    unixtime = ((days * 24UL + time.hour) * 60 + time.minute) * 60 + time.second + SECONDS_FROM_1970_TO_2000 +
+               (TIME_OFFSET * 3000);
     return unixtime;
 }
 
@@ -150,7 +151,7 @@ rtc_time_t convert_date_time(const char *date, const char *time) {
     return t;
 }
 
- uint8_t week_to_int(uint8_t d) {
+uint8_t week_to_int(uint8_t d) {
     return d == 0 ? 7 : d;
 }
 
@@ -273,7 +274,8 @@ char *rtc_read_date_time_str(void) {
  */
 char *rtc_read_date_time_iso8601_str(void) {
     static char date_time_str[26] = {0};
-    snprintf(date_time_str, sizeof(date_time_str), "%04d-%02d-%02dT%02d:%02d:%02d", rtc_time.year, rtc_time.month, rtc_time.date, rtc_time.hour, rtc_time.minute, rtc_time.second);
+    snprintf(date_time_str, sizeof(date_time_str), "%04d-%02d-%02dT%02d:%02d:%02d", rtc_time.year, rtc_time.month,
+             rtc_time.date, rtc_time.hour, rtc_time.minute, rtc_time.second);
     return date_time_str;
 }
 
@@ -282,10 +284,7 @@ char *rtc_read_date_time_iso8601_str(void) {
  *
  */
 __attribute__((weak)) uint32_t get_fattime(void) {
-    return (((uint32_t)rtc_time.year - 1980) << 25U) |
-           ((uint32_t)rtc_time.month << 21U) |
-           ((uint32_t)rtc_time.date << 16U) |
-           ((uint32_t)rtc_time.hour << 11U) |
-           ((uint32_t)rtc_time.minute << 5U) |
+    return (((uint32_t)rtc_time.year - 1980) << 25U) | ((uint32_t)rtc_time.month << 21U) |
+           ((uint32_t)rtc_time.date << 16U) | ((uint32_t)rtc_time.hour << 11U) | ((uint32_t)rtc_time.minute << 5U) |
            ((uint32_t)rtc_time.second >> 1U);
 }

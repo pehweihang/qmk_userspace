@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 
-static bool  pcf8523_initialized = false;
+static bool pcf8523_initialized = false;
 
 /**
  * @brief Sets the time on the RTC

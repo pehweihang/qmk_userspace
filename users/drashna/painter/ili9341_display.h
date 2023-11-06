@@ -3,9 +3,8 @@
 
 #pragma once
 
-extern painter_device_t ili9341_display;
+extern painter_device_t      ili9341_display;
 extern painter_font_handle_t font;
-
 
 void housekeeping_task_quantum_painter(void);
 void keyboard_post_init_quantum_painter(void);

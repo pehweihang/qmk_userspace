@@ -8,7 +8,8 @@ extern led_config_t g_led_config;
 
 static uint32_t hypno_timer;
 
-void rgb_matrix_layer_helper(uint8_t hue, uint8_t sat, uint8_t val, uint8_t mode, uint8_t speed, uint8_t led_type, uint8_t led_min, uint8_t led_max) {
+void rgb_matrix_layer_helper(uint8_t hue, uint8_t sat, uint8_t val, uint8_t mode, uint8_t speed, uint8_t led_type,
+                             uint8_t led_min, uint8_t led_max) {
     HSV hsv = {hue, sat, val};
     if (hsv.v > rgb_matrix_get_val()) {
         hsv.v = rgb_matrix_get_val();
@@ -16,33 +17,34 @@ void rgb_matrix_layer_helper(uint8_t hue, uint8_t sat, uint8_t val, uint8_t mode
 
     switch (mode) {
         case 1: // breathing
-        {
-            uint16_t time = scale16by8(g_rgb_timer, speed / 8);
-            hsv.v         = scale8(abs8(sin8(time) - 128) * 2, hsv.v);
-            RGB rgb       = hsv_to_rgb(hsv);
-            for (uint8_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
-                if (HAS_FLAGS(g_led_config.flags[i], led_type)) {
-                    RGB_MATRIX_INDICATOR_SET_COLOR(i, rgb.r, rgb.g, rgb.b);
+            {
+                uint16_t time = scale16by8(g_rgb_timer, speed / 8);
+                hsv.v         = scale8(abs8(sin8(time) - 128) * 2, hsv.v);
+                RGB rgb       = hsv_to_rgb(hsv);
+                for (uint8_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
+                    if (HAS_FLAGS(g_led_config.flags[i], led_type)) {
+                        RGB_MATRIX_INDICATOR_SET_COLOR(i, rgb.r, rgb.g, rgb.b);
+                    }
                 }
+                break;
             }
-            break;
-        }
         default: // Solid Color
-        {
-            RGB rgb = hsv_to_rgb(hsv);
-            for (uint8_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
-                if (HAS_FLAGS(g_led_config.flags[i], led_type)) {
-                    RGB_MATRIX_INDICATOR_SET_COLOR(i, rgb.r, rgb.g, rgb.b);
+            {
+                RGB rgb = hsv_to_rgb(hsv);
+                for (uint8_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
+                    if (HAS_FLAGS(g_led_config.flags[i], led_type)) {
+                        RGB_MATRIX_INDICATOR_SET_COLOR(i, rgb.r, rgb.g, rgb.b);
+                    }
                 }
+                break;
             }
-            break;
-        }
     }
 }
 
 void housekeeping_task_rgb_matrix(void) {
 #if defined(RGB_MATRIX_FRAMEBUFFER_EFFECTS)
-    if (userspace_config.rgb_matrix_idle_anim && rgb_matrix_get_mode() == RGB_MATRIX_TYPING_HEATMAP && sync_timer_elapsed32(hypno_timer) > 15000) {
+    if (userspace_config.rgb_matrix_idle_anim && rgb_matrix_get_mode() == RGB_MATRIX_TYPING_HEATMAP &&
+        sync_timer_elapsed32(hypno_timer) > 15000) {
         rgb_matrix_mode_noeeprom(RGB_MATRIX_REST_MODE);
     }
 #endif
@@ -117,20 +119,25 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
                 break;
             default:
                 if (layer_state_is(_MOUSE)) {
-                    rgb_matrix_layer_helper(HSV_PURPLE, 1, rgb_matrix_config.speed, LED_FLAG_MODIFIER, led_min, led_max);
+                    rgb_matrix_layer_helper(HSV_PURPLE, 1, rgb_matrix_config.speed, LED_FLAG_MODIFIER, led_min,
+                                            led_max);
                 } else {
                     switch (get_highest_layer(default_layer_state)) {
                         case _DEFAULT_LAYER_1:
-                            rgb_matrix_layer_helper(DEFAULT_LAYER_1_HSV, 0, rgb_matrix_config.speed, LED_FLAG_MODIFIER, led_min, led_max);
+                            rgb_matrix_layer_helper(DEFAULT_LAYER_1_HSV, 0, rgb_matrix_config.speed, LED_FLAG_MODIFIER,
+                                                    led_min, led_max);
                             break;
                         case _DEFAULT_LAYER_2:
-                            rgb_matrix_layer_helper(DEFAULT_LAYER_2_HSV, 0, rgb_matrix_config.speed, LED_FLAG_MODIFIER, led_min, led_max);
+                            rgb_matrix_layer_helper(DEFAULT_LAYER_2_HSV, 0, rgb_matrix_config.speed, LED_FLAG_MODIFIER,
+                                                    led_min, led_max);
                             break;
                         case _DEFAULT_LAYER_3:
-                            rgb_matrix_layer_helper(DEFAULT_LAYER_3_HSV, 0, rgb_matrix_config.speed, LED_FLAG_MODIFIER, led_min, led_max);
+                            rgb_matrix_layer_helper(DEFAULT_LAYER_3_HSV, 0, rgb_matrix_config.speed, LED_FLAG_MODIFIER,
+                                                    led_min, led_max);
                             break;
                         case _DEFAULT_LAYER_4:
-                            rgb_matrix_layer_helper(DEFAULT_LAYER_4_HSV, 0, rgb_matrix_config.speed, LED_FLAG_MODIFIER, led_min, led_max);
+                            rgb_matrix_layer_helper(DEFAULT_LAYER_4_HSV, 0, rgb_matrix_config.speed, LED_FLAG_MODIFIER,
+                                                    led_min, led_max);
                             break;
                     }
                 }
@@ -146,7 +153,6 @@ __attribute__((weak)) bool rgb_matrix_indicators_keymap(void) {
 bool rgb_matrix_indicators_user(void) {
     return rgb_matrix_indicators_keymap();
 }
-
 
 //----------------------------------------------------------
 // RGB Matrix naming
@@ -172,7 +178,7 @@ enum {
 #define RGB_MATRIX_EFFECT(x)    \
     case RGB_MATRIX_EFFECT_##x: \
         return #x;
-const char* rgb_matrix_name(uint8_t effect) {
+const char *rgb_matrix_name(uint8_t effect) {
     switch (effect) {
         case RGB_MATRIX_EFFECT_NONE:
             return "NONE";

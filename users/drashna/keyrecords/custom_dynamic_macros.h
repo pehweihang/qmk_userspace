@@ -41,7 +41,7 @@ void dynamic_macro_record_key_user(uint8_t macro_id, keyrecord_t* record);
 void dynamic_macro_record_end_user(uint8_t macro_id);
 
 #define DYNAMIC_MACRO_CRC_LENGTH (sizeof(dynamic_macro_t) - sizeof(uint16_t))
-#define IS_DYN_KEYCODE(keycode) (keycode >= DYN_MACRO_KEY00 && keycode <= DYN_MACRO_KEY15)
+#define IS_DYN_KEYCODE(keycode)  (keycode >= DYN_MACRO_KEY00 && keycode <= DYN_MACRO_KEY15)
 
 uint16_t dynamic_macro_calc_crc(dynamic_macro_t* macro);
 void     dynamic_macro_load_eeprom_all(void);

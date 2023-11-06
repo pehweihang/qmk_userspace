@@ -22,13 +22,13 @@
 /**
  * @brief register definition
  */
-#define DS3231_TIME_REG 0x00
-#define DS3231_ALARM1_REG 0x07
-#define DS3231_ALARM2_REG 0x0B
-#define DS3231_CONTROL_REG 0x0E
-#define DS3231_STATUS_REG 0x0F
+#define DS3231_TIME_REG         0x00
+#define DS3231_ALARM1_REG       0x07
+#define DS3231_ALARM2_REG       0x0B
+#define DS3231_CONTROL_REG      0x0E
+#define DS3231_STATUS_REG       0x0F
 #define DS3231_AGING_OFFSET_REG 0x10
-#define DS3231_TEMPERATURE_REG 0x11
+#define DS3231_TEMPERATURE_REG  0x11
 
 /**
  * @brief Functions Prototypes

@@ -40,26 +40,24 @@ typedef struct {
     uint32_t                   unixtime;        /**< Unix Time */
 } rtc_time_t;
 
-
 #define SECONDS_FROM_1970_TO_2000 946684800
-#define TIME_OFFSET 6
+#define TIME_OFFSET               6
 
 void rtc_init(void);
 void rtc_task(void);
 
-uint32_t convert_to_unixtime(rtc_time_t time);
+uint32_t   convert_to_unixtime(rtc_time_t time);
 rtc_time_t convert_date_time(const char *date, const char *time);
-uint8_t rtc_bcd2bin(uint8_t val);
-uint8_t rtc_bin2bcd(uint8_t val);
-uint8_t week_to_int(uint8_t d);
-
+uint8_t    rtc_bcd2bin(uint8_t val);
+uint8_t    rtc_bin2bcd(uint8_t val);
+uint8_t    week_to_int(uint8_t d);
 
 rtc_time_t rtc_read_time_struct(void);
-char *rtc_read_date_str(void);
-char *rtc_read_time_str(void);
-char *rtc_read_date_time_str(void);
-char *rtc_read_date_time_iso8601_str(void);
+char      *rtc_read_date_str(void);
+char      *rtc_read_time_str(void);
+char      *rtc_read_date_time_str(void);
+char      *rtc_read_date_time_iso8601_str(void);
 
-bool rtc_is_connected(void);
-void rtc_set_time_split(rtc_time_t time, bool is_connected);
+bool     rtc_is_connected(void);
+void     rtc_set_time_split(rtc_time_t time, bool is_connected);
 uint32_t get_fattime(void);

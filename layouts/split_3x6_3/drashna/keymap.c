@@ -92,12 +92,12 @@ oled_rotation_t oled_init_keymap(oled_rotation_t rotation, bool has_run) {
 #    ifdef CONVERT_TO_PROTON_C
 // WPM-responsive animation stuff here
 #        define SLEEP_FRAMES 2
-#        define SLEEP_SPEED 10 // below this wpm value your animation will idle
+#        define SLEEP_SPEED  10 // below this wpm value your animation will idle
 
 #        define WAKE_FRAMES 2 // uncomment if >1
 
 #        define KAKI_FRAMES 3
-#        define KAKI_SPEED 40 // above this wpm value typing animation to triggere
+#        define KAKI_SPEED  40 // above this wpm value typing animation to triggere
 
 #        define RTOGI_FRAMES 2
 // #define LTOGI_FRAMES 2

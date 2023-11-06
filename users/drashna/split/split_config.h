@@ -19,10 +19,9 @@
 #    define SELECT_SOFT_SERIAL_SPEED 1
 #endif
 #ifdef CUSTOM_SPLIT_TRANSPORT_SYNC
-#    define SPLIT_TRANSACTION_IDS_USER                                            \
-        RPC_ID_USER_STATE_SYNC, RPC_ID_USER_KEYMAP_SYNC, RPC_ID_USER_CONFIG_SYNC, \
-        RPC_ID_USER_AUTOCORRECT_STR, RPC_ID_USER_OLED_KEYLOG_STR,                 \
-        RPC_ID_USER_SUSPEND_STATE_SYNC
+#    define SPLIT_TRANSACTION_IDS_USER                                                                         \
+        RPC_ID_USER_STATE_SYNC, RPC_ID_USER_KEYMAP_SYNC, RPC_ID_USER_CONFIG_SYNC, RPC_ID_USER_AUTOCORRECT_STR, \
+            RPC_ID_USER_OLED_KEYLOG_STR, RPC_ID_USER_SUSPEND_STATE_SYNC
 
 // autocorrect and the like require larger data sets, so we need to increase the buffer size
 #    define RPC_M2S_BUFFER_SIZE 64

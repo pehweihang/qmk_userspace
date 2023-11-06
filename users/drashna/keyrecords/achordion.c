@@ -137,7 +137,8 @@ bool process_achordion(uint16_t keycode, keyrecord_t* record) {
         // events back into the handling pipeline so that QMK features and other
         // user code can see them. This is done by calling `process_record()`, which
         // in turn calls most handlers including `process_record_user()`.
-        if (!is_key_event || (is_tap_hold && record->tap.count == 0) || achordion_chord(tap_hold_keycode, &tap_hold_record, keycode, record)) {
+        if (!is_key_event || (is_tap_hold && record->tap.count == 0) ||
+            achordion_chord(tap_hold_keycode, &tap_hold_record, keycode, record)) {
             dprintln("Achordion: Plumbing hold press.");
             settle_as_hold();
         } else {
@@ -189,7 +190,8 @@ bool achordion_opposite_hands(const keyrecord_t* tap_hold_record, const keyrecor
 
 // By default, use the BILATERAL_COMBINATIONS rule to consider the tap-hold key
 // "held" only when it and the other key are on opposite hands.
-__attribute__((weak)) bool achordion_chord(uint16_t tap_hold_keycode, keyrecord_t* tap_hold_record, uint16_t other_keycode, keyrecord_t* other_record) {
+__attribute__((weak)) bool achordion_chord(uint16_t tap_hold_keycode, keyrecord_t* tap_hold_record,
+                                           uint16_t other_keycode, keyrecord_t* other_record) {
     // Exceptionally consider the following chords as holds, even though they
     // are on the same hand in Dvorak.
     switch (tap_hold_keycode) {

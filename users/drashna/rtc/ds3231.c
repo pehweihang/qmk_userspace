@@ -33,14 +33,16 @@ i2c_status_t ds3231_set_time(rtc_time_t t) {
     };
     // clang-format on
 
-    if (i2c_writeReg(DS3231_I2C_ADDRESS << 1, DS3231_TIME_REG, data, ARRAY_SIZE(data), DS3231_I2C_TIMEOUT) != I2C_STATUS_SUCCESS) {
+    if (i2c_writeReg(DS3231_I2C_ADDRESS << 1, DS3231_TIME_REG, data, ARRAY_SIZE(data), DS3231_I2C_TIMEOUT) !=
+        I2C_STATUS_SUCCESS) {
         dprintf("Error while sending time to RTC!\n");
         return I2C_STATUS_ERROR;
     }
 
     uint8_t status[1] = {0};
 
-    if (i2c_readReg(DS3231_I2C_ADDRESS << 1, DS3231_STATUS_REG, status, ARRAY_SIZE(status), DS3231_I2C_TIMEOUT) != I2C_STATUS_SUCCESS) {
+    if (i2c_readReg(DS3231_I2C_ADDRESS << 1, DS3231_STATUS_REG, status, ARRAY_SIZE(status), DS3231_I2C_TIMEOUT) !=
+        I2C_STATUS_SUCCESS) {
         dprintf("Error while reading status!\n");
         return I2C_STATUS_ERROR;
     }
@@ -59,7 +61,8 @@ i2c_status_t ds3231_set_time(rtc_time_t t) {
 i2c_status_t ds3231_get_time(rtc_time_t *time) {
     uint8_t data[7] = {0, 0, 0, 0, 0, 0, 0};
 
-    i2c_status_t status = i2c_readReg(DS3231_I2C_ADDRESS << 1, DS3231_TIME_REG, data, ARRAY_SIZE(data), DS3231_I2C_TIMEOUT);
+    i2c_status_t status =
+        i2c_readReg(DS3231_I2C_ADDRESS << 1, DS3231_TIME_REG, data, ARRAY_SIZE(data), DS3231_I2C_TIMEOUT);
     if (status != I2C_STATUS_SUCCESS) {
         return status;
     }

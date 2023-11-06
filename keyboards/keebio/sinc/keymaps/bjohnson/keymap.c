@@ -68,7 +68,8 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
 #include <string.h>
 
 uint16_t transport_keymap_config = 0;
-void     user_keymap_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer, uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
+void     user_keymap_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
+                          uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
     if (initiator2target_buffer_size == sizeof(transport_keymap_config)) {
         memcpy(&transport_keymap_config, initiator2target_buffer, initiator2target_buffer_size);
     }
@@ -106,7 +107,8 @@ void user_transport_sync(void) {
 
         // Perform the sync if requested
         if (needs_sync) {
-            if (transaction_rpc_send(RPC_ID_USER_KEYMAP_SYNC, sizeof(transport_keymap_config), &transport_keymap_config)) {
+            if (transaction_rpc_send(RPC_ID_USER_KEYMAP_SYNC, sizeof(transport_keymap_config),
+                                     &transport_keymap_config)) {
                 last_sync = timer_read32();
             }
             needs_sync = false;

@@ -105,7 +105,8 @@ void achordion_task(void);
  * @param other_record keyrecord_t from the other key's press event.
  * @return True if the tap-hold key should be considered held.
  */
-bool achordion_chord(uint16_t tap_hold_keycode, keyrecord_t* tap_hold_record, uint16_t other_keycode, keyrecord_t* other_record);
+bool achordion_chord(uint16_t tap_hold_keycode, keyrecord_t* tap_hold_record, uint16_t other_keycode,
+                     keyrecord_t* other_record);
 
 /**
  * Optional callback to define a timeout duration per keycode.

@@ -76,14 +76,16 @@ void add_keylog(uint16_t keycode, keyrecord_t *record) {
         if (record->tap.count) {
             keycode = keycode_config(QK_MOD_TAP_GET_TAP_KEYCODE(keycode));
         } else {
-            keycode = keycode_config(0xE0 + biton(QK_MOD_TAP_GET_MODS(keycode) & 0xF) + biton(QK_MOD_TAP_GET_MODS(keycode) & 0x10));
+            keycode = keycode_config(0xE0 + biton(QK_MOD_TAP_GET_MODS(keycode) & 0xF) +
+                                     biton(QK_MOD_TAP_GET_MODS(keycode) & 0x10));
         }
     } else if (IS_QK_LAYER_TAP(keycode) && record->tap.count) {
         keycode = keycode_config(QK_LAYER_TAP_GET_TAP_KEYCODE(keycode));
     } else if (IS_QK_MODS(keycode)) {
         keycode = keycode_config(QK_MODS_GET_BASIC_KEYCODE(keycode));
     } else if (IS_QK_ONE_SHOT_MOD(keycode)) {
-        keycode = keycode_config(0xE0 + biton(QK_ONE_SHOT_MOD_GET_MODS(keycode) & 0xF) + biton(QK_ONE_SHOT_MOD_GET_MODS(keycode) & 0x10));
+        keycode = keycode_config(0xE0 + biton(QK_ONE_SHOT_MOD_GET_MODS(keycode) & 0xF) +
+                                 biton(QK_ONE_SHOT_MOD_GET_MODS(keycode) & 0x10));
     } else if (IS_QK_BASIC(keycode)) {
         keycode = keycode_config(keycode);
     }
@@ -206,7 +208,8 @@ void render_default_layer_state(uint8_t col, uint8_t line) {
     static layer_state_t old_state              = 0;
 
     if (old_state != default_layer_state) {
-        snprintf(layer_state_buffer, sizeof(layer_state_buffer), "%-10s", get_layer_name_string(default_layer_state, false));
+        snprintf(layer_state_buffer, sizeof(layer_state_buffer), "%-10s",
+                 get_layer_name_string(default_layer_state, false));
         old_state = default_layer_state;
     }
     oled_write(layer_state_buffer, false);
@@ -334,7 +337,8 @@ void render_matrix_scan_rate(uint8_t padding, uint8_t col, uint8_t line) {
  * @param modifiers Modifiers to check against (real, weak, onesheot, etc;)
  */
 void render_mod_status(uint8_t modifiers, uint8_t col, uint8_t line) {
-    static const char PROGMEM mod_status[5][3] = {{0xE8, 0xE9, 0}, {0xE4, 0xE5, 0}, {0xE6, 0xE7, 0}, {0xEA, 0xEB, 0}, {0xEC, 0xED, 0}};
+    static const char PROGMEM mod_status[5][3] = {
+        {0xE8, 0xE9, 0}, {0xE4, 0xE5, 0}, {0xE6, 0xE7, 0}, {0xEA, 0xEB, 0}, {0xEC, 0xED, 0}};
 #if defined(OLED_DISPLAY_VERBOSE)
     oled_set_cursor(col, line);
 #endif
@@ -475,7 +479,8 @@ void render_user_status(uint8_t col, uint8_t line) {
     static const char PROGMEM cat_mode[3] = {0xF9, 0xFA, 0};
     oled_write_P(cat_mode, get_keyboard_lock());
 #if defined(UNICODE_COMMON_ENABLE)
-    static const char PROGMEM uc_mod_status[5][3] = {{0xEC, 0xED, 0}, {0x20, 0x20, 0}, {0x20, 0x20, 0}, {0x20, 0x20, 0}, {0xEA, 0xEB, 0}};
+    static const char PROGMEM uc_mod_status[5][3] = {
+        {0xEC, 0xED, 0}, {0x20, 0x20, 0}, {0x20, 0x20, 0}, {0x20, 0x20, 0}, {0xEA, 0xEB, 0}};
     oled_write_P(uc_mod_status[get_unicode_input_mode()], false);
 #endif
     if (userspace_config.nuke_switch) {
@@ -590,9 +595,11 @@ void render_wpm_graph(uint8_t start_offset, uint8_t cutoff, uint8_t max_lines_gr
     uint8_t         currwpm = get_current_wpm();
     float           max_wpm = OLED_WPM_GRAPH_MAX_WPM;
 
-    if (timer_elapsed(timer) > OLED_WPM_GRAPH_REFRESH_INTERVAL) {                  // check if it's been long enough before refreshing graph
-        x = (max_lines_graph - 1) - ((currwpm / max_wpm) * (max_lines_graph - 1)); // main calculation to plot graph line
-        for (uint8_t i = 0; i <= OLED_WPM_GRAPH_GRAPH_LINE_THICKNESS - 1; i++) {   // first draw actual value line
+    if (timer_elapsed(timer) >
+        OLED_WPM_GRAPH_REFRESH_INTERVAL) { // check if it's been long enough before refreshing graph
+        x = (max_lines_graph - 1) -
+            ((currwpm / max_wpm) * (max_lines_graph - 1));                       // main calculation to plot graph line
+        for (uint8_t i = 0; i <= OLED_WPM_GRAPH_GRAPH_LINE_THICKNESS - 1; i++) { // first draw actual value line
             oled_write_pixel(start_offset, x + i + vertical_offset, true);
         }
 #    ifdef OLED_WPM_GRAPH_VERTICAL_LINE
@@ -620,8 +627,9 @@ void render_wpm_graph(uint8_t start_offset, uint8_t cutoff, uint8_t max_lines_gr
 #    endif
         uint8_t y_start  = ceil(vertical_offset / 8);
         uint8_t y_length = y_start + ceil(max_lines_graph / 8);
-        oled_pan_section(false, y_start, y_length, start_offset, cutoff); // then move the entire graph one pixel to the right
-        timer = timer_read();                                             // refresh the timer for the next iteration
+        oled_pan_section(false, y_start, y_length, start_offset,
+                         cutoff); // then move the entire graph one pixel to the right
+        timer = timer_read();     // refresh the timer for the next iteration
     }
 #endif
 }
@@ -656,7 +664,8 @@ void render_pointing_dpi_status(uint16_t cpi, uint8_t padding, uint8_t col, uint
 
 // #define ANIM_FRAME_DURATION 500 // how long each frame lasts in ms
 //  #define SLEEP_TIMER 60000 // should sleep after this period of 0 wpm, needs fixing
-#if (OLED_SLEEP_FRAMES > OLED_ANIM_MAX_FRAMES) || (OLED_WAKE_FRAMES > OLED_ANIM_MAX_FRAMES) || (OLED_KAKI_FRAMES > OLED_ANIM_MAX_FRAMES) || (OLED_RTOGI_FRAMES > OLED_ANIM_MAX_FRAMES)
+#if (OLED_SLEEP_FRAMES > OLED_ANIM_MAX_FRAMES) || (OLED_WAKE_FRAMES > OLED_ANIM_MAX_FRAMES) || \
+    (OLED_KAKI_FRAMES > OLED_ANIM_MAX_FRAMES) || (OLED_RTOGI_FRAMES > OLED_ANIM_MAX_FRAMES)
 #    error frame size too large
 #endif
 
@@ -722,7 +731,8 @@ void render_unicode_mode_small(uint8_t col, uint8_t line, bool invert) {
 }
 
 void render_mouse_mode(uint8_t col, uint8_t line) {
-#if (defined(KEYBOARD_bastardkb_charybdis) || defined(KEYBOARD_handwired_tractyl_manuform)) && defined(POINTING_DEVICE_ENABLE)
+#if (defined(KEYBOARD_bastardkb_charybdis) || defined(KEYBOARD_handwired_tractyl_manuform)) && \
+    defined(POINTING_DEVICE_ENABLE)
     // credit and thanks to jaspertandy on discord for these images
     uint8_t image_index = 0;
 #    ifdef OLED_DISPLAY_TEST
@@ -767,8 +777,11 @@ void render_status_left(void) {
 #    else
     render_matrix_scan_rate(1, 7, 1);
 #    endif
-#    if (defined(KEYBOARD_bastardkb_charybdis) || defined(KEYBOARD_handwired_tractyl_manuform)) && defined(POINTING_DEVICE_ENABLE)
-    render_pointing_dpi_status(charybdis_get_pointer_sniping_enabled() ? charybdis_get_pointer_sniping_dpi() : charybdis_get_pointer_default_dpi(), 1, 7, 2);
+#    if (defined(KEYBOARD_bastardkb_charybdis) || defined(KEYBOARD_handwired_tractyl_manuform)) && \
+        defined(POINTING_DEVICE_ENABLE)
+    render_pointing_dpi_status(charybdis_get_pointer_sniping_enabled() ? charybdis_get_pointer_sniping_dpi()
+                                                                       : charybdis_get_pointer_default_dpi(),
+                               1, 7, 2);
     render_mouse_mode(17, 1);
 #    elif defined(WPM_ENABLE)
     render_matrix_scan_rate(1, 7, 2);
@@ -829,7 +842,8 @@ void render_arasaka_logo(uint8_t col, uint8_t line) {
     }
 
     if (timer < 250) {
-        uint8_t frame = can_be_dirty ? rand() % (text_glitch_count + text_glitch_dirty_count) : rand() % text_glitch_count;
+        uint8_t frame =
+            can_be_dirty ? rand() % (text_glitch_count + text_glitch_dirty_count) : rand() % text_glitch_count;
 
         if (frame < text_glitch_count) {
             oled_write_raw_P(text_glitch[frame], sizeof(text_glitch[0]));
@@ -843,7 +857,8 @@ void render_arasaka_logo(uint8_t col, uint8_t line) {
     }
 
     if (timer > 9750 && timer < 9850) {
-        uint8_t frame = can_be_dirty ? rand() % (text_glitch_count + text_glitch_dirty_count) : rand() % text_glitch_count;
+        uint8_t frame =
+            can_be_dirty ? rand() % (text_glitch_count + text_glitch_dirty_count) : rand() % text_glitch_count;
 
         if (frame < text_glitch_count) {
             oled_write_raw_P(text_glitch[frame], sizeof(text_glitch[0]));
@@ -866,7 +881,8 @@ void render_arasaka_logo(uint8_t col, uint8_t line) {
 
     if (glitch && 0 != frame_count) {
         frame_count--;
-        uint8_t frame = can_be_dirty ? rand() % (text_glitch_count + text_glitch_dirty_count) : rand() % text_glitch_count;
+        uint8_t frame =
+            can_be_dirty ? rand() % (text_glitch_count + text_glitch_dirty_count) : rand() % text_glitch_count;
 
         if (frame < text_glitch_count) {
             oled_write_raw_P(text_glitch[frame], sizeof(text_glitch[0]));
@@ -1068,7 +1084,8 @@ bool oled_task_user(void) {
 
 void housekeeping_task_oled(void) {
     is_oled_enabled = false;
-    if ((userspace_config.oled_lock || (last_input_activity_elapsed() < 60000)) && !(is_oled_force_off || is_device_suspended())) {
+    if ((userspace_config.oled_lock || (last_input_activity_elapsed() < 60000)) &&
+        !(is_oled_force_off || is_device_suspended())) {
         is_oled_enabled = true;
     }
     if (oled_get_brightness() != userspace_config.oled_brightness) {

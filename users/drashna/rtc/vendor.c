@@ -11,7 +11,6 @@
 #include "timer.h"
 #include <stdio.h>
 
-
 void convert_halrtc_to_local_rtc_struct(RTCDateTime *halrtc, rtc_time_t *local) {
     local->year            = halrtc->year + 1980U;
     local->month           = halrtc->month;

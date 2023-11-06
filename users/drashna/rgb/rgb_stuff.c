@@ -59,7 +59,6 @@ bool is_rgblight_startup_running(void) {
 #endif
 }
 
-
 void keyboard_post_init_rgb_light(void) {
 #if defined(RGBLIGHT_STARTUP_ANIMATION)
     is_enabled = rgblight_is_enabled();
@@ -137,29 +136,28 @@ layer_state_t default_layer_state_set_rgb_light(layer_state_t state) {
 #define _RGBM_SINGLE_STATIC(sym) \
     case RGBLIGHT_MODE_##sym:    \
         return #sym;
-#define _RGBM_SINGLE_DYNAMIC(sym)  \
+#define _RGBM_SINGLE_DYNAMIC(sym) \
+    case RGBLIGHT_MODE_##sym:     \
+        return #sym;
+#define _RGBM_MULTI_STATIC(sym) \
+    case RGBLIGHT_MODE_##sym:   \
+        return #sym;
+#define _RGBM_MULTI_DYNAMIC(sym) \
     case RGBLIGHT_MODE_##sym:    \
         return #sym;
-#define _RGBM_MULTI_STATIC(sym)  \
-    case RGBLIGHT_MODE_##sym:    \
-        return #sym;
-#define _RGBM_MULTI_DYNAMIC(sym)  \
-    case RGBLIGHT_MODE_##sym:    \
-        return #sym;
-#define _RGBM_TMP_STATIC(sym, msym)  \
-    case RGBLIGHT_MODE_##sym:    \
+#define _RGBM_TMP_STATIC(sym, msym) \
+    case RGBLIGHT_MODE_##sym:       \
         return #msym;
-#define _RGBM_TMP_DYNAMIC(sym, msym)  \
-    case RGBLIGHT_MODE_##sym:    \
+#define _RGBM_TMP_DYNAMIC(sym, msym) \
+    case RGBLIGHT_MODE_##sym:        \
         return #msym;
 
-
-const char* rgblight_name(uint8_t effect) {
+const char *rgblight_name(uint8_t effect) {
     switch (effect) {
 #include "rgblight_modes.h"
-    case 0:
-        return "Off";
-    default:
-        return "UNKNOWN";
+        case 0:
+            return "Off";
+        default:
+            return "UNKNOWN";
     }
 }

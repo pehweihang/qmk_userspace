@@ -11,7 +11,7 @@ enum local_layers {
 
 // Defines for task manager and such
 #define CALTDEL LCTL(LALT(KC_DEL))
-#define TSKMGR LCTL(LSFT(KC_ESC))
+#define TSKMGR  LCTL(LSFT(KC_ESC))
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {

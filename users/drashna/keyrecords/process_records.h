@@ -22,9 +22,6 @@
 #    include "keyrecords/unicode.h"
 #endif
 
-
-
-
 enum userspace_custom_keycodes {
     VRSN = QK_USER,  // Prints QMK Firmware and board info
     KC_DIABLO_CLEAR, // Clears all Diablo Timers
@@ -98,14 +95,14 @@ void post_process_record_keymap(uint16_t keycode, keyrecord_t *record);
 bool process_record_unicode(uint16_t keycode, keyrecord_t *record);
 #endif
 
-#define LOWER MO(_LOWER)
-#define RAISE MO(_RAISE)
-#define ADJUST MO(_ADJUST)
+#define LOWER   MO(_LOWER)
+#define RAISE   MO(_RAISE)
+#define ADJUST  MO(_ADJUST)
 #define TG_MODS OS_TOGG
 #define TG_GAME TG(_GAMEPAD)
 #define TG_DBLO TG(_DIABLO)
-#define OS_LWR OSL(_LOWER)
-#define OS_RSE OSL(_RAISE)
+#define OS_LWR  OSL(_LOWER)
+#define OS_RSE  OSL(_RAISE)
 
 #define KC_SEC1 KC_SECRET_1
 #define KC_SEC2 KC_SECRET_2
@@ -113,15 +110,15 @@ bool process_record_unicode(uint16_t keycode, keyrecord_t *record);
 #define KC_SEC4 KC_SECRET_4
 #define KC_SEC5 KC_SECRET_5
 
-#define KC_QWERTY DF(_QWERTY)
+#define KC_QWERTY     DF(_QWERTY)
 #define KC_COLEMAK_DH DF(_COLEMAK_DH)
-#define KC_COLEMAK DF(_COLEMAK)
-#define KC_DVORAK DF(_DVORAK)
+#define KC_COLEMAK    DF(_COLEMAK)
+#define KC_DVORAK     DF(_DVORAK)
 
-#define QWERTY KC_QWERTY
-#define DVORAK KC_DVORAK
+#define QWERTY  KC_QWERTY
+#define DVORAK  KC_DVORAK
 #define COLEMAK KC_COLEMAK
-#define CLMKDH KC_COLEMAK_DH
+#define CLMKDH  KC_COLEMAK_DH
 
 #ifdef SWAP_HANDS_ENABLE
 #    define KC_C1R3 SH_T(KC_TAB)
@@ -148,7 +145,7 @@ bool process_record_unicode(uint16_t keycode, keyrecord_t *record);
 #define OS_RCTL OSM(MOD_RCTL)
 #define OS_LALT OSM(MOD_LALT)
 #define OS_RALT OSM(MOD_RALT)
-#define OS_MEH OSM(MOD_MEH)
+#define OS_MEH  OSM(MOD_MEH)
 #define OS_HYPR OSM(MOD_HYPR)
 
 #define ALT_APP ALT_T(KC_APP)
@@ -176,8 +173,8 @@ We use custom codes here, so we can substitute the right stuff
 #define OL_LOCK OLED_LOCK
 #define OL_BINC OLED_BRIGHTNESS_INC
 #define OL_BDEC OLED_BRIGHTNESS_DEC
-#define OL_CW OLED_ROTATE_CW
-#define OL_CCW OLED_ROTATE_CCW
+#define OL_CW   OLED_ROTATE_CW
+#define OL_CCW  OLED_ROTATE_CCW
 
 #define US_MSRP US_MATRIX_SCAN_RATE_PRINT
 #define US_SELW US_SELECT_WORD

@@ -17,11 +17,11 @@
 #define RGBLIGHT_EFFECT_ALTERNATING
 #define RGBLIGHT_EFFECT_TWINKLE
 #undef RGBLED_NUM
-#define RGBLED_NUM 8  // Number of LEDs
+#define RGBLED_NUM        8 // Number of LEDs
 #define RGBLIGHT_HUE_STEP 10
 #define RGBLIGHT_SAT_STEP 17
 #define RGBLIGHT_VAL_STEP 17
 
 #define RGB_MATRIX_LED_COUNT RGBLED_NUM
-#define AUDIO_PIN B7
+#define AUDIO_PIN            B7
 #define AUDIO_CLICKY

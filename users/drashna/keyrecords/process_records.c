@@ -53,12 +53,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     }
 #endif
 #ifdef ACHORDION_ENABLE
-  if (!process_achordion(keycode, record)) { return false; }
+    if (!process_achordion(keycode, record)) {
+        return false;
+    }
 #endif
 
     // If console is enabled, it will print the matrix position and status of each key pressed
 #ifdef KEYLOGGER_ENABLE
-    uprintf("KL: kc: 0x%04X, col: %2u, row: %2u, pressed: %1d, time: %5u, int: %1d, count: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed, record->event.time, record->tap.interrupted, record->tap.count);
+    uprintf("KL: kc: 0x%04X, col: %2u, row: %2u, pressed: %1d, time: %5u, int: %1d, count: %u\n", keycode,
+            record->event.key.col, record->event.key.row, record->event.pressed, record->event.time,
+            record->tap.interrupted, record->tap.count);
 #endif // KEYLOGGER_ENABLE
 #if defined(OLED_ENABLE) && defined(CUSTOM_OLED_DRIVER)
     process_record_user_oled(keycode, record);
@@ -103,7 +107,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
         case VRSN: // Prints firmware version
             if (record->event.pressed) {
-                send_string_with_delay_P(PSTR(QMK_KEYBOARD "/" QMK_KEYMAP " @ " QMK_VERSION ", Built on: " QMK_BUILDDATE), TAP_CODE_DELAY);
+                send_string_with_delay_P(
+                    PSTR(QMK_KEYBOARD "/" QMK_KEYMAP " @ " QMK_VERSION ", Built on: " QMK_BUILDDATE), TAP_CODE_DELAY);
             }
             break;
 
@@ -175,7 +180,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             if (record->event.pressed) {
                 bool is_eeprom_updated;
 #    if defined(CUSTOM_RGBLIGHT) && !defined(RGBLIGHT_DISABLE_KEYCODES)
-                // This disables layer indication, as it's assumed that if you're changing this ... you want that disabled
+                // This disables layer indication, as it's assumed that if you're changing this ... you want that
+                // disabled
                 if (userspace_config.rgb_layer_change) {
                     userspace_config.rgb_layer_change = false;
                     dprintf("rgblight layer change [EEPROM]: %u\n", userspace_config.rgb_layer_change);

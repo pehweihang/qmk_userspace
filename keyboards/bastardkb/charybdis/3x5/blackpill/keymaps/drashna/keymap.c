@@ -2,9 +2,9 @@
 // Copyright 2023 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-
 #include "drashna.h"
 
+// clang-format off
 #define LAYOUT_charybdis_3x5_wrapper(...) LAYOUT_charybdis_3x5(__VA_ARGS__)
 #define LAYOUT_charybdis_3x5_base( \
     K01, K02, K03, K04, K05, K06, K07, K08, K09, K0A, \
@@ -69,3 +69,4 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                           EE_CLR, KC_NUKE, _______,    _______, QK_BOOT
     ),
 };
+// clang-format on

@@ -3,6 +3,7 @@
 
 #include "drashna.h"
 
+// clang-format off
 #define LAYOUT_rockon_bp_wrapper(...) LAYOUT_rockon_bp(__VA_ARGS__)
 #define LAYOUT_rockon_bp_base( \
     K01, K02, K03, K04, K05, K06, K07, K08, K09, K0A, \
@@ -17,8 +18,7 @@
                       KC_GRV, OS_LALT, OS_LGUI, SP_LWER, BK_LWER, KC_MUTE,    UC_IRNY, DL_RAIS, KC_ENT,  OS_RGUI, OS_RALT, UC_IRNY\
     )
 
-#define LAYOUT_base_wrapper(...)       LAYOUT_rockon_bp_base(__VA_ARGS__)
-
+#define LAYOUT_base_wrapper(...) LAYOUT_rockon_bp_base(__VA_ARGS__)
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_DEFAULT_LAYER_1] = LAYOUT_base_wrapper(
@@ -93,20 +93,21 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                           _______, _______, QK_RBT,  _______, _______, _______,     _______, _______, _______, KC_NUKE, _______, AUTO_CTN
     ),
 };
+// clang-format on
 
 #ifdef ENCODER_MAP_ENABLE
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
-    [_DEFAULT_LAYER_1] = { { KC_VOLD, KC_VOLU }, { KC_WH_D, KC_WH_U } },
-    [_DEFAULT_LAYER_2] = { { _______, _______ }, { _______, _______ } },
-    [_DEFAULT_LAYER_3] = { { _______, _______ }, { _______, _______ } },
-    [_DEFAULT_LAYER_4] = { { _______, _______ }, { _______, _______ } },
-    [_GAMEPAD]         = { { _______, _______ }, { _______, _______ } },
-    [_DIABLO]          = { { _______, _______ }, { _______, _______ } },
-    [_MOUSE]           = { { _______, _______ }, { KC_WH_D, KC_WH_U } },
-    [_MEDIA]           = { { _______, _______ }, { _______, _______ } },
-    [_RAISE]           = { { _______, _______ }, { KC_PGDN, KC_PGUP } },
-    [_LOWER]           = { { RGB_MOD, RGB_RMOD}, { RGB_HUD, RGB_HUI } },
-    [_ADJUST]          = { { CK_DOWN, CK_UP   }, { _______, _______ } },
+    [_DEFAULT_LAYER_1] = {{KC_VOLD, KC_VOLU}, {KC_WH_D, KC_WH_U}},
+    [_DEFAULT_LAYER_2] = {{_______, _______}, {_______, _______}},
+    [_DEFAULT_LAYER_3] = {{_______, _______}, {_______, _______}},
+    [_DEFAULT_LAYER_4] = {{_______, _______}, {_______, _______}},
+    [_GAMEPAD]         = {{_______, _______}, {_______, _______}},
+    [_DIABLO]          = {{_______, _______}, {_______, _______}},
+    [_MOUSE]           = {{_______, _______}, {KC_WH_D, KC_WH_U}},
+    [_MEDIA]           = {{_______, _______}, {_______, _______}},
+    [_RAISE]           = {{_______, _______}, {KC_PGDN, KC_PGUP}},
+    [_LOWER]           = {{RGB_MOD, RGB_RMOD}, {RGB_HUD, RGB_HUI}},
+    [_ADJUST]          = {{CK_DOWN, CK_UP}, {_______, _______}},
 };
 #endif
 

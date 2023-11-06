@@ -3,6 +3,7 @@
 
 #include "drashna.h"
 
+// clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = LAYOUT_ortho_1x1(KC_A)
 };
@@ -165,6 +166,7 @@ led_config_t g_led_config = { {
   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4
 } };
 #endif
+// clang-format off
 
 
 #if defined(OLED_ENABLE) && defined(OLED_DISPLAY_128X128)

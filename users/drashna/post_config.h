@@ -123,8 +123,6 @@
 #    endif
 #endif // MOUSEKEY_ENABLE
 
-#define MOUSE_EXTENDED_REPORT
-
 #ifndef TAPPING_TERM
 #    define TAPPING_TERM 175
 #endif

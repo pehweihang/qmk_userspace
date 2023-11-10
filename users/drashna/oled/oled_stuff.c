@@ -39,7 +39,8 @@ bool is_oled_enabled = true, is_oled_force_off = false;
 
 uint32_t               oled_timer                                 = 0;
 char                   oled_keylog_str[OLED_KEYLOGGER_LENGTH + 1] = {0};
-static oled_rotation_t oled_rotation;
+extern oled_rotation_t oled_rotation;
+extern uint8_t         oled_rotation_width;
 
 deferred_token kittoken;
 
@@ -51,13 +52,13 @@ void oled_pan_section(bool left, uint16_t y_start, uint16_t y_end, uint16_t x_st
     for (uint16_t y = y_start; y < y_end; y++) {
         if (left) {
             for (uint16_t x = x_start; x < x_end - 1; x++) {
-                i              = y * OLED_DISPLAY_WIDTH + x;
+                i              = y * oled_rotation_width + x;
                 oled_buffer[i] = oled_buffer[i + 1];
                 oled_dirty |= ((OLED_BLOCK_TYPE)1 << (i / OLED_BLOCK_SIZE));
             }
         } else {
             for (uint16_t x = x_end - 1; x >= x_start; x--) {
-                i              = y * OLED_DISPLAY_WIDTH + x;
+                i              = y * oled_rotation_width + x;
                 oled_buffer[i] = oled_buffer[i - 1];
                 oled_dirty |= ((OLED_BLOCK_TYPE)1 << (i / OLED_BLOCK_SIZE));
             }
@@ -145,39 +146,45 @@ bool process_record_user_oled(uint16_t keycode, keyrecord_t *record) {
                 }
                 break;
             case OLED_ROTATE_CW:
-                switch (oled_rotation) {
-                    case OLED_ROTATION_0:
-                        oled_rotation = OLED_ROTATION_90;
-                        break;
-                    case OLED_ROTATION_90:
-                        oled_rotation = OLED_ROTATION_180;
-                        break;
-                    case OLED_ROTATION_180:
-                        oled_rotation = OLED_ROTATION_270;
-                        break;
-                    default:
-                        oled_rotation = OLED_ROTATION_0;
-                        break;
+                {
+                    oled_rotation_t rot_temp;
+                    switch (oled_rotation) {
+                        case OLED_ROTATION_0:
+                            rot_temp = OLED_ROTATION_90;
+                            break;
+                        case OLED_ROTATION_90:
+                            rot_temp = OLED_ROTATION_180;
+                            break;
+                        case OLED_ROTATION_180:
+                            rot_temp = OLED_ROTATION_270;
+                            break;
+                        default:
+                            rot_temp = OLED_ROTATION_0;
+                            break;
+                    }
+                    oled_init(rot_temp);
+                    break;
                 }
-                oled_init(oled_rotation);
-                break;
             case OLED_ROTATE_CCW:
-                switch (oled_rotation) {
-                    case OLED_ROTATION_0:
-                        oled_rotation = OLED_ROTATION_270;
-                        break;
-                    case OLED_ROTATION_90:
-                        oled_rotation = OLED_ROTATION_0;
-                        break;
-                    case OLED_ROTATION_180:
-                        oled_rotation = OLED_ROTATION_90;
-                        break;
-                    default:
-                        oled_rotation = OLED_ROTATION_180;
-                        break;
+                {
+                    oled_rotation_t rot_temp;
+                    switch (oled_rotation) {
+                        case OLED_ROTATION_0:
+                            rot_temp = OLED_ROTATION_270;
+                            break;
+                        case OLED_ROTATION_90:
+                            rot_temp = OLED_ROTATION_0;
+                            break;
+                        case OLED_ROTATION_180:
+                            rot_temp = OLED_ROTATION_90;
+                            break;
+                        default:
+                            rot_temp = OLED_ROTATION_180;
+                            break;
+                    }
+                    oled_init(rot_temp);
+                    break;
                 }
-                oled_init(oled_rotation);
-                break;
         }
     }
     return true;
@@ -994,10 +1001,10 @@ __attribute__((weak)) oled_rotation_t oled_init_keymap(oled_rotation_t rotation,
 
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     static bool has_run = false;
-    oled_rotation       = oled_init_keymap(rotation, has_run);
+    rotation            = oled_init_keymap(rotation, has_run);
 
     if (has_run) {
-        return oled_rotation;
+        return rotation;
     }
 
     if (is_keyboard_master()) {
@@ -1010,7 +1017,7 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     oled_clear();
     oled_render();
     has_run = true;
-    return oled_rotation;
+    return rotation;
 }
 
 __attribute__((weak)) bool oled_task_keymap(void) {

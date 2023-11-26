@@ -8,8 +8,6 @@
 
 userspace_config_t userspace_config;
 static bool        device_suspended   = false;
-bool               jump_to_bootloader = false;
-;
 
 /**
  * @brief Handle registering a keycode, with optional modifer based on timed event

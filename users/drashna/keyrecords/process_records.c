@@ -101,10 +101,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     }
 
     switch (keycode) {
-        case QK_BOOTLOADER:
-            if (record->event.pressed) {
-                jump_to_bootloader = true;
-            }
         case VRSN: // Prints firmware version
             if (record->event.pressed) {
                 send_string_with_delay_P(

@@ -95,9 +95,9 @@ void rgb_matrix_update_pwm_buffers(void);
 __attribute__((weak)) bool shutdown_keymap(bool jump_to_bootloader) {
     return true;
 }
-void shutdown_user(void) {
+bool shutdown_user(bool jump_to_bootloader) {
     if (!shutdown_keymap(jump_to_bootloader)) {
-        return;
+        return false;
     }
 #ifdef RGBLIGHT_ENABLE
     rgblight_enable_noeeprom();
@@ -114,6 +114,7 @@ void shutdown_user(void) {
 #ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
     shutdown_quantum_painter();
 #endif
+    return true;
 }
 
 __attribute__((weak)) void suspend_power_down_keymap(void) {}

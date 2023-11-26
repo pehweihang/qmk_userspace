@@ -263,6 +263,9 @@ uint32_t startup_exec(uint32_t trigger_time, void *cb_arg) {
                     xprintf("Nintend Switch/Quest 2 Detected\n");
                     break;
 #    endif
+                default:
+                    xprintf("Unknown OS Detected\n");
+                    break;
             }
         }
     }

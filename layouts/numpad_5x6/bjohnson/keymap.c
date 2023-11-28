@@ -24,7 +24,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 void keyboard_post_init_user(void) {
 #ifdef RGBLIGHT_ENABLE
-    uint8_t temp_mode = rgblight_config.mode;
+    uint8_t temp_mode = rgblight_get_mode();;
     rgblight_enable_noeeprom();
     rgblight_mode_noeeprom(RGBLIGHT_MODE_STATIC_LIGHT);
     for (uint16_t i = 255; i > 0; i--) {
@@ -46,10 +46,11 @@ bool led_update_user(led_t led_state) {
     return false;
 }
 
-void shutdown_user(void) {
+bool shutdown_user(bool jump_to_bootloader) {
 #ifdef RGBLIGHT_ENABLE
     rgblight_enable_noeeprom();
     rgblight_mode_noeeprom(RGBLIGHT_MODE_STATIC_LIGHT);
     rgblight_setrgb(RGB_RED);
 #endif // RGBLIGHT_ENABLE
+    return true;
 }

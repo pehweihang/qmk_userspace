@@ -21,8 +21,8 @@ jobs:
       qmk_ref: ${{ github.ref_name }}
 
   build-bjohnson:
-    name: 'QMK Firmware Build (BJohnson)'
-    uses: drashna/.github/.github/workflows/qmk_userspace_build.yml@main
+    name: 'QMK Firmware Build'
+    uses: drashna/.github/.github/workflows/qmk_userspace_build_all.yml@main
     with:
       keymap_name: bjohnson
       qmk_repo: qmk/qmk_firmware

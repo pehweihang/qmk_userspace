@@ -345,7 +345,7 @@ void center_text(const char *text, char *output, uint8_t width) {
     /* Try to center the TEXT, TODO: Handle Even lengths*/
     uint8_t padlen_l = (width - strlen(text)) / 2;
     uint8_t padlen_r = (padlen_l * 2) + strlen(text) == width ? padlen_l : padlen_l + 1;
-    sprintf(output, "%*s%s%*s", padlen_l, "", text, padlen_r, "");
+    snprintf(output, width, "%*s%s%*s", padlen_l, "", text, padlen_r, "");
 }
 
 /**

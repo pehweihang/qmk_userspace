@@ -138,15 +138,15 @@ rtc_time_t convert_date_time(const char *date, const char *time) {
             break;
     }
 
-    t.year            = year_offset + 2000U;
-    t.day_of_the_week = day_of_the_week(t);
-    t.date            = atoi(date + 4);
-    t.hour            = atoi(time);
-    t.minute          = atoi(time + 3);
-    t.second          = atoi(time + 6);
-    t.format          = RTC_FORMAT_24H;
+    t.year            = (uint16_t)year_offset + 2000U;
+    t.day_of_the_week = (rtc_time_day_of_the_week_t)day_of_the_week(t);
+    t.date            = (uint8_t)atoi(date + 4);
+    t.hour            = (uint8_t)atoi(time);
+    t.minute          = (uint8_t)atoi(time + 3);
+    t.second          = (uint8_t)atoi(time + 6);
+    t.format          = (rtc_time_format_t)RTC_FORMAT_24H;
     t.am_pm           = (rtc_time_am_pm_t)(t.hour >= 12);
-    t.unixtime        = convert_to_unixtime(t);
+    t.unixtime        = (uint32_t)convert_to_unixtime(t);
 
     return t;
 }

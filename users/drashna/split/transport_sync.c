@@ -104,7 +104,7 @@ void keyboard_post_init_transport_sync(void) {
 #ifdef CUSTOM_OLED_DRIVER
     transaction_register_rpc(RPC_ID_USER_OLED_KEYLOG_STR, keylogger_string_sync);
 #endif
-    //    transaction_register_rpc(RPC_ID_USER_SUSPEND_STATE_SYNC, suspend_state_sync);
+    transaction_register_rpc(RPC_ID_USER_SUSPEND_STATE_SYNC, suspend_state_sync);
 }
 
 void user_transport_update(void) {

@@ -12,7 +12,7 @@ ifeq ($(strip $(RTC_ENABLE)), yes)
         ifeq ($(strip $(RTC_DRIVER)), vendor)
             OPT_DEFS += -DHAL_USE_RTC=TRUE
         else
-            QUANTUM_LIB_SRC += i2c_master.c
+            I2C_DRIVER_REQUIRED = yes
         endif
     endif
 endif

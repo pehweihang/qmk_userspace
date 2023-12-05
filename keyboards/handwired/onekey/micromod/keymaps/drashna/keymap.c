@@ -173,13 +173,21 @@ led_config_t g_led_config = { {
 #include "oled/oled_stuff.h"
 
 void oled_render_large_display(bool side) {
+#if 0
         render_rgb_hsv(1, 6);
         render_rgb_mode(1, 7);
         render_arasaka_logo(0, 8);
 
         oled_render_time(1, 13);
         render_unicode_mode(1, 12);
+#else
+        render_rgb_hsv(1, 6);
+        render_rgb_mode(1, 7);
 
+        render_arasaka_logo(0, 8);
+        render_wpm_graph(23, 107, 25, 96);
+
+#endif
 
 }
 #endif

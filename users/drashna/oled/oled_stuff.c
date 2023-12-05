@@ -917,6 +917,22 @@ void render_arasaka_logo(uint8_t col, uint8_t line) {
     }
 }
 
+void oled_render_mario(uint8_t col, uint8_t line) {
+    static uint16_t timer = 0;
+    static uint8_t  frame = 0;
+    if (timer_elapsed(timer) > 500) {
+        frame++;
+        if (frame == 3) {
+            frame = 0;
+        }
+        timer = timer_read();
+    }
+    for (uint8_t i = 0; i < 4; i++) {
+        oled_set_cursor(col, line + i);
+        oled_write_raw_P(mario_animation[frame][i], sizeof(mario_animation[0][0]));
+    }
+}
+
 void oled_render_time(uint8_t col, uint8_t line) {
 #ifdef RTC_ENABLE
     oled_set_cursor(col, line);
@@ -970,7 +986,8 @@ __attribute__((weak)) void oled_render_large_display(bool side) {
         render_rgb_mode(1, 7);
 
         render_arasaka_logo(0, 8);
-        render_wpm_graph(20, 107, 25, 96);
+        render_wpm_graph(23, 107, 25, 96);
+        oled_render_mario(1, 11);
     } else {
         // oled_advance_page(true);
 #    if 1

@@ -263,3 +263,36 @@ void housekeeping_task_transport_sync(void) {
     // Data sync from master to slave
     user_transport_sync();
 }
+
+
+#if 0
+// lets define a custom data type to make things easier to work with
+typedef struct {
+    uint8_t position; // position of the string on the array
+    uint8_t length;
+    char    str[RPC_S2M_BUFFER_SIZE - 2]; // this is as big as you can fit on the split comms message
+} split_msg_t;
+_Static_assert(sizeof(split_msg_t) == RPC_S2M_BUFFER_SIZE, "Wrong size");
+
+
+// instead of
+    transaction_rpc_send(RPC_ID_USER_STR, ARRAY_SIZE(stringToWrite), stringToWrite);
+// you now do:
+    split_msg_t msg = {0};
+    msg.position = <your_variable>;
+    msg.length = strlen(<your_string>) + 1;
+    if (msg.length > ARRAY_SIZE(split_msg_t.str)) {
+        // too big to fit
+        // do something here if you like, but do not send the message
+        return;
+    }
+    strcpy(msg.str, <your_string>);
+    transaction_rpc_send(RPC_ID_USER_STR, sizeof(msg), &msg);
+
+// instead of
+    memcpy(stringToWrite, initiator2target_buffer, initiator2target_buffer_size);
+// you now do:
+    split_msg_t *msg = (split_msg_t *)initiator2target_buffer;
+    memcpy(<your_array>[msg->position], msg->str, msg->length);
+}
+#endif

@@ -41,21 +41,22 @@ void            render_pointing_dpi_status(uint16_t cpi, uint8_t padding, uint8_
 void            oled_driver_render_logo_left(void);
 void            oled_driver_render_logo_right(void);
 void            oled_render_large_display(bool side);
-void render_wpm_graph(uint8_t start_offset, uint8_t cutoff, uint8_t max_lines_graph, uint8_t vertical_offset);
-void render_pet(uint8_t col, uint8_t line);
-void render_unicode_mode(uint8_t col, uint8_t line);
-void render_unicode_mode_small(uint8_t col, uint8_t line, bool invert);
-void render_rgb_hsv(uint8_t col, uint8_t line);
-void render_rgb_mode(uint8_t col, uint8_t line);
-void render_mouse_mode(uint8_t col, uint8_t line);
-void render_autocorrected_info(uint8_t col, uint8_t line);
-void render_cyberpunk_logo(uint8_t col, uint8_t line);
-void render_arasaka_logo(uint8_t col, uint8_t line);
-void housekeeping_task_oled(void);
-void render_oled_title(bool side);
-void oled_shutdown(bool jump_to_bootloader);
-void oled_render_time(uint8_t col, uint8_t line);
+void            oled_render_mario(uint8_t col, uint8_t line);
+void            render_pet(uint8_t col, uint8_t line);
+void            render_unicode_mode(uint8_t col, uint8_t line);
+void            render_unicode_mode_small(uint8_t col, uint8_t line, bool invert);
+void            render_rgb_hsv(uint8_t col, uint8_t line);
+void            render_rgb_mode(uint8_t col, uint8_t line);
+void            render_mouse_mode(uint8_t col, uint8_t line);
+void            render_autocorrected_info(uint8_t col, uint8_t line);
+void            render_cyberpunk_logo(uint8_t col, uint8_t line);
+void            render_arasaka_logo(uint8_t col, uint8_t line);
+void            housekeeping_task_oled(void);
+void            render_oled_title(bool side);
+void            oled_shutdown(bool jump_to_bootloader);
+void            oled_render_time(uint8_t col, uint8_t line);
 
+void render_wpm_graph(uint8_t start_offset, uint8_t cutoff, uint8_t max_lines_graph, uint8_t vertical_offset);
 void oled_pan_section(bool left, uint16_t y_start, uint16_t y_end, uint16_t x_start, uint16_t x_end);
 
 #if defined(OLED_DISPLAY_128X128) || defined(OLED_DISPLAY_128X64)

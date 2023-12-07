@@ -161,3 +161,9 @@ const char *rgblight_name(uint8_t effect) {
             return "UNKNOWN";
     }
 }
+
+void rgblight_shutdown(bool jump_to_bootloader) {
+    rgblight_enable_noeeprom();
+    rgblight_mode_noeeprom(1);
+    rgblight_setrgb(rgblight_get_val(), 0x00, 0x00);
+}

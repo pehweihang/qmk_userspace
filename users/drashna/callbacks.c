@@ -68,6 +68,10 @@ void                       keyboard_post_init_user(void) {
     keyboard_post_init_unicode();
 #endif
 
+#ifdef DEBUG_MATRIX_SCAN_RATE_ENABLE
+    userspace_config.matrix_scan_print = true;
+#endif
+
 #if defined(BOOTLOADER_CATERINA) && defined(__AVR__) && defined(__AVR_ATmega32U4__)
     DDRD &= ~(1 << 5);
     PORTD &= ~(1 << 5);
@@ -88,25 +92,19 @@ void                       keyboard_post_init_user(void) {
     keyboard_post_init_keymap();
 }
 
-#ifdef RGB_MATRIX_ENABLE
-void rgb_matrix_update_pwm_buffers(void);
-#endif
-
 __attribute__((weak)) bool shutdown_keymap(bool jump_to_bootloader) {
     return true;
 }
+
 bool shutdown_user(bool jump_to_bootloader) {
     if (!shutdown_keymap(jump_to_bootloader)) {
         return false;
     }
 #ifdef RGBLIGHT_ENABLE
-    rgblight_enable_noeeprom();
-    rgblight_mode_noeeprom(1);
-    rgblight_setrgb(rgblight_get_val(), 0x00, 0x00);
+    rgblight_shutdown(jump_to_bootloader);
 #endif // RGBLIGHT_ENABLE
 #ifdef RGB_MATRIX_ENABLE
-    rgb_matrix_set_color_all(rgb_matrix_get_val(), 0x00, 0x00);
-    rgb_matrix_update_pwm_buffers();
+    rgb_matrix_shutdown(jump_to_bootloader);
 #endif // RGB_MATRIX_ENABLE
 #if defined(OLED_ENABLE) && defined(CUSTOM_OLED_DRIVER)
     oled_shutdown(jump_to_bootloader);
@@ -150,15 +148,12 @@ void                       suspend_wakeup_init_user(void) {
     suspend_wakeup_init_keymap();
 }
 
-// No global matrix scan code, so just run keymap's matrix
-// scan function
-__attribute__((weak)) void matrix_scan_keymap(void) {}
-void                       matrix_scan_user(void) {
+void matrix_scan_user(void) {
     matrix_scan_count++;
 
     uint32_t timer_now = timer_read32();
     if (TIMER_DIFF_32(timer_now, matrix_timer) >= 1000) {
-#if defined(CONSOLE_ENABLE)
+#ifndef NO_PRINT
         if (userspace_config.matrix_scan_print) {
             xprintf("matrix scan frequency: %lu\n", matrix_scan_count);
         }
@@ -167,8 +162,6 @@ void                       matrix_scan_user(void) {
         matrix_timer           = timer_now;
         matrix_scan_count      = 0;
     }
-
-    matrix_scan_keymap();
 }
 
 uint32_t get_matrix_scan_rate(void) {
@@ -213,7 +206,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 #endif
     state = layer_state_set_keymap(state);
 
-#ifdef CONSOLE_ENABLE
+#ifndef NO_PRINT
     char layer_buffer[16 + 5];
     format_layer_bitmap_string(layer_buffer, state, default_layer_state);
     dprintf("layer state: %s\n", layer_buffer);

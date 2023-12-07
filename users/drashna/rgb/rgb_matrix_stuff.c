@@ -150,8 +150,15 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
 __attribute__((weak)) bool rgb_matrix_indicators_keymap(void) {
     return true;
 }
+
 bool rgb_matrix_indicators_user(void) {
     return rgb_matrix_indicators_keymap();
+}
+
+void rgb_matrix_shutdown(bool jump_to_bootloader) {
+    void rgb_matrix_update_pwm_buffers(void);
+    rgb_matrix_set_color_all(rgb_matrix_get_val(), 0x00, 0x00);
+    rgb_matrix_update_pwm_buffers();
 }
 
 //----------------------------------------------------------

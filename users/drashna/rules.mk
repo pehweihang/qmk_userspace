@@ -62,6 +62,11 @@ ifeq ($(strip $(HARDWARE_DEBUG_ENABLE)), yes)
     OPT_DEFS += -g
 endif
 
+ifeq ($(strip $(DEBUG_MATRIX_SCAN_RATE_ENABLE)), yes)
+    DEBUG_MATRIX_SCAN_RATE_ENABLE := no
+    OPT_DEFS += -DDEBUG_MATRIX_SCAN_RATE_ENABLE
+endif
+
 include $(USER_PATH)/oled/rules.mk
 include $(USER_PATH)/pointing/rules.mk
 include $(USER_PATH)/split/rules.mk

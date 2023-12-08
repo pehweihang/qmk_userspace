@@ -79,7 +79,7 @@ void keylogger_string_sync(uint8_t initiator2target_buffer_size, const void* ini
 
 void suspend_state_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
                         uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
-    bool suspend_state;
+    bool suspend_state = false;
     memcpy(&suspend_state, initiator2target_buffer, initiator2target_buffer_size);
     if (suspend_state != is_device_suspended()) {
         set_is_device_suspended(suspend_state);
@@ -151,7 +151,7 @@ void user_transport_sync(void) {
     if (is_keyboard_master()) {
         // Keep track of the last state, so that we can tell if we need to propagate to slave
         static uint16_t last_keymap = 0;
-        static uint32_t last_config = 0, last_sync[5], last_user_state = 0;
+        static uint32_t last_config = 0, last_sync[6], last_user_state = 0;
         bool            needs_sync = false;
 #ifdef CUSTOM_OLED_DRIVER
         static char keylog_temp[OLED_KEYLOGGER_LENGTH + 1] = {0};
@@ -159,7 +159,10 @@ void user_transport_sync(void) {
 #if defined(AUTOCORRECT_ENABLE)
         static char temp_autocorrected_str[2][22] = {0};
 #endif
-
+        if (timer_elapsed32(last_sync[5]) > 500 && !is_device_suspended()) {
+            transaction_rpc_send(RPC_ID_USER_SUSPEND_STATE_SYNC, sizeof(bool), &needs_sync);
+            last_sync[5] = timer_read32();
+        }
         // Check if the state values are different
         if (memcmp(&transport_user_state, &last_user_state, sizeof(transport_user_state))) {
             needs_sync = true;

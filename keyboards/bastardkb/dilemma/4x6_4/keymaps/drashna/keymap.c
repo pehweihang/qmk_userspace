@@ -117,7 +117,7 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
 #        include "keyrecords/unicode.h"
 #    endif
 
-extern const char PROGMEM display_border[3];
+extern const char PROGMEM display_border[3+1];
 
 extern bool is_oled_enabled;
 

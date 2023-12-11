@@ -682,7 +682,7 @@ static uint8_t animation_type  = 0;
 void render_pet(uint8_t col, uint8_t line) {
     for (uint8_t i = 0; i < 4; i++) {
         oled_set_cursor(col, line + i);
-        oled_write_raw_P(OLED_PET_ARRAY[animation_type][animation_frame][i], OLED_ANIM_SIZE);
+        oled_write_raw_P(pet_animiations[1][animation_type][animation_frame][i], OLED_ANIM_SIZE);
     }
 }
 

@@ -7,7 +7,7 @@
 #include <ctype.h>
 
 userspace_config_t userspace_config;
-static bool        device_suspended   = false;
+static bool        device_suspended = false;
 
 /**
  * @brief Handle registering a keycode, with optional modifer based on timed event

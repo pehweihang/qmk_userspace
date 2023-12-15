@@ -196,9 +196,8 @@ char *ds3231_read_temp_str(void) {
     snprintf(temp_str, sizeof(temp_str), "%2.2f", ds3231_temp);
 #else
 #    pragma message "PRINTF_SUPPORT_DECIMAL_SPECIFIERS not enabled, RTC temperature will be rounded to nearest integer"
-    uint8_t temp = (uint8_t)round(ds3231_temp);
-    uint8_t frac = (uint8_t)round((ds3231_temp - temp) * 100);
-    snprintf(temp_str, sizeof(temp_str), "%2d.%02d", temp, frac);
+    uint16_t temp = (uint16_t)(ds3231_temp * 100);
+    snprintf(temp_str, sizeof(temp_str), "%2d.%02d", temp / 100, temp % 100);
 #endif
     return temp_str;
 }
@@ -210,9 +209,8 @@ char *ds3231_read_temp_imperial_str(void) {
     snprintf(temp_str, sizeof(temp_str), "%2.2f", temp_f);
 #else
 #    pragma message "PRINTF_SUPPORT_DECIMAL_SPECIFIERS not enabled, RTC temperature will be rounded to nearest integer"
-    uint8_t temp = (uint8_t)round(temp_f);
-    uint8_t frac = (uint8_t)round((temp_f - temp) * 100);
-    snprintf(temp_str, sizeof(temp_str), "%2d.%02d", temp, frac);
+    uint16_t temp = (uint16_t)(temp_f * 100);
+    snprintf(temp_str, sizeof(temp_str), "%2d.%02d", temp / 100, temp % 100);
 #endif
     return temp_str;
 }

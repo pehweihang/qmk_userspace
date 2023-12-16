@@ -8,6 +8,7 @@
         ["bastardkb/dilemma/4x6_4", "drashna"],
         ["splitkb/kyria/rev3", "drashna"],
         ["crkbd/rev1", "drashna"],
-        ["splitkb/zima", "drashna"]
+        ["splitkb/zima", "drashna"],
+        ["converter/usb_usb/pro_micro", "drashna"]
     ]
 }

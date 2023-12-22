@@ -1,4 +1,17 @@
 {
     "userspace_version": "1.0",
-    "build_targets": []
+    "build_targets": [
+        ["work_louder/micro", "via"],
+        ["work_louder/loop/rev1", "via"],
+        ["work_louder/loop/rev3", "via"],
+        ["work_louder/nano", "via"],
+        ["work_louder/work_board/rev1", "via"],
+        ["work_louder/work_board/rev3", "via"],
+        ["work_louder/numpad", "via"],
+        ["work_louder/micro", "via_midi"],
+        ["work_louder/work_board/rev1", "via_midi"],
+        ["work_louder/work_board/rev3", "via_midi"],
+        ["work_louder/loop/rev1", "via_midi"],
+        ["work_louder/loop/rev3", "via_midi"]
+    ]
 }

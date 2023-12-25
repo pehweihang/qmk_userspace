@@ -85,18 +85,6 @@ void tap_code16_nomods(uint16_t kc) {
 #        define I2C_SCANNER_TIMEOUT 50
 #    endif
 
-#    ifdef PROTOCOL_CHIBIOS
-i2c_status_t i2c_start_bodge(uint8_t address, uint16_t timeout) {
-    i2c_start(address);
-
-    // except on ChibiOS where the only way is do do "something"
-    uint8_t data = 0;
-    return i2c_readReg(address, 0, &data, sizeof(data), I2C_SCANNER_TIMEOUT);
-}
-
-#        define i2c_start i2c_start_bodge
-#    endif
-
 void do_scan(void) {
     uint8_t nDevices = 0;
 
@@ -104,10 +92,9 @@ void do_scan(void) {
 
     for (uint8_t address = 1; address < 127; address++) {
         // The i2c_scanner uses the return value of
-        // i2c_start to see if a device did acknowledge to the address.
-        i2c_status_t error = i2c_start(address << 1, I2C_SCANNER_TIMEOUT);
+        // i2c_ping_address to see if a device did acknowledge to the address.
+        i2c_status_t error = i2c_ping_address(address << 1, I2C_SCANNER_TIMEOUT);
         if (error == I2C_STATUS_SUCCESS) {
-            i2c_stop();
             xprintf("  I2C device found at address 0x%02X\n", address);
             nDevices++;
         } else {

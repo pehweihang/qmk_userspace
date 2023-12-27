@@ -369,3 +369,23 @@ void set_is_device_suspended(bool status) {
 #endif
     device_suspended = status;
 }
+
+#if 0
+#include "hardware_id.h"
+void get_serial_number(void) {
+    uint8_t uid[12];
+    for (uint8_t index = 0; index < 12; index++) {
+        uid[index] = (uint8_t)(get_hardware_id().data[index / 4] >> ((index % 4) * 8));
+    }
+
+    uint16_t serial[6];
+    serial[0] = uid[11];
+    serial[1] = uid[10] + uid[2];
+    serial[2] = uid[9];
+    serial[3] = uid[8] + uid[0];
+    serial[4] = uid[7];
+    serial[5] = uid[6];
+
+    xprintf("%02X%02X%02X%02X%02X%02X", serial[0], serial[1], serial[2], serial[3], serial[4], serial[5]);
+}
+#endif

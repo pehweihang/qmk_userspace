@@ -96,6 +96,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #ifdef SENTENCE_CASE_ENABLE
           && process_sentence_case(keycode, record)
 #endif
+#ifdef ORBITAL_MOUSE_ENABLE
+            && process_orbital_mouse(keycode, record)
+#endif
           && true)) {
         return false;
     }

@@ -85,6 +85,16 @@ enum userspace_custom_keycodes {
 
     US_SELECT_WORD,
 
+    OM_DBLS,
+    OM_SEL1,
+    OM_SEL2,
+    OM_SEL3,
+    OM_SEL4,
+    OM_SEL5,
+    OM_SEL6,
+    OM_SEL7,
+    OM_SEL8,
+
     USER_SAFE_RANGE,
 };
 
@@ -179,3 +189,23 @@ We use custom codes here, so we can substitute the right stuff
 #define US_MSRP US_MATRIX_SCAN_RATE_PRINT
 #define US_SELW US_SELECT_WORD
 #define PD_JIGG PD_JIGGLER
+
+#define OM_U    KC_MS_U
+#define OM_D    KC_MS_D
+#define OM_L    KC_MS_L
+#define OM_R    KC_MS_R
+#define OM_W_U  KC_WH_U
+#define OM_W_D  KC_WH_D
+#define OM_W_L  KC_WH_L
+#define OM_W_R  KC_WH_R
+#define OM_BTN1 KC_BTN1
+#define OM_BTN2 KC_BTN2
+#define OM_BTN3 KC_BTN3
+#define OM_BTN4 KC_BTN4
+#define OM_BTN5 KC_BTN5
+#define OM_BTN6 KC_BTN6
+#define OM_BTN7 KC_BTN7
+#define OM_BTN8 KC_BTN8
+#define OM_BTNS KC_ACL0
+#define OM_HLDS KC_ACL1
+#define OM_RELS KC_ACL2

@@ -351,5 +351,8 @@ void                       housekeeping_task_user(void) {
 #ifdef ACHORDION_ENABLE
     achordion_task();
 #endif
+#ifdef ORBITAL_MOUSE_ENABLE
+    orbital_mouse_task();
+#endif
     housekeeping_task_keymap();
 }

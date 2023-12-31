@@ -55,6 +55,11 @@ ifeq ($(strip $(CUSTOM_BOOTMAGIC_ENABLE)), yes)
     endif
 endif
 
+ifeq ($(strip $(ORBITAL_MOUSE_ENABLE)), yes)
+    SRC += orbital_mouse.c
+	OPT_DEFS += -DORBITAL_MOUSE_ENABLE
+    MOUSE_ENABLE := yes
+endif
 
 ifeq ($(strip $(HARDWARE_DEBUG_ENABLE)), yes)
     LTO_ENABLE := no

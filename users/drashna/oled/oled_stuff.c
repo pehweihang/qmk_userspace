@@ -933,6 +933,45 @@ void oled_render_mario(uint8_t col, uint8_t line) {
     }
 }
 
+void render_os(uint8_t col, uint8_t line) {
+#ifdef OS_DETECTION_ENABLE
+    oled_set_cursor(col, line);
+    oled_write_P(PSTR("OS: "), false);
+    os_variant_t os_type = detected_host_os();
+    switch (os_type) {
+        case OS_LINUX:
+            oled_write_ln_P(PSTR("Linux"), false);
+            break;
+        case OS_WINDOWS:
+            oled_write_ln_P(PSTR("Windows"), false);
+            break;
+        case OS_MACOS:
+            oled_write_ln_P(PSTR("MacOS"), false);
+            break;
+        case OS_IOS:
+            oled_write_ln_P(PSTR("iOS"), false);
+            break;
+#    if 0
+        case OS_WINDOWS_UNSURE:
+            oled_write_ln_P(PSTR("Windows?"), false);
+            break;
+        case OS_PS5:
+            oled_write_ln_P(PSTR("Sony"), false);
+            break;
+        case OS_HANDHELD:
+            oled_write_ln_P(PSTR("Handheld"), false);
+            break;
+#    endif
+        case OS_UNSURE:
+            oled_write_ln_P(PSTR("Unsure"), false);
+            break;
+        default:
+            oled_write_ln(get_u8_str(os_type, ' '), false);
+            break;
+    }
+#endif
+}
+
 void oled_render_time(uint8_t col, uint8_t line) {
 #ifdef RTC_ENABLE
     oled_set_cursor(col, line);
@@ -990,19 +1029,10 @@ __attribute__((weak)) void oled_render_large_display(bool side) {
         oled_render_mario(1, 11);
     } else {
         // oled_advance_page(true);
-#    if 1
         render_autocorrected_info(1, 7);
-
-        oled_set_cursor(1, 11);
-        oled_write_P(PSTR("Mouse Jiggler: "), false);
-        oled_write_P(userspace_config.mouse_jiggler ? PSTR("ON ") : PSTR("OFF"), false);
-
+        render_os(1, 11);
         render_unicode_mode(1, 12);
         oled_render_time(1, 13);
-#    else
-        render_arasaka_logo(1, 7);
-        render_unicode_mode(1, 14);
-#    endif
     }
 }
 #endif

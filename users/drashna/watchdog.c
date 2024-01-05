@@ -27,17 +27,19 @@
 #        define WATCHDOG_TIMEOUT 2.0
 #    endif
 
+static WDGConfig wdgcfg = {
+#    if STM32_HAS_IWDG == TRUE
+    .pr = STM32_IWDG_PR_S(WATCHDOG_TIMEOUT),
+#    endif
+    .rlr = STM32_IWDG_RL_S(WATCHDOG_TIMEOUT),
+#    if STM32_IWDG_IS_WINDOWED == TRUE
+    .winr = STM32_IWDG_WIN_DISABLED,
+#    endif
+};
+
 void watchdog_init(void) {
     wdgInit();
 
-    static WDGConfig wdgcfg;
-#if STM32_HAS_IWDG == TRUE
-    wdgcfg.pr   = STM32_IWDG_PR_S(WATCHDOG_TIMEOUT);
-#endif
-    wdgcfg.rlr  = STM32_IWDG_RL_S(WATCHDOG_TIMEOUT);
-#if STM32_IWDG_IS_WINDOWED == TRUE
-    wdgcfg.winr = STM32_IWDG_WIN_DISABLED;
-#endif
     wdgStart(&WDGD1, &wdgcfg);
 }
 
@@ -48,8 +50,18 @@ void watchdog_task(void) {
 void watchdog_shutdown(void) {
     wdgStop(&WDGD1);
 }
+
+void suspend_power_down_watchdog(void) {
+    wdgReset(&WDGD1);
+}
+
+void suspend_wakeup_init_watchdog(void) {
+    wdgReset(&WDGD1);
+}
+
 #elif defined(__AVR__)
 #    include <avr/wdt.h>
+#pragma message "AVR Watchdog causes issues, likely due to the way the matrix scan is done.  Disable this."
 
 void watchdog_init(void) {
     wdt_enable(WDTO_2S);
@@ -62,4 +74,15 @@ void watchdog_task(void) {
 void watchdog_shutdown(void) {
     wdt_disable();
 }
+
+void suspend_power_down_watchdog(void) {
+    wdt_disable();
+
+}
+
+void suspend_wakeup_init_watchdog(void) {
+    wdt_enable(WDTO_2S);
+    clear_keyboard();
+}
+
 #endif

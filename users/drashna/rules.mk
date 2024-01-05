@@ -72,6 +72,11 @@ ifeq ($(strip $(DEBUG_MATRIX_SCAN_RATE_ENABLE)), yes)
     OPT_DEFS += -DDEBUG_MATRIX_SCAN_RATE_ENABLE
 endif
 
+ifeq ($(strip $(WATCHDOG_ENABLE)), yes)
+    SRC += $(USER_PATH)/watchdog.c
+    OPT_DEFS += -DWATCHDOG_ENABLE -DHAL_USE_WDG=TRUE
+endif
+
 include $(USER_PATH)/oled/rules.mk
 include $(USER_PATH)/pointing/rules.mk
 include $(USER_PATH)/split/rules.mk

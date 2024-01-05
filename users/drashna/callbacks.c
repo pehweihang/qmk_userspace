@@ -19,6 +19,9 @@ void keyboard_post_init_i2c(void);
 #ifdef CUSTOM_UNICODE_ENABLE
 void keyboard_post_init_unicode(void);
 #endif
+#ifdef WATCHDOG_ENABLE
+#    include "watchdog.h"
+#endif
 
 static uint32_t matrix_timer           = 0;
 static uint32_t matrix_scan_count      = 0;
@@ -88,6 +91,9 @@ void                       keyboard_post_init_user(void) {
 #ifdef RTC_ENABLE
     rtc_init();
 #endif
+#ifdef WATCHDOG_ENABLE
+    watchdog_init();
+#endif
 
     keyboard_post_init_keymap();
 }
@@ -97,6 +103,9 @@ __attribute__((weak)) bool shutdown_keymap(bool jump_to_bootloader) {
 }
 
 bool shutdown_user(bool jump_to_bootloader) {
+#ifdef WATCHDOG_ENABLE
+    watchdog_shutdown();
+#endif
     if (!shutdown_keymap(jump_to_bootloader)) {
         return false;
     }
@@ -321,6 +330,9 @@ void                       matrix_slave_scan_user(void) {
 
 __attribute__((weak)) void housekeeping_task_keymap(void) {}
 void                       housekeeping_task_user(void) {
+#ifdef WATCHDOG_ENABLE
+    watchdog_task();
+#endif // WATCHDOG_ENABLE
 #if defined(CUSTOM_TAP_DANCE_ENABLE) // Run Diablo 3 macro checking code.
     run_diablo_macro_check();
 #endif // CUSTOM_TAP_DANCE_ENABLE

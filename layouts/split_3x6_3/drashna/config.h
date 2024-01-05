@@ -48,18 +48,12 @@
 #endif
 
 #ifdef CONVERT_TO_PROTON_C
-#    define WS2812_PWM_DRIVER  PWMD2 // default: PWMD2
-#    define WS2812_PWM_CHANNEL 4     // default: 2
-#    define WS2812_PWM_PAL_MODE \
-        1 // Pin "alternate function", see the respective datasheet for the appropriate values for your MCU. default: 2
-#    define WS2812_DMA_STREAM \
-        STM32_DMA1_STREAM2 // DMA Stream for TIMx_UP, see the respective reference manual for the appropriate values for
-                           // your MCU.
-#    define WS2812_DMA_CHANNEL \
-        2 // DMA Channel for TIMx_UP, see the respective reference manual for the appropriate values for your MCU.
-#    define WS2812_DMAMUX_ID \
-        STM32_DMAMUX1_TIM2_UP // DMAMUX configuration for TIMx_UP -- only required if your MCU has a DMAMUX peripheral,
-                              // see the respective reference manual for the appropriate values for your MCU.
+#    define WS2812_PWM_DRIVER   PWMD15
+#    define WS2812_PWM_CHANNEL  2
+#    define WS2812_PWM_PAL_MODE 9
+#    define WS2812_DMA_STREAM   STM32_DMA1_STREAM5
+
+#    define WS2812_DMA_CHANNEL 5
 
 #    undef SOFT_SERIAL_PIN
 #    define SOFT_SERIAL_PIN     D3

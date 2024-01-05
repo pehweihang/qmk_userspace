@@ -12,12 +12,15 @@ WPM_ENABLE                 = yes
 
 ifeq ($(strip $(KEYBOARD)), splitkb/kyria/rev1/proton_c)
     OVERLOAD_FEATURES = yes
+    BOOTLOADER        = tinyuf2
 endif
 ifeq ($(strip $(KEYBOARD)), splitkb/kyria/rev3)
     OVERLOAD_FEATURES = yes
     CONVERT_TO        = proton_c
+    BOOTLOADER        = tinyuf2
     WS2812_DRIVER     = pwm
     SERIAL_DRIVER     = usart
+
 endif
 
 ifeq ($(strip $(OVERLOAD_FEATURES)), yes)

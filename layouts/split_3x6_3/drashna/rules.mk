@@ -33,6 +33,7 @@ endif
 USE_ARM_CONFIG ?= no
 ifeq ($(strip $(CONVERT_TO)), proton_c)
     USE_ARM_CONFIG = yes
+    BOOTLOADER     = tinyuf2
 endif
 ifeq ($(strip $(MCU)), STM32F303)
     USE_ARM_CONFIG = yes

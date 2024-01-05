@@ -19,14 +19,16 @@
 
 #if defined(KEYBOARD_crkbd) || defined(KEYBOARD_splitkb_aurora_corne)
 
-#    undef STM32_PWM_USE_TIM2
-#    define STM32_PWM_USE_TIM2 TRUE
+#    undef STM32_PWM_USE_TIM15
+#    define STM32_PWM_USE_TIM15 TRUE
 #    undef STM32_PWM_USE_TIM3
 #    define STM32_PWM_USE_TIM3 FALSE
+#    undef STM32_GPT_USE_TIM15
+#    define STM32_GPT_USE_TIM15 FALSE
 
 #    undef STM32_SERIAL_USE_USART1
 #    define STM32_SERIAL_USE_USART1 TRUE
 
-#    undef STM32_ST_USE_TIMER
-#    define STM32_ST_USE_TIMER 3
+#    undef STM32_WDG_USE_IWDG
+#    define STM32_WDG_USE_IWDG TRUE
 #endif

@@ -6,3 +6,5 @@
 void watchdog_init(void);
 void watchdog_task(void);
 void watchdog_shutdown(void);
+void suspend_power_down_watchdog(void);
+void suspend_wakeup_init_watchdog(void);

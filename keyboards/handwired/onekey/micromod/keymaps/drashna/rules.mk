@@ -9,3 +9,4 @@ RTC_ENABLE = yes
 RTC_DRIVER = ds3231
 WPM_ENABLE = yes
 CONSOLE_ENABLE = yes
+BLUETOOTH_DRIVER = bluefruit_le

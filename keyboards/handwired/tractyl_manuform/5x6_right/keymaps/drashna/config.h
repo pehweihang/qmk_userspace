@@ -26,3 +26,5 @@
 
 #undef PMW33XX_SPI_DIVISOR
 #define PMW33XX_SPI_DIVISOR 8
+
+#define DEBOUNCE 15

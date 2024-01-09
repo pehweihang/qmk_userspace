@@ -20,9 +20,9 @@
 #define OLED_FONT_END 255
 // #    define OLED_FONT_5X5
 // #    define OLED_FONT_AZTECH
-// #    define OLED_FONT_BMPLAIN
+ #    define OLED_FONT_BMPLAIN
 // #    define OLED_FONT_CRACKERS
-#define OLED_FONT_DEAD_MEAL
+// #define OLED_FONT_DEAD_MEAL
 // #    define OLED_FONT_EIN
 // #    define OLED_FONT_HISKYF21
 // #    define OLED_FONT_SQUASH

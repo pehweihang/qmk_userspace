@@ -173,7 +173,7 @@ led_config_t g_led_config = { {
 #include "oled/oled_stuff.h"
 
 void oled_render_large_display(bool side) {
-#if 0
+#if 1
         render_rgb_hsv(1, 6);
         render_rgb_mode(1, 7);
         render_arasaka_logo(0, 8);

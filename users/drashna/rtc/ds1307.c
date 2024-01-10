@@ -104,7 +104,7 @@ bool ds1307_init(rtc_time_t *time) {
     ds1307_initialized  = (status == I2C_STATUS_SUCCESS);
     if (ds1307_initialized) {
         ds1307_initialized = true;
-        dprintf("n: Initialized and initial read performed\n");
+        dprintf("DS1307: Initialized and initial read performed\n");
     } else {
         dprintf("DS1307: Failed to initialize\n");
     }

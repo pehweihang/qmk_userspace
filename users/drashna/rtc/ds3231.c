@@ -148,7 +148,7 @@ bool ds3231_init(rtc_time_t *time) {
     ds3231_initialized  = (status == I2C_STATUS_SUCCESS);
     if (ds3231_initialized) {
         ds3231_initialized = true;
-        dprintf("n: Initialized and initial read performed\n");
+        dprintf("DS3231: Initialized and initial read performed\n");
     } else {
         dprintf("DS3231: Failed to initialize\n");
     }

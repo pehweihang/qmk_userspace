@@ -104,7 +104,7 @@ bool pcf8523_init(rtc_time_t *time) {
     pcf8523_initialized = (status == I2C_STATUS_SUCCESS) && ((data[0] & 0xE0) != 0xE0) ;
     if (pcf8523_initialized) {
         pcf8523_initialized = true;
-        dprintf("n: Initialized and initial read performed\n");
+        dprintf("PCF8523: Initialized and initial read performed\n");
     } else {
         dprintf("PCF8523: Failed to initialize\n");
     }

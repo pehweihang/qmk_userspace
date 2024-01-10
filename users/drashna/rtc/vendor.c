@@ -58,6 +58,8 @@ bool vendor_rtc_init(rtc_time_t *time) {
     if (time->year < 2000) {
         dprintf("Vendor RTC: Date/time not set. Setting to compiled date/time as fallback!\n");
         vendor_rtc_set_time(convert_date_time(__DATE__, __TIME__));
+    } else {
+        dprintf("vendor RTC: Initialized and initial read performed\n");
     }
     return true;
 }

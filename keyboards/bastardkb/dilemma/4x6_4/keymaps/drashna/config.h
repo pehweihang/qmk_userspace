@@ -25,7 +25,6 @@
 
 #define SERIAL_USART_FULL_DUPLEX
 #define SERIAL_USART_PIN_SWAP
-#define SERIAL_USART_FULL_DUPLEX // Enable full duplex operation mode.
 #define SERIAL_USART_RX_PIN      GP13
 
 #define QP_DC    GP11

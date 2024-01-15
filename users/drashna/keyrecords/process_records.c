@@ -1,6 +1,7 @@
 // Copyright 2020 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include "process_records.h"
 #include "drashna.h"
 #include "version.h"
 #ifdef OS_DETECTION_ENABLE
@@ -16,6 +17,20 @@
 uint16_t copy_paste_timer;
 // Defines actions tor my global custom keycodes. Defined in drashna.h file
 // Then runs the _keymap's record handier if not processed here
+
+__attribute__((weak)) bool pre_process_record_keymap(uint16_t keycode, keyrecord_t *record) {
+    return true;
+}
+
+bool pre_process_record_user(uint16_t keycode, keyrecord_t *record) {
+#ifdef ACHORDION_ENABLE
+    if (!process_achordion(keycode, record)) {
+        return false;
+    }
+#endif
+
+    return pre_process_record_keymap(keycode, record);
+}
 
 /**
  * @brief Keycode handler for keymaps
@@ -50,11 +65,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 ignore_next = false;
             }
         }
-    }
-#endif
-#ifdef ACHORDION_ENABLE
-    if (!process_achordion(keycode, record)) {
-        return false;
     }
 #endif
 
@@ -97,7 +107,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
           && process_sentence_case(keycode, record)
 #endif
 #ifdef ORBITAL_MOUSE_ENABLE
-            && process_orbital_mouse(keycode, record)
+          && process_orbital_mouse(keycode, record)
 #endif
           && true)) {
         return false;

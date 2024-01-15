@@ -218,11 +218,32 @@ bool achordion_opposite_hands(const keyrecord_t* tap_hold_record, const keyrecor
 // "held" only when it and the other key are on opposite hands.
 __attribute__((weak)) bool achordion_chord(uint16_t tap_hold_keycode, keyrecord_t* tap_hold_record,
                                            uint16_t other_keycode, keyrecord_t* other_record) {
+    // Exceptionally consider the following chords as holds, even though they
+    // are on the same hand in Dvorak.
+    switch (tap_hold_keycode) {
+        case QK_LAYER_TAP ... QK_LAYER_TAP_MAX:
+        case QK_LAYER_TAP_TOGGLE ... QK_LAYER_TAP_TOGGLE_MAX:
+            return true;
+    }
+
+    // Also allow same-hand holds when the other key is in the rows below the
+    // alphas. I need the `% (MATRIX_ROWS / 2)` because my keyboard is split.
+    if (other_record->event.key.row % (MATRIX_ROWS / 2) >= 4) {
+        return true;
+    }
+
+    // Otherwise, follow the opposite hands rule.
+
     return achordion_opposite_hands(tap_hold_record, other_record);
 }
 
 // By default, the timeout is 1000 ms for all keys.
 __attribute__((weak)) uint16_t achordion_timeout(uint16_t tap_hold_keycode) {
+    if (layer_state_is(_MOUSE)) {
+        return 0;
+    }
+
+    // Otherwise, follow the opposite hands rule.
     return 1000;
 }
 
@@ -233,8 +254,7 @@ __attribute__((weak)) bool achordion_eager_mod(uint8_t mod) {
 
 #ifdef ACHORDION_STREAK
 __attribute__((weak)) uint16_t achordion_streak_timeout(uint16_t tap_hold_keycode) {
-    return 100; // Defa
-    ult of 100 ms.
+    return 100; // Default of 100 ms.
 }
 
 #endif

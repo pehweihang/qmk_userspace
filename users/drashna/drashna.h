@@ -116,3 +116,4 @@ const char *get_layer_name_string(layer_state_t state, bool alt_name);
 
 bool is_device_suspended(void);
 void set_is_device_suspended(bool status);
+bool is_gaming_layer_active(layer_state_t state);

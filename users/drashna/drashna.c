@@ -148,7 +148,7 @@ float autocorrect_song[][2] = SONG(PLOVER_GOODBYE_SOUND);
 char autocorrected_str[2][21] = {"    automatically\0", "      corrected\0"};
 
 bool apply_autocorrect(uint8_t backspaces, const char *str, char *typo, char *correct) {
-    if (layer_state_is(_GAMEPAD)) {
+    if (is_gaming_layer_active(layer_state)) {
         return false;
     }
     center_text(typo, autocorrected_str[0], sizeof(autocorrected_str[0]) - 1);
@@ -374,6 +374,18 @@ void set_is_device_suspended(bool status) {
     send_device_suspend_state(status);
 #endif
     device_suspended = status;
+}
+
+/**
+ * @brief Checks to see if one or more gaming layers are active
+ *
+ * @param state layer state bitmask
+ * @return true A gaming layer is active
+ * @return false No gaming layers active
+ */
+
+bool is_gaming_layer_active(layer_state_t state) {
+    return (state & (1 << _GAMEPAD)) || (state & (1 << _DIABLO)) || (state & (1 << _DIABLOII));
 }
 
 #if 0

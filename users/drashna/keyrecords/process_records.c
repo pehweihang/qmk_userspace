@@ -23,11 +23,6 @@ __attribute__((weak)) bool pre_process_record_keymap(uint16_t keycode, keyrecord
 }
 
 bool pre_process_record_user(uint16_t keycode, keyrecord_t *record) {
-#ifdef ACHORDION_ENABLE
-    if (!process_achordion(keycode, record)) {
-        return false;
-    }
-#endif
 
     return pre_process_record_keymap(keycode, record);
 }
@@ -74,6 +69,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             record->event.key.col, record->event.key.row, record->event.pressed, record->event.time,
             record->tap.interrupted, record->tap.count);
 #endif // KEYLOGGER_ENABLE
+
+#ifdef ACHORDION_ENABLE
+    if (!process_achordion(keycode, record)) {
+        return false;
+    }
+#endif
 #if defined(OLED_ENABLE) && defined(CUSTOM_OLED_DRIVER)
     process_record_user_oled(keycode, record);
 #endif // OLED

@@ -57,7 +57,7 @@ static bool CUSTOM_GRADIENT(effect_params_t* params) {
         RGB_MATRIX_TEST_LED_FLAGS();
 
         HSV hsv_orig = CUSTOM_GRADIENT_math(g_led_config.point[i].x, min_x, max_x);
-        RGB rgb      = hsv_to_rgb(hsv_orig);
+        RGB rgb      = rgb_matrix_hsv_to_rgb(hsv_orig);
 
         rgb_matrix_set_color(i, rgb.r, rgb.g, rgb.b);
     }

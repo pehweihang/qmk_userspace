@@ -88,7 +88,7 @@ static void swirl_set_color(HSV hsv) {
                 v_values[v] = 0;
         }
         hsv.v   = v_values[v];
-        RGB rgb = hsv_to_rgb(hsv);
+        RGB rgb = rgb_matrix_hsv_to_rgb(hsv);
         rgb_matrix_set_color(v, rgb.r, rgb.g, rgb.b);
     }
 
@@ -103,7 +103,7 @@ static bool STARTUP_SWIRL_ANIM(effect_params_t* params) {
     HSV     hsv  = rgb_matrix_config.hsv;
     uint8_t time = scale16by8(g_rgb_timer, qadd8(24, 1));
     hsv.h        = time;
-    RGB rgb      = hsv_to_rgb(hsv);
+    RGB rgb      = rgb_matrix_hsv_to_rgb(hsv);
 
     if (traverse) {
         swirl_set_color(hsv);

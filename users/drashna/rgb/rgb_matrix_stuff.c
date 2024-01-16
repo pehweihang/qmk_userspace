@@ -7,6 +7,8 @@
 extern led_config_t g_led_config;
 
 static uint32_t hypno_timer;
+RGB rgb_matrix_hsv_to_rgb(HSV hsv);
+
 
 void rgb_matrix_layer_helper(uint8_t hue, uint8_t sat, uint8_t val, uint8_t mode, uint8_t speed, uint8_t led_type,
                              uint8_t led_min, uint8_t led_max) {

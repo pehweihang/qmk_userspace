@@ -12,6 +12,7 @@
         ["work_louder/work_board/rev1", "via_midi"],
         ["work_louder/work_board/rev3", "via_midi"],
         ["work_louder/loop/rev1", "via_midi"],
-        ["work_louder/loop/rev3", "via_midi"]
+        ["work_louder/loop/rev3", "via_midi"],
+        ["work_louder/micro", "figma"]
     ]
 }

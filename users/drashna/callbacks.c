@@ -210,12 +210,12 @@ layer_state_t layer_state_set_user(layer_state_t state) {
             if (is_click_on) {
                 clicky_off();
             }
-            PLAY_LOOP(doom_song);
+            audio_play_melody(&doom_song, NOTE_ARRAY_SIZE(doom_song), true);
         } else {
             if (is_click_on) {
                 clicky_on();
             }
-            stop_all_notes();
+            audio_stop_all();
         }
     }
 #endif
@@ -255,7 +255,7 @@ layer_state_t default_layer_state_set_user(layer_state_t state) {
     if (has_init_been_ran) {
 #if defined(AUDIO_ENABLE) && defined(DEFAULT_LAYER_SONGS)
         if (get_highest_layer(state) < MAX_LAYER) {
-            PLAY_SONG(default_layer_songs[get_highest_layer(state)]);
+            audio_play_melody(&default_layer_songs[get_highest_layer(state)], NOTE_ARRAY_SIZE(default_layer_songs[get_highest_layer(state)]), false);
         }
 #endif
         eeconfig_update_default_layer(state);

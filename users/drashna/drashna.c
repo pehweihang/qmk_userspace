@@ -162,7 +162,7 @@ bool apply_autocorrect(uint8_t backspaces, const char *str, char *typo, char *co
 #endif
 
 #    if defined(AUDIO_ENABLE)
-    PLAY_SONG(autocorrect_song);
+    audio_play_melody(&autocorrect_song, NOTE_ARRAY_SIZE(autocorrect_song), false);
 #    endif
     return true;
 }

@@ -211,57 +211,53 @@ void format_layer_bitmap_string(char *buffer, layer_state_t state, layer_state_t
 }
 
 #if defined(OS_DETECTION_ENABLE) && defined(DEFERRED_EXEC_ENABLE)
-os_variant_t os_type;
 
-uint32_t startup_exec(uint32_t trigger_time, void *cb_arg) {
+bool process_detected_host_os_user(os_variant_t detected_os) {
     if (is_keyboard_master()) {
-        os_type = detected_host_os();
-        if (os_type) {
-            bool is_mac = (os_type == OS_MACOS) || (os_type == OS_IOS);
-            if (keymap_config.swap_lctl_lgui != is_mac) {
-                keymap_config.swap_lctl_lgui = keymap_config.swap_rctl_rgui = is_mac;
-                eeconfig_update_keymap(keymap_config.raw);
-            }
+        bool is_mac = (detected_os == OS_MACOS) || (detected_os == OS_IOS);
+        if (keymap_config.swap_lctl_lgui != is_mac) {
+            keymap_config.swap_lctl_lgui = keymap_config.swap_rctl_rgui = is_mac;
+            eeconfig_update_keymap(keymap_config.raw);
+        }
 #    ifdef UNICODE_COMMON_ENABLE
-            set_unicode_input_mode_soft(keymap_config.swap_lctl_lgui ? UNICODE_MODE_MACOS : UNICODE_MODE_WINCOMPOSE);
+        set_unicode_input_mode_soft(keymap_config.swap_lctl_lgui ? UNICODE_MODE_MACOS : UNICODE_MODE_WINCOMPOSE);
 #    endif
-            switch (os_type) {
-                case OS_UNSURE:
-                    xprintf("unknown OS Detected\n");
-                    break;
-                case OS_LINUX:
-                    xprintf("Linux Detected\n");
-                    break;
-                case OS_WINDOWS:
-                    xprintf("Windows Detected\n");
-                    break;
+        switch (detected_os) {
+            case OS_UNSURE:
+                xprintf("unknown OS Detected\n");
+                break;
+            case OS_LINUX:
+                xprintf("Linux Detected\n");
+                break;
+            case OS_WINDOWS:
+                xprintf("Windows Detected\n");
+                break;
 #    if 0
-                case OS_WINDOWS_UNSURE:
-                    xprintf("Windows? Detected\n");
-                    break;
+            case OS_WINDOWS_UNSURE:
+                xprintf("Windows? Detected\n");
+                break;
 #    endif
-                case OS_MACOS:
-                    xprintf("MacOS Detected\n");
-                    break;
-                case OS_IOS:
-                    xprintf("iOS Detected\n");
-                    break;
+            case OS_MACOS:
+                xprintf("MacOS Detected\n");
+                break;
+            case OS_IOS:
+                xprintf("iOS Detected\n");
+                break;
 #    if 0
-                case OS_PS5:
-                    xprintf("PlayStation 5 Detected\n");
-                    break;
-                case OS_HANDHELD:
-                    xprintf("Nintend Switch/Quest 2 Detected\n");
-                    break;
+            case OS_PS5:
+                xprintf("PlayStation 5 Detected\n");
+                break;
+            case OS_HANDHELD:
+                xprintf("Nintend Switch/Quest 2 Detected\n");
+                break;
 #    endif
-                default:
-                    xprintf("Unknown OS Detected\n");
-                    break;
-            }
+            default:
+                xprintf("Unknown OS Detected\n");
+                break;
         }
     }
 
-    return os_type ? 0 : 500;
+    return true;
 }
 #endif
 

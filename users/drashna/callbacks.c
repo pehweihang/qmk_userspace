@@ -91,9 +91,6 @@ void                       keyboard_post_init_user(void) {
 #ifdef CUSTOM_DYNAMIC_MACROS_ENABLE
     dynamic_macro_init();
 #endif
-#if defined(OS_DETECTION_ENABLE) && defined(DEFERRED_EXEC_ENABLE)
-    defer_exec(100, startup_exec, NULL);
-#endif
 #ifdef RTC_ENABLE
     rtc_init();
 #endif

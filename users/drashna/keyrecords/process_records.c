@@ -13,6 +13,9 @@
 #ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
 #    include "painter/ili9341_display.h"
 #endif
+#ifdef LAYER_LOCK_ENABLE
+#    include "layer_lock.h"
+#endif
 
 uint16_t copy_paste_timer;
 // Defines actions tor my global custom keycodes. Defined in drashna.h file
@@ -23,7 +26,6 @@ __attribute__((weak)) bool pre_process_record_keymap(uint16_t keycode, keyrecord
 }
 
 bool pre_process_record_user(uint16_t keycode, keyrecord_t *record) {
-
     return pre_process_record_keymap(keycode, record);
 }
 
@@ -109,6 +111,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #endif
 #ifdef ORBITAL_MOUSE_ENABLE
           && process_orbital_mouse(keycode, record)
+#endif
+#ifdef LAYER_LOCK_ENABLE
+          && process_layer_lock(keycode, record, LAYER_LOCK)
 #endif
           && true)) {
         return false;

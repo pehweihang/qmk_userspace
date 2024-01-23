@@ -95,6 +95,8 @@ enum userspace_custom_keycodes {
     OM_SEL7,
     OM_SEL8,
 
+    LAYER_LOCK,
+
     USER_SAFE_RANGE,
 };
 

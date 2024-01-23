@@ -6,9 +6,9 @@ SRC += $(USER_PATH)/drashna.c \
 
 # TOP_SYMBOLS = yes
 
-DEBOUNCE_TYPE        = asym_eager_defer_pk
-DEFERRED_EXEC_ENABLE = yes
-OS_DETECTION_ENABLE  = yes
+DEBOUNCE_TYPE        ?= asym_eager_defer_pk
+DEFERRED_EXEC_ENABLE ?= yes
+OS_DETECTION_ENABLE  ?= yes
 DEBUG_MATRIX_SCAN_RATE_ENABLE := no
 
 ifeq ($(PLATFORM_KEY),chibios)
@@ -22,8 +22,8 @@ else
     ifneq ($(strip $(LTO_SUPPORTED)), no)
         LTO_ENABLE        = yes
     endif
-    SPACE_CADET_ENABLE    = no
-    GRAVE_ESC_ENABLE      = no
+    SPACE_CADET_ENABLE    ?= no
+    GRAVE_ESC_ENABLE      ?= no
 endif
 
 -include $(USER_PATH)/../../../qmk_secrets/rules.mk
@@ -57,7 +57,7 @@ endif
 
 ifeq ($(strip $(ORBITAL_MOUSE_ENABLE)), yes)
     SRC += orbital_mouse.c
-	OPT_DEFS += -DORBITAL_MOUSE_ENABLE
+    OPT_DEFS += -DORBITAL_MOUSE_ENABLE
     MOUSE_ENABLE := yes
 endif
 

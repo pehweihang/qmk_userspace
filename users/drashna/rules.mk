@@ -77,6 +77,11 @@ ifeq ($(strip $(WATCHDOG_ENABLE)), yes)
     OPT_DEFS += -DWATCHDOG_ENABLE -DHAL_USE_WDG=TRUE
 endif
 
+ifeq ($(strip $(LAYER_LOCK_ENABLE)), yes)
+    SRC += $(USER_PATH)/layer_lock.c
+    OPT_DEFS += -DLAYER_LOCK_ENABLE
+endif
+
 include $(USER_PATH)/oled/rules.mk
 include $(USER_PATH)/pointing/rules.mk
 include $(USER_PATH)/split/rules.mk

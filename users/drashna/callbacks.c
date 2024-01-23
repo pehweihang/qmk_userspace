@@ -22,6 +22,9 @@ void keyboard_post_init_unicode(void);
 #ifdef WATCHDOG_ENABLE
 #    include "watchdog.h"
 #endif
+#if defined(LAYER_LOCK_ENABLE) && defined(LAYER_LOCK_IDLE_TIMEOUT)
+#    include "layer_lock.h"
+#endif
 
 static uint32_t matrix_timer           = 0;
 static uint32_t matrix_scan_count      = 0;
@@ -339,6 +342,9 @@ void                       housekeeping_task_user(void) {
 #ifdef WATCHDOG_ENABLE
     watchdog_task();
 #endif // WATCHDOG_ENABLE
+#if defined(LAYER_LOCK_ENABLE) && defined(LAYER_LOCK_IDLE_TIMEOUT)
+    layer_lock_task();
+#endif
 #if defined(CUSTOM_TAP_DANCE_ENABLE) // Run Diablo 3 macro checking code.
     run_diablo_macro_check();
 #endif // CUSTOM_TAP_DANCE_ENABLE

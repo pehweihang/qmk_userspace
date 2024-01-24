@@ -55,4 +55,5 @@ ifeq ($(strip $(OVERLOAD_FEATURES)), yes)
     WPM_ENABLE                       = yes
     RTC_ENABLE                       = yes
     RTC_DRIVER                       = ds3231
+    SENTENCE_CASE_ENABLE             = yes
 endif

@@ -8,3 +8,4 @@
 #include "rgb/anim/random_breath_rainbow.h" // rgb vomit!
 // #include "rgb/anim/custom_gradient.h" // too custom
 #include "rgb/anim/raindrops.h"
+#include "rgb/anim/candy.h"

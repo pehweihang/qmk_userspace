@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "drashna.h"
-#include "bootmagic_lite.h"
+#include "bootmagic.h"
 
 void bootmagic_lite(void) {
     bool perform_reset = false;

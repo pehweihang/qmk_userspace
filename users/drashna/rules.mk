@@ -39,26 +39,16 @@ ifeq ($(strip $(PROTOCOL)), VUSB)
     NKRO_ENABLE       := no
 endif
 
-
-
-
 ifeq ($(strip $(I2C_SCANNER_ENABLE)), yes)
     OPT_DEFS += -DI2C_SCANNER_ENABLE
     CONSOLE_ENABLE := yes
 endif
-
 
 CUSTOM_BOOTMAGIC_ENABLE ?= yes
 ifeq ($(strip $(CUSTOM_BOOTMAGIC_ENABLE)), yes)
     ifeq ($(strip $(BOOTMAGIC_ENABLE)), yes)
         SRC += bootmagic_better.c
     endif
-endif
-
-ifeq ($(strip $(ORBITAL_MOUSE_ENABLE)), yes)
-    SRC += orbital_mouse.c
-    OPT_DEFS += -DORBITAL_MOUSE_ENABLE
-    MOUSE_ENABLE := yes
 endif
 
 ifeq ($(strip $(HARDWARE_DEBUG_ENABLE)), yes)
@@ -72,22 +62,12 @@ ifeq ($(strip $(DEBUG_MATRIX_SCAN_RATE_ENABLE)), yes)
     OPT_DEFS += -DDEBUG_MATRIX_SCAN_RATE_ENABLE
 endif
 
-ifeq ($(strip $(WATCHDOG_ENABLE)), yes)
-    SRC += $(USER_PATH)/watchdog.c
-    OPT_DEFS += -DWATCHDOG_ENABLE -DHAL_USE_WDG=TRUE
-endif
-
-ifeq ($(strip $(LAYER_LOCK_ENABLE)), yes)
-    SRC += $(USER_PATH)/layer_lock.c
-    OPT_DEFS += -DLAYER_LOCK_ENABLE
-endif
-
 include $(USER_PATH)/oled/rules.mk
 include $(USER_PATH)/pointing/rules.mk
 include $(USER_PATH)/split/rules.mk
 include $(USER_PATH)/painter/rules.mk
 include $(USER_PATH)/rgb/rules.mk
-include $(USER_PATH)/rtc/rtc.mk
 include $(USER_PATH)/keyrecords/rules.mk
+include $(USER_PATH)/features/rules.mk
 # Ignore if not found
 -include $(KEYMAP_PATH)/post_rules.mk

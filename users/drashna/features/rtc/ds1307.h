@@ -4,7 +4,7 @@
 #pragma once
 
 #include "i2c_master.h"
-#include "rtc/rtc.h"
+#include "rtc.h"
 #include <stdint.h>
 #include <stdbool.h>
 

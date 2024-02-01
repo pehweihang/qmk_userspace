@@ -35,18 +35,6 @@
 #    endif
 #endif
 
-#ifdef RGB_MATRIX_ENABLE
-#    include "rgb/post_rgb_matrix.h"
-#    ifndef RGB_MATRIX_REST_MODE
-#        if defined(SPLIT_KEYBOARD) || defined(KEYBOARD_ergodox_ez) || defined(KEYBOARD_moonlander)
-#            define RGB_MATRIX_REST_MODE RGB_MATRIX_CYCLE_OUT_IN_DUAL
-#        else
-#            define RGB_MATRIX_REST_MODE RGB_MATRIX_CYCLE_OUT_IN
-#        endif
-#    endif
-#    undef RGB_MATRIX_DEFAULT_MODE
-#    define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_REST_MODE
-#endif
 
 #ifdef MOUSEKEY_ENABLE
 // mouse movement config

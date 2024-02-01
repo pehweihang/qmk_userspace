@@ -8,15 +8,6 @@
 #endif // AUDIO_ENABLE
 
 
-#if defined(WPM_ENABLE)
-// #    define WPM_LAUNCH_CONTROL
-// #    define WPM_UNFILTERED
-#    define WPM_ALLOW_COUNT_REGRESSION
-#    define WPM_SAMPLE_SECONDS      10
-#    define WPM_SAMPLE_PERIODS      50
-#    define WPM_ESTIMATED_WORD_SIZE 5
-#endif
-
 #ifdef CONVERT_TO_PROTON_C
 // pins that are available but not present on Pro Micro
 #    define A3  PAL_LINE(GPIOA, 3)

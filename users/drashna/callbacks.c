@@ -14,7 +14,7 @@ void housekeeping_task_i2c_scanner(void);
 void keyboard_post_init_i2c(void);
 #endif
 #ifdef RTC_ENABLE
-#    include "rtc/rtc.h"
+#    include "rtc.h"
 #endif
 #ifdef CUSTOM_UNICODE_ENABLE
 void keyboard_post_init_unicode(void);

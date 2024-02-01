@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "rtc/rtc.h"
+#include "rtc.h"
 #include <stdint.h>
 #include <stdbool.h>
 

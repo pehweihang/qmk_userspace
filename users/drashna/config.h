@@ -3,34 +3,10 @@
 
 #pragma once
 
-#include "keyrecords/keyrecord_config.h"
-
-#if defined(SPLIT_KEYBOARD)
-#    include "split/split_config.h"
-#endif
-#ifdef RGBLIGHT_ENABLE
-#    include "rgb/rgblight_config.h"
-#endif // RGBLIGHT_ENABLE
-
-#ifdef RGB_MATRIX_ENABLE
-#    include "rgb/rgb_matrix_config.h"
-#endif // RGB_MATRIX_ENABLE
-
-#ifdef OLED_ENABLE
-#    include "oled/oled_config.h"
-#endif
-
-#ifdef POINTING_DEVICE_ENABLE
-#    include "pointing/pointing_config.h"
-#endif // POINTING_DEVICE_ENABLE
-
 #ifdef AUDIO_ENABLE
 #    include "audio_config.h"
 #endif // AUDIO_ENABLE
 
-#ifdef RTC_ENABLE
-#    include "rtc/rtc_config.h"
-#endif // RTC_ENABLE
 
 #if defined(WPM_ENABLE)
 // #    define WPM_LAUNCH_CONTROL

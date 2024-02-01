@@ -2,7 +2,7 @@
 // Copyright 2023 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "rtc/ds3231.h"
+#include "ds3231.h"
 #include "i2c_master.h"
 #include "debug.h"
 #include <math.h>

@@ -1,7 +1,7 @@
 ifeq ($(strip $(PER_KEY_TAPPING)), yes)
     OPT_DEFS += -DPER_KEY_TAPPING
 endif
-
+CONFIG_H += $(USER_PATH)/keyrecords/config.h
 
 UNICODE_ENABLE        := no
 UNICODEMAP_ENABLE     := no

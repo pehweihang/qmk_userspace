@@ -13,16 +13,16 @@
 #include <string.h>
 
 #ifdef DS3231_RTC_DRIVER_ENABLE
-#    include "rtc/ds3231.h"
+#    include "ds3231.h"
 #endif
 #ifdef DS1307_RTC_DRIVER_ENABLE
-#    include "rtc/ds1307.h"
+#    include "ds1307.h"
 #endif
 #ifdef PCF8523_RTC_DRIVER_ENABLE
-#    include "rtc/pcf8523.h"
+#    include "pcf8523.h"
 #endif
 #ifdef VENDOR_RTC_DRIVER_ENABLE
-#    include "rtc/vendor.h"
+#    include "vendor.h"
 #endif
 
 #ifndef RTC_READ_INTERVAL

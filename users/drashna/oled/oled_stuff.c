@@ -25,9 +25,9 @@
 #include <stdio.h>
 
 #ifdef RTC_ENABLE
-#    include "rtc/rtc.h"
+#    include "rtc.h"
 #    ifdef DS3231_RTC_DRIVER_ENABLE
-#        include "rtc/ds3231.h"
+#        include "ds3231.h"
 #    endif
 #endif
 

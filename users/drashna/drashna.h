@@ -85,25 +85,24 @@ void tap_code16_nomods(uint16_t kc);
 void format_layer_bitmap_string(char *buffer, layer_state_t state, layer_state_t default_state);
 void center_text(const char *text, char *output, uint8_t width);
 
-// clang-format off
 typedef union {
     uint32_t raw;
     struct {
-        bool     rgb_layer_change     :1;
-        bool     is_overwatch         :1;
-        bool     nuke_switch          :1;
-        bool     swapped_numbers      :1;
-        bool     rgb_matrix_idle_anim :1;
-        bool     mouse_jiggler        :1;
-        bool     matrix_scan_print    :1;
-        bool     align_reserved       :1;
-        uint8_t  oled_brightness      :8;
-        bool     oled_lock            :1;
-        uint32_t reserved             :14;
-        bool     check                :1;
+        bool     rgb_layer_change     : 1;
+        bool     is_overwatch         : 1;
+        bool     nuke_switch          : 1;
+        bool     swapped_numbers      : 1;
+        bool     rgb_matrix_idle_anim : 1;
+        bool     mouse_jiggler        : 1;
+        bool     matrix_scan_print    : 1;
+        bool     align_reserved       : 1;
+        uint8_t  oled_brightness      : 8;
+        bool     oled_lock            : 1;
+        bool     enable_acceleration  : 1;
+        uint32_t reserved             : 13;
+        bool     check                : 1;
     };
 } userspace_config_t;
-// clang-format on
 
 _Static_assert(sizeof(userspace_config_t) == sizeof(uint32_t), "Userspace EECONFIG out of spec.");
 

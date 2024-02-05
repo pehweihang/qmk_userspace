@@ -5,7 +5,6 @@
 #include "math.h"
 
 static uint16_t mouse_debounce_timer = 0;
-bool            enable_acceleration  = false;
 
 #ifdef TAPPING_TERM_PER_KEY
 #    define TAP_CHECK get_tapping_term(KC_BTN1, NULL)
@@ -49,7 +48,7 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
     mouse_report.y = 0;
 
     if (x != 0 && y != 0 && (timer_elapsed(mouse_debounce_timer) > TAP_CHECK)) {
-        if (enable_acceleration) {
+        if (userspace_config.enable_acceleration) {
             const float speed = sqrtf(x * x + y * y);
 
             float scale_factor = 1 - expf(maccel_a - speed * maccel_b);
@@ -71,7 +70,10 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
 bool process_record_pointing(uint16_t keycode, keyrecord_t* record) {
     switch (keycode) {
         case KC_ACCEL:
-            enable_acceleration = record->event.pressed;
+            if (record->event.pressed) {
+                userspace_config.enable_acceleration ^= 1;
+                eeconfig_update_user_config(&userspace_config.raw);
+            }
             break;
 #if defined(POINTING_DEVICE_MOUSE_JIGGLER_ENABLE)
         case PD_JIGGLER:

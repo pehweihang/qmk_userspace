@@ -16,6 +16,20 @@ bool            enable_acceleration  = false;
 #    define TAP_CHECK TAPPING_TERM
 #endif
 
+#ifndef POINTING_DEVICE_ACCEL_CURVE_A
+#    define POINTING_DEVICE_ACCEL_CURVE_A 0.169
+#endif
+#ifndef POINTING_DEVICE_ACCEL_CURVE_B
+#    define POINTING_DEVICE_ACCEL_CURVE_B 0.18
+#endif
+#ifndef POINTING_DEVICE_ACCEL_CURVE_C
+#    define POINTING_DEVICE_ACCEL_CURVE_C 0.1
+#endif
+
+static float maccel_a = POINTING_DEVICE_ACCEL_CURVE_A;
+static float maccel_b = POINTING_DEVICE_ACCEL_CURVE_B;
+static float maccel_c = POINTING_DEVICE_ACCEL_CURVE_C;
+
 __attribute__((weak)) void pointing_device_init_keymap(void) {}
 
 void pointing_device_init_user(void) {
@@ -36,12 +50,16 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
 
     if (x != 0 && y != 0 && (timer_elapsed(mouse_debounce_timer) > TAP_CHECK)) {
         if (enable_acceleration) {
-            float magnitude          = sqrtf(mouse_report.x * mouse_report.x + mouse_report.y * mouse_report.y);
-            float adjusted_magnitude = powf(magnitude, 1.2f);
-            x                        = (mouse_xy_report_t)(x * adjusted_magnitude);
-            y                        = (mouse_xy_report_t)(y * adjusted_magnitude);
-            //            x = (mouse_xy_report_t)(x > 0 ? x * x / 16 + x : -x * x / 16 + x);
-            //            y = (mouse_xy_report_t)(y > 0 ? y * y / 16 + y : -y * y / 16 + y);
+            const float speed = sqrtf(x * x + y * y);
+
+            float scale_factor = 1 - expf(maccel_a - speed * maccel_b);
+            if (scale_factor <= maccel_c) {
+                scale_factor = 0.1;
+            }
+
+            x = (mouse_xy_report_t)(x * scale_factor);
+            y = (mouse_xy_report_t)(y * scale_factor);
+            xprintf("maccel: a = %8f, b = %8f, speed = %4f -> scale_factor = %f\r\n", maccel_a, maccel_b, speed, scale_factor);
         }
         mouse_report.x = x;
         mouse_report.y = y;

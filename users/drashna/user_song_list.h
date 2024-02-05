@@ -33,6 +33,9 @@
 
 #define ZELDA_TREASURE Q__NOTE(_A4), Q__NOTE(_AS4), Q__NOTE(_B4), HD_NOTE(_C5)
 
+#define ZELDA_OTHER \
+    W__NOTE(_G6), W__NOTE(_FS6), W__NOTE(_F6), W__NOTE(_CS6), W__NOTE(_C6), W__NOTE(_F6), W__NOTE(_GS6), W__NOTE(_AS6)
+
 #define OVERWATCH_THEME \
     HD_NOTE(_A4), Q__NOTE(_E4), Q__NOTE(_A4), HD_NOTE(_B4), Q__NOTE(_E4), Q__NOTE(_B4), W__NOTE(_CS5)
 

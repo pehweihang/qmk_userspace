@@ -3,6 +3,7 @@
 
 #include "pointing.h"
 #include "math.h"
+#include "pointing_device_internal.h"
 
 static uint16_t mouse_debounce_timer = 0;
 
@@ -16,18 +17,31 @@ static uint16_t mouse_debounce_timer = 0;
 #endif
 
 #ifndef POINTING_DEVICE_ACCEL_CURVE_A
-#    define POINTING_DEVICE_ACCEL_CURVE_A 0.169
+#    define POINTING_DEVICE_ACCEL_CURVE_A 7 // steepness of accel curve
 #endif
 #ifndef POINTING_DEVICE_ACCEL_CURVE_B
-#    define POINTING_DEVICE_ACCEL_CURVE_B 0.18
+#    define POINTING_DEVICE_ACCEL_CURVE_B 0.05 // X-offset of accel curve
 #endif
 #ifndef POINTING_DEVICE_ACCEL_CURVE_C
-#    define POINTING_DEVICE_ACCEL_CURVE_C 0.1
+#    define POINTING_DEVICE_ACCEL_CURVE_C 0.3 // Y-offset of accel curve
 #endif
+#ifndef POINTING_DEVICE_ACCEL_CURVE_D
+#    define POINTING_DEVICE_ACCEL_CURVE_D .1 // speed scaling factor
+#endif
+#ifndef POINTING_DEVICE_ACCEL_HISTORY_TIME
+#    define POINTING_DEVICE_ACCEL_HISTORY_TIME 100 // milliseconds of history to keep
+#endif
+#define POINTING_DEVICE_ACCEL_ACCUM
+
+static uint32_t maccel_timer;
 
 static float maccel_a = POINTING_DEVICE_ACCEL_CURVE_A;
 static float maccel_b = POINTING_DEVICE_ACCEL_CURVE_B;
 static float maccel_c = POINTING_DEVICE_ACCEL_CURVE_C;
+static float maccel_d = POINTING_DEVICE_ACCEL_CURVE_D;
+
+static float maccel_accum_x = 0;
+static float maccel_accum_y = 0;
 
 __attribute__((weak)) void pointing_device_init_keymap(void) {}
 
@@ -43,23 +57,46 @@ __attribute__((weak)) report_mouse_t pointing_device_task_keymap(report_mouse_t 
 }
 
 report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
-    mouse_xy_report_t x = mouse_report.x, y = mouse_report.y;
-    mouse_report.x = 0;
-    mouse_report.y = 0;
-
-    if (x != 0 && y != 0 && (timer_elapsed(mouse_debounce_timer) > TAP_CHECK)) {
-        if (userspace_config.enable_acceleration) {
-            const float speed = sqrtf(x * x + y * y);
-
-            float scale_factor = 1 - expf(maccel_a - speed * maccel_b);
-            if (scale_factor <= maccel_c) {
-                scale_factor = 0.1;
-            }
-
-            x = (mouse_xy_report_t)(x * scale_factor);
-            y = (mouse_xy_report_t)(y * scale_factor);
-            xprintf("maccel: a = %8f, b = %8f, speed = %4f -> scale_factor = %f\r\n", maccel_a, maccel_b, speed, scale_factor);
+    if (!(mouse_report.x == 0 && mouse_report.y == 0) && (timer_elapsed(mouse_debounce_timer) > TAP_CHECK)) {
+        const float speed = maccel_d * (sqrtf(mouse_report.x * mouse_report.x + mouse_report.y * mouse_report.y)) /
+                            timer_elapsed32(maccel_timer);
+        float scale_factor = 1 - (1 - maccel_c) * expf(-1 * (speed - maccel_b) * maccel_a);
+        if (speed <= maccel_b) {
+            scale_factor = maccel_c;
         }
+        const float x = (mouse_report.x * scale_factor);
+        const float y = (mouse_report.y * scale_factor);
+        maccel_timer  = timer_read32();
+
+        pd_dprintf("maccel: x: %i, y: %i, speed %f -> factor %f; x': %3f, y': %3f\n", mouse_report.x, mouse_report.y,
+                   speed, scale_factor, x, y);
+
+#ifdef POINTING_DEVICE_ACCEL_ACCUM
+        // report the integer part
+        mouse_report.x = (mouse_xy_report_t)x;
+        mouse_report.y = (mouse_xy_report_t)y;
+
+        // accumulate remaining fraction
+        maccel_accum_x += (x - mouse_report.x);
+        maccel_accum_y += (y - mouse_report.y);
+
+        // pay out accumulated fraction once it's whole
+        if (maccel_accum_x >= 1) {
+            mouse_report.x += 1;
+            maccel_accum_x -= 1;
+        } else if (maccel_accum_x <= -1) {
+            mouse_report.x -= 1;
+            maccel_accum_x += 1;
+        }
+        if (maccel_accum_y >= 1) {
+            mouse_report.y += 1;
+            maccel_accum_y -= 1;
+        } else if (maccel_accum_y <= -1) {
+            mouse_report.y -= 1;
+            maccel_accum_y += 1;
+        }
+        pd_dprintf("maccel accum: x: %3f, y: %3f\n", maccel_accum_x, maccel_accum_y);
+#endif // MACCEL_ACCUM
         mouse_report.x = x;
         mouse_report.y = y;
     }

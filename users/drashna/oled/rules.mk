@@ -4,7 +4,7 @@ ifeq ($(strip $(OLED_ENABLE)), yes)
     ifeq ($(strip $(CUSTOM_OLED_DRIVER)), yes)
         OPT_DEFS += -DCUSTOM_OLED_DRIVER
         SRC += $(USER_PATH)/oled/oled_stuff.c
-        POST_CONFIG_H += $(USER_PATH)/oled/oled_config.h
+        POST_CONFIG_H += $(USER_PATH)/oled/config.h
     endif
     ifeq ($(strip $(OLED_DISPLAY_TEST)), yes)
         OPT_DEFS += -DOLED_DISPLAY_TEST

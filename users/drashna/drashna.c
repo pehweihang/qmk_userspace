@@ -194,7 +194,7 @@ bool caps_word_press_user(uint16_t keycode) {
 
 #    if !defined(NO_ACTION_ONESHOT)
 void oneshot_locked_mods_changed_user(uint8_t mods) {
-    if (mods & MOD_MASK_SHIFT) {
+    if (mods == MOD_BIT_LSHIFT || mods == MOD_BIT_RSHIFT) {
         del_mods(MOD_MASK_SHIFT);
         set_oneshot_locked_mods(~MOD_MASK_SHIFT & get_oneshot_locked_mods());
         caps_word_on();

@@ -12,12 +12,12 @@ define HANDLE_MY_FEATURE
     OPT_DEFS += -D$1_ENABLE
 endef
 
-$(foreach F,$(KEYRECORD_FEATURES),\
+$(foreach F,$(USERSPACE_FEATURES),\
     $(if $(filter yes, $(strip $($(F)_ENABLE))),\
         $(eval $(call HANDLE_MY_FEATURE,$(F),$(shell echo $(F) | tr '[:upper:]' '[:lower:]'))) \
     ) \
 )
 
 ifeq ($(strip $(WATCHDOG_ENABLE)), yes)
-    OPT_DEFS += -DHAL_USE_WATCHDOG=TRUE
+    OPT_DEFS += -DHAL_USE_WDG=TRUE
 endif

@@ -38,6 +38,7 @@ ifeq ($(strip $(KEYBOARD)), handwired/tractyl_manuform/5x6_right/f411)
     OVERLOAD_FEATURES                = yes
     HAPTIC_ENABLE                    = yes
     HAPTIC_DRIVER                    = drv2605l
+    WATCHDOG_ENABLE                  = yes
 endif
 
 ifeq ($(strip $(OVERLOAD_FEATURES)), yes)

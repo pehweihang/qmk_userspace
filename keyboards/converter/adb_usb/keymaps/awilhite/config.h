@@ -12,5 +12,5 @@
 // #define NO_ACTION_LAYER
 // #define NO_ACTION_TAPPING
 
-#define BOOTMAGIC_LITE_ROW    6
-#define BOOTMAGIC_LITE_COLUMN 5
+#define BOOTMAGIC_ROW    6
+#define BOOTMAGIC_COLUMN 5

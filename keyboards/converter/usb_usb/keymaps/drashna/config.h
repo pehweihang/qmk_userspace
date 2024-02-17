@@ -3,8 +3,8 @@
 
 #pragma once
 
-#define BOOTMAGIC_LITE_COLUMN 9
-#define BOOTMAGIC_LITE_ROW    2
+#define BOOTMAGIC_COLUMN 9
+#define BOOTMAGIC_ROW    2
 
 #define BLUEFRUIT_LE_RST_PIN D4
 #define BLUEFRUIT_LE_CS_PIN  B4

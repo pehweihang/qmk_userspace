@@ -44,15 +44,15 @@
 #    define WS2812_DMA_STREAM STM32_DMA1_STREAM5
 #    define WS2812_DMA_CHANNEL 5
 
-#    define BOOTMAGIC_LITE_ROW          0
-#    define BOOTMAGIC_LITE_COLUMN       6
-#    define BOOTMAGIC_LITE_ROW_RIGHT    4
-#    define BOOTMAGIC_LITE_COLUMN_RIGHT 6
+#    define BOOTMAGIC_ROW          0
+#    define BOOTMAGIC_COLUMN       6
+#    define BOOTMAGIC_ROW_RIGHT    4
+#    define BOOTMAGIC_COLUMN_RIGHT 6
 
-#    define BOOTMAGIC_LITE_EEPROM_ROW          1
-#    define BOOTMAGIC_LITE_EEPROM_COLUMN       6
-#    define BOOTMAGIC_LITE_EEPROM_ROW_RIGHT    5
-#    define BOOTMAGIC_LITE_EEPROM_COLUMN_RIGHT 6
+#    define BOOTMAGIC_EEPROM_ROW          1
+#    define BOOTMAGIC_EEPROM_COLUMN       6
+#    define BOOTMAGIC_EEPROM_ROW_RIGHT    5
+#    define BOOTMAGIC_EEPROM_COLUMN_RIGHT 6
 #    define SECURE_UNLOCK_SEQUENCE    \
         {                             \
             {1, 5}, {1, 4}, {1, 3}, { \
@@ -62,15 +62,15 @@
 
 #    define ENCODER_RESOLUTION 2
 #else
-#    define BOOTMAGIC_LITE_ROW          0
-#    define BOOTMAGIC_LITE_COLUMN       7
-#    define BOOTMAGIC_LITE_ROW_RIGHT    4
-#    define BOOTMAGIC_LITE_COLUMN_RIGHT 7
+#    define BOOTMAGIC_ROW          0
+#    define BOOTMAGIC_COLUMN       7
+#    define BOOTMAGIC_ROW_RIGHT    4
+#    define BOOTMAGIC_COLUMN_RIGHT 7
 
-#    define BOOTMAGIC_LITE_EEPROM_ROW          1
-#    define BOOTMAGIC_LITE_EEPROM_COLUMN       7
-#    define BOOTMAGIC_LITE_EEPROM_ROW_RIGHT    5
-#    define BOOTMAGIC_LITE_EEPROM_COLUMN_RIGHT 7
+#    define BOOTMAGIC_EEPROM_ROW          1
+#    define BOOTMAGIC_EEPROM_COLUMN       7
+#    define BOOTMAGIC_EEPROM_ROW_RIGHT    5
+#    define BOOTMAGIC_EEPROM_COLUMN_RIGHT 7
 #endif
 
 #define SERIAL_USART_SPEED 921600

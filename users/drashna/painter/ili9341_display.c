@@ -445,8 +445,8 @@ void keyboard_post_init_quantum_painter(void) {
     backlight_enable();
     backlight_level(BACKLIGHT_LEVELS);
 #elif defined(BACKLIGHT_PIN)
-    setPinOutput(BACKLIGHT_PIN);
-    writePinHigh(BACKLIGHT_PIN);
+    gpio_set_pin_output_push_pull(BACKLIGHT_PIN);
+    gpio_write_pin_high(BACKLIGHT_PIN);
 #endif
     wait_ms(150);
 
@@ -469,7 +469,7 @@ void suspend_power_down_quantum_painter(void) {
     }
     backlight_set(0);
 #elif defined(BACKLIGHT_PIN)
-    writePinLow(BACKLIGHT_PIN);
+    gpio_write_pin_low(BACKLIGHT_PIN);
 #endif
     qp_power(ili9341_display, false);
 }
@@ -482,7 +482,7 @@ void suspend_wakeup_init_quantum_painter(void) {
     }
     last_backlight = 255;
 #elif defined(BACKLIGHT_PIN)
-    writePinHigh(BACKLIGHT_PIN);
+    gpio_write_pin_high(BACKLIGHT_PIN);
 #endif
 }
 
@@ -490,7 +490,7 @@ void shutdown_quantum_painter(void) {
 #ifdef BACKLIGHT_ENABLE
     backlight_set(0);
 #elif defined(BACKLIGHT_PIN)
-    writePinLow(BACKLIGHT_PIN);
+    gpio_write_pin_low(BACKLIGHT_PIN);
 #endif
     qp_power(ili9341_display, false);
 }

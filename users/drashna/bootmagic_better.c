@@ -46,7 +46,7 @@ void bootmagic_lite(void) {
         perform_reset = true;
     }
 #ifdef BOOTLOADER_RESET_PIN
-    if (!readPin(BOOTLOADER_RESET_PIN)) {
+    if (!gpio_read_pin(BOOTLOADER_RESET_PIN)) {
         perform_reset = true;
     }
 #endif

@@ -17,9 +17,6 @@ extern unicode_config_t unicode_config;
 extern audio_config_t audio_config;
 extern bool           delayed_tasks_run;
 #endif
-#if defined(POINTING_DEVICE_ENABLE) && defined(KEYBOARD_handwired_tractyl_manuform)
-extern bool tap_toggling;
-#endif
 #ifdef SWAP_HANDS_ENABLE
 extern bool swap_hands;
 #endif

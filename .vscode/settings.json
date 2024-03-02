@@ -2,11 +2,10 @@
 {
     // Unofficially, QMK uses spaces for indentation
     "editor.insertSpaces": true,
+    "editor.formatOnSave: true,
     // Configure glob patterns for excluding files and folders.
     "files.exclude": {
-        "**/*.hex": true,
-        "**/*.bin": true,
-        "**/*.uf2": true
+        "**/.build": true
     },
     "files.associations": {
         "*.h": "c",

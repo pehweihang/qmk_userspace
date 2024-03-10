@@ -1,0 +1,106 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Tractyl Manuform",
+            "type": "shell",
+            "command": "qmk compile -kb handwired/tractyl_manuform/5x6_right/f411 -km drashna -e HARDWARE_DEBUG_ENABLE=yes -c",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build"
+            },
+            "presentation": {
+                "echo": false,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false,
+                "close": false
+            }
+        },
+        {
+            "label": "Build Userspace",
+            "type": "shell",
+            "command": "qmk userspace-compile; echo Done.",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": false,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": false,
+                "close": false
+            }
+        },
+        {
+            "label": "Create terminals on startup",
+            "dependsOn": [
+                "userspace-terminal",
+                "firmware-terminal"
+            ],
+            "group": {
+                "kind": "none"
+            },
+            "runOptions": {
+                "runOn": "folderOpen"
+            },
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true,
+                "close": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "userspace-terminal",
+            "type": "shell",
+            "command": "/bin/zsh",
+            "options": {
+                "cwd": "${workspaceFolder:qmk_userspace}"
+            },
+            "isBackground": true,
+            "problemMatcher": [],
+            "presentation": {
+                "group": "my-group",
+                "echo": false,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true,
+                "close": true
+            }
+        },
+        {
+            "label": "firmware-terminal",
+            "type": "shell",
+            "command": "/bin/zsh",
+            "options": {
+                "cwd": "${workspaceFolder:qmk_firmware}"
+            },
+            "isBackground": true,
+            "problemMatcher": [],
+            "presentation": {
+                "group": "my-group",
+                "echo": false,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true,
+                "close": true
+            }
+        }
+    ]
+}

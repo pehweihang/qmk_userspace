@@ -9,8 +9,8 @@
 
 uint8_t    unicode_typing_mode                            = UCTM_NO_MODE;
 const char unicode_mode_str[UNCODES_MODE_END][13] PROGMEM = {
-    "      Normal\0", "        Wide\0", "      Script\0", "      Blocks\0", "    Regional\0",
-    "      Aussie\0", "       Zalgo\0", "Super Script\0", "       Comic\0",
+    "      Normal\0", "        Wide\0", "      Script\0", "      Blocks\0", "    Regional\0", "      Aussie\0",
+    "       Zalgo\0", "Super Script\0", "       Comic\0", "     Fraktur\0", "DoubleStruck\0",
 };
 
 /**
@@ -95,6 +95,8 @@ DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_wide, 0xFF41, 0xFF21, 0
 DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_script, 0x1D4EA, 0x1D4D0, 0x1D7CE, 0x1D7C1, 0x2002);
 DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_boxes, 0x1F170, 0x1F170, '0', '1', 0x2002);
 DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_regional, 0x1F1E6, 0x1F1E6, '0', '1', 0x2003);
+DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_fraktur, 0x1D51E, 0x1D51E, '0', '1', 0x2002);
+DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_double_struck, 0x1D552, 0x1D538, 0x1D7D8, 0x1D7D9, 0x2002);
 
 // DEFINE_UNICODE_LUT_TRANSLATOR(unicode_lut_translator_normal,
 //                               'a', // a
@@ -404,6 +406,14 @@ bool process_record_unicode(uint16_t keycode, keyrecord_t *record) {
                 tap_unicode_glyph_nomods(0x200C);
                 return false;
             }
+        }
+    } else if (unicode_typing_mode == UCTM_FRAKTUR) {
+        if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
+            return process_record_glyph_replacement(keycode, record, unicode_range_translator_fraktur);
+        }
+    } else if (unicode_typing_mode == UCTM_DOUBLE_STRUCK) {
+        if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
+            return process_record_glyph_replacement(keycode, record, unicode_range_translator_double_struck);
         }
     } else if (unicode_typing_mode == UCTM_SUPER) {
         if (((KC_A <= keycode) && (keycode <= KC_0))) {

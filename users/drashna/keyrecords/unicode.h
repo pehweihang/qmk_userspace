@@ -13,6 +13,8 @@ enum unicode_typing_modes {
     UCTM_ZALGO,
     UCTM_SUPER,
     UCTM_COMIC,
+    UCTM_FRAKTUR,
+    UCTM_DOUBLE_STRUCK,
     UNCODES_MODE_END,
 };
 

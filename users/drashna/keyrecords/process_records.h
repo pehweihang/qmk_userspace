@@ -163,7 +163,7 @@ bool process_record_unicode(uint16_t keycode, keyrecord_t *record);
 
 #define ALT_APP ALT_T(KC_APP)
 
-#define MG_NKRO MAGIC_TOGGLE_NKRO
+#define MG_NKRO QK_MAGIC_TOGGLE_NKRO
 
 #define AUTO_CTN QK_AUTOCORRECT_TOGGLE
 /*

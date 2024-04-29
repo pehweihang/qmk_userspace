@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "drashna.h"
+#ifdef LAYER_MAP_ENABLE
+#    include "layer_map.h"
+#endif
 #ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
 #    include "painter/ili9341_display.h"
 #endif
@@ -230,6 +233,9 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     dprintf("layer state: %s\n", layer_buffer);
 #endif
 
+#ifdef LAYER_MAP_ENABLE
+    set_layer_map();
+#endif
     return state;
 }
 
@@ -266,6 +272,9 @@ layer_state_t default_layer_state_set_user(layer_state_t state) {
         has_init_been_ran = true;
     }
 
+#ifdef LAYER_MAP_ENABLE
+    set_layer_map();
+#endif
     return state;
 }
 

@@ -3,6 +3,7 @@ VPATH += $(USER_PATH)/features/
 
 USERSPACE_FEATURES = \
     LAYER_LOCK \
+    LAYER_MAP \
     ORBITAL_MOUSE \
     WATCHDOG
 

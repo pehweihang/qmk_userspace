@@ -4,3 +4,4 @@ CAPS_WORD_ENABLE      = yes
 CONSOLE_ENABLE        = yes
 KEYLOGGER_ENABLE      = no
 PER_KEY_TAPPING       = yes
+EEPROM_DRIVER         = i2c

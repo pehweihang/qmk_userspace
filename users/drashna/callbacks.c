@@ -387,5 +387,8 @@ void                       housekeeping_task_user(void) {
 #ifdef ORBITAL_MOUSE_ENABLE
     orbital_mouse_task();
 #endif
+#ifdef LAYER_MAP_ENABLE
+    housekeeping_task_layer_map();
+#endif
     housekeeping_task_keymap();
 }

@@ -6,15 +6,27 @@
 #include "print.h"
 
 volatile uint16_t layer_map[MATRIX_ROWS][MATRIX_COLS] = {0};
+static bool       layer_map_set                       = false;
 
 void set_layer_map(void) {
-    //    xprintf("Layer map set\n\n");
+    layer_map_set = true;
+}
+
+void populate_layer_map(void) {
+    // xprintf("Layer map set\n\n");
     for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
         for (uint8_t j = 0; j < MATRIX_COLS; j++) {
             keypos_t key    = {j, i};
             layer_map[i][j] = keymap_key_to_keycode(layer_switch_get_layer(key), key);
-            //            xprintf("0x%04x, ", layer_map[i][j]);
+            // xprintf("0x%04x, ", layer_map[i][j]);
         }
-        //        xprintf("\n");
+        // xprintf("\n");
+    }
+}
+
+void housekeeping_task_layer_map(void) {
+    if (layer_map_set) {
+        populate_layer_map();
+        layer_map_set = false;
     }
 }

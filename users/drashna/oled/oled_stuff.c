@@ -30,6 +30,13 @@
 #        include "ds3231.h"
 #    endif
 #endif
+#ifdef LAYER_MAP_ENABLE
+#    include "layer_map.h"
+extern bool peek_matrix(uint8_t row_index, uint8_t col_index, bool read_raw);
+#    if defined(SWAP_HANDS_ENABLE)
+#        include "action.h"
+#    endif
+#endif
 
 #ifndef OLED_BRIGHTNESS_STEP
 #    define OLED_BRIGHTNESS_STEP 32
@@ -1029,10 +1036,67 @@ __attribute__((weak)) void oled_render_large_display(bool side) {
         oled_render_mario(1, 11);
     } else {
         // oled_advance_page(true);
+#    if defined(LAYER_MAP_ENABLE)
+        oled_set_cursor(1, 7);
+#        if defined(SPLIT_KEYBOARD)
+#            define ROWS_PER_HAND (MATRIX_ROWS / 2)
+#        else
+#            define ROWS_PER_HAND (MATRIX_ROWS)
+#        endif
+
+        for (uint8_t x = 0; x < MATRIX_ROWS; x++) {
+            if (x >= ROWS_PER_HAND) {
+                oled_set_cursor(MATRIX_COLS + 2, x + 1);
+            } else {
+                oled_set_cursor(1, MATRIX_COLS + x + 1);
+            }
+            for (uint8_t y = 0; y < MATRIX_COLS; y++) {
+                uint8_t i = x, j = y;
+#        if defined(SWAP_HANDS_ENABLE)
+                if (is_swap_hands_on()) {
+                    i = pgm_read_byte(&hand_swap_config[x][y].row);
+                    j = pgm_read_byte(&hand_swap_config[x][y].col);
+                }
+#        endif
+
+                uint16_t keycode = layer_map[i][j];
+                if (IS_QK_MOD_TAP(keycode)) {
+                    keycode = keycode_config(QK_MOD_TAP_GET_TAP_KEYCODE(keycode));
+                } else if (IS_QK_LAYER_TAP(keycode)) {
+                    keycode = keycode_config(QK_LAYER_TAP_GET_TAP_KEYCODE(keycode));
+                } else if (IS_QK_MODS(keycode)) {
+                    keycode = keycode_config(QK_MODS_GET_BASIC_KEYCODE(keycode));
+                } else if (IS_QK_ONE_SHOT_MOD(keycode)) {
+                    keycode = keycode_config(0xE0 + biton(QK_ONE_SHOT_MOD_GET_MODS(keycode) & 0xF) +
+                                             biton(QK_ONE_SHOT_MOD_GET_MODS(keycode) & 0x10));
+                } else if (IS_QK_BASIC(keycode)) {
+                    keycode = keycode_config(keycode);
+                }
+
+                char code = 0;
+                if (keycode > 0xFF) {
+                    if (keycode == UC_IRNY) {
+                        code = 0xFD;
+                    } else if (keycode == UC_CLUE) {
+                        code = 0xFE;
+                    } else {
+                        keycode = 0;
+                    }
+                }
+                if (keycode < ARRAY_SIZE(code_to_name)) {
+                    code = pgm_read_byte(&code_to_name[keycode]);
+                }
+
+                oled_write_char(code, peek_matrix(x, y, false));
+            }
+        }
+
+#    else
         render_autocorrected_info(1, 7);
         render_os(1, 11);
         render_unicode_mode(1, 12);
         oled_render_time(1, 13);
+#    endif
     }
 }
 #endif

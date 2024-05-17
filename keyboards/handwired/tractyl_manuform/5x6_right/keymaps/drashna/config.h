@@ -28,3 +28,6 @@
 #define PMW33XX_SPI_DIVISOR 8
 
 #define DEBOUNCE 15
+
+#define LAYER_MAP_COLS 17
+#define LAYER_MAP_ROWS 8

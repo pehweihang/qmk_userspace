@@ -32,10 +32,6 @@
 #endif
 #ifdef LAYER_MAP_ENABLE
 #    include "layer_map.h"
-extern bool peek_matrix(uint8_t row_index, uint8_t col_index, bool read_raw);
-#    if defined(SWAP_HANDS_ENABLE)
-#        include "action.h"
-#    endif
 #endif
 
 #ifndef OLED_BRIGHTNESS_STEP
@@ -1038,27 +1034,10 @@ __attribute__((weak)) void oled_render_large_display(bool side) {
         // oled_advance_page(true);
 #    if defined(LAYER_MAP_ENABLE)
         oled_set_cursor(1, 7);
-#        if defined(SPLIT_KEYBOARD)
-#            define ROWS_PER_HAND (MATRIX_ROWS / 2)
-#        else
-#            define ROWS_PER_HAND (MATRIX_ROWS)
-#        endif
 
-        for (uint8_t x = 0; x < MATRIX_ROWS; x++) {
-            if (x >= ROWS_PER_HAND) {
-                oled_set_cursor(MATRIX_COLS + 2, x + 1);
-            } else {
-                oled_set_cursor(1, MATRIX_COLS + x + 1);
-            }
-            for (uint8_t y = 0; y < MATRIX_COLS; y++) {
-                uint8_t i = x, j = y;
-#        if defined(SWAP_HANDS_ENABLE)
-                if (is_swap_hands_on()) {
-                    i = pgm_read_byte(&hand_swap_config[x][y].row);
-                    j = pgm_read_byte(&hand_swap_config[x][y].col);
-                }
-#        endif
-
+        for (uint8_t i = 0; i < LAYER_MAP_ROWS; i++) {
+            oled_set_cursor(1 + 1, 7 + i);
+            for (uint8_t j = 0; j < LAYER_MAP_COLS; j++) {
                 uint16_t keycode = layer_map[i][j];
                 if (IS_QK_MOD_TAP(keycode)) {
                     keycode = keycode_config(QK_MOD_TAP_GET_TAP_KEYCODE(keycode));
@@ -1087,7 +1066,7 @@ __attribute__((weak)) void oled_render_large_display(bool side) {
                     code = pgm_read_byte(&code_to_name[keycode]);
                 }
 
-                oled_write_char(code, peek_matrix(x, y, false));
+                oled_write_char(code, peek_matrix_layer_map(i, j));
             }
         }
 

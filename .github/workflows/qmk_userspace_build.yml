@@ -32,7 +32,7 @@ jobs:
 
       - name: Check if qmk_firmware exists
         id: check_files
-        uses: andstor/file-existence-action@v2
+        uses: andstor/file-existence-action@v3
         with:
           files: qmk_firmware
 
@@ -72,7 +72,7 @@ jobs:
           [ ! -f .failed ] || exit 1
 
       - name: Upload binaries
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always() && !cancelled()
         continue-on-error: true
         with:

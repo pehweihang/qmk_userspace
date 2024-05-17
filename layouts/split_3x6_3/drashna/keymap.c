@@ -79,7 +79,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     QK_MAKE, _________________ADJUST_L1_________________,                    _________________ADJUST_R1_________________, QK_BOOT,
     VRSN,    _________________ADJUST_L2_________________,                    _________________ADJUST_R2_________________, EE_CLR,
     KEYLOCK, _________________ADJUST_L3_________________,                    _________________ADJUST_R3_________________, RGB_IDL,
-                                     QK_RBT, KC_NUKE, _______,        _______, TG_MODS, AUTO_CTN
+                                     QK_RBT, KC_NUKE, _______,        _______, TG_MODS, AC_TOGG
   )
 };
 // clang-format on

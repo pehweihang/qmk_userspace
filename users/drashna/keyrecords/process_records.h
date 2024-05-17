@@ -163,8 +163,6 @@ bool process_record_unicode(uint16_t keycode, keyrecord_t *record);
 
 #define ALT_APP ALT_T(KC_APP)
 
-#define MG_NKRO QK_MAGIC_TOGGLE_NKRO
-
 /*
 Custom Keycodes for Diablo 3 layer
 But since TD() doesn't work when tap dance is disabled

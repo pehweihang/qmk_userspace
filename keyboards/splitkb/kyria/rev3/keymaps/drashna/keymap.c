@@ -55,7 +55,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_ESC,  KC_K,    KC_Q,    KC_W,    KC_E,    KC_R,                                          _______, _______, _______, _______, _______, _______,
         KC_TAB,  KC_G,    KC_A,    KC_S,    KC_D,    KC_F,                                          _______, _______, _______, _______, _______, _______,
         KC_LCTL, KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    _______, _______,   _______, LALT(KC_PSCR), _______, _______, _______, _______, _______, _______,
-                                  _______, MAGIC_TOGGLE_NKRO, KC_V,     KC_SPC,  KC_H,   _______, _______, _______, _______, _______
+                                  _______, NK_TOGG, KC_V,     KC_SPC,  KC_H,   _______, _______, _______, _______, _______
     ),
 
     [_DIABLO] = LAYOUT_wrapper(
@@ -79,7 +79,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_ADJUST] = LAYOUT_wrapper(
         QK_MAKE, _________________ADJUST_L1_________________,                                       _________________ADJUST_R1_________________, QK_BOOT,
         VRSN,    _________________ADJUST_L2_________________,                                       _________________ADJUST_R2_________________, EE_CLR,
-        UC_NEXT, _________________ADJUST_L3_________________, HF_TOGG, HF_FDBK,   MG_NKRO, UC_NEXT, _________________ADJUST_R3_________________, TG_MODS,
+        UC_NEXT, _________________ADJUST_L3_________________, HF_TOGG, HF_FDBK,   NK_TOGG, UC_NEXT, _________________ADJUST_R3_________________, TG_MODS,
                                    QK_RBT,  _______, KEYLOCK, KC_NUKE, _______,   _______, _______, _______, _______, AC_TOGG
     ),
 //     [_LAYERINDEX] = LAYOUT_wrapper(

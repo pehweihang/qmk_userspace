@@ -9,7 +9,6 @@
         ["splitkb/kyria/rev3", "drashna"],
         ["crkbd/rev1", "drashna"],
         ["splitkb/zima", "drashna"],
-        ["converter/usb_usb/pro_micro", "drashna"],
         ["zsa/voyager", "drashna"]
     ]
 }

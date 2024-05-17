@@ -1,0 +1,53 @@
+name: Build Binaries
+
+on:
+  workflow_call:
+    inputs:
+      release_name:
+        description: "allow setting the release name"
+        default: "latest"
+        required: false
+        type: string
+      qmk_ref:
+        description: 'qmk_firmware branch to build against'
+        default: ${{ github.ref_name }}
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    name: Publish
+    if: always() && !cancelled()
+    runs-on: ubuntu-latest
+
+    steps:
+      # - name: Prune Previous Releases
+      #   uses: dev-drprasad/delete-tag-and-release@v1.0.1
+      #   if: always() && !cancelled()
+      #   with:
+      #     github_token: ${{ github.token }}
+      #     tag_name: latest_${{ inputs.qmk_ref }}
+      #     delete_release: true
+      #     repo: drashna/qmk_userspace
+
+      - name: Download binaries
+        if: always() && !cancelled()
+        uses: actions/download-artifact@v4
+
+      - name: Generate Release
+        uses: softprops/action-gh-release@v2
+        if: always() && !cancelled()
+        with:
+          token: ${{ github.token }}
+          name: Latest QMK Firmware
+          tag_name: ${{ inputs.release_name || 'latest_${{ inputs.qmk_ref }}' }}
+          fail_on_unmatched_files: false
+          draft: false
+          prerelease: false
+          files: |
+            **/*.hex
+            **/*.bin
+            **/*.uf2

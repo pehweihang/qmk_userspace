@@ -43,15 +43,21 @@ void populate_layer_map(void) {
 }
 
 bool peek_matrix_layer_map(uint8_t row, uint8_t col) {
+#ifdef LAYER_MAP_REMAPPING
     return peek_matrix(layer_remap[row][col].row, layer_remap[row][col].col, false);
+#else
+    return peek_matrix(row, col, false);
+#endif
 }
 
 void housekeeping_task_layer_map(void) {
+#ifdef SWAP_HANDS_ENABLE
     static bool swap_hands = false;
     if (is_swap_hands_on() != swap_hands) {
         swap_hands    = is_swap_hands_on();
         layer_map_set = true;
     }
+#endif
     if (layer_map_set) {
         populate_layer_map();
         layer_map_set = false;

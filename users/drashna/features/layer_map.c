@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "action.h"
+#include "keyboard.h"
 #include "keymap_common.h"
 #include "action_layer.h"
 #include "layer_map.h"
@@ -44,8 +45,14 @@ void populate_layer_map(void) {
 
 bool peek_matrix_layer_map(uint8_t row, uint8_t col) {
 #ifdef LAYER_MAP_REMAPPING
+    if (layer_remap[row][col].row >= KEYLOC_DIP_SWITCH_OFF) {
+        return false;
+    }
     return peek_matrix(layer_remap[row][col].row, layer_remap[row][col].col, false);
 #else
+    if (row = > KEYLOC_DIP_SWITCH_OFF) {
+        return false;
+    }
     return peek_matrix(row, col, false);
 #endif
 }

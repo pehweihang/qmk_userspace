@@ -29,5 +29,6 @@
 
 #define DEBOUNCE 15
 
+#define LAYER_MAP_REMAPPING
 #define LAYER_MAP_COLS 17
 #define LAYER_MAP_ROWS 8

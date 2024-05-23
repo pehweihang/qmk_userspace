@@ -1114,10 +1114,16 @@ __attribute__((weak)) bool oled_task_keymap(void) {
     return true;
 }
 
+void render_matrix_animation_128x128(void);
+
 bool oled_task_user(void) {
 #ifndef OLED_DISPLAY_TEST
     if (!is_oled_enabled) {
+#    if defined(OLED_DISPLAY_128X128)
+        render_matrix_animation_128x128();
+#    else
         oled_off();
+#    endif
         return false;
     } else
 #endif

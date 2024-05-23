@@ -3,7 +3,7 @@ CUSTOM_OLED_DRIVER ?= yes
 ifeq ($(strip $(OLED_ENABLE)), yes)
     ifeq ($(strip $(CUSTOM_OLED_DRIVER)), yes)
         OPT_DEFS += -DCUSTOM_OLED_DRIVER
-        SRC += $(USER_PATH)/oled/oled_stuff.c
+        SRC += $(USER_PATH)/oled/oled_stuff.c $(USER_PATH)/oled/matrix_anim.c
         POST_CONFIG_H += $(USER_PATH)/oled/config.h
     endif
     ifeq ($(strip $(OLED_DISPLAY_TEST)), yes)

@@ -322,7 +322,7 @@ void render_keylock_status(led_t led_usb_state, uint8_t col, uint8_t line) {
     oled_write_P(PSTR(OLED_RENDER_LOCK_CAPS), led_usb_state.caps_lock);
 #if defined(OLED_DISPLAY_VERBOSE)
     oled_write_P(PSTR(" "), false);
-    oled_write_P(PSTR(OLED_RENDER_LOCK_SCLK), led_usb_state.scroll_lock);
+    oled_write_ln_P(PSTR(OLED_RENDER_LOCK_SCLK), led_usb_state.scroll_lock);
 #endif
 }
 
@@ -983,12 +983,12 @@ void oled_render_time(uint8_t col, uint8_t line) {
         oled_write_P(PSTR("RTC Temp: "), false);
         oled_write(ds3231_read_temp_imperial_str(), false);
         oled_write_char(0xF8, false);
-        oled_write_P(PSTR("F\n "), false);
+        oled_write_ln_P(PSTR("F "), false);
 #    else
         oled_write_ln_P(PSTR("RTC Temp: N/A"), false);
 #    endif
         oled_set_cursor(col, line + 1);
-        oled_write(rtc_read_date_time_str(), false);
+        oled_write_ln(rtc_read_date_time_str(), false);
     } else {
         oled_write_ln_P(PSTR("RTC not found"), false);
         oled_advance_page(true);

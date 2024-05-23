@@ -20,6 +20,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
+#include "keyboard.h"
 #include "lib/lib8tion/lib8tion.h"
 #include <math.h>
 #include <stdio.h>
@@ -38,7 +39,7 @@
 #    define OLED_BRIGHTNESS_STEP 32
 #endif
 
-bool is_oled_enabled = true, is_oled_force_off = false;
+bool is_oled_enabled = true, is_oled_force_off = false, oled_screensaver_enabled = false;
 
 uint32_t               oled_timer                                 = 0;
 char                   oled_keylog_str[OLED_KEYLOGGER_LENGTH + 1] = {0};
@@ -1119,11 +1120,7 @@ void render_matrix_animation_128x128(void);
 bool oled_task_user(void) {
 #ifndef OLED_DISPLAY_TEST
     if (!is_oled_enabled) {
-#    if defined(OLED_DISPLAY_128X128)
-        render_matrix_animation_128x128();
-#    else
         oled_off();
-#    endif
         return false;
     } else
 #endif
@@ -1132,6 +1129,11 @@ bool oled_task_user(void) {
     }
 
     if (!oled_task_keymap()) {
+        return false;
+    }
+
+    if (oled_screensaver_enabled) {
+        render_matrix_animation_128x128();
         return false;
     }
 
@@ -1186,11 +1188,19 @@ bool oled_task_user(void) {
 }
 
 void housekeeping_task_oled(void) {
-    is_oled_enabled = false;
-    if ((userspace_config.oled_lock || (last_input_activity_elapsed() < 60000)) &&
-        !(is_oled_force_off || is_device_suspended())) {
+    is_oled_enabled = oled_screensaver_enabled = false;
+
+    if (is_device_suspended() || is_oled_force_off) {
+        is_oled_enabled = false;
+    } else if (userspace_config.oled_lock) {
+        is_oled_enabled = true;
+    } else if (last_input_activity_elapsed() < (10 * 60 * 1000)) {
         is_oled_enabled = true;
     }
+    if (is_oled_enabled && last_input_activity_elapsed() > (1 * 60 * 1000)) {
+        oled_screensaver_enabled = true;
+    }
+
     if (oled_get_brightness() != userspace_config.oled_brightness) {
         oled_set_brightness(userspace_config.oled_brightness);
     }

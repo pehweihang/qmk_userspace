@@ -4,7 +4,7 @@
 #include "timer.h"
 
 // clang-format off
-static const char matrix_scroll_animation[72][2048+1] PROGMEM = {
+__attribute__((unused)) static const char matrix_scroll_animation[72][2048+1] PROGMEM = {
     {  // frame 00
         0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 28, 98,162,156,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 28,200, 60,  0,  0,116,  4,255,244,132,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,255, 64, 96, 24,  0,  0,  0,  0,  0,255,  8, 16,  0,  0,  0,  0,  0,  0,  0,  0, 56,  6, 12,112, 64,  4,132,127,  4,  4,248,  4,  2, 28, 96,  0,  0,  0,  0,  0,105, 73,146,  0,  4,132,127,  4,  4,192,
         0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  9,137,121, 15,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,205, 56,120,132,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 56,  6, 12,112, 64,  0,  0,  0,  0,  0,252, 20, 28,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  9,137,121, 15,  2,114,138,142,  0,  0,  0,  0,  0,  0, 56,  8,142,120,128,132,253,132,128, 66, 66,
@@ -1263,6 +1263,7 @@ uint32_t timer         = 0;
 uint8_t  current_frame = 0;
 
 void render_matrix_animation_128x128(void) {
+#if defined(MCU_RP2040) || defined(QMK_MCU_STM32F411)
     // Run animation
     if (timer_elapsed(timer) > FRAME_DURATION) {
         // Set timer to updated time
@@ -1274,4 +1275,5 @@ void render_matrix_animation_128x128(void) {
 
     // Draw frame to OLED
     oled_write_raw_P(matrix_scroll_animation[current_frame], 2048 + 1);
+#endif
 }

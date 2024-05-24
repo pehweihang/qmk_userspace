@@ -1118,6 +1118,7 @@ __attribute__((weak)) bool oled_task_keymap(void) {
 void render_matrix_animation_128x128(void);
 
 bool oled_task_user(void) {
+    static bool was_screensaver_enabled = false;
 #ifndef OLED_DISPLAY_TEST
     if (!is_oled_enabled) {
         oled_off();
@@ -1133,8 +1134,13 @@ bool oled_task_user(void) {
     }
 
     if (oled_screensaver_enabled) {
+        was_screensaver_enabled = true;
         render_matrix_animation_128x128();
         return false;
+    }
+    if (was_screensaver_enabled) {
+        was_screensaver_enabled = false;
+        oled_clear();
     }
 
 #if defined(OLED_DISPLAY_VERBOSE)
@@ -1197,7 +1203,7 @@ void housekeeping_task_oled(void) {
     } else if (last_input_activity_elapsed() < (10 * 60 * 1000)) {
         is_oled_enabled = true;
     }
-    if (is_oled_enabled && last_input_activity_elapsed() > (1 * 60 * 1000)) {
+    if (is_oled_enabled && last_input_activity_elapsed() > (1 * 60 * 100)) {
         oled_screensaver_enabled = true;
     }
 

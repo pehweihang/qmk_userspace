@@ -1131,10 +1131,6 @@ bool oled_task_user(void) {
         oled_on();
     }
 
-    if (!oled_task_keymap()) {
-        return false;
-    }
-
     if (oled_screensaver_enabled) {
         was_screensaver_enabled = true;
         render_oled_screensaver();
@@ -1143,6 +1139,10 @@ bool oled_task_user(void) {
     if (was_screensaver_enabled) {
         was_screensaver_enabled = false;
         oled_clear();
+    }
+
+    if (!oled_task_keymap()) {
+        return false;
     }
 
 #if defined(OLED_DISPLAY_VERBOSE)

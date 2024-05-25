@@ -3,14 +3,12 @@
 #include "timer.h"
 #include "util.h"
 
-#if defined(MCU_RP) || defined(QMK_MCU_SERIES_STM32F4XX)
-#    include "screensavers/matrix_scroll.h"
-#endif
+#include "screensavers/matrix_scroll.h"
 
 #define FRAME_DURATION 30 // How long each frame lasts in milliseconds
 
 void render_oled_screensaver(void) {
-#if defined(MCU_RP) || defined(QMK_MCU_SERIES_STM32F4XX)
+#if defined(SCREENSAVER_ANIM_ENABLED)
     static uint32_t timer         = 0;
     static uint8_t  current_frame = 0;
 

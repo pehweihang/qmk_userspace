@@ -1,6 +1,11 @@
 #include "progmem.h"
-// clang-format off
+
 #if defined(OLED_DISPLAY_128X128)
+#    if defined(MCU_RP) || defined(QMK_MCU_SERIES_STM32F4XX)
+#        define SCREENSAVER_ANIM_ENABLED
+#    endif
+
+// clang-format off
 static const char screensaver[72][2048+1] PROGMEM = {
     {  // frame 00
         0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 28, 98,162,156,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 28,200, 60,  0,  0,116,  4,255,244,132,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,255, 64, 96, 24,  0,  0,  0,  0,  0,255,  8, 16,  0,  0,  0,  0,  0,  0,  0,  0, 56,  6, 12,112, 64,  4,132,127,  4,  4,248,  4,  2, 28, 96,  0,  0,  0,  0,  0,105, 73,146,  0,  4,132,127,  4,  4,192,

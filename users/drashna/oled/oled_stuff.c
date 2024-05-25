@@ -1203,7 +1203,7 @@ void housekeeping_task_oled(void) {
     } else if (last_input_activity_elapsed() < (10 * 60 * 1000)) {
         is_oled_enabled = true;
     }
-    if (is_oled_enabled && last_input_activity_elapsed() > (1 * 60 * 100)) {
+    if (is_oled_enabled && last_input_activity_elapsed() > (1 * 60 * 1000)) {
         oled_screensaver_enabled = true;
     }
 

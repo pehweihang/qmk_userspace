@@ -1115,7 +1115,9 @@ __attribute__((weak)) bool oled_task_keymap(void) {
     return true;
 }
 
-void render_matrix_animation_128x128(void);
+__attribute__((weak)) void render_oled_screensaver(void) {
+    oled_off();
+}
 
 bool oled_task_user(void) {
     static bool was_screensaver_enabled = false;
@@ -1135,7 +1137,7 @@ bool oled_task_user(void) {
 
     if (oled_screensaver_enabled) {
         was_screensaver_enabled = true;
-        render_matrix_animation_128x128();
+        render_oled_screensaver();
         return false;
     }
     if (was_screensaver_enabled) {

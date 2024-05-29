@@ -116,7 +116,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
 */
-
+// clang-format on
 
 bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
@@ -153,22 +153,47 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
 }
 
 #ifdef RGB_MATRIX_ENABLE
+
+#    ifdef RGBLIGHT_ENABLE
+#        include "rgblight_drivers.h"
+
+rgb_led_t led_array[RGBLIGHT_LED_COUNT] = {0};
+
+uint8_t led_mapping[RGBLIGHT_LED_COUNT] = {0,  1,  2,  3,  4,  9,  14, 19, 24, 29, 30, 31, 32, 33, 34, 35,
+                                           71, 70, 69, 68, 67, 66, 65, 60, 55, 50, 45, 40, 39, 38, 37, 36};
+
+void init(void) {}
+
+void setleds(rgb_led_t *ledarray, uint16_t number_of_leds) {
+    memcpy(led_array, ledarray, number_of_leds * sizeof(rgb_led_t));
+}
+
+const rgblight_driver_t rgblight_driver = {
+    .init    = init,
+    .setleds = setleds,
+};
+#    endif
+
 bool rgb_matrix_indicators_advanced_keymap(uint8_t led_min, uint8_t led_max) {
     if (layer_state_is(_GAMEPAD)) {
-        RGB_MATRIX_INDICATOR_SET_COLOR(11, 0x00, 0xFF, 0x00);  // Q
-        RGB_MATRIX_INDICATOR_SET_COLOR(16, 0x00, 0xFF, 0xFF);  // W
-        RGB_MATRIX_INDICATOR_SET_COLOR(21, 0xFF, 0x00, 0x00);  // E
-        RGB_MATRIX_INDICATOR_SET_COLOR(26, 0xFF, 0x80, 0x00);  // R
-        RGB_MATRIX_INDICATOR_SET_COLOR(12, 0x00, 0xFF, 0xFF);  // A
-        RGB_MATRIX_INDICATOR_SET_COLOR(17, 0x00, 0xFF, 0xFF);  // S
-        RGB_MATRIX_INDICATOR_SET_COLOR(22, 0x00, 0xFF, 0xFF);  // D
-        RGB_MATRIX_INDICATOR_SET_COLOR(27, 0x7A, 0x00, 0xFF);  // F
+        RGB_MATRIX_INDICATOR_SET_COLOR(11, 0x00, 0xFF, 0x00); // Q
+        RGB_MATRIX_INDICATOR_SET_COLOR(16, 0x00, 0xFF, 0xFF); // W
+        RGB_MATRIX_INDICATOR_SET_COLOR(21, 0xFF, 0x00, 0x00); // E
+        RGB_MATRIX_INDICATOR_SET_COLOR(26, 0xFF, 0x80, 0x00); // R
+        RGB_MATRIX_INDICATOR_SET_COLOR(12, 0x00, 0xFF, 0xFF); // A
+        RGB_MATRIX_INDICATOR_SET_COLOR(17, 0x00, 0xFF, 0xFF); // S
+        RGB_MATRIX_INDICATOR_SET_COLOR(22, 0x00, 0xFF, 0xFF); // D
+        RGB_MATRIX_INDICATOR_SET_COLOR(27, 0x7A, 0x00, 0xFF); // F
 
-        RGB_MATRIX_INDICATOR_SET_COLOR((userspace_config.swapped_numbers ? 15 : 10), 0xFF, 0xFF, 0xFF);  // 1
-        RGB_MATRIX_INDICATOR_SET_COLOR((userspace_config.swapped_numbers ? 10 : 15), 0x00, 0xFF, 0x00);  // 2
-        RGB_MATRIX_INDICATOR_SET_COLOR(20, 0x7A, 0x00, 0xFF);                                          // 3
+        RGB_MATRIX_INDICATOR_SET_COLOR((userspace_config.swapped_numbers ? 15 : 10), 0xFF, 0xFF, 0xFF); // 1
+        RGB_MATRIX_INDICATOR_SET_COLOR((userspace_config.swapped_numbers ? 10 : 15), 0x00, 0xFF, 0x00); // 2
+        RGB_MATRIX_INDICATOR_SET_COLOR(20, 0x7A, 0x00, 0xFF);                                           // 3
     }
-
+#    ifdef RGBLIGHT_ENABLE
+    for (uint8_t i = 0; i < RGBLIGHT_LED_COUNT; i++) {
+        RGB_MATRIX_INDICATOR_SET_COLOR(led_mapping[i], led_array[i].r, led_array[i].g, led_array[i].b);
+    }
+#    endif
     return true;
 }
 #endif

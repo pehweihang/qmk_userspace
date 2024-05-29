@@ -13,3 +13,5 @@
             2, 4                  \
         }                         \
     }
+
+#define RGBLIGHT_LED_COUNT (16 + 16)

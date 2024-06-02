@@ -5,7 +5,7 @@ on:
     inputs:
       release_name:
         description: "allow setting the release name"
-        default: "latest"
+        default: "latest_${{ inputs.qmk_ref }}"
         required: false
         type: string
       qmk_ref:
@@ -43,7 +43,7 @@ jobs:
         with:
           token: ${{ github.token }}
           name: Latest QMK Firmware
-          tag_name: ${{ inputs.release_name || 'latest_${{ inputs.qmk_ref }}' }}
+          tag_name: ${{ inputs.release_name || 'latest' }}
           fail_on_unmatched_files: false
           draft: false
           prerelease: false

@@ -65,7 +65,9 @@ void keyboard_post_init_rgb_matrix(void) {
 }
 
 bool process_record_user_rgb_matrix(uint16_t keycode, keyrecord_t *record) {
+#if defined(RGBLIGHT_ENABLE) && defined(RGBLIGHT_CUSTOM)
     bool shifted = (get_mods() | get_oneshot_mods()) & MOD_MASK_SHIFT;
+#endif
 #if defined(RGB_MATRIX_FRAMEBUFFER_EFFECTS)
     hypno_timer = sync_timer_read32();
     if (userspace_config.rgb_matrix_idle_anim && rgb_matrix_get_mode() == RGB_MATRIX_REST_MODE) {

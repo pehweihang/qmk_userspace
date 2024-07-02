@@ -3,7 +3,7 @@
 
 #pragma once
 
-#define MATRIX_COL_PINS_RIGHT \
+#define MATRIX_COL_PINS \
     { B0, B1, B12, B3, B4, B5 }
 
 // #    define BOOTLOADER_RESET_PIN A0

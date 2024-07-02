@@ -68,7 +68,6 @@ bool is_rgblight_startup_running(void) {
 }
 
 void keyboard_post_init_rgb_light(void) {
-    debug_enable = true;
 #ifdef RGB_MATRIX_ENABLE
     if (rgblight_get_val() != rgb_matrix_get_val()) {
         rgblight_sethsv(rgblight_get_hue(), rgblight_get_sat(), rgb_matrix_get_val());

@@ -145,3 +145,11 @@ const keypos_t PROGMEM hand_swap_config[MATRIX_ROWS][MATRIX_COLS] = {
 const uint8_t PROGMEM encoder_hand_swap_config[NUM_ENCODERS] = {1, 0};
 #    endif
 #endif
+
+#ifdef USB_VBUS_PIN
+bool usb_vbus_state(void) {
+    gpio_set_pin_input_low(USB_VBUS_PIN);
+    wait_us(5);
+    return gpio_read_pin(USB_VBUS_PIN);
+}
+#endif

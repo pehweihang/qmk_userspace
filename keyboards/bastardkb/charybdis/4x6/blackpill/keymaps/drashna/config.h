@@ -8,6 +8,7 @@
 
 // #    define BOOTLOADER_RESET_PIN A0
 #define DEBUG_LED_PIN C13
+#define USB_VBUS_PIN  B10
 
 #define AUDIO_PIN          B7
 #define AUDIO_PWM_DRIVER   PWMD4

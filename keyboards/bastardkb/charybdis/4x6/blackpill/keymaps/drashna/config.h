@@ -3,6 +3,7 @@
 
 #pragma once
 
+#undef MATRIX_COL_PINS
 #define MATRIX_COL_PINS \
     { B0, B1, B12, B3, B4, B5 }
 

@@ -3,13 +3,9 @@
 
 #pragma once
 
-#undef MATRIX_COL_PINS
-#define MATRIX_COL_PINS \
-    { B0, B1, B12, B3, B4, B5 }
-
 // #    define BOOTLOADER_RESET_PIN A0
 #define DEBUG_LED_PIN C13
-#define USB_VBUS_PIN  B10
+#define USB_VBUS_PIN  B12
 
 #define AUDIO_PIN          B7
 #define AUDIO_PWM_DRIVER   PWMD4

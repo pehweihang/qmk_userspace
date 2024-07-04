@@ -26,4 +26,6 @@ enum {
     TD_D3_2,
     TD_D3_3,
     TD_D3_4,
+    TAP_DANCE_MAX,
 };
+extern tap_dance_action_t tap_dance_actions[TAP_DANCE_MAX];

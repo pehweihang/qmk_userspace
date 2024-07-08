@@ -123,6 +123,9 @@ void user_transport_update(void) {
         user_state.swap_hands = swap_hands;
 #endif
         user_state.host_driver_disabled = get_keyboard_lock();
+#ifdef CAPS_WORD_ENABLE
+        user_state.is_caps_word = is_caps_word_on();
+#endif
         transport_user_state            = user_state.raw;
     } else {
         keymap_config.raw    = transport_keymap_config;
@@ -139,6 +142,13 @@ void user_transport_update(void) {
 #endif
 #ifdef SWAP_HANDS_ENABLE
         swap_hands = user_state.swap_hands;
+#endif
+#ifdef CAPS_WORD_ENABLE
+        if (user_state.is_caps_word) {
+            caps_word_on();
+        } else {
+            caps_word_off();
+        }
 #endif
         set_keyboard_lock(user_state.host_driver_disabled);
     }

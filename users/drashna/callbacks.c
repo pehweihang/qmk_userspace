@@ -1,6 +1,7 @@
 // Copyright 2021 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include "action.h"
 #include "drashna.h"
 #ifdef LAYER_MAP_ENABLE
 #    include "layer_map.h"
@@ -232,6 +233,12 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 
 #ifdef LAYER_MAP_ENABLE
     set_layer_map();
+#endif
+
+#ifdef SWAP_HANDS_ENABLE
+    if (is_gaming_layer_active(state) && is_swap_hands_on()) {
+        swap_hands_off();
+    }
 #endif
     return state;
 }

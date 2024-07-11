@@ -77,23 +77,7 @@ void oled_pan_section(bool left, uint16_t y_start, uint16_t y_end, uint16_t x_st
  * @param record keyrecord_t data structure
  */
 void add_keylog(uint16_t keycode, keyrecord_t *record) {
-    if (IS_QK_MOD_TAP(keycode)) {
-        if (record->tap.count) {
-            keycode = keycode_config(QK_MOD_TAP_GET_TAP_KEYCODE(keycode));
-        } else {
-            keycode = keycode_config(0xE0 + biton(QK_MOD_TAP_GET_MODS(keycode) & 0xF) +
-                                     biton(QK_MOD_TAP_GET_MODS(keycode) & 0x10));
-        }
-    } else if (IS_QK_LAYER_TAP(keycode) && record->tap.count) {
-        keycode = keycode_config(QK_LAYER_TAP_GET_TAP_KEYCODE(keycode));
-    } else if (IS_QK_MODS(keycode)) {
-        keycode = keycode_config(QK_MODS_GET_BASIC_KEYCODE(keycode));
-    } else if (IS_QK_ONE_SHOT_MOD(keycode)) {
-        keycode = keycode_config(0xE0 + biton(QK_ONE_SHOT_MOD_GET_MODS(keycode) & 0xF) +
-                                 biton(QK_ONE_SHOT_MOD_GET_MODS(keycode) & 0x10));
-    } else if (IS_QK_BASIC(keycode)) {
-        keycode = keycode_config(keycode);
-    }
+    keycode = extract_basic_keycode(keycode, record, true);
 
     if ((keycode == KC_BSPC) && mod_config(get_mods() | get_oneshot_mods()) & MOD_MASK_CTRL) {
         memset(oled_keylog_str, ' ', OLED_KEYLOGGER_LENGTH);
@@ -1053,19 +1037,7 @@ __attribute__((weak)) void oled_render_large_display(bool side) {
         for (uint8_t i = 0; i < LAYER_MAP_ROWS; i++) {
             oled_set_cursor(1 + 1, 7 + i);
             for (uint8_t j = 0; j < LAYER_MAP_COLS; j++) {
-                uint16_t keycode = layer_map[i][j];
-                if (IS_QK_MOD_TAP(keycode)) {
-                    keycode = keycode_config(QK_MOD_TAP_GET_TAP_KEYCODE(keycode));
-                } else if (IS_QK_LAYER_TAP(keycode)) {
-                    keycode = keycode_config(QK_LAYER_TAP_GET_TAP_KEYCODE(keycode));
-                } else if (IS_QK_MODS(keycode)) {
-                    keycode = keycode_config(QK_MODS_GET_BASIC_KEYCODE(keycode));
-                } else if (IS_QK_ONE_SHOT_MOD(keycode)) {
-                    keycode = keycode_config(0xE0 + biton(QK_ONE_SHOT_MOD_GET_MODS(keycode) & 0xF) +
-                                             biton(QK_ONE_SHOT_MOD_GET_MODS(keycode) & 0x10));
-                } else if (IS_QK_BASIC(keycode)) {
-                    keycode = keycode_config(keycode);
-                }
+                uint16_t keycode = extract_basic_keycode(layer_map[i][j], NULL, false);
 
                 char code = 0;
                 if (keycode > 0xFF) {

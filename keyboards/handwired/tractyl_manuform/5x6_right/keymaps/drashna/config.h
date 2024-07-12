@@ -33,3 +33,5 @@
 #define LAYER_MAP_REMAPPING
 #define LAYER_MAP_COLS 17
 #define LAYER_MAP_ROWS 8
+
+#define USB_VBUS_PIN B10

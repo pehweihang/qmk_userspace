@@ -121,7 +121,7 @@ uint8_t led_mapping[RGBLIGHT_LED_COUNT] = {0, 1, 2, 3, 26, 25, 27, 24, 28, 53, 5
 
 #if defined(BOOTLOADER_RESET_PIN)
 void keyboard_pre_init_keymap(void) {
-    setPinOutput(BOOTLOADER_RESET_PIN);
+    gpio_set_pin_output_push_pull(BOOTLOADER_RESET_PIN);
 }
 #endif
 

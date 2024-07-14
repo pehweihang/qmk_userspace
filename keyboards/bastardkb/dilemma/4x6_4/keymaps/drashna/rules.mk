@@ -5,5 +5,6 @@ CONSOLE_ENABLE        = yes
 KEYLOGGER_ENABLE      = no
 WPM_ENABLE            = yes
 OLED_ENABLE           = yes
+OLED_TRANSPORT        = spi
 ENCODER_MAP_ENABLE    = yes
 PER_KEY_TAPPING       = yes

@@ -33,7 +33,10 @@ static uint16_t mouse_debounce_timer = 0;
 #endif
 #define POINTING_DEVICE_ACCEL_ACCUM
 
-static uint32_t maccel_timer;
+static uint32_t     maccel_timer        = 0;
+static uint16_t     mouse_jiggler_timer = 0;
+static const int8_t deltas[32]          = {0, -1, -2, -2, -3, -3, -4, -4, -4, -4, -3, -3, -2, -2, -1, 0,
+                                           0, 1,  2,  2,  3,  3,  4,  4,  4,  4,  3,  3,  2,  2,  1,  0};
 
 static float maccel_a = POINTING_DEVICE_ACCEL_CURVE_A;
 static float maccel_b = POINTING_DEVICE_ACCEL_CURVE_B;
@@ -100,6 +103,13 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
         mouse_report.x = x;
         mouse_report.y = y;
     }
+    if (userspace_config.mouse_jiggler && timer_elapsed(mouse_jiggler_timer) > 16) {
+        static uint8_t phase = 0;
+        mouse_report.x += deltas[phase];
+        mouse_report.y += deltas[(phase + 8) & 31];
+        phase               = (phase + 1) & 31;
+        mouse_jiggler_timer = timer_read();
+    }
 
     return pointing_device_task_keymap(mouse_report);
 }
@@ -109,17 +119,23 @@ bool process_record_pointing(uint16_t keycode, keyrecord_t* record) {
         case KC_ACCEL:
             if (record->event.pressed) {
                 userspace_config.enable_acceleration ^= 1;
+                userspace_config.mouse_jiggler = false;
                 eeconfig_update_user_config(&userspace_config.raw);
             }
             break;
-#if defined(POINTING_DEVICE_MOUSE_JIGGLER_ENABLE)
         case PD_JIGGLER:
             if (record->event.pressed) {
-                pointing_device_mouse_jiggler_toggle();
+                mouse_jiggler_timer            = timer_read();
+                userspace_config.mouse_jiggler = !userspace_config.mouse_jiggler;
+                eeconfig_update_user_config(&userspace_config.raw);
             }
-#endif
+            break;
         default:
             mouse_debounce_timer = timer_read();
+            if (userspace_config.mouse_jiggler) {
+                userspace_config.mouse_jiggler = false;
+                eeconfig_update_user_config(&userspace_config.raw);
+            }
             break;
     }
     return true;
@@ -135,27 +151,12 @@ layer_state_t layer_state_set_pointing(layer_state_t state) {
     return state;
 }
 
-#if defined(POINTING_DEVICE_MOUSE_JIGGLER_ENABLE)
-static uint16_t mouse_jiggler_timer;
-
 bool has_mouse_report_changed(report_mouse_t* new_report, report_mouse_t* old_report) {
-    // Only report every 5 seconds.
-    if (userspace_config.mouse_jiggler && timer_elapsed(mouse_jiggler_timer) > 5000) {
-        mouse_jiggler_timer = timer_read();
-        return true;
-    }
     return ((new_report->buttons != old_report->buttons) || (new_report->x != 0 && new_report->x != old_report->x) ||
             (new_report->y != 0 && new_report->y != old_report->y) ||
             (new_report->h != 0 && new_report->h != old_report->h) ||
             (new_report->v != 0 && new_report->v != old_report->v));
 }
-
-void pointing_device_mouse_jiggler_toggle(void) {
-    mouse_jiggler_timer            = timer_read();
-    userspace_config.mouse_jiggler = !userspace_config.mouse_jiggler;
-}
-
-#endif
 
 #if defined(POINTING_DEVICE_AUTO_MOUSE_ENABLE)
 __attribute__((weak)) bool is_mouse_record_keymap(uint16_t keycode, keyrecord_t* record) {

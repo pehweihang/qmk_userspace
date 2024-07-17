@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "pointing.h"
+#include <stdbool.h>
+#include "drashna.h"
 #include "math.h"
 #include "pointing_device_internal.h"
 
@@ -33,10 +35,14 @@ static uint16_t mouse_debounce_timer = 0;
 #endif
 #define POINTING_DEVICE_ACCEL_ACCUM
 
+#ifndef MOUSE_JIGGLER_THRESHOLD
+#    define MOUSE_JIGGLER_THRESHOLD 20
+#endif // MOUSE_JIGGLER_THRESHOLD
+#ifndef MOUSE_JIGGLER_INTERVAL_MS
+#    define MOUSE_JIGGLER_INTERVAL_MS 16
+#endif // MOUSE_JIGGLER_INTERVAL_MS
+
 static uint32_t     maccel_timer        = 0;
-static uint16_t     mouse_jiggler_timer = 0;
-static const int8_t deltas[32]          = {0, -1, -2, -2, -3, -3, -4, -4, -4, -4, -3, -3, -2, -2, -1, 0,
-                                           0, 1,  2,  2,  3,  3,  4,  4,  4,  4,  3,  3,  2,  2,  1,  0};
 
 static float maccel_a = POINTING_DEVICE_ACCEL_CURVE_A;
 static float maccel_b = POINTING_DEVICE_ACCEL_CURVE_B;
@@ -46,6 +52,18 @@ static float maccel_d = POINTING_DEVICE_ACCEL_CURVE_D;
 static float maccel_accum_x = 0;
 static float maccel_accum_y = 0;
 
+static uint16_t     mouse_jiggler_timer = 0;
+static bool         mouse_jiggler       = false;
+static const int8_t deltas[32]          = {0, -1, -2, -2, -3, -3, -4, -4, -4, -4, -3, -3, -2, -2, -1, 0,
+                                           0, 1,  2,  2,  3,  3,  4,  4,  4,  4,  3,  3,  2,  2,  1,  0};
+typedef struct {
+    mouse_xy_report_t x;
+    mouse_xy_report_t y;
+    int8_t            v;
+    int8_t            h;
+} mouse_movement_t;
+mouse_movement_t total_mouse_movement = {0, 0, 0, 0};
+
 __attribute__((weak)) void pointing_device_init_keymap(void) {}
 
 void pointing_device_init_user(void) {
@@ -53,6 +71,31 @@ void pointing_device_init_user(void) {
     set_auto_mouse_enable(true);
 
     pointing_device_init_keymap();
+}
+
+bool mouse_movement_threshold_check(report_mouse_t* mouse_report, mouse_movement_t* movement, uint16_t threshold) {
+    movement->x += mouse_report->x;
+    movement->y += mouse_report->y;
+    movement->h += mouse_report->h;
+    movement->v += mouse_report->v;
+    return abs(movement->x) > threshold || abs(movement->y) > threshold || abs(movement->h) > threshold ||
+           abs(movement->v) > threshold;
+}
+
+void mouse_jiggler_check(report_mouse_t* mouse_report) {
+    static mouse_movement_t jiggler_threshold = {0, 0, 0, 0};
+    if (mouse_movement_threshold_check(mouse_report, &jiggler_threshold, MOUSE_JIGGLER_THRESHOLD)) {
+        mouse_jiggler     = false;
+        jiggler_threshold = (mouse_movement_t){.x = 0, .y = 0, .h = 0, .v = 0};
+    }
+    if (mouse_jiggler && timer_elapsed(mouse_jiggler_timer) > MOUSE_JIGGLER_INTERVAL_MS) {
+        static uint8_t phase = 0;
+        mouse_report->x += deltas[phase];
+        mouse_report->y += deltas[(phase + 8) & 31];
+        phase               = (phase + 1) & 31;
+        mouse_jiggler_timer = timer_read();
+        jiggler_threshold   = (mouse_movement_t){.x = 0, .y = 0, .h = 0, .v = 0};
+    }
 }
 
 __attribute__((weak)) report_mouse_t pointing_device_task_keymap(report_mouse_t mouse_report) {
@@ -103,13 +146,8 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
         mouse_report.x = x;
         mouse_report.y = y;
     }
-    if (userspace_config.mouse_jiggler && timer_elapsed(mouse_jiggler_timer) > 16) {
-        static uint8_t phase = 0;
-        mouse_report.x += deltas[phase];
-        mouse_report.y += deltas[(phase + 8) & 31];
-        phase               = (phase + 1) & 31;
-        mouse_jiggler_timer = timer_read();
-    }
+
+    mouse_jiggler_check(&mouse_report);
 
     return pointing_device_task_keymap(mouse_report);
 }
@@ -119,22 +157,19 @@ bool process_record_pointing(uint16_t keycode, keyrecord_t* record) {
         case KC_ACCEL:
             if (record->event.pressed) {
                 userspace_config.enable_acceleration ^= 1;
-                userspace_config.mouse_jiggler = false;
-                eeconfig_update_user_config(&userspace_config.raw);
+                mouse_jiggler = false;
             }
             break;
         case PD_JIGGLER:
             if (record->event.pressed) {
                 mouse_jiggler_timer            = timer_read();
-                userspace_config.mouse_jiggler = !userspace_config.mouse_jiggler;
-                eeconfig_update_user_config(&userspace_config.raw);
+                mouse_jiggler                  = !mouse_jiggler;
             }
             break;
         default:
             mouse_debounce_timer = timer_read();
-            if (userspace_config.mouse_jiggler) {
-                userspace_config.mouse_jiggler = false;
-                eeconfig_update_user_config(&userspace_config.raw);
+            if (mouse_jiggler) {
+                mouse_jiggler = false;
             }
             break;
     }

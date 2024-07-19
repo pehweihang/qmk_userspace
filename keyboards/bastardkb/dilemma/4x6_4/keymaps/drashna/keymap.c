@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "drashna.h"
+#include "keyboard.h"
 
 // clang-format off
 #define LAYOUT_wrapper(...) LAYOUT(__VA_ARGS__)
@@ -169,13 +170,6 @@ bool oled_task_keymap(void) {
 }
 #endif
 
-void keyboard_post_init_keymap(void) {
-#ifdef RGB_MATRIX_ENABLE
-    g_led_config.flags[48] = g_led_config.flags[50] = g_led_config.flags[51] = g_led_config.flags[100] =
-        g_led_config.flags[101] = g_led_config.flags[102] = g_led_config.flags[103] = LED_FLAG_MODIFIER;
-#endif
-}
-
 #ifdef RGB_MATRIX_ENABLE
 void check_default_layer(uint8_t mode, uint8_t type, uint8_t led_min, uint8_t led_max) {
     switch (get_highest_layer(default_layer_state)) {
@@ -229,4 +223,25 @@ uint16_t get_tapping_term_keymap(uint16_t keycode, keyrecord_t *record) {
         return 400;
     }
     return TAPPING_TERM;
+}
+#include "qp.h"
+#include "bkb_logo_mod.qgf.h"
+
+static painter_device_t       display;
+static painter_image_handle_t my_image;
+// static deferred_token         my_anim;
+
+void keyboard_post_init_keymap(void) {
+    if (is_keyboard_left()) {
+        display = qp_gc9a01_make_spi_device(240, 240, DISPLAY_CS_PIN, DISPLAY_DC_PIN, DISPLAY_RST_PIN, 4, 0);
+        qp_init(display, QP_ROTATION_0);
+        qp_clear(display);
+        my_image = qp_load_image_mem(gfx_bkb_logo_mod);
+        qp_drawimage(display, 0, 0, my_image);
+        // my_anim = qp_animate(display, 0, 0, my_image);
+    }
+#ifdef RGB_MATRIX_ENABLE
+    g_led_config.flags[48] = g_led_config.flags[50] = g_led_config.flags[51] = g_led_config.flags[100] =
+        g_led_config.flags[101] = g_led_config.flags[102] = g_led_config.flags[103] = LED_FLAG_MODIFIER;
+#endif
 }

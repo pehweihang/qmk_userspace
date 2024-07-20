@@ -159,3 +159,30 @@ keypos_t layer_remap[LAYER_MAP_ROWS][LAYER_MAP_COLS] = {
     { { 255, 255 }, { 255, 255 }, { 255, 255 }, { 255, 255 }, { 255, 255 }, { 255, 255 }, {   2,   5 }, {   3,   5 }, { 255, 255 }, {   2,  11 }, {   3,  11 }, { 255, 255 }, { 255, 255 }, { 255, 255 }, { 255, 255 }, { 255, 255 }, { 255, 255 } },
 };
 // clang-format on
+
+#ifdef QUANTUM_PAINTER_ENABLE
+
+#    include "qp.h"
+#    include "painter/graphics/asuka-240x320.qgf.h"
+#    include "painter/graphics/unit-02-240x320.qgf.h"
+#    include "painter/graphics/anime-girl-jacket-240x320.qgf.h"
+
+static painter_device_t       display;
+static painter_image_handle_t my_image;
+// static deferred_token         my_anim;
+
+void keyboard_post_init_keymap(void) {
+    display = qp_ili9341_make_spi_device(240, 320, DISPLAY_CS_PIN, DISPLAY_DC_PIN, DISPLAY_RST_PIN, 4, 0);
+    qp_init(display, QP_ROTATION_180);
+    qp_clear(display);
+    qp_power(display, true);
+    my_image = qp_load_image_mem(unit_02_240x320);
+    if (is_keyboard_master()) {
+        my_image = qp_load_image_mem(gfx_asuka_240x320);
+    } else {
+        my_image = qp_load_image_mem(gfx_anime_girl_jacket_240x320);
+    }
+    // qp_drawimage(display, 0, 0, my_image);
+    debug_enable = true;
+}
+#endif

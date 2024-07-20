@@ -39,6 +39,11 @@ ifeq ($(strip $(KEYBOARD)), handwired/tractyl_manuform/5x6_right/f411)
     HAPTIC_ENABLE                    = yes
     HAPTIC_DRIVER                    = drv2605l
     WATCHDOG_ENABLE                  = yes
+
+    BACKLIGHT_ENABLE = yes
+    QUANTUM_PAINTER_ENABLE = yes
+    QUANTUM_PAINTER_DRIVERS += ili9341_spi
+    SRC += painter/graphics/asuka-240x320.qgf.c painter/graphics/unit-02-240x320.qgf.c painter/graphics/anime-girl-jacket-240x320.qgf.c
 endif
 
 ifeq ($(strip $(OVERLOAD_FEATURES)), yes)

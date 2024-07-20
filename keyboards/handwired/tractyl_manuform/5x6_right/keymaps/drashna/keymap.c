@@ -176,13 +176,12 @@ void keyboard_post_init_keymap(void) {
     qp_init(display, QP_ROTATION_180);
     qp_clear(display);
     qp_power(display, true);
-    my_image = qp_load_image_mem(unit_02_240x320);
     if (is_keyboard_master()) {
         my_image = qp_load_image_mem(gfx_asuka_240x320);
     } else {
-        my_image = qp_load_image_mem(gfx_anime_girl_jacket_240x320);
+        // my_image = qp_load_image_mem(gfx_anime_girl_jacket_240x320);
+        my_image = qp_load_image_mem(unit_02_240x320);
     }
-    // qp_drawimage(display, 0, 0, my_image);
-    debug_enable = true;
+    qp_drawimage(display, 0, 0, my_image);
 }
 #endif

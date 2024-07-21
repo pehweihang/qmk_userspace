@@ -1,6 +1,7 @@
 // Copyright 2023 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include "callbacks.h"
 #include "drashna.h"
 
 // clang-format off
@@ -58,6 +59,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_LCTL, KC_D3_1, KC_D3_2, KC_D3_3, KC_D3_4, KC_Z,       _______, _______, _______, _______, _______, _______,
                                            KC_LSFT, KC_LCTL,      _______, TG_DBLO
     ),
+    [_MOUSE] = LAYOUT(
+        _______, _______, _______, _______, _______, _______,    _______, _______, _______, _______, _______, _______,
+        _______, _______, _______, _______, _______, _______,    KC_WH_U, _______, _______, _______, _______, _______,
+        _______, _______, _______, _______, _______, _______,    KC_WH_D, KC_BTN1, KC_BTN3, KC_BTN2, KC_BTN6, _______,
+        _______, _______, _______, _______, _______, _______,    KC_BTN7, KC_BTN4, KC_BTN5, KC_BTN8, _______, _______,
+                                           _______, _______,      _______, _______
+    ),
     [_LOWER] = LAYOUT_wrapper(
         KC_F12,  _________________FUNC_LEFT_________________,    _________________FUNC_RIGHT________________, KC_F11,
         _______, _________________LOWER_L1__________________,    _________________LOWER_R1__________________, _______,
@@ -84,13 +92,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
-#if defined(OLED_ENABLE) && defined(OLED_DISPLAY_128X128)
+void keyboard_post_init_keymap(void) {
+    set_auto_mouse_layer(_MOUSE);
+    set_auto_mouse_enable(true);
+}
 
+#if defined(OLED_ENABLE) && defined(OLED_DISPLAY_128X128)
 oled_rotation_t oled_init_keymap(oled_rotation_t rotation, bool has_run) {
     return has_run ? rotation : OLED_ROTATION_180;
 }
-
-extern bool is_oled_enabled;
 
 bool oled_task_keymap(void) {
     // No right side oled, so just exit.

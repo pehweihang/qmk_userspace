@@ -1,11 +1,14 @@
 SWAP_HANDS_ENABLE     = yes
 AUTOCORRECT_ENABLE    = no
 CAPS_WORD_ENABLE      = yes
+SENTENCE_CASE_ENABLE  = yes
 CONSOLE_ENABLE        = yes
 KEYLOGGER_ENABLE      = no
 PER_KEY_TAPPING       = yes
 EEPROM_DRIVER         = i2c
 OLED_ENABLE           = yes
+CUSTOM_UNICODE_ENABLE = yes
+WPM_ENABLE            = yes
 
 POINTING_DEVICE_ENABLE = yes
 POINTING_DEVICE_DRIVER = cirque_pinnacle_i2c

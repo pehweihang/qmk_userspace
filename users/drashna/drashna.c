@@ -217,7 +217,6 @@ bool process_detected_host_os_user(os_variant_t detected_os) {
         bool is_mac = (detected_os == OS_MACOS) || (detected_os == OS_IOS);
         if (keymap_config.swap_lctl_lgui != is_mac) {
             keymap_config.swap_lctl_lgui = keymap_config.swap_rctl_rgui = is_mac;
-            eeconfig_update_keymap(keymap_config.raw);
         }
 #    ifdef UNICODE_COMMON_ENABLE
         set_unicode_input_mode_soft(keymap_config.swap_lctl_lgui ? UNICODE_MODE_MACOS : UNICODE_MODE_WINCOMPOSE);

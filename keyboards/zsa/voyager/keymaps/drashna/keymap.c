@@ -83,3 +83,52 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     )
 };
 // clang-format on
+
+#if defined(OLED_ENABLE) && defined(OLED_DISPLAY_128X128)
+
+oled_rotation_t oled_init_keymap(oled_rotation_t rotation, bool has_run) {
+    return has_run ? rotation : OLED_ROTATION_180;
+}
+
+extern bool is_oled_enabled;
+
+bool oled_task_keymap(void) {
+    // No right side oled, so just exit.
+    if (!is_keyboard_left()) {
+        return false;
+    }
+
+    oled_write_raw_P(header_image, sizeof(header_image));
+    oled_set_cursor(4, 0);
+    oled_write_P(PSTR(" ZSA Voyager"), true);
+
+    render_default_layer_state(1, 1);
+    render_layer_state(1, 2);
+    render_pet(0, 5);
+    render_wpm(1, 7, 5);
+    render_matrix_scan_rate(1, 7, 6);
+    render_bootmagic_status(7, 7);
+    render_user_status(1, 9);
+
+    render_mod_status(get_mods() | get_oneshot_mods(), 1, 10);
+    render_keylock_status(host_keyboard_led_state(), 1, 11);
+    render_unicode_mode(1, 12);
+
+    render_os(1, 13);
+    render_rgb_mode(1, 14);
+
+    for (uint8_t i = 1; i < 15; i++) {
+        oled_set_cursor(0, i);
+        oled_write_raw_P(display_border, sizeof(display_border));
+        oled_set_cursor(21, i);
+        oled_write_raw_P(display_border, sizeof(display_border));
+    }
+
+    oled_set_cursor(0, 15);
+    oled_write_raw_P(footer_image2, sizeof(footer_image2));
+    oled_set_cursor(4, 15);
+    oled_write(oled_keylog_str, true);
+
+    return false;
+}
+#endif

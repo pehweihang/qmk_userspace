@@ -4,3 +4,7 @@
 #pragma once
 
 #define EEPROM_I2C_24LC256
+
+#define OLED_DISPLAY_128X128
+#define OLED_UPDATE_INTERVAL      100
+#define OLED_UPDATE_PROCESS_LIMIT 2

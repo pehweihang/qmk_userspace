@@ -1,7 +1,6 @@
 // Copyright 2023 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "callbacks.h"
 #include "drashna.h"
 
 // clang-format off
@@ -93,15 +92,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // clang-format on
 
 void keyboard_post_init_keymap(void) {
+#ifdef POINTING_DEVICE_ENABLE
     set_auto_mouse_layer(_MOUSE);
     set_auto_mouse_enable(true);
+#endif // POINTING_DEVICE_ENABLE
 }
 
 #if defined(OLED_ENABLE) && defined(OLED_DISPLAY_128X128)
-oled_rotation_t oled_init_keymap(oled_rotation_t rotation, bool has_run) {
-    return has_run ? rotation : OLED_ROTATION_180;
-}
-
 bool oled_task_keymap(void) {
     // No right side oled, so just exit.
     if (!is_keyboard_left()) {

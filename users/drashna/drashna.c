@@ -210,7 +210,7 @@ void format_layer_bitmap_string(char *buffer, layer_state_t state, layer_state_t
     *buffer = 0;
 }
 
-#if defined(OS_DETECTION_ENABLE) && defined(DEFERRED_EXEC_ENABLE)
+#if defined(OS_DETECTION_ENABLE)
 
 bool process_detected_host_os_user(os_variant_t detected_os) {
     if (is_keyboard_master()) {
@@ -259,7 +259,7 @@ bool process_detected_host_os_user(os_variant_t detected_os) {
 
     return true;
 }
-#endif
+#endif // OS_DETECTION_ENABLE
 
 static host_driver_t *host_driver          = 0;
 static bool           host_driver_disabled = false;

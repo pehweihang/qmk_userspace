@@ -1,22 +1,12 @@
 #include "drashna.h"
-#include <qp.h>
-#include "handwired/tractyl_manuform/5x6_right/f405_coreboard/config.h"
-#include "keycode_config.h"
-#include "painter/qp_comms.h"
-#include "qp_ili9341.h"
+#include "qp.h"
 #include "painter/fonts.qff.h"
 #include "painter/graphics.qgf.h"
-#if defined(RGB_MATRIX_ENABLE)
-#    include "rgb_matrix.h"
-#elif defined(RGBLIGHT_ENABLE)
-#    include "rgblight.h"
-#endif
 #include "qp_comms.h"
 #ifdef CUSTOM_SPLIT_TRANSPORT_SYNC
 #    include "split/transport_sync.h"
 #endif
 
-#include "keyboard.h"
 #include <math.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -46,10 +36,13 @@ void init_and_clear(painter_device_t device, painter_rotation_t rotation) {
 
     qp_init(device, rotation);
     // if needs inversion
-    // qp_comms_start(device);
-    // qp_comms_command(device, ILI9XXX_CMD_INVERT_ON);
-    // qp_comms_stop(device);
+#if 0
+    qp_comms_start(device);
+    qp_comms_command(device, ILI9XXX_CMD_INVERT_OFF);
+    qp_comms_stop(device);
+#endif
     qp_get_geometry(device, &width, &height, NULL, NULL, NULL);
+    qp_clear(device);
     qp_rect(device, 0, 0, width - 1, height - 1, 0, 0, 0, true);
 }
 
@@ -158,18 +151,21 @@ void draw_ui_user(void) {
         int  ypos    = 0;
         int  xpos    = 5;
 
-        // static led_t last_led_state = {0};
-        // if (hue_redraw || last_led_state.raw != host_keyboard_led_state().raw) {
-        //     last_led_state.raw = host_keyboard_led_state().raw;
-        //     qp_drawimage_recolor(ili9341_display, 128 - (32 * 3), 0, last_led_state.caps_lock ? lock_caps_on :
-        //     lock_caps_off, curr_hue, 255, last_led_state.caps_lock ? 255 : 32, curr_hue, 255, 0);
-        //     qp_drawimage_recolor(ili9341_display, 128 - (32 * 2), 0, last_led_state.num_lock ? lock_num_on :
-        //     lock_num_off, curr_hue, 255, last_led_state.num_lock ? 255 : 32, curr_hue, 255, 0);
-        //     qp_drawimage_recolor(ili9341_display, 128 - (32 * 1), 0, last_led_state.scroll_lock ? lock_scrl_on :
-        //     lock_scrl_off, curr_hue, 255, last_led_state.scroll_lock ? 255 : 32, curr_hue, 255, 0);
-        // }
+        static led_t last_led_state = {0};
+        if (hue_redraw || last_led_state.raw != host_keyboard_led_state().raw) {
+            last_led_state.raw = host_keyboard_led_state().raw;
+            qp_drawimage_recolor(ili9341_display, xpos, 0, last_led_state.caps_lock ? lock_caps_on : lock_caps_off,
+                                 curr_hue, 255, last_led_state.caps_lock ? 255 : 32, curr_hue, 255, 0);
+            xpos += lock_caps_on->width + 4;
+            qp_drawimage_recolor(ili9341_display, xpos, 0, last_led_state.num_lock ? lock_num_on : lock_num_off,
+                                 curr_hue, 255, last_led_state.num_lock ? 255 : 32, curr_hue, 255, 0);
+            xpos += lock_num_on->width + 4;
+            qp_drawimage_recolor(ili9341_display, xpos, 0, last_led_state.scroll_lock ? lock_scrl_on : lock_scrl_off,
+                                 curr_hue, 255, last_led_state.scroll_lock ? 255 : 32, curr_hue, 255, 0);
+        }
 
-        // ypos += font->line_height + 4;
+        ypos += lock_caps_on->height + 4;
+
         if (hue_redraw || wpm_redraw) {
             static int max_wpm_xpos = 0;
             xpos                    = 5;
@@ -203,10 +199,10 @@ void draw_ui_user(void) {
             if (max_cpi_xpos < xpos) {
                 max_cpi_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_cpi_xpos, ypos + font->line_height, 0, 0, 0, true);
+            // qp_rect(ili9341_display, xpos, ypos, max_cpi_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
         // if (hue_redraw) {
-        //     xpos                    = 160;
+        //     xpos = 160;
         //     qp_rect(ili9341_display, xpos, ypos, xpos + 10, ypos + 10, 0, 0, 200, true);
         //     qp_drawimage(ili9341_display, xpos, ypos, mouse_icon);
         // }
@@ -222,7 +218,7 @@ void draw_ui_user(void) {
             if (max_dss_xpos < xpos) {
                 max_dss_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_dss_xpos, ypos + font->line_height, 0, 0, 0, true);
+            // qp_rect(ili9341_display, xpos, ypos, max_dss_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
 
         if (hue_redraw || am_state_redraw) {
@@ -234,7 +230,7 @@ void draw_ui_user(void) {
             if (max_ams_xpos < xpos) {
                 max_ams_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_ams_xpos, ypos + font->line_height, 0, 0, 0, true);
+            // qp_rect(ili9341_display, xpos, ypos, max_ams_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
 
         if (hue_redraw || sp_state_redraw) {
@@ -247,7 +243,7 @@ void draw_ui_user(void) {
             if (max_sps_xpos < xpos) {
                 max_sps_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_sps_xpos, ypos + font->line_height, 0, 0, 0, true);
+            // qp_rect(ili9341_display, xpos, ypos, max_sps_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
 #endif
 
@@ -276,7 +272,7 @@ void draw_ui_user(void) {
             if (max_bpm_xpos < xpos) {
                 max_bpm_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_bpm_xpos, ypos + font->line_height, 0, 0, 0, true);
+            // qp_rect(ili9341_display, xpos, ypos, max_bpm_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
 
         ypos += font->line_height + 2;
@@ -301,7 +297,7 @@ void draw_ui_user(void) {
             if (max_upm_xpos < xpos) {
                 max_upm_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_upm_xpos, ypos + font->line_height, 0, 0, 0, true);
+            // qp_rect(ili9341_display, xpos, ypos, max_upm_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
 
 #if defined(RGB_MATRIX_ENABLE)
@@ -325,7 +321,7 @@ void draw_ui_user(void) {
             if (max_rgb_xpos < xpos) {
                 max_rgb_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_rgb_xpos, ypos + font->line_height, 0, 0, 0, true);
+            // qp_rect(ili9341_display, xpos, ypos, max_rgb_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
 #endif
 
@@ -350,7 +346,7 @@ void draw_ui_user(void) {
             if (max_rgb_xpos < xpos) {
                 max_rgb_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_rgb_xpos, ypos + font->line_height, 0, 0, 0, true);
+            // qp_rect(ili9341_display, xpos, ypos, max_rgb_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
 #endif
         ypos += font->line_height + 4;
@@ -378,7 +374,7 @@ void draw_ui_user(void) {
             if (max_layer_xpos < xpos) {
                 max_layer_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_layer_xpos, ypos + font->line_height, 0, 0, 0, true);
+            // qp_rect(ili9341_display, xpos, ypos, max_layer_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
 
         if (hue_redraw || layer_state_redraw) {
@@ -408,7 +404,7 @@ void draw_ui_user(void) {
             if (max_layer_xpos < xpos) {
                 max_layer_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_layer_xpos, ypos + font->line_height, 0, 0, 0, true);
+            // qp_rect(ili9341_display, xpos, ypos, max_layer_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
 
 #ifdef KEYLOGGER_ENABLE
@@ -423,7 +419,7 @@ void draw_ui_user(void) {
             if (max_klog_xpos < xpos) {
                 max_klog_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 0, true);
+            // qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 0, true);
             klog_redraw = false;
         }
 #endif

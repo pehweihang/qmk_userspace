@@ -162,9 +162,9 @@ keypos_t layer_remap[LAYER_MAP_ROWS][LAYER_MAP_COLS] = {
 
 #if defined(QUANTUM_PAINTER_ENABLE) && !defined(CUSTOM_QUANTUM_PAINTER_ENABLE)
 #    include "qp.h"
-#    include "painter/graphics/asuka-240x320.qgf.h"
-#    include "painter/graphics/unit-02-240x320.qgf.h"
-#    include "painter/graphics/anime-girl-jacket-240x320.qgf.h"
+#    include "display/painter/graphics/asuka-240x320.qgf.h"
+#    include "display/painter/graphics/unit-02-240x320.qgf.h"
+#    include "display/painter/graphics/anime-girl-jacket-240x320.qgf.h"
 
 static painter_device_t       display;
 static painter_image_handle_t my_image;

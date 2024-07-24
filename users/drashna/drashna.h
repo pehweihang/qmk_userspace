@@ -16,7 +16,7 @@
 #    include "rgb/rgb_matrix_stuff.h"
 #endif
 #if defined(OLED_ENABLE)
-#    include "oled/oled_stuff.h"
+#    include "display/oled/oled_stuff.h"
 #endif
 #ifdef SPLIT_KEYBOARD
 #    include "split/transport_sync.h"

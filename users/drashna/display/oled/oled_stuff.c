@@ -24,6 +24,7 @@
 #include "lib/lib8tion/lib8tion.h"
 #include <math.h>
 #include <stdio.h>
+#include "display/display.h"
 
 #ifdef RTC_ENABLE
 #    include "rtc.h"

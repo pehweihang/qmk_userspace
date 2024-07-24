@@ -20,8 +20,8 @@ extern bool           delayed_tasks_run;
 #ifdef SWAP_HANDS_ENABLE
 extern bool swap_hands;
 #endif
-#ifdef CUSTOM_OLED_ENABLE
-#    include "oled/oled_stuff.h"
+#ifdef CUSTOM_OLED_DRIVER
+#    include "display/oled/oled_stuff.h"
 #endif
 
 extern userspace_config_t userspace_config;

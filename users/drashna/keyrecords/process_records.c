@@ -10,11 +10,11 @@
 #ifdef CUSTOM_DYNAMIC_MACROS_ENABLE
 #    include "keyrecords/custom_dynamic_macros.h"
 #endif
-#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
-#    include "painter/ili9341_display.h"
-#endif
 #ifdef LAYER_LOCK_ENABLE
 #    include "layer_lock.h"
+#endif
+#ifdef DISPLAY_DRIVER_ENABLE
+#    include "display/display.h"
 #endif
 
 uint16_t copy_paste_timer;
@@ -77,12 +77,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         return false;
     }
 #endif
-#if defined(OLED_ENABLE) && defined(CUSTOM_OLED_DRIVER)
-    process_record_user_oled(keycode, record);
-#endif // OLED
-#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
-    process_record_user_quantum_painter(keycode, record);
-#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
+#ifdef DISPLAY_DRIVER_ENABLE
+    process_record_display_driver(keycode, record);
+#endif // DISPLAY_DRIVER_ENABLE
 
     if (!(process_record_keymap(keycode, record) && process_record_secrets(keycode, record)
 #ifdef CUSTOM_RGB_MATRIX

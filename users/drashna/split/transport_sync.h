@@ -5,9 +5,6 @@
 
 #include <stdint.h>
 #include "drashna.h"
-#ifdef OLED_ENABLE
-#    include "oled/oled_stuff.h"
-#endif
 
 typedef union {
     uint32_t raw;

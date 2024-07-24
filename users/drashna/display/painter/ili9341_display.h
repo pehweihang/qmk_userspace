@@ -12,3 +12,11 @@ void suspend_power_down_quantum_painter(void);
 void suspend_wakeup_init_quantum_painter(void);
 void shutdown_quantum_painter(void);
 bool process_record_user_quantum_painter(uint16_t keycode, keyrecord_t* record);
+
+#ifdef KEYLOGGER_ENABLE
+#    ifndef QP_KEYLOGGER_LENGTH
+#        define QP_KEYLOGGER_LENGTH 25
+#    endif
+extern char qp_keylog_str[QP_KEYLOGGER_LENGTH];
+extern bool keylogger_has_changed;
+#endif

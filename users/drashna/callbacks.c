@@ -7,7 +7,7 @@
 #    include "layer_map.h"
 #endif
 #ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
-#    include "painter/ili9341_display.h"
+#    include "display/painter/ili9341_display.h"
 #endif
 
 #ifdef CUSTOM_DYNAMIC_MACROS_ENABLE

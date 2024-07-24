@@ -1,8 +1,10 @@
 #include "drashna.h"
 #include "qp.h"
-#include "painter/fonts.qff.h"
-#include "painter/graphics.qgf.h"
+#include "display/painter/fonts.qff.h"
+#include "display/painter/graphics.qgf.h"
 #include "qp_comms.h"
+#include "display/display.h"
+#include "display/painter/ili9341_display.h"
 #ifdef CUSTOM_SPLIT_TRANSPORT_SYNC
 #    include "split/transport_sync.h"
 #endif
@@ -25,9 +27,7 @@ static painter_image_handle_t cg_off;
 static painter_image_handle_t mouse_icon;
 
 #ifdef KEYLOGGER_ENABLE
-#    define KEYLOGGER_LENGTH 25
-char        keylog_str[KEYLOGGER_LENGTH] = {0};
-static bool klog_redraw                  = false;
+char qp_keylog_str[QP_KEYLOGGER_LENGTH] = {0};
 #endif
 
 void init_and_clear(painter_device_t device, painter_rotation_t rotation) {
@@ -121,7 +121,7 @@ void draw_ui_user(void) {
 
 #ifdef KEYLOGGER_ENABLE
     static uint32_t last_klog_update = 0;
-    if (timer_elapsed32(last_klog_update) > 125 || klog_redraw) {
+    if (timer_elapsed32(last_klog_update) > 125 || keylogger_has_changed) {
         last_klog_update = timer_read32();
     }
 #endif
@@ -286,13 +286,21 @@ void draw_ui_user(void) {
             const char* buf1        = "CLCK ";
             const char* buf2        = "HOST ";
             const char* buf3        = "SWAP ";
-            temp_pos                = qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf0, last_user_state.audio_enable ? 153 : 255, 255, 255, last_user_state.audio_enable ? 153 : 255, 255, 0);
+            temp_pos =
+                qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf0, last_user_state.audio_enable ? 153 : 255,
+                                    255, 255, last_user_state.audio_enable ? 153 : 255, 255, 0);
             xpos += MAX(temp_pos, 30);
-            temp_pos = qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf1, last_user_state.audio_clicky_enable ? 153 : 255, 255, 255, last_user_state.audio_clicky_enable ? 153 : 255, 255, 0);
+            temp_pos = qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf1,
+                                           last_user_state.audio_clicky_enable ? 153 : 255, 255, 255,
+                                           last_user_state.audio_clicky_enable ? 153 : 255, 255, 0);
             xpos += MAX(temp_pos, 30);
-            temp_pos = qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf2, last_user_state.host_driver_disabled ? 153 : 255, 255, 255, last_user_state.host_driver_disabled ? 153 : 255, 255, 0);
+            temp_pos = qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf2,
+                                           last_user_state.host_driver_disabled ? 153 : 255, 255, 255,
+                                           last_user_state.host_driver_disabled ? 153 : 255, 255, 0);
             xpos += MAX(temp_pos, 30);
-            temp_pos = qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf3, last_user_state.swap_hands ? 153 : 255, 255, 255, last_user_state.swap_hands ? 153 : 255, 255, 0);
+            temp_pos =
+                qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf3, last_user_state.swap_hands ? 153 : 255,
+                                    255, 255, last_user_state.swap_hands ? 153 : 255, 255, 0);
             xpos += MAX(temp_pos, 30);
             if (max_upm_xpos < xpos) {
                 max_upm_xpos = xpos;
@@ -409,10 +417,10 @@ void draw_ui_user(void) {
 
 #ifdef KEYLOGGER_ENABLE
         ypos += font->line_height + 4;
-        if (hue_redraw || klog_redraw) {
+        if (hue_redraw || keylogger_has_changed) {
             static int max_klog_xpos = 0;
             xpos                     = 5;
-            snprintf(buf, sizeof(buf), "Keylog: %s", keylog_str);
+            snprintf(buf, sizeof(buf), "Keylog: %s", qp_keylog_str);
 
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
 
@@ -420,7 +428,7 @@ void draw_ui_user(void) {
                 max_klog_xpos = xpos;
             }
             // qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 0, true);
-            klog_redraw = false;
+            keylogger_has_changed = false;
         }
 #endif
     }
@@ -448,12 +456,11 @@ void keyboard_post_init_quantum_painter(void) {
     mouse_icon = qp_load_image_mem(gfx_mouse_icon);
 
 #ifdef KEYLOGGER_ENABLE
-    memset(keylog_str, '_', KEYLOGGER_LENGTH);
+    memset(qp_keylog_str, '_', QP_KEYLOGGER_LENGTH);
 #endif
 
 #ifdef BACKLIGHT_ENABLE
-    backlight_enable();
-    backlight_level(BACKLIGHT_LEVELS);
+    backlight_level_noeeprom(BACKLIGHT_LEVELS);
 #elif defined(BACKLIGHT_PIN)
     gpio_set_pin_output_push_pull(BACKLIGHT_PIN);
     gpio_write_pin_high(BACKLIGHT_PIN);
@@ -503,83 +510,4 @@ void shutdown_quantum_painter(void) {
     gpio_write_pin_low(BACKLIGHT_PIN);
 #endif
     qp_power(ili9341_display, false);
-}
-
-#ifdef KEYLOGGER_ENABLE
-// clang-format off
-#ifndef OLED_ENABLE
-static const char PROGMEM code_to_name[256] = {
-//   0    1    2    3    4    5    6    7    8    9    A    B    c    D    E    F
-    ' ', ' ', ' ', ' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',  // 0x
-    'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1', '2',  // 1x
-    '3', '4', '5', '6', '7', '8', '9', '0',  20,  19,  27,  26,  22, '-', '=', '[',  // 2x
-    ']','\\', '#', ';','\'', '`', ',', '.', '/', 128,0xD5,0xD6,0xD7,0xD8,0xD9,0xDA,  // 3x
-    0xDB,0xDC,0xDD,0xDE,0XDF,0xFB,'P', 'S',  19, ' ',  17,  30,  16,  16,  31,  26,  // 4x
-     27,  25,  24, 'N', '/', '*', '-', '+',  23, '1', '2', '3', '4', '5', '6', '7',  // 5x
-    '8', '9', '0', '.','\\', 'A',   0, '=', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',  // 6x
-    ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',  // 7x
-    ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',  // 8x
-    ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',  // 9x
-    ' ', ' ', ' ', ' ', ' ',   0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',  // Ax
-    ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',  // Bx
-    ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',  // Cx
-    ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',  // Dx
-    'C', 'S', 'A', 'C', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',  24,  26,  24,  // Ex
-     25,0x9D,0x9D,0x9D,0x9D,0x9D,0x9D,0x9D,0x9D,  24,  25,  27,  26, ' ', ' ', ' '   // Fx
-};
-#endif
-// clang-format on
-
-/**
- * @brief parses pressed keycodes and saves to buffer
- *
- * @param keycode Keycode pressed from switch matrix
- * @param record keyrecord_t data structure
- */
-static void add_keylog(uint16_t keycode, keyrecord_t* record) {
-    if (keycode >= QK_MOD_TAP && keycode <= QK_MOD_TAP_MAX) {
-        keycode = QK_MOD_TAP_GET_TAP_KEYCODE(keycode);
-    } else if (keycode >= QK_LAYER_TAP && keycode <= QK_LAYER_TAP_MAX) {
-        keycode = QK_LAYER_TAP_GET_TAP_KEYCODE(keycode);
-    } else if (keycode >= QK_MODS && keycode <= QK_MODS_MAX) {
-        keycode = QK_MODS_GET_BASIC_KEYCODE(keycode);
-    }
-
-    if ((keycode == KC_BSPC) && mod_config(get_mods() | get_oneshot_mods()) & MOD_MASK_CTRL) {
-        memset(keylog_str, ' ', KEYLOGGER_LENGTH);
-        keylog_str[KEYLOGGER_LENGTH - 1] = 0x00;
-        return;
-    }
-    if (record->tap.count) {
-        keycode &= 0xFF;
-    } else if (keycode > 0xFF) {
-        return;
-    }
-
-    memmove(keylog_str, keylog_str + 1, KEYLOGGER_LENGTH - 2);
-
-    if (keycode < ARRAY_SIZE(code_to_name)) {
-        keylog_str[(KEYLOGGER_LENGTH - 2)] = pgm_read_byte(&code_to_name[keycode]);
-        klog_redraw                        = true;
-    }
-}
-#endif
-
-/**
- * @brief Keycode handler for oled display.
- *
- * This adds pressed keys to buffer, but also resets the oled timer
- *
- * @param keycode Keycode from matrix
- * @param record keyrecord data struture
- * @return true
- * @return false
- */
-bool process_record_user_quantum_painter(uint16_t keycode, keyrecord_t* record) {
-#ifdef KEYLOGGER_ENABLE
-    if (record->event.pressed) {
-        add_keylog(keycode, record);
-    }
-#endif
-    return true;
 }

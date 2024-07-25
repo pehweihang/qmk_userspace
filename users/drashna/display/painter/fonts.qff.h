@@ -7,7 +7,9 @@
 
 #include <qp.h>
 
-extern const uint32_t ubuntu_mono_font_length;
-extern const uint8_t  ubuntu_mono_font[1080];
+extern const uint32_t font_ubuntu_10_font_length;
+extern const uint8_t  font_ubuntu_10_font[2598];
+extern const uint32_t font_ubuntu_mono_12_font_length;
+extern const uint8_t  font_ubuntu_mono_12_font[2650];
 extern const uint32_t font_thintel15_length;
 extern const uint8_t  font_thintel15[966];

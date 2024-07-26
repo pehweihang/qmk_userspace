@@ -139,3 +139,7 @@ bool oled_task_keymap(void) {
     return false;
 }
 #endif
+
+#if defined(RGBLIGHT_ENABLE) && defined(RGBLIGHT_CUSTOM)
+const uint8_t led_mapping[RGBLIGHT_LED_COUNT] = {0, 6, 12, 18, 24, 25, 31, 37, 43, 49, 50, 51};
+#endif

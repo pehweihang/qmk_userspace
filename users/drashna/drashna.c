@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
+#include "unicode.h"
 
 userspace_config_t userspace_config;
 static bool        device_suspended = false;
@@ -226,27 +227,34 @@ bool process_detected_host_os_user(os_variant_t detected_os) {
                 xprintf("unknown OS Detected\n");
                 break;
             case OS_LINUX:
+                set_unicode_input_mode_soft(UNICODE_MODE_LINUX);
                 xprintf("Linux Detected\n");
                 break;
             case OS_WINDOWS:
+                set_unicode_input_mode_soft(UNICODE_MODE_WINCOMPOSE);
                 xprintf("Windows Detected\n");
                 break;
 #    if 0
             case OS_WINDOWS_UNSURE:
+                set_unicode_input_mode_soft(UNICODE_MODE_WINCOMPOSE);
                 xprintf("Windows? Detected\n");
                 break;
 #    endif
             case OS_MACOS:
+                set_unicode_input_mode_soft(UNICODE_MODE_MACOS);
                 xprintf("MacOS Detected\n");
                 break;
             case OS_IOS:
+                set_unicode_input_mode_soft(UNICODE_MODE_MACOS);
                 xprintf("iOS Detected\n");
                 break;
 #    if 0
             case OS_PS5:
+                set_unicode_input_mode_soft(UNICODE_MODE_LINUX);
                 xprintf("PlayStation 5 Detected\n");
                 break;
             case OS_HANDHELD:
+                set_unicode_input_mode_soft(UNICODE_MODE_LINUX);
                 xprintf("Nintend Switch/Quest 2 Detected\n");
                 break;
 #    endif

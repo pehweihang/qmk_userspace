@@ -31,3 +31,6 @@ extern const uint8_t  gfx_lock_scrl_OFF[292];
 
 extern const uint32_t gfx_mouse_icon_length;
 extern const uint8_t  gfx_mouse_icon[99];
+
+extern const uint32_t gfx_nyan_cat_length;
+extern const uint8_t  gfx_nyan_cat[43015];

@@ -182,5 +182,6 @@ void keyboard_post_init_keymap(void) {
         my_image = qp_load_image_mem(unit_02_240x320);
     }
     qp_drawimage(display, 0, 0, my_image);
+    qp_close_image(my_image);
 }
 #endif

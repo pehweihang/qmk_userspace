@@ -162,10 +162,7 @@ keypos_t layer_remap[LAYER_MAP_ROWS][LAYER_MAP_COLS] = {
 
 #if defined(QUANTUM_PAINTER_ENABLE) && !defined(CUSTOM_QUANTUM_PAINTER_ENABLE)
 #    include "qp.h"
-#    include "display/painter/graphics/asuka-240x320.qgf.h"
-#    include "display/painter/graphics/unit-02-240x320.qgf.h"
-#    include "display/painter/graphics/anime-girl-jacket-240x320.qgf.h"
-#    include "display/painter/graphics/samurai-cyberpunk-minimal-dark-8k-b3-240x320.qgf.h"
+#    include "display/painter/graphics/assets.h"
 
 static painter_device_t       display;
 static painter_image_handle_t my_image;
@@ -181,7 +178,7 @@ void keyboard_post_init_keymap(void) {
     } else {
         my_image = qp_load_image_mem(gfx_samurai_cyberpunk_minimal_dark_8k_b3_240x320);
     }
-    // my_image = qp_load_image_mem(unit_02_240x320);
+    // my_image = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_02_240x320);
     // my_image = qp_load_image_mem(gfx_asuka_240x320);
     qp_drawimage(display, 0, 0, my_image);
     qp_close_image(my_image);

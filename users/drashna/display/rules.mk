@@ -19,7 +19,8 @@ endif
 ifeq ($(strip $(QUANTUM_PAINTER_ENABLE)), yes)
     SRC += $(USER_PATH)/display/painter/graphics/asuka-240x320.qgf.c \
            $(USER_PATH)/display/painter/graphics/unit-02-240x320.qgf.c \
-           $(USER_PATH)/display/painter/graphics/anime-girl-jacket-240x320.qgf.c
+           $(USER_PATH)/display/painter/graphics/anime-girl-jacket-240x320.qgf.c \
+		   $(USER_PATH)/display/painter/graphics/samurai-cyberpunk-minimal-dark-8k-b3-240x320.qgf.c
 endif
 
 ifeq ($(strip $(OLED_ENABLE)), yes)

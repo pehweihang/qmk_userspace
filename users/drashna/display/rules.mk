@@ -27,7 +27,8 @@ ifeq ($(strip $(QUANTUM_PAINTER_ENABLE)), yes)
         $(USER_PATH)/display/painter/graphics/neon-genesis-evangelion-initial-machine-04-240x320.qgf.c \
         $(USER_PATH)/display/painter/graphics/neon-genesis-evangelion-initial-machine-05-240x320.qgf.c \
         $(USER_PATH)/display/painter/graphics/neon-genesis-evangelion-initial-machine-06-240x320.qgf.c \
-        $(USER_PATH)/display/painter/graphics/samurai-cyberpunk-minimal-dark-8k-b3-240x320.qgf.c
+        $(USER_PATH)/display/painter/graphics/samurai-cyberpunk-minimal-dark-8k-b3-240x320.qgf.c \
+        $(USER_PATH)/display/painter/graphics/frame.qgf.c
 endif
 
 ifeq ($(strip $(OLED_ENABLE)), yes)

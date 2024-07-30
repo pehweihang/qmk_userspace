@@ -175,12 +175,13 @@ void keyboard_post_init_keymap(void) {
     qp_power(display, true);
     if (is_keyboard_master()) {
         my_image = qp_load_image_mem(gfx_anime_girl_jacket_240x320);
+        qp_drawimage_recolor(display, 0, 0, my_image, true ? 213 : 0, 0, 255, 0, 0, 0);
     } else {
         my_image = qp_load_image_mem(gfx_samurai_cyberpunk_minimal_dark_8k_b3_240x320);
+        qp_drawimage(display, 0, 0, my_image);
     }
     // my_image = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_02_240x320);
     // my_image = qp_load_image_mem(gfx_asuka_240x320);
-    qp_drawimage(display, 0, 0, my_image);
     qp_close_image(my_image);
 }
 #endif

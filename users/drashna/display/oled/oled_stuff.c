@@ -511,7 +511,7 @@ void render_rgb_hsv(uint8_t col, uint8_t line) {
         oled_write_P(PSTR(", "), false);
         oled_write(get_u8_str(rgblight_get_sat(), ' '), false);
         oled_write_P(PSTR(", "), false);
-        oled_write(get_u8_str(rgblight_get_val(), ' '), false);
+        oled_write_ln(get_u8_str(rgblight_get_val(), ' '), false);
     }
 #endif
 }

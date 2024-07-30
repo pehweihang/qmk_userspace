@@ -5,7 +5,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
-#include "unicode.h"
 
 userspace_config_t userspace_config;
 static bool        device_suspended = false;
@@ -227,34 +226,48 @@ bool process_detected_host_os_user(os_variant_t detected_os) {
                 xprintf("unknown OS Detected\n");
                 break;
             case OS_LINUX:
+#    ifdef UNICODE_COMMON_ENABLE
                 set_unicode_input_mode_soft(UNICODE_MODE_LINUX);
+#    endif // UNICODE_COMMON_ENABLE
                 xprintf("Linux Detected\n");
                 break;
             case OS_WINDOWS:
+#    ifdef UNICODE_COMMON_ENABLE
                 set_unicode_input_mode_soft(UNICODE_MODE_WINCOMPOSE);
+#    endif // UNICODE_COMMON_ENABLE
                 xprintf("Windows Detected\n");
                 break;
 #    if 0
             case OS_WINDOWS_UNSURE:
+#        ifdef UNICODE_COMMON_ENABLE
                 set_unicode_input_mode_soft(UNICODE_MODE_WINCOMPOSE);
+#        endif // UNICODE_COMMON_ENABLE
                 xprintf("Windows? Detected\n");
                 break;
 #    endif
             case OS_MACOS:
+#    ifdef UNICODE_COMMON_ENABLE
                 set_unicode_input_mode_soft(UNICODE_MODE_MACOS);
+#    endif // UNICODE_COMMON_ENABLE
                 xprintf("MacOS Detected\n");
                 break;
             case OS_IOS:
+#    ifdef UNICODE_COMMON_ENABLE
                 set_unicode_input_mode_soft(UNICODE_MODE_MACOS);
+#    endif // UNICODE_COMMON_ENABLE
                 xprintf("iOS Detected\n");
                 break;
 #    if 0
             case OS_PS5:
+#        ifdef UNICODE_COMMON_ENABLE
                 set_unicode_input_mode_soft(UNICODE_MODE_LINUX);
+#        endif // UNICODE_COMMON_ENABLE
                 xprintf("PlayStation 5 Detected\n");
                 break;
             case OS_HANDHELD:
+#        ifdef UNICODE_COMMON_ENABLE
                 set_unicode_input_mode_soft(UNICODE_MODE_LINUX);
+#        endif // UNICODE_COMMON_ENABLE
                 xprintf("Nintend Switch/Quest 2 Detected\n");
                 break;
 #    endif
@@ -401,7 +414,7 @@ uint16_t extract_basic_keycode(uint16_t keycode, keyrecord_t *record, bool check
 }
 
 #if 0
-#include "hardware_id.h"
+#    include "hardware_id.h"
 void get_serial_number(void) {
     uint8_t uid[12];
     for (uint8_t index = 0; index < 12; index++) {

@@ -142,11 +142,11 @@ bool apply_autocorrect(uint8_t backspaces, const char *str, char *typo, char *co
     center_text(correct, autocorrected_str[1], sizeof(autocorrected_str[1]) - 1);
     // printf("Autocorrected %s to %s (original: %s)\n", typo, correct, str);
 
-#if defined(WPM_ENABLE) && defined(WPM_ALLOW_COUNT_REGRESSION)
+#    if defined(WPM_ENABLE) && defined(WPM_ALLOW_COUNT_REGRESSION)
     for (uint8_t i = 0; i < backspaces; i++) {
         update_wpm(KC_BSPC);
     }
-#endif
+#    endif
 
 #    if defined(AUDIO_ENABLE)
     audio_play_melody(&autocorrect_song, NOTE_ARRAY_SIZE(autocorrect_song), false);

@@ -61,7 +61,7 @@ void suspend_wakeup_init_watchdog(void) {
 
 #elif defined(__AVR__)
 #    include <avr/wdt.h>
-#pragma message "AVR Watchdog causes issues, likely due to the way the matrix scan is done.  Disable this."
+#    pragma message "AVR Watchdog causes issues, likely due to the way the matrix scan is done.  Disable this."
 
 void watchdog_init(void) {
     wdt_enable(WDTO_2S);
@@ -77,7 +77,6 @@ void watchdog_shutdown(void) {
 
 void suspend_power_down_watchdog(void) {
     wdt_disable();
-
 }
 
 void suspend_wakeup_init_watchdog(void) {

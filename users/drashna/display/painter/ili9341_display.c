@@ -205,7 +205,7 @@ void draw_ui_user(void) {
             if (max_cpi_xpos < xpos) {
                 max_cpi_xpos = xpos;
             }
-            // qp_rect(ili9341_display, xpos, ypos, max_cpi_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_cpi_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
         // if (hue_redraw) {
         //     xpos = 160;
@@ -224,7 +224,7 @@ void draw_ui_user(void) {
             if (max_dss_xpos < xpos) {
                 max_dss_xpos = xpos;
             }
-            // qp_rect(ili9341_display, xpos, ypos, max_dss_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_dss_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
 
         if (am_state_redraw) {
@@ -236,7 +236,7 @@ void draw_ui_user(void) {
             if (max_ams_xpos < xpos) {
                 max_ams_xpos = xpos;
             }
-            // qp_rect(ili9341_display, xpos, ypos, max_ams_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_ams_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
 
         if (sp_state_redraw) {
@@ -249,7 +249,7 @@ void draw_ui_user(void) {
             if (max_sps_xpos < xpos) {
                 max_sps_xpos = xpos;
             }
-            // qp_rect(ili9341_display, xpos, ypos, max_sps_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_sps_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
 #endif // POINTING_DEVICE_ENABLE
 
@@ -279,7 +279,7 @@ void draw_ui_user(void) {
             if (max_bpm_xpos < xpos) {
                 max_bpm_xpos = xpos;
             }
-            // qp_rect(ili9341_display, xpos, ypos, max_bpm_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_bpm_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
 
         ypos += font->line_height + 2;
@@ -312,7 +312,7 @@ void draw_ui_user(void) {
             if (max_upm_xpos < xpos) {
                 max_upm_xpos = xpos;
             }
-            // qp_rect(ili9341_display, xpos, ypos, max_upm_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_upm_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
 
 #if defined(RGBLIGHT_ENABLE)
@@ -336,7 +336,7 @@ void draw_ui_user(void) {
             if (max_rgb_xpos < xpos) {
                 max_rgb_xpos = xpos;
             }
-            // qp_rect(ili9341_display, xpos, ypos, max_rgb_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_rgb_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
 #endif // RGBLIGHT_ENABLE
 
@@ -361,7 +361,7 @@ void draw_ui_user(void) {
             if (max_rgb_xpos < xpos) {
                 max_rgb_xpos = xpos;
             }
-            // qp_rect(ili9341_display, xpos, ypos, max_rgb_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_rgb_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
 #endif // RGB_MATRIX_ENABLE
 
@@ -390,7 +390,7 @@ void draw_ui_user(void) {
             if (max_layer_xpos < xpos) {
                 max_layer_xpos = xpos;
             }
-            // qp_rect(ili9341_display, xpos, ypos, max_layer_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_layer_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
 
         if (hue_redraw || layer_state_redraw) {
@@ -420,7 +420,7 @@ void draw_ui_user(void) {
             if (max_layer_xpos < xpos) {
                 max_layer_xpos = xpos;
             }
-            // qp_rect(ili9341_display, xpos, ypos, max_layer_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_layer_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
 
 #ifdef KEYLOGGER_ENABLE
@@ -447,43 +447,23 @@ void draw_ui_user(void) {
         if (hue_redraw || autocorrect_str_has_changed) {
             static int max_klog_xpos = 0;
             xpos                     = 5;
-            snprintf(buf, sizeof(buf), "Autocorrected:");
+            snprintf(buf, sizeof(buf), "Autocorrected: %s", autocorrected_str[0]);
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
 
             if (max_klog_xpos < xpos) {
                 max_klog_xpos = xpos;
             }
-            // qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 0, true);
-
-            ypos += font->line_height + 4;
-            max_klog_xpos = 0;
-            xpos          = 5;
-            snprintf(buf, sizeof(buf), "%s", autocorrected_str[0]);
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
-            if (max_klog_xpos < xpos) {
-                max_klog_xpos = xpos;
-            }
-            // qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 0, true);
 
             ypos += font->line_height + 4;
             max_klog_xpos = 0;
             xpos          = 5;
-            snprintf(buf, sizeof(buf), "Original:");
+            snprintf(buf, sizeof(buf), "Original Text: %s", autocorrected_str[1]);
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_klog_xpos < xpos) {
                 max_klog_xpos = xpos;
             }
-            // qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 0, true);
-
-            ypos += font->line_height + 4;
-            max_klog_xpos = 0;
-            xpos          = 5;
-            snprintf(buf, sizeof(buf), "%s", autocorrected_str[1]);
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
-            if (max_klog_xpos < xpos) {
-                max_klog_xpos = xpos;
-            }
-            // qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 0, true);
 
             autocorrect_str_has_changed = false;
         }

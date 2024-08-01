@@ -413,6 +413,37 @@ uint16_t extract_basic_keycode(uint16_t keycode, keyrecord_t *record, bool check
     return keycode;
 }
 
+static uint32_t last_matrix_scan_count = 0;
+/**
+ * @brief Get the matrix scan rate value
+ *
+ * @return uint32_t scans per second
+ */
+uint32_t get_matrix_scan_rate(void) {
+    return last_matrix_scan_count;
+}
+
+/**
+ * @brief Task to monitor and print the matrix scan rate
+ */
+void matrix_scan_rate_task(void) {
+    static uint32_t matrix_timer      = 0;
+    static uint32_t matrix_scan_count = 0;
+
+    matrix_scan_count++;
+
+    if (timer_elapsed32(matrix_timer) >= 1000) {
+#ifndef NO_PRINT
+        if (userspace_config.matrix_scan_print) {
+            xprintf("matrix scan frequency: %lu\n", matrix_scan_count);
+        }
+#endif
+        last_matrix_scan_count = matrix_scan_count;
+        matrix_timer           = timer_read32();
+        matrix_scan_count      = 0;
+    }
+}
+
 #if 0
 #    include "hardware_id.h"
 void get_serial_number(void) {

@@ -6,6 +6,9 @@
 #ifdef LAYER_MAP_ENABLE
 #    include "layer_map.h"
 #endif
+#ifdef DISPLAY_DRIVER_ENABLE
+#    include "display/display.h"
+#endif // DISPLAY_DRIVER_ENABLE
 #ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
 #    include "display/painter/ili9341_display.h"
 #endif
@@ -29,10 +32,6 @@ void keyboard_post_init_unicode(void);
 #if defined(LAYER_LOCK_ENABLE) && defined(LAYER_LOCK_IDLE_TIMEOUT)
 #    include "layer_lock.h"
 #endif
-
-static uint32_t matrix_timer           = 0;
-static uint32_t matrix_scan_count      = 0;
-static uint32_t last_matrix_scan_count = 0;
 
 __attribute__((weak)) void keyboard_pre_init_keymap(void) {}
 void                       keyboard_pre_init_user(void) {
@@ -59,6 +58,9 @@ uint32_t startup_exec(uint32_t trigger_time, void *cb_arg);
 
 __attribute__((weak)) void keyboard_post_init_keymap(void) {}
 void                       keyboard_post_init_user(void) {
+#ifdef DISPLAY_DRIVER_ENABLE
+    keyboard_post_init_display_driver();
+#endif // DISPLAY_DRIVER_ENABLE
 #if defined(CUSTOM_RGBLIGHT)
     keyboard_post_init_rgb_light();
 #endif
@@ -165,26 +167,6 @@ void                       suspend_wakeup_init_user(void) {
     suspend_wakeup_init_quantum_painter();
 #endif
     suspend_wakeup_init_keymap();
-}
-
-void matrix_scan_user(void) {
-    matrix_scan_count++;
-
-    uint32_t timer_now = timer_read32();
-    if (TIMER_DIFF_32(timer_now, matrix_timer) >= 1000) {
-#ifndef NO_PRINT
-        if (userspace_config.matrix_scan_print) {
-            xprintf("matrix scan frequency: %lu\n", matrix_scan_count);
-        }
-#endif
-        last_matrix_scan_count = matrix_scan_count;
-        matrix_timer           = timer_now;
-        matrix_scan_count      = 0;
-    }
-}
-
-uint32_t get_matrix_scan_rate(void) {
-    return last_matrix_scan_count;
 }
 
 #ifdef AUDIO_ENABLE
@@ -314,9 +296,14 @@ void eeconfig_init_user_datablock(void) {
 #endif
 }
 
+void matrix_scan_user(void) {
+    matrix_scan_rate_task();
+}
+
 #ifdef SPLIT_KEYBOARD
 __attribute__((weak)) void matrix_slave_scan_keymap(void) {}
 void                       matrix_slave_scan_user(void) {
+    matrix_scan_rate_task();
 #    if defined(AUDIO_ENABLE)
 #        ifdef AUDIO_INIT_DELAY
     if (!is_keyboard_master()) {

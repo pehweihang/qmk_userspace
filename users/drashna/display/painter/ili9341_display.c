@@ -26,10 +26,6 @@ static painter_image_handle_t cg_on;
 static painter_image_handle_t cg_off;
 static painter_image_handle_t mouse_icon;
 
-#ifdef KEYLOGGER_ENABLE
-char qp_keylog_str[QP_KEYLOGGER_LENGTH] = {0};
-#endif
-
 void init_and_clear(painter_device_t device, painter_rotation_t rotation) {
     uint16_t width;
     uint16_t height;
@@ -112,12 +108,14 @@ void draw_ui_user(void) {
     }
 #endif
 
+#ifdef WPM_ENABLE
     bool            wpm_redraw      = false;
     static uint32_t last_wpm_update = 0;
     if (timer_elapsed32(last_wpm_update) > 125) {
         last_wpm_update = timer_read32();
         wpm_redraw      = true;
     }
+#endif // WPM_ENABLE
 
 #ifdef KEYLOGGER_ENABLE
     static uint32_t last_klog_update = 0;
@@ -166,6 +164,7 @@ void draw_ui_user(void) {
 
         ypos += lock_caps_on->height + 4;
 
+#ifdef WPM_ENABLE
         if (hue_redraw || wpm_redraw) {
             static int max_wpm_xpos = 0;
             xpos                    = 5;
@@ -176,6 +175,7 @@ void draw_ui_user(void) {
             }
             qp_rect(ili9341_display, xpos, ypos, max_wpm_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
+#endif // WPM_ENABLE
 
         if (hue_redraw || scan_redraw) {
             static int max_scans_xpos = 0;
@@ -454,10 +454,6 @@ void keyboard_post_init_quantum_painter(void) {
     cg_on      = qp_load_image_mem(gfx_cg_on);
     cg_off     = qp_load_image_mem(gfx_cg_off);
     mouse_icon = qp_load_image_mem(gfx_mouse_icon);
-
-#ifdef KEYLOGGER_ENABLE
-    memset(qp_keylog_str, '_', QP_KEYLOGGER_LENGTH);
-#endif
 
 #ifdef BACKLIGHT_ENABLE
     backlight_level_noeeprom(BACKLIGHT_LEVELS);

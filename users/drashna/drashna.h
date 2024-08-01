@@ -117,3 +117,6 @@ bool     is_device_suspended(void);
 void     set_is_device_suspended(bool status);
 bool     is_gaming_layer_active(layer_state_t state);
 uint16_t extract_basic_keycode(uint16_t keycode, keyrecord_t *record, bool check_hold);
+
+void     matrix_scan_rate_task(void);
+uint32_t get_matrix_scan_rate(void);

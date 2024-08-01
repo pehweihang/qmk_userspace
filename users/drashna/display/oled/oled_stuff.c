@@ -42,10 +42,12 @@
 
 bool is_oled_enabled = true, is_oled_force_off = false, oled_screensaver_enabled = false;
 
-uint32_t               oled_timer                                 = 0;
-char                   oled_keylog_str[OLED_KEYLOGGER_LENGTH + 1] = {0};
+uint32_t               oled_timer = 0;
 extern oled_rotation_t oled_rotation;
 extern uint8_t         oled_rotation_width;
+#ifdef KEYLOGGER_ENABLE
+char oled_keylog_str[OLED_KEYLOGGER_LENGTH + 1] = {0};
+#endif
 
 deferred_token kittoken;
 
@@ -72,38 +74,6 @@ void oled_pan_section(bool left, uint16_t y_start, uint16_t y_end, uint16_t x_st
 }
 
 /**
- * @brief parses pressed keycodes and saves to buffer
- *
- * @param keycode Keycode pressed from switch matrix
- * @param record keyrecord_t data structure
- */
-void add_keylog(uint16_t keycode, keyrecord_t *record) {
-    keycode = extract_basic_keycode(keycode, record, true);
-
-    if ((keycode == KC_BSPC) && mod_config(get_mods() | get_oneshot_mods()) & MOD_MASK_CTRL) {
-        memset(oled_keylog_str, ' ', OLED_KEYLOGGER_LENGTH);
-        oled_keylog_str[OLED_KEYLOGGER_LENGTH] = '\0';
-        return;
-    }
-
-    char code = 0;
-    if (keycode < ARRAY_SIZE(code_to_name)) {
-        code = pgm_read_byte(&code_to_name[keycode]);
-    } else {
-        if (keycode == UC_IRNY) {
-            code = 0xFD;
-        } else if (keycode == UC_CLUE) {
-            code = 0xFE;
-        }
-    }
-
-    if (code != 0) {
-        memmove(oled_keylog_str, oled_keylog_str + 1, OLED_KEYLOGGER_LENGTH - 1);
-        oled_keylog_str[(OLED_KEYLOGGER_LENGTH - 1)] = code;
-    }
-}
-
-/**
  * @brief Keycode handler for oled display.
  *
  * This adds pressed keys to buffer, but also resets the oled timer
@@ -115,7 +85,6 @@ void add_keylog(uint16_t keycode, keyrecord_t *record) {
  */
 bool process_record_user_oled(uint16_t keycode, keyrecord_t *record) {
     if (record->event.pressed) {
-        add_keylog(keycode, record);
         switch (keycode) {
             case OLED_BRIGHTNESS_INC:
                 userspace_config.oled_brightness = qadd8(userspace_config.oled_brightness, OLED_BRIGHTNESS_STEP);
@@ -184,11 +153,13 @@ bool process_record_user_oled(uint16_t keycode, keyrecord_t *record) {
  *
  */
 void render_keylogger_status(uint8_t col, uint8_t line) {
-#ifdef OLED_DISPLAY_VERBOSE
+#ifdef KEYLOGGER_ENABLE
+#    ifdef OLED_DISPLAY_VERBOSE
     oled_set_cursor(col, line);
-#endif
+#    endif
     oled_write_P(PSTR(OLED_RENDER_KEYLOGGER), false);
     oled_write(oled_keylog_str, false);
+#endif
 }
 
 /**
@@ -1085,11 +1056,6 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
         return rotation;
     }
 
-    if (is_keyboard_master()) {
-        memset(oled_keylog_str, ' ', OLED_KEYLOGGER_LENGTH);
-        oled_keylog_str[OLED_KEYLOGGER_LENGTH] = '\0';
-    }
-
     kittoken = defer_exec(3000, pet_animation_phases, NULL);
 
     oled_clear();
@@ -1171,10 +1137,13 @@ bool oled_task_user(void) {
     oled_set_cursor(0, num_of_rows);
     oled_write_raw_P(footer_image2, sizeof(footer_image2));
 
+#    ifdef KEYLOGGER_ENABLE
     if (is_keyboard_left()) {
         oled_set_cursor(4, num_of_rows);
         oled_write(oled_keylog_str, true);
-    } else {
+    } else
+#    endif // KEYLOGGER_ENABLE
+    {
         render_unicode_mode_small(4, num_of_rows, true);
     }
 #endif

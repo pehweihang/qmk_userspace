@@ -1,19 +1,28 @@
 #include "drashna.h"
+#include "display.h"
 
 #if defined(OLED_ENABLE) && defined(CUSTOM_OLED_DRIVER)
 #    include "display/oled/oled_stuff.h"
+#    ifdef KEYLOGGER_ENABLE
+extern char oled_keylog_str[OLED_KEYLOGGER_LENGTH + 1];
+#    endif
 #endif
 #if defined(QUANTUM_PAINTER_ENABLE) && defined(CUSTOM_QUANTUM_PAINTER_ENABLE)
 #    include "qp.h"
 #    ifdef CUSTOM_QUANTUM_PAINTER_ILI9341
 #        include "display/painter/ili9341_display.h"
 #    endif // CUSTOM_QUANTUM_PAINTER_ILI9341
+#    ifdef KEYLOGGER_ENABLE
+char qp_keylog_str[QP_KEYLOGGER_LENGTH] = {0};
+#    endif
 #endif     // QUANTUM_PAINTER_ENABLE && CUSTOM_QUANTUM_PAINTER_ENABLE
 
+#ifdef KEYLOGGER_ENABLE
 bool keylogger_has_changed = false;
+#endif
 
 // clang-format off
-static const char PROGMEM code_to_name[256] = {
+const char PROGMEM code_to_name[256] = {
 //   0    1    2    3    4    5    6    7    8    9    A    B    c    D    E    F
     ' ', ' ', ' ', ' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',  // 0x
     'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1', '2',  // 1x
@@ -40,7 +49,7 @@ static const char PROGMEM code_to_name[256] = {
  * @param keycode Keycode pressed from switch matrix
  * @param record keyrecord_t data structure
  */
-static void add_keylog(uint16_t keycode, keyrecord_t* record, char* str, uint8_t length) {
+__attribute__((unused)) static void add_keylog(uint16_t keycode, keyrecord_t* record, char* str, uint8_t length) {
     keycode = extract_basic_keycode(keycode, record, true);
 
     if ((keycode == KC_BSPC) && mod_config(get_mods() | get_oneshot_mods()) & MOD_MASK_CTRL) {
@@ -74,12 +83,33 @@ static void add_keylog(uint16_t keycode, keyrecord_t* record, char* str, uint8_t
  */
 bool process_record_display_driver(uint16_t keycode, keyrecord_t* record) {
     if (record->event.pressed) {
-#if defined(OLED_ENABLE) && defined(CUSTOM_OLED_DRIVER)
+#ifdef KEYLOGGER_ENABLE
+#    if defined(OLED_ENABLE) && defined(CUSTOM_OLED_DRIVER)
         add_keylog(keycode, record, oled_keylog_str, (OLED_KEYLOGGER_LENGTH + 1));
 #endif // OLED_ENABLE && CUSTOM_OLED_DRIVER
 #if defined(QUANTUM_PAINTER_ENABLE) && defined(CUSTOM_QUANTUM_PAINTER_ENABLE)
         add_keylog(keycode, record, qp_keylog_str, QP_KEYLOGGER_LENGTH);
 #endif // QUANTUM_PAINTER_ENABLE && CUSTOM_QUANTUM_PAINTER_ENABLE
+#endif // KEYLOGGER_ENABLE
     }
     return true;
+}
+
+/**
+ * @brief
+ *
+ */
+
+void keyboard_post_init_display_driver(void) {
+#ifdef KEYLOGGER_ENABLE
+    if (is_keyboard_master()) {
+#    if defined(OLED_ENABLE) && defined(CUSTOM_OLED_DRIVER)
+        memset(oled_keylog_str, ' ', OLED_KEYLOGGER_LENGTH);
+        oled_keylog_str[OLED_KEYLOGGER_LENGTH] = '\0';
+#    endif // OLED_ENABLE && CUSTOM_OLED_DRIVER
+#    if defined(QUANTUM_PAINTER_ENABLE) && defined(CUSTOM_QUANTUM_PAINTER_ENABLE)
+        memset(qp_keylog_str, '_', QP_KEYLOGGER_LENGTH);
+#    endif // QUANTUM_PAINTER_ENABLE && CUSTOM_QUANTUM_PAINTER_ENABLE
+    }
+#endif // KEYLOGGER_ENABLE
 }

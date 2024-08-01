@@ -2,6 +2,7 @@
 #include "qp.h"
 #include "display/painter/fonts.qff.h"
 #include "display/painter/graphics.qgf.h"
+#include "display/painter/graphics/assets.h"
 #include "qp_comms.h"
 #include "display/display.h"
 #include "display/painter/ili9341_display.h"
@@ -16,6 +17,7 @@
 painter_device_t      ili9341_display;
 painter_font_handle_t font;
 
+static painter_image_handle_t frame;
 static painter_image_handle_t lock_caps_on;
 static painter_image_handle_t lock_caps_off;
 static painter_image_handle_t lock_num_on;
@@ -40,6 +42,8 @@ void init_and_clear(painter_device_t device, painter_rotation_t rotation) {
     qp_get_geometry(device, &width, &height, NULL, NULL, NULL);
     qp_clear(device);
     qp_rect(device, 0, 0, width - 1, height - 1, 0, 0, 0, true);
+    qp_drawimage_recolor(device, 0, 0, frame, 0, 0, 255, 0, 0, 0);
+    qp_close_image(frame);
 }
 
 void draw_ui_user(void) {
@@ -87,21 +91,21 @@ void draw_ui_user(void) {
 
 #ifdef POINTING_DEVICE_ENABLE
     bool            ds_state_redraw = false;
-    static uint32_t last_ds_state   = 0;
+    static uint32_t last_ds_state   = 0xFFFFFFFF;
     if (last_ds_state != charybdis_get_pointer_dragscroll_enabled()) {
         last_ds_state   = charybdis_get_pointer_dragscroll_enabled();
         ds_state_redraw = true;
     }
 
     bool            sp_state_redraw = false;
-    static uint32_t last_sp_state   = 0;
+    static uint32_t last_sp_state   = 0xFFFFFFFF;
     if (last_sp_state != charybdis_get_pointer_sniping_enabled()) {
         last_sp_state   = charybdis_get_pointer_sniping_enabled();
         sp_state_redraw = true;
     }
 
     __attribute__((unused)) bool            am_state_redraw = false;
-    __attribute__((unused)) static uint32_t last_am_state   = 0;
+    __attribute__((unused)) static uint32_t last_am_state   = 0xFFFFFFFF;
     if (last_am_state != get_auto_mouse_enable()) {
         last_am_state   = get_auto_mouse_enable();
         am_state_redraw = true;
@@ -146,23 +150,25 @@ void draw_ui_user(void) {
 #endif
     if (is_keyboard_left()) {
         char buf[36] = {0};
-        int  ypos    = 0;
+        int  ypos    = 14;
         int  xpos    = 5;
 
+#ifdef QP_LOCK_LOGO_ENABLE
         static led_t last_led_state = {0};
         if (hue_redraw || last_led_state.raw != host_keyboard_led_state().raw) {
             last_led_state.raw = host_keyboard_led_state().raw;
-            qp_drawimage_recolor(ili9341_display, xpos, 0, last_led_state.caps_lock ? lock_caps_on : lock_caps_off,
+            qp_drawimage_recolor(ili9341_display, xpos, ypos, last_led_state.caps_lock ? lock_caps_on : lock_caps_off,
                                  curr_hue, 255, last_led_state.caps_lock ? 255 : 32, curr_hue, 255, 0);
             xpos += lock_caps_on->width + 4;
-            qp_drawimage_recolor(ili9341_display, xpos, 0, last_led_state.num_lock ? lock_num_on : lock_num_off,
+            qp_drawimage_recolor(ili9341_display, xpos, ypos, last_led_state.num_lock ? lock_num_on : lock_num_off,
                                  curr_hue, 255, last_led_state.num_lock ? 255 : 32, curr_hue, 255, 0);
             xpos += lock_num_on->width + 4;
-            qp_drawimage_recolor(ili9341_display, xpos, 0, last_led_state.scroll_lock ? lock_scrl_on : lock_scrl_off,
+            qp_drawimage_recolor(ili9341_display, xpos, ypos, last_led_state.scroll_lock ? lock_scrl_on : lock_scrl_off,
                                  curr_hue, 255, last_led_state.scroll_lock ? 255 : 32, curr_hue, 255, 0);
         }
 
         ypos += lock_caps_on->height + 4;
+#endif // QP_LOCK_LOGO_ENABLE
 
 #ifdef WPM_ENABLE
         if (hue_redraw || wpm_redraw) {
@@ -208,7 +214,7 @@ void draw_ui_user(void) {
         // }
 
         ypos += font->line_height + 4;
-        if (hue_redraw || ds_state_redraw) {
+        if (ds_state_redraw) {
             static int max_dss_xpos = 0;
             xpos                    = 5;
             const char* buf         = "DRAG SCROLL";
@@ -221,7 +227,7 @@ void draw_ui_user(void) {
             // qp_rect(ili9341_display, xpos, ypos, max_dss_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
 
-        if (hue_redraw || am_state_redraw) {
+        if (am_state_redraw) {
             static int max_ams_xpos = 0;
             xpos += 10;
             const char* buf = "Auto Layer";
@@ -233,7 +239,7 @@ void draw_ui_user(void) {
             // qp_rect(ili9341_display, xpos, ypos, max_ams_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
 
-        if (hue_redraw || sp_state_redraw) {
+        if (sp_state_redraw) {
             static int max_sps_xpos = 0;
             xpos += 10;
             const char* buf = "Sniping";
@@ -245,7 +251,7 @@ void draw_ui_user(void) {
             }
             // qp_rect(ili9341_display, xpos, ypos, max_sps_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
-#endif
+#endif // POINTING_DEVICE_ENABLE
 
         ypos += font->line_height + 4;
         static keymap_config_t last_keymap_config = {0};
@@ -253,11 +259,12 @@ void draw_ui_user(void) {
             last_keymap_config.raw  = keymap_config.raw;
             uint8_t    temp_pos     = 0;
             static int max_bpm_xpos = 0;
-            xpos                    = cg_off->width + 5;
+            xpos                    = 5;
             const char* buf0        = "NKRO ";
             const char* buf1        = "CRCT ";
             const char* buf2        = "1SHOT";
-            qp_drawimage(ili9341_display, 0, ypos, last_keymap_config.swap_lctl_lgui ? cg_on : cg_off);
+            qp_drawimage(ili9341_display, xpos, ypos, last_keymap_config.swap_lctl_lgui ? cg_on : cg_off);
+            temp_pos = xpos += cg_off->width + 5;
             temp_pos = qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf0, last_keymap_config.nkro ? 153 : 255,
                                            255, 255, last_keymap_config.nkro ? 153 : 255, 255, 0);
             xpos += MAX(temp_pos, 30);
@@ -281,7 +288,7 @@ void draw_ui_user(void) {
             last_user_state.raw     = user_state.raw;
             uint8_t    temp_pos     = 0;
             static int max_upm_xpos = 0;
-            xpos                    = cg_off->width + 5;
+            xpos                    = cg_off->width + 10;
             const char* buf0        = "AUDIO";
             const char* buf1        = "CLCK ";
             const char* buf2        = "HOST ";
@@ -308,31 +315,6 @@ void draw_ui_user(void) {
             // qp_rect(ili9341_display, xpos, ypos, max_upm_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
 
-#if defined(RGB_MATRIX_ENABLE)
-        ypos += font->line_height + 4;
-        if (hue_redraw || rgb_effect_redraw) {
-            static int max_rgb_xpos = 0;
-            xpos                    = 5;
-            snprintf(buf, sizeof(buf), "RGB Matrix: %s", rgb_matrix_name(curr_effect));
-            for (int i = 5; i < sizeof(buf); ++i) {
-                if (buf[i] == 0)
-                    break;
-                else if (buf[i] == '_')
-                    buf[i] = ' ';
-                else if (buf[i - 1] == ' ')
-                    buf[i] = toupper(buf[i]);
-                else if (buf[i - 1] != ' ')
-                    buf[i] = tolower(buf[i]);
-            }
-
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
-            if (max_rgb_xpos < xpos) {
-                max_rgb_xpos = xpos;
-            }
-            // qp_rect(ili9341_display, xpos, ypos, max_rgb_xpos, ypos + font->line_height, 0, 0, 0, true);
-        }
-#endif
-
 #if defined(RGBLIGHT_ENABLE)
         ypos += font->line_height + 4;
         if (hue_redraw || rgb_effect_redraw) {
@@ -356,7 +338,33 @@ void draw_ui_user(void) {
             }
             // qp_rect(ili9341_display, xpos, ypos, max_rgb_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
-#endif
+#endif // RGBLIGHT_ENABLE
+
+#if defined(RGB_MATRIX_ENABLE)
+        ypos += font->line_height + 4;
+        if (hue_redraw || rgb_effect_redraw) {
+            static int max_rgb_xpos = 0;
+            xpos                    = 5;
+            snprintf(buf, sizeof(buf), "RGB Matrix: %s", rgb_matrix_name(curr_effect));
+            for (int i = 5; i < sizeof(buf); ++i) {
+                if (buf[i] == 0)
+                    break;
+                else if (buf[i] == '_')
+                    buf[i] = ' ';
+                else if (buf[i - 1] == ' ')
+                    buf[i] = toupper(buf[i]);
+                else if (buf[i - 1] != ' ')
+                    buf[i] = tolower(buf[i]);
+            }
+
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            if (max_rgb_xpos < xpos) {
+                max_rgb_xpos = xpos;
+            }
+            // qp_rect(ili9341_display, xpos, ypos, max_rgb_xpos, ypos + font->line_height, 0, 0, 0, true);
+        }
+#endif // RGB_MATRIX_ENABLE
+
         ypos += font->line_height + 4;
         if (hue_redraw || dl_state_redraw || layer_state_redraw) {
             const char* dl_name = "unknown";
@@ -441,6 +449,7 @@ void housekeeping_task_quantum_painter(void) {
 
 void keyboard_post_init_quantum_painter(void) {
     font = qp_load_font_mem(font_thintel15);
+    frame = qp_load_image_mem(gfx_frame);
 
     // ters1 = qp_load_image_mem(gfx_ters1);
     lock_caps_on  = qp_load_image_mem(gfx_lock_caps_ON);

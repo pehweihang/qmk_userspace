@@ -18,7 +18,7 @@ char qp_keylog_str[QP_KEYLOGGER_LENGTH] = {0};
 #endif     // QUANTUM_PAINTER_ENABLE && CUSTOM_QUANTUM_PAINTER_ENABLE
 
 #ifdef KEYLOGGER_ENABLE
-bool keylogger_has_changed = false;
+bool keylogger_has_changed = true;
 #endif
 
 // clang-format off

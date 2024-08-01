@@ -43,6 +43,15 @@ void init_and_clear(painter_device_t device, painter_rotation_t rotation) {
     qp_clear(device);
     qp_rect(device, 0, 0, width - 1, height - 1, 0, 0, 0, true);
     qp_drawimage_recolor(device, 0, 0, frame, 0, 0, 255, 0, 0, 0);
+
+    char title[50] = {0};
+    snprintf(title, sizeof(title), "%s", PRODUCT);
+    uint8_t title_width = qp_textwidth(font, title);
+    if (title_width > (width - 50)) {
+        title_width = width - 50;
+    }
+    uint8_t title_xpos = (width - title_width) / 2;
+    qp_drawtext_recolor(device, title_xpos, 1, font, title, 0, 0, 0, 0, 0, 255);
     qp_close_image(frame);
 }
 
@@ -149,7 +158,7 @@ void draw_ui_user(void) {
     }
 #endif
     if (is_keyboard_left()) {
-        char buf[36] = {0};
+        char buf[50] = {0};
         int  ypos    = 14;
         int  xpos    = 5;
 
@@ -423,23 +432,6 @@ void draw_ui_user(void) {
             qp_rect(ili9341_display, xpos, ypos, max_layer_xpos, ypos + font->line_height, 0, 0, 0, true);
         }
 
-#ifdef KEYLOGGER_ENABLE
-        ypos += font->line_height + 4;
-        if (hue_redraw || keylogger_has_changed) {
-            static int max_klog_xpos = 0;
-            xpos                     = 5;
-            snprintf(buf, sizeof(buf), "Keylog: %s", qp_keylog_str);
-
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
-
-            if (max_klog_xpos < xpos) {
-                max_klog_xpos = xpos;
-            }
-            qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 0, true);
-            keylogger_has_changed = false;
-        }
-#endif
-
 #ifdef AUTOCORRECT_ENABLE
         ypos += font->line_height + 4;
         extern bool autocorrect_str_has_changed;
@@ -468,6 +460,23 @@ void draw_ui_user(void) {
             autocorrect_str_has_changed = false;
         }
 #endif // AUTOCORRECT_ENABLE
+
+#ifdef KEYLOGGER_ENABLE // keep at very end
+        ypos = height - (font->line_height + 0);
+        if (keylogger_has_changed) {
+            static int max_klog_xpos = 0;
+            xpos                     = 25;
+            snprintf(buf, sizeof(buf), "Keylogger: %s ---", qp_keylog_str);
+
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, 0, 255, 0, 0, 0, 255);
+
+            if (max_klog_xpos < xpos) {
+                max_klog_xpos = xpos;
+            }
+            qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 255, true);
+            keylogger_has_changed = false;
+        }
+#endif
     }
     qp_flush(ili9341_display);
 }

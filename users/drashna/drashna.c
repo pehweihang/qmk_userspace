@@ -133,6 +133,7 @@ float autocorrect_song[][2] = SONG(PLOVER_GOODBYE_SOUND);
 #    endif
 // 2 strings, 2q chars each + null terminator. max autocorrect length is 19 chars but 128px/6 supports 21 chars
 char autocorrected_str[2][21] = {"    automatically\0", "      corrected\0"};
+bool autocorrect_str_has_changed = false;
 
 bool apply_autocorrect(uint8_t backspaces, const char *str, char *typo, char *correct) {
     if (is_gaming_layer_active(layer_state)) {
@@ -141,7 +142,7 @@ bool apply_autocorrect(uint8_t backspaces, const char *str, char *typo, char *co
     center_text(typo, autocorrected_str[0], sizeof(autocorrected_str[0]) - 1);
     center_text(correct, autocorrected_str[1], sizeof(autocorrected_str[1]) - 1);
     // printf("Autocorrected %s to %s (original: %s)\n", typo, correct, str);
-
+    autocorrect_str_has_changed = true;
 #    if defined(WPM_ENABLE) && defined(WPM_ALLOW_COUNT_REGRESSION)
     for (uint8_t i = 0; i < backspaces; i++) {
         update_wpm(KC_BSPC);

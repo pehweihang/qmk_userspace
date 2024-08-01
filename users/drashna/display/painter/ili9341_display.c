@@ -435,10 +435,59 @@ void draw_ui_user(void) {
             if (max_klog_xpos < xpos) {
                 max_klog_xpos = xpos;
             }
-            // qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 0, true);
             keylogger_has_changed = false;
         }
 #endif
+
+#ifdef AUTOCORRECT_ENABLE
+        ypos += font->line_height + 4;
+        extern bool autocorrect_str_has_changed;
+        extern char autocorrected_str[2][21];
+        if (hue_redraw || autocorrect_str_has_changed) {
+            static int max_klog_xpos = 0;
+            xpos                     = 5;
+            snprintf(buf, sizeof(buf), "Autocorrected:");
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+
+            if (max_klog_xpos < xpos) {
+                max_klog_xpos = xpos;
+            }
+            // qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 0, true);
+
+            ypos += font->line_height + 4;
+            max_klog_xpos = 0;
+            xpos          = 5;
+            snprintf(buf, sizeof(buf), "%s", autocorrected_str[0]);
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            if (max_klog_xpos < xpos) {
+                max_klog_xpos = xpos;
+            }
+            // qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 0, true);
+
+            ypos += font->line_height + 4;
+            max_klog_xpos = 0;
+            xpos          = 5;
+            snprintf(buf, sizeof(buf), "Original:");
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            if (max_klog_xpos < xpos) {
+                max_klog_xpos = xpos;
+            }
+            // qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 0, true);
+
+            ypos += font->line_height + 4;
+            max_klog_xpos = 0;
+            xpos          = 5;
+            snprintf(buf, sizeof(buf), "%s", autocorrected_str[1]);
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            if (max_klog_xpos < xpos) {
+                max_klog_xpos = xpos;
+            }
+            // qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 0, true);
+
+            autocorrect_str_has_changed = false;
+        }
+#endif // AUTOCORRECT_ENABLE
     }
     qp_flush(ili9341_display);
 }

@@ -25,6 +25,15 @@
 #    include "vendor.h"
 #endif
 
+#define strncpy_nowarn(...)                                          \
+    __extension__({                                                  \
+        _Pragma("GCC diagnostic push");                              \
+        _Pragma("GCC diagnostic ignored \"-Wstringop-truncation\""); \
+        const char *_strncpy_nowarn = strncpy(__VA_ARGS__);          \
+        _Pragma("GCC diagnostic pop");                               \
+        _strncpy_nowarn;                                             \
+    })
+
 #ifndef RTC_READ_INTERVAL
 #    define RTC_READ_INTERVAL 250
 #endif
@@ -239,7 +248,7 @@ char *rtc_read_date_str(void) {
     char date_str_temp[14] = {0};
     snprintf(date_str_temp, sizeof(date_str_temp), "%02d/%02d/%04d", rtc_time.month, rtc_time.date, rtc_time.year);
     static char date_str[12] = {0};
-    strncpy(date_str, date_str_temp, sizeof(date_str));
+    strncpy_nowarn(date_str, date_str_temp, sizeof(date_str));
     return date_str;
 }
 
@@ -252,7 +261,7 @@ char *rtc_read_time_str(void) {
     char time_str_temp[12];
     snprintf(time_str_temp, sizeof(time_str_temp), "%02d:%02d:%02d", rtc_time.hour, rtc_time.minute, rtc_time.second);
     static char time_str[9] = {0};
-    strncpy(time_str, time_str_temp, sizeof(time_str));
+    strncpy_nowarn(time_str, time_str_temp, sizeof(time_str));
     return time_str;
 }
 

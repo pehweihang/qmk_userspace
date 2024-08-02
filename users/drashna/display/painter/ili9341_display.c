@@ -158,9 +158,9 @@ void draw_ui_user(void) {
     }
 #endif
     if (is_keyboard_left()) {
-        char buf[50] = {0};
-        int  ypos    = 14;
-        int  xpos    = 5;
+        char     buf[50] = {0};
+        uint16_t ypos    = 15;
+        uint16_t xpos    = 5;
 
 #ifdef QP_LOCK_LOGO_ENABLE
         static led_t last_led_state = {0};
@@ -462,18 +462,18 @@ void draw_ui_user(void) {
 #endif // AUTOCORRECT_ENABLE
 
 #ifdef KEYLOGGER_ENABLE // keep at very end
-        ypos = height - (font->line_height + 0);
+        ypos = height - (font->line_height + 2);
         if (keylogger_has_changed) {
             static int max_klog_xpos = 0;
             xpos                     = 25;
-            snprintf(buf, sizeof(buf), "Keylogger: %s ---", qp_keylog_str);
+            snprintf(buf, sizeof(buf), "Keylogger: %s", qp_keylog_str);
 
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, 0, 255, 0, 0, 0, 255);
 
             if (max_klog_xpos < xpos) {
                 max_klog_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 255, true);
+            // qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 255, true);
             keylogger_has_changed = false;
         }
 #endif
@@ -486,7 +486,7 @@ void housekeeping_task_quantum_painter(void) {
 }
 
 void keyboard_post_init_quantum_painter(void) {
-    font = qp_load_font_mem(font_thintel15);
+    font  = qp_load_font_mem(font_thintel15);
     frame = qp_load_image_mem(gfx_frame);
 
     // ters1 = qp_load_image_mem(gfx_ters1);

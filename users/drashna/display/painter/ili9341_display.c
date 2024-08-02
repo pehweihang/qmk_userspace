@@ -15,7 +15,7 @@
 #include <ctype.h>
 
 painter_device_t      ili9341_display;
-painter_font_handle_t font, font_mono;
+painter_font_handle_t font_thintel, font_mono, font_oled;
 
 static painter_image_handle_t frame;
 static painter_image_handle_t lock_caps_on;
@@ -89,6 +89,74 @@ char* truncate_text_from_start(const char* text, uint16_t max_width, painter_fon
     return truncated_text + start_index;
 }
 
+/**
+ * @brief Renders full character set of characters that can be displayed in 4 lines:
+ *
+ *   abcdefghijklmnopqrstuvwxyz
+ *   ABCDEFGHIJKLMNOPQRSTUVWXYZ
+ *   01234567890 !@#$%^&*()
+ *   __+-=[]{}\\|;:'",.<>/?
+ *
+ * @param display quantum painter device to write to
+ * @param x_offset x offset to start rendering at
+ * @param max_pos array to store max x position of each line for clearing after rerendering
+ * @param ypos y position to start rendering at
+ * @param font font to use
+ * @param hue_fg text hue
+ * @param sat_fg text saturation
+ * @param val_fg text value
+ * @param hue_bg background hue
+ * @param sat_bg background saturation
+ * @param val_bg background value
+ */
+void render_character_set(painter_device_t display, uint16_t* x_offset, uint16_t* max_pos, uint16_t* ypos,
+                          painter_font_handle_t font, uint8_t hue_fg, uint8_t sat_fg, uint8_t val_fg, uint8_t hue_bg,
+                          uint8_t sat_bg, uint8_t val_bg) {
+    uint16_t xpos    = *x_offset;
+    char     buf[30] = {0};
+    snprintf(buf, sizeof(buf), "abcdefghijklmnopqrstuvwxyz");
+    xpos += qp_drawtext_recolor(display, xpos, *ypos, font, buf, hue_fg, sat_fg, val_fg, hue_bg, sat_bg, val_bg);
+
+    if (max_pos[0] < xpos) {
+        max_pos[0] = xpos;
+    }
+    qp_rect(display, xpos, *ypos, max_pos[0], *ypos + font->line_height, 0, 0, 0, true);
+    *ypos += font->line_height + 4;
+    xpos = *x_offset;
+    snprintf(buf, sizeof(buf), "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    xpos += qp_drawtext_recolor(display, xpos, *ypos, font, buf, hue_fg, sat_fg, val_fg, hue_bg, sat_bg, val_bg);
+
+    if (max_pos[1] < xpos) {
+        max_pos[1] = xpos;
+    }
+    qp_rect(display, xpos, *ypos, max_pos[1], *ypos + font->line_height, 0, 0, 0, true);
+    *ypos += font->line_height + 4;
+    xpos = *x_offset;
+    snprintf(buf, sizeof(buf), "01234567890 !@#$%%^&*()");
+    xpos += qp_drawtext_recolor(display, xpos, *ypos, font, buf, hue_fg, sat_fg, val_fg, hue_bg, sat_bg, val_bg);
+
+    if (max_pos[2] < xpos) {
+        max_pos[2] = xpos;
+    }
+    qp_rect(ili9341_display, xpos, *ypos, max_pos[2], *ypos + font->line_height, 0, 0, 0, true);
+    *ypos += font->line_height + 4;
+    xpos = *x_offset;
+    snprintf(buf, sizeof(buf), "__+-=[]{}\\|;:'\",.<>/?");
+    xpos += qp_drawtext_recolor(display, xpos, *ypos, font, buf, hue_fg, sat_fg, val_fg, hue_bg, sat_bg, val_bg);
+
+    if (max_pos[3] < xpos) {
+        max_pos[3] = xpos;
+    }
+    qp_rect(display, xpos, *ypos, max_pos[3], *ypos + font->line_height, 0, 0, 0, true);
+    *ypos += font->line_height + 4;
+}
+
+/**
+ * @brief Initializes the display, clears it and sets frame and title
+ *
+ * @param device display to use
+ * @param rotation rotation to use
+ */
 void init_and_clear(painter_device_t device, painter_rotation_t rotation) {
     uint16_t width;
     uint16_t height;
@@ -107,12 +175,13 @@ void init_and_clear(painter_device_t device, painter_rotation_t rotation) {
 
     char title[50] = {0};
     snprintf(title, sizeof(title), "%s", PRODUCT);
-    uint8_t title_width = qp_textwidth(font, title);
-    if (title_width > (width - 50)) {
-        title_width = width - 50;
+    uint8_t title_width = qp_textwidth(font_thintel, title);
+    if (title_width > (width - 54)) {
+        title_width = width - 54;
     }
     uint8_t title_xpos = (width - title_width) / 2;
-    qp_drawtext_recolor(device, title_xpos, 2, font, title, 0, 0, 0, 0, 0, 255);
+    qp_drawtext_recolor(device, title_xpos, 2, font_thintel, truncate_text(title, title_width, font_thintel), 0, 0, 0,
+                        0, 0, 255);
     qp_close_image(frame);
 }
 
@@ -245,11 +314,12 @@ void draw_ui_user(void) {
             static int max_wpm_xpos = 0;
             xpos                    = 5;
             snprintf(buf, sizeof(buf), "WPM: %d", (int)get_current_wpm());
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos +=
+                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_wpm_xpos < xpos) {
                 max_wpm_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_wpm_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_wpm_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
 #endif // WPM_ENABLE
 
@@ -257,11 +327,12 @@ void draw_ui_user(void) {
             static int max_scans_xpos = 0;
             xpos                      = 50;
             snprintf(buf, sizeof(buf), "SCANS: %d", (int)get_matrix_scan_rate());
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos +=
+                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_scans_xpos < xpos) {
                 max_scans_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_scans_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_scans_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
 
 #ifdef POINTING_DEVICE_ENABLE
@@ -271,11 +342,12 @@ void draw_ui_user(void) {
             snprintf(buf, sizeof(buf), "CPI: %d",
                      (int)charybdis_get_pointer_sniping_enabled() ? charybdis_get_pointer_sniping_dpi()
                                                                   : charybdis_get_pointer_default_dpi());
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos +=
+                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_cpi_xpos < xpos) {
                 max_cpi_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_cpi_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_cpi_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
         // if (hue_redraw) {
         //     xpos = 160;
@@ -283,47 +355,47 @@ void draw_ui_user(void) {
         //     qp_drawimage(ili9341_display, xpos, ypos, mouse_icon);
         // }
 
-        ypos += font->line_height + 4;
+        ypos += font_oled->line_height + 4;
         if (ds_state_redraw) {
             static int max_dss_xpos = 0;
             xpos                    = 5;
             const char* buf         = "DRAG SCROLL";
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf,
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf,
                                         charybdis_get_pointer_dragscroll_enabled() ? 153 : 255, 255, 255,
                                         charybdis_get_pointer_dragscroll_enabled() ? 153 : 255, 255, 0);
             if (max_dss_xpos < xpos) {
                 max_dss_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_dss_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_dss_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
 
         if (am_state_redraw) {
             static int max_ams_xpos = 0;
             xpos += 10;
             const char* buf = "Auto Layer";
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, get_auto_mouse_enable() ? 34 : 255, 255,
-                                        255, charybdis_get_pointer_sniping_enabled() ? 34 : 255, 255, 0);
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, get_auto_mouse_enable() ? 34 : 255,
+                                        255, 255, charybdis_get_pointer_sniping_enabled() ? 34 : 255, 255, 0);
             if (max_ams_xpos < xpos) {
                 max_ams_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_ams_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_ams_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
 
         if (sp_state_redraw) {
             static int max_sps_xpos = 0;
             xpos += 10;
             const char* buf = "Sniping";
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf,
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf,
                                         charybdis_get_pointer_sniping_enabled() ? 153 : 255, 255, 255,
                                         charybdis_get_pointer_sniping_enabled() ? 153 : 255, 255, 0);
             if (max_sps_xpos < xpos) {
                 max_sps_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_sps_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_sps_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
 #endif // POINTING_DEVICE_ENABLE
 
-        ypos += font->line_height + 4;
+        ypos += font_oled->line_height + 4;
         static keymap_config_t last_keymap_config = {0};
         if (hue_redraw || last_keymap_config.raw != keymap_config.raw) {
             last_keymap_config.raw  = keymap_config.raw;
@@ -335,24 +407,25 @@ void draw_ui_user(void) {
             const char* buf2        = "1SHOT";
             qp_drawimage(ili9341_display, xpos, ypos, last_keymap_config.swap_lctl_lgui ? cg_on : cg_off);
             temp_pos = xpos += cg_off->width + 5;
-            temp_pos = qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf0, last_keymap_config.nkro ? 153 : 255,
-                                           255, 255, last_keymap_config.nkro ? 153 : 255, 255, 0);
+            temp_pos =
+                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf0, last_keymap_config.nkro ? 153 : 255,
+                                    255, 255, last_keymap_config.nkro ? 153 : 255, 255, 0);
             xpos += MAX(temp_pos, 30);
-            temp_pos = qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf1,
+            temp_pos = qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf1,
                                            last_keymap_config.autocorrect_enable ? 153 : 255, 255, 255,
                                            last_keymap_config.autocorrect_enable ? 153 : 255, 255, 0);
             xpos += MAX(temp_pos, 30);
-            temp_pos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf2,
+            temp_pos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf2,
                                             last_keymap_config.oneshot_enable ? 153 : 255, 255, 255,
                                             last_keymap_config.oneshot_enable ? 153 : 255, 255, 0);
             xpos += MAX(temp_pos, 30);
             if (max_bpm_xpos < xpos) {
                 max_bpm_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_bpm_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_bpm_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
 
-        ypos += font->line_height + 2;
+        ypos += font_oled->line_height + 2;
         static user_runtime_config_t last_user_state = {0};
         if (hue_redraw || last_user_state.raw != user_state.raw) {
             last_user_state.raw     = user_state.raw;
@@ -363,30 +436,30 @@ void draw_ui_user(void) {
             const char* buf1        = "CLCK ";
             const char* buf2        = "HOST ";
             const char* buf3        = "SWAP ";
-            temp_pos =
-                qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf0, last_user_state.audio_enable ? 153 : 255,
-                                    255, 255, last_user_state.audio_enable ? 153 : 255, 255, 0);
+            temp_pos                = qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf0,
+                                           last_user_state.audio_enable ? 153 : 255, 255, 255,
+                                           last_user_state.audio_enable ? 153 : 255, 255, 0);
             xpos += MAX(temp_pos, 30);
-            temp_pos = qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf1,
+            temp_pos = qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf1,
                                            last_user_state.audio_clicky_enable ? 153 : 255, 255, 255,
                                            last_user_state.audio_clicky_enable ? 153 : 255, 255, 0);
             xpos += MAX(temp_pos, 30);
-            temp_pos = qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf2,
+            temp_pos = qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf2,
                                            last_user_state.host_driver_disabled ? 153 : 255, 255, 255,
                                            last_user_state.host_driver_disabled ? 153 : 255, 255, 0);
             xpos += MAX(temp_pos, 30);
-            temp_pos =
-                qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf3, last_user_state.swap_hands ? 153 : 255,
-                                    255, 255, last_user_state.swap_hands ? 153 : 255, 255, 0);
+            temp_pos = qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf3,
+                                           last_user_state.swap_hands ? 153 : 255, 255, 255,
+                                           last_user_state.swap_hands ? 153 : 255, 255, 0);
             xpos += MAX(temp_pos, 30);
             if (max_upm_xpos < xpos) {
                 max_upm_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_upm_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_upm_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
 
 #if defined(RGBLIGHT_ENABLE)
-        ypos += font->line_height + 4;
+        ypos += font_oled->line_height + 4;
         if (hue_redraw || rgb_effect_redraw) {
             static int max_rgb_xpos = 0;
             xpos                    = 5;
@@ -402,16 +475,17 @@ void draw_ui_user(void) {
                     buf[i] = tolower(buf[i]);
             }
 
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos +=
+                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_rgb_xpos < xpos) {
                 max_rgb_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_rgb_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_rgb_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
 #endif // RGBLIGHT_ENABLE
 
 #if defined(RGB_MATRIX_ENABLE)
-        ypos += font->line_height + 4;
+        ypos += font_oled->line_height + 4;
         if (hue_redraw || rgb_effect_redraw) {
             static int max_rgb_xpos = 0;
             xpos                    = 5;
@@ -427,15 +501,16 @@ void draw_ui_user(void) {
                     buf[i] = tolower(buf[i]);
             }
 
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos +=
+                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_rgb_xpos < xpos) {
                 max_rgb_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_rgb_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_rgb_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
 #endif // RGB_MATRIX_ENABLE
 
-        ypos += font->line_height + 4;
+        ypos += font_oled->line_height + 4;
         if (hue_redraw || dl_state_redraw || layer_state_redraw) {
             const char* dl_name = "unknown";
             switch (get_highest_layer(default_layer_state)) {
@@ -456,11 +531,12 @@ void draw_ui_user(void) {
             static int max_layer_xpos = 0;
             xpos                      = 5;
             snprintf(buf, sizeof(buf), "LAYOUT: %s", dl_name);
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos +=
+                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_layer_xpos < xpos) {
                 max_layer_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_layer_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_layer_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
 
         if (hue_redraw || layer_state_redraw) {
@@ -484,44 +560,58 @@ void draw_ui_user(void) {
             }
 
             static int max_layer_xpos = 0;
-            xpos                      = 5 + (qp_textwidth(font, "LAYOUT: COLEMAK_DH"));
+            xpos                      = 5 + (qp_textwidth(font_oled, "LAYOUT: COLEMAK_DH"));
             snprintf(buf, sizeof(buf), "LAYER: %s", layer_name);
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos +=
+                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_layer_xpos < xpos) {
                 max_layer_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_layer_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_layer_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
 
 #ifdef AUTOCORRECT_ENABLE
-        ypos += font->line_height + 4;
+        ypos += font_oled->line_height + 4;
         extern bool autocorrect_str_has_changed;
         extern char autocorrected_str_raw[2][21];
         if (hue_redraw || autocorrect_str_has_changed) {
             static int max_klog_xpos = 0;
             xpos                     = 5;
             snprintf(buf, sizeof(buf), "Autocorrected: %s", autocorrected_str_raw[0]);
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos +=
+                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
 
             if (max_klog_xpos < xpos) {
                 max_klog_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
 
-            ypos += font->line_height + 4;
+            ypos += font_oled->line_height + 4;
             max_klog_xpos = 0;
             xpos          = 5;
             snprintf(buf, sizeof(buf), "Original Text: %s", autocorrected_str_raw[1]);
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos +=
+                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_klog_xpos < xpos) {
                 max_klog_xpos = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
 
             autocorrect_str_has_changed = false;
         }
 #endif // AUTOCORRECT_ENABLE
 
+        ypos += font_oled->line_height + 4;
+        if (hue_redraw) {
+            xpos                             = 5;
+            static uint16_t max_font_xpos[4] = {0};
+            render_character_set(ili9341_display, &xpos, max_font_xpos, &ypos, font_thintel, curr_hue, 255, 255,
+                                 curr_hue, 255, 0);
+            render_character_set(ili9341_display, &xpos, max_font_xpos, &ypos, font_mono, curr_hue, 255, 255, curr_hue,
+                                 255, 0);
+            render_character_set(ili9341_display, &xpos, max_font_xpos, &ypos, font_oled, curr_hue, 255, 255, curr_hue,
+                                 255, 0);
+        }
 #ifdef KEYLOGGER_ENABLE // keep at very end
         ypos = height - (font_mono->line_height + 2);
         if (keylogger_has_changed) {
@@ -547,9 +637,10 @@ void housekeeping_task_quantum_painter(void) {
 }
 
 void keyboard_post_init_quantum_painter(void) {
-    font      = qp_load_font_mem(font_thintel15);
-    font_mono = qp_load_font_mem(font_unifont_ex_mono_12);
-    frame     = qp_load_image_mem(gfx_frame);
+    font_thintel = qp_load_font_mem(font_thintel15);
+    font_mono    = qp_load_font_mem(font_ProggyTiny15);
+    font_oled    = qp_load_font_mem(font_oled_font);
+    frame        = qp_load_image_mem(gfx_frame);
 
     // ters1 = qp_load_image_mem(gfx_ters1);
     lock_caps_on  = qp_load_image_mem(gfx_lock_caps_ON);

@@ -36,7 +36,7 @@ static painter_image_handle_t mouse_icon;
  * @param font font being used
  * @return char* truncated text
  */
-char* truncate_text(const char* text, uint16_t max_width, const font_t* font) {
+char* truncate_text(const char* text, uint16_t max_width, painter_font_handle_t font) {
     static char truncated_text[256];
     strncpy(truncated_text, text, sizeof(truncated_text) - 1);
     truncated_text[sizeof(truncated_text) - 1] = '\0';
@@ -69,7 +69,7 @@ char* truncate_text(const char* text, uint16_t max_width, const font_t* font) {
  * @param font
  * @return char*
  */
-char* truncate_text_from_start(const char* text, uint16_t max_width, const font_t* font) {
+char* truncate_text_from_start(const char* text, uint16_t max_width, painter_font_handle_t font) {
     static char truncated_text[256];
     strncpy(truncated_text, text, sizeof(truncated_text) - 1);
     truncated_text[sizeof(truncated_text) - 1] = '\0';

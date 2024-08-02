@@ -15,7 +15,7 @@ void keyboard_post_init_display_driver(void);
 
 #ifdef KEYLOGGER_ENABLE
 #    ifndef QP_KEYLOGGER_LENGTH
-#        define QP_KEYLOGGER_LENGTH 29
+#        define QP_KEYLOGGER_LENGTH 20
 #    endif
 extern char qp_keylog_str[QP_KEYLOGGER_LENGTH];
 extern bool keylogger_has_changed;

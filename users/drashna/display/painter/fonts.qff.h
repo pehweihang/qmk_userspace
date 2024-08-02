@@ -13,3 +13,5 @@ extern const uint32_t font_ubuntu_mono_12_font_length;
 extern const uint8_t  font_ubuntu_mono_12_font[2650];
 extern const uint32_t font_thintel15_length;
 extern const uint8_t  font_thintel15[966];
+extern const uint32_t font_unifont_ex_mono_12_length;
+extern const uint8_t  font_unifont_ex_mono_12[1186];

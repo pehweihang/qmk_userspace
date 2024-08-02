@@ -15,7 +15,7 @@
 #include <ctype.h>
 
 painter_device_t      ili9341_display;
-painter_font_handle_t font;
+painter_font_handle_t font, font_mono;
 
 static painter_image_handle_t frame;
 static painter_image_handle_t lock_caps_on;
@@ -462,13 +462,13 @@ void draw_ui_user(void) {
 #endif // AUTOCORRECT_ENABLE
 
 #ifdef KEYLOGGER_ENABLE // keep at very end
-        ypos = height - (font->line_height + 2);
+        ypos = height - (font_mono->line_height + 2);
         if (keylogger_has_changed) {
             static int max_klog_xpos = 0;
-            xpos                     = 25;
+            xpos                     = 27;
             snprintf(buf, sizeof(buf), "Keylogger: %s", qp_keylog_str);
 
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, 0, 255, 0, 0, 0, 255);
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_mono, buf, 0, 255, 0, 0, 0, 255);
 
             if (max_klog_xpos < xpos) {
                 max_klog_xpos = xpos;
@@ -486,8 +486,9 @@ void housekeeping_task_quantum_painter(void) {
 }
 
 void keyboard_post_init_quantum_painter(void) {
-    font  = qp_load_font_mem(font_thintel15);
-    frame = qp_load_image_mem(gfx_frame);
+    font      = qp_load_font_mem(font_thintel15);
+    font_mono = qp_load_font_mem(font_unifont_ex_mono_12);
+    frame     = qp_load_image_mem(gfx_frame);
 
     // ters1 = qp_load_image_mem(gfx_ters1);
     lock_caps_on  = qp_load_image_mem(gfx_lock_caps_ON);

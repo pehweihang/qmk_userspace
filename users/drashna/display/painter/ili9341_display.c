@@ -220,7 +220,7 @@ void draw_ui_user(void) {
 #endif
     if (is_keyboard_left()) {
         char     buf[50] = {0};
-        uint16_t ypos    = 15;
+        uint16_t ypos    = 16;
         uint16_t xpos    = 5;
 
 #ifdef QP_LOCK_LOGO_ENABLE
@@ -496,11 +496,11 @@ void draw_ui_user(void) {
 #ifdef AUTOCORRECT_ENABLE
         ypos += font->line_height + 4;
         extern bool autocorrect_str_has_changed;
-        extern char autocorrected_str[2][21];
+        extern char autocorrected_str_raw[2][21];
         if (hue_redraw || autocorrect_str_has_changed) {
             static int max_klog_xpos = 0;
             xpos                     = 5;
-            snprintf(buf, sizeof(buf), "Autocorrected: %s", autocorrected_str[0]);
+            snprintf(buf, sizeof(buf), "Autocorrected: %s", autocorrected_str_raw[0]);
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
 
             if (max_klog_xpos < xpos) {
@@ -511,7 +511,7 @@ void draw_ui_user(void) {
             ypos += font->line_height + 4;
             max_klog_xpos = 0;
             xpos          = 5;
-            snprintf(buf, sizeof(buf), "Original Text: %s", autocorrected_str[1]);
+            snprintf(buf, sizeof(buf), "Original Text: %s", autocorrected_str_raw[1]);
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_klog_xpos < xpos) {
                 max_klog_xpos = xpos;

@@ -28,6 +28,67 @@ static painter_image_handle_t cg_on;
 static painter_image_handle_t cg_off;
 static painter_image_handle_t mouse_icon;
 
+/**
+ * @brief Truncates text to fit within a certain width
+ *
+ * @param text original text
+ * @param max_width max width in pixels
+ * @param font font being used
+ * @return char* truncated text
+ */
+char* truncate_text(const char* text, uint16_t max_width, const font_t* font) {
+    static char truncated_text[256];
+    strncpy(truncated_text, text, sizeof(truncated_text) - 1);
+    truncated_text[sizeof(truncated_text) - 1] = '\0';
+
+    uint16_t text_width = qp_textwidth(font, truncated_text);
+    if (text_width <= max_width) {
+        return truncated_text;
+    }
+
+    size_t len = strlen(truncated_text);
+    while (len > 0 && text_width > max_width) {
+        truncated_text[--len] = '\0';
+        text_width            = qp_textwidth(font, truncated_text);
+    }
+
+    if (len > 3) {
+        truncated_text[len - 3] = '.';
+        truncated_text[len - 2] = '.';
+        truncated_text[len - 1] = '.';
+    }
+
+    return truncated_text;
+}
+
+/**
+ * @brief Truncate text, but from start of string, instead of end
+ *
+ * @param text
+ * @param max_width
+ * @param font
+ * @return char*
+ */
+char* truncate_text_from_start(const char* text, uint16_t max_width, const font_t* font) {
+    static char truncated_text[256];
+    strncpy(truncated_text, text, sizeof(truncated_text) - 1);
+    truncated_text[sizeof(truncated_text) - 1] = '\0';
+
+    uint16_t text_width = qp_textwidth(font, truncated_text);
+    if (text_width <= max_width) {
+        return truncated_text;
+    }
+
+    size_t len         = strlen(truncated_text);
+    size_t start_index = 0;
+    while (start_index < len && text_width > max_width) {
+        start_index++;
+        text_width = qp_textwidth(font, truncated_text + start_index);
+    }
+
+    return truncated_text + start_index;
+}
+
 void init_and_clear(painter_device_t device, painter_rotation_t rotation) {
     uint16_t width;
     uint16_t height;
@@ -51,7 +112,7 @@ void init_and_clear(painter_device_t device, painter_rotation_t rotation) {
         title_width = width - 50;
     }
     uint8_t title_xpos = (width - title_width) / 2;
-    qp_drawtext_recolor(device, title_xpos, 1, font, title, 0, 0, 0, 0, 0, 255);
+    qp_drawtext_recolor(device, title_xpos, 2, font, title, 0, 0, 0, 0, 0, 255);
     qp_close_image(frame);
 }
 

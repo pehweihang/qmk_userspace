@@ -18,7 +18,7 @@
  */
 char* truncate_text(const char* text, uint16_t max_width, painter_font_handle_t font, bool from_start,
                     bool add_ellipses) {
-    static char truncated_text[75];
+    static char truncated_text[50];
     strncpy(truncated_text, text, sizeof(truncated_text) - 1);
     truncated_text[sizeof(truncated_text) - 1] = '\0';
 

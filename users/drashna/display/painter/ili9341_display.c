@@ -195,9 +195,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         static uint16_t max_cpi_xpos = 0;
         if (hue_redraw || cpi_redraw) {
             xpos = max_scans_xpos + 10;
-            snprintf(buf, sizeof(buf), "CPI: %5u",
-                     charybdis_get_pointer_sniping_enabled() ? charybdis_get_pointer_sniping_dpi()
-                                                             : charybdis_get_pointer_default_dpi());
+            snprintf(buf, sizeof(buf), "CPI: %5u", curr_cpi);
             xpos +=
                 qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_cpi_xpos < xpos) {

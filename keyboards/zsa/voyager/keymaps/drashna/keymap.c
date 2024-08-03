@@ -133,8 +133,10 @@ bool oled_task_keymap(void) {
 
     oled_set_cursor(0, 15);
     oled_write_raw_P(footer_image2, sizeof(footer_image2));
+#    ifdef KEYLOGGER_ENABLE
     oled_set_cursor(4, 15);
     oled_write(oled_keylog_str, true);
+#    endif
 
     return false;
 }

@@ -173,7 +173,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         }
         static uint16_t max_scans_xpos = 0;
         if (hue_redraw || scan_redraw) {
-            xpos = max_wpm_xpos + 10;
+            xpos = max_wpm_xpos == 0 ? 5 : max_wpm_xpos + 10;
             snprintf(buf, sizeof(buf), "SCANS: %4lu", get_matrix_scan_rate());
             xpos +=
                 qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);

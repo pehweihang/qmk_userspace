@@ -155,7 +155,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
         if (hue_redraw || wpm_redraw) {
             xpos = 5;
-            snprintf(buf, sizeof(buf), "WPM: %s", get_u8_str(get_current_wpm(), ' '));
+            snprintf(buf, sizeof(buf), "WPM: %3u", get_current_wpm());
             xpos +=
                 qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_wpm_xpos < xpos) {
@@ -174,7 +174,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         static uint16_t max_scans_xpos = 0;
         if (hue_redraw || scan_redraw) {
             xpos = max_wpm_xpos + 10;
-            snprintf(buf, sizeof(buf), "SCANS: %s", get_u16_str(get_matrix_scan_rate(), ' '));
+            snprintf(buf, sizeof(buf), "SCANS: %4lu", get_matrix_scan_rate());
             xpos +=
                 qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_scans_xpos < xpos) {
@@ -195,10 +195,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         static uint16_t max_cpi_xpos = 0;
         if (hue_redraw || cpi_redraw) {
             xpos = max_scans_xpos + 10;
-            snprintf(buf, sizeof(buf), "CPI: %s",
-                     get_u16_str(charybdis_get_pointer_sniping_enabled() ? charybdis_get_pointer_sniping_dpi()
-                                                                         : charybdis_get_pointer_default_dpi(),
-                                 ' '));
+            snprintf(buf, sizeof(buf), "CPI: %5u",
+                     charybdis_get_pointer_sniping_enabled() ? charybdis_get_pointer_sniping_dpi()
+                                                             : charybdis_get_pointer_default_dpi());
             xpos +=
                 qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_cpi_xpos < xpos) {

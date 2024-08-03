@@ -1,6 +1,7 @@
 // Copyright 2024 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include "display/painter/graphics/samurai-cyberpunk-minimal-dark-8k-b3-240x320.qgf.h"
 #include "drashna.h"
 #include "qp.h"
 #include "qp_comms.h"
@@ -34,7 +35,6 @@ void init_display_ili9341(void) {
     font_thintel = qp_load_font_mem(font_thintel15);
     font_mono    = qp_load_font_mem(font_ProggyTiny15);
     font_oled    = qp_load_font_mem(font_oled_font);
-    frame        = qp_load_image_mem(gfx_frame);
 
     // ters1 = qp_load_image_mem(gfx_ters1);
     lock_caps_on  = qp_load_image_mem(gfx_lock_caps_ON);
@@ -67,17 +67,23 @@ void init_display_ili9341(void) {
     qp_get_geometry(ili9341_display, &width, &height, NULL, NULL, NULL);
     qp_clear(ili9341_display);
     qp_rect(ili9341_display, 0, 0, width - 1, height - 1, 0, 0, 0, true);
-    qp_drawimage_recolor(ili9341_display, 0, 0, frame, 0, 0, 255, 0, 0, 0);
+    if (is_keyboard_master()) {
+        frame = qp_load_image_mem(gfx_frame);
+        qp_drawimage_recolor(ili9341_display, 0, 0, frame, 0, 0, 255, 0, 0, 0);
 
-    char title[50] = {0};
-    snprintf(title, sizeof(title), "%s", PRODUCT);
-    uint8_t title_width = qp_textwidth(font_thintel, title);
-    if (title_width > (width - 55)) {
-        title_width = width - 55;
+        char title[50] = {0};
+        snprintf(title, sizeof(title), "%s", PRODUCT);
+        uint8_t title_width = qp_textwidth(font_thintel, title);
+        if (title_width > (width - 55)) {
+            title_width = width - 55;
+        }
+        uint8_t title_xpos = (width - title_width) / 2;
+        qp_drawtext_recolor(ili9341_display, title_xpos, 2, font_thintel,
+                            truncate_text(title, title_width, font_thintel, false, false), 0, 0, 0, 0, 0, 255);
+    } else {
+        frame = qp_load_image_mem(gfx_samurai_cyberpunk_minimal_dark_8k_b3_240x320);
+        qp_drawimage_recolor(ili9341_display, 0, 0, frame, 0, 0, 255, 0, 0, 0);
     }
-    uint8_t title_xpos = (width - title_width) / 2;
-    qp_drawtext_recolor(ili9341_display, title_xpos, 2, font_thintel,
-                        truncate_text(title, title_width, font_thintel, false, false), 0, 0, 0, 0, 0, 255);
     qp_close_image(frame);
     qp_power(ili9341_display, true);
 }
@@ -121,7 +127,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
     }
 #endif
 
-    if (is_keyboard_left()) {
+    if (is_keyboard_master()) {
         char     buf[50] = {0};
         uint16_t ypos    = 16;
         uint16_t xpos    = 5;
@@ -385,7 +391,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         ypos += font_oled->line_height + 4;
         if (hue_redraw || rgb_effect_redraw) {
             static uint16_t max_rgb_xpos = 0;
-            xpos                    = 5;
+            xpos                         = 5;
             snprintf(buf, sizeof(buf), "RGB Light Mode: %s", rgblight_name(curr_effect));
             for (uint16_t i = 16; i < sizeof(buf); ++i) {
                 if (buf[i] == 0)
@@ -425,7 +431,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         ypos += font_oled->line_height + 4;
         if (hue_redraw || rgb_effect_redraw) {
             static uint16_t max_rgb_xpos = 0;
-            xpos                    = 5;
+            xpos                         = 5;
             snprintf(buf, sizeof(buf), "RGB Matrix Mode: %s", rgb_matrix_name(curr_effect));
             for (uint16_t i = 17; i < sizeof(buf); ++i) {
                 if (buf[i] == 0)

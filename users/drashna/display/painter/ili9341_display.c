@@ -87,93 +87,25 @@ void ili9341_display_power(bool on) {
 }
 
 __attribute__((weak)) void ili9341_draw_user(void) {
-    bool            hue_redraw = false;
-    static uint16_t last_hue   = {0xFFFF};
+    bool hue_redraw = false;
 #if defined(RGBLIGHT_ENABLE) || defined(RGB_MATRIX_ENABLE)
-    uint8_t curr_hue = rgblight_get_hue();
-#endif
-
-#ifdef POINTING_DEVICE_ENABLE
-    static uint16_t last_cpi   = {0xFFFF};
-    uint16_t        curr_cpi   = charybdis_get_pointer_sniping_enabled() ? charybdis_get_pointer_sniping_dpi()
-                                                                         : charybdis_get_pointer_default_dpi();
-    bool            cpi_redraw = false;
+    static uint16_t last_hue = {0xFFFF};
+    uint8_t         curr_hue = rgblight_get_hue();
+    if (last_hue != curr_hue) {
+        last_hue   = curr_hue;
+        hue_redraw = true;
+    }
+#else
+    static uint32_t last_update = 0;
+    if (timer_elapsed32(last_update) > 125) {
+        last_update = timer_read32();
+        hue_redraw  = true;
+    }
 #endif
 
     uint16_t width;
     uint16_t height;
     qp_get_geometry(ili9341_display, &width, &height, NULL, NULL, NULL);
-
-    if (last_hue != curr_hue) {
-        last_hue   = curr_hue;
-        hue_redraw = true;
-    }
-#ifdef POINTING_DEVICE_ENABLE
-    if (last_cpi != curr_cpi) {
-        last_cpi   = curr_cpi;
-        cpi_redraw = true;
-    }
-#endif
-
-    bool            layer_state_redraw = false;
-    static uint32_t last_layer_state   = 0;
-    if (last_layer_state != layer_state) {
-        last_layer_state   = layer_state;
-        layer_state_redraw = true;
-    }
-
-    bool            dl_state_redraw = false;
-    static uint32_t last_dl_state   = 0;
-    if (last_dl_state != default_layer_state) {
-        last_dl_state   = default_layer_state;
-        dl_state_redraw = true;
-    }
-
-#ifdef POINTING_DEVICE_ENABLE
-    bool            ds_state_redraw = false;
-    static uint32_t last_ds_state   = 0xFFFFFFFF;
-    if (last_ds_state != charybdis_get_pointer_dragscroll_enabled()) {
-        last_ds_state   = charybdis_get_pointer_dragscroll_enabled();
-        ds_state_redraw = true;
-    }
-
-    bool            sp_state_redraw = false;
-    static uint32_t last_sp_state   = 0xFFFFFFFF;
-    if (last_sp_state != charybdis_get_pointer_sniping_enabled()) {
-        last_sp_state   = charybdis_get_pointer_sniping_enabled();
-        sp_state_redraw = true;
-    }
-
-    __attribute__((unused)) bool            am_state_redraw = false;
-    __attribute__((unused)) static uint32_t last_am_state   = 0xFFFFFFFF;
-    if (last_am_state != get_auto_mouse_enable()) {
-        last_am_state   = get_auto_mouse_enable();
-        am_state_redraw = true;
-    }
-#endif
-
-#ifdef WPM_ENABLE
-    bool            wpm_redraw      = false;
-    static uint32_t last_wpm_update = 0;
-    if (timer_elapsed32(last_wpm_update) > 125) {
-        last_wpm_update = timer_read32();
-        wpm_redraw      = true;
-    }
-#endif // WPM_ENABLE
-
-#ifdef KEYLOGGER_ENABLE
-    static uint32_t last_klog_update = 0;
-    if (timer_elapsed32(last_klog_update) > 125 || keylogger_has_changed) {
-        last_klog_update = timer_read32();
-    }
-#endif
-
-    bool            scan_redraw      = false;
-    static uint32_t last_scan_update = 0;
-    if (timer_elapsed32(last_scan_update) > 125) {
-        last_scan_update = timer_read32();
-        scan_redraw      = true;
-    }
 
 #if defined(RGB_MATRIX_ENABLE) || defined(RGBLIGHT_ENABLE)
     bool            rgb_effect_redraw = false;
@@ -188,6 +120,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         rgb_effect_redraw = true;
     }
 #endif
+
     if (is_keyboard_left()) {
         char     buf[50] = {0};
         uint16_t ypos    = 16;
@@ -212,6 +145,14 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
         static uint16_t max_wpm_xpos = 0;
 #ifdef WPM_ENABLE
+
+        bool            wpm_redraw      = false;
+        static uint32_t last_wpm_update = 0;
+        if (timer_elapsed32(last_wpm_update) > 125) {
+            last_wpm_update = timer_read32();
+            wpm_redraw      = true;
+        }
+
         if (hue_redraw || wpm_redraw) {
             xpos = 5;
             snprintf(buf, sizeof(buf), "WPM: %s", get_u8_str(get_current_wpm(), ' '));
@@ -224,6 +165,12 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         }
 #endif // WPM_ENABLE
 
+        bool            scan_redraw      = false;
+        static uint32_t last_scan_update = 0;
+        if (timer_elapsed32(last_scan_update) > 125) {
+            last_scan_update = timer_read32();
+            scan_redraw      = true;
+        }
         static uint16_t max_scans_xpos = 0;
         if (hue_redraw || scan_redraw) {
             xpos = max_wpm_xpos + 10;
@@ -237,6 +184,14 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         }
 
 #ifdef POINTING_DEVICE_ENABLE
+        static uint16_t last_cpi   = {0xFFFF};
+        uint16_t        curr_cpi   = charybdis_get_pointer_sniping_enabled() ? charybdis_get_pointer_sniping_dpi()
+                                                                             : charybdis_get_pointer_default_dpi();
+        bool            cpi_redraw = false;
+        if (last_cpi != curr_cpi) {
+            last_cpi   = curr_cpi;
+            cpi_redraw = true;
+        }
         static uint16_t max_cpi_xpos = 0;
         if (hue_redraw || cpi_redraw) {
             xpos = max_scans_xpos + 10;
@@ -257,6 +212,13 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         //     qp_drawimage(ili9341_display, xpos, ypos, mouse_icon);
         // }
 
+        bool            ds_state_redraw = false;
+        static uint32_t last_ds_state   = 0xFFFFFFFF;
+        if (last_ds_state != charybdis_get_pointer_dragscroll_enabled()) {
+            last_ds_state   = charybdis_get_pointer_dragscroll_enabled();
+            ds_state_redraw = true;
+        }
+
         ypos += font_oled->line_height + 4;
         if (ds_state_redraw) {
             static int max_dss_xpos = 0;
@@ -271,6 +233,14 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             qp_rect(ili9341_display, xpos, ypos, max_dss_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
 
+#    ifdef POINTING_DEVICE_AUTO_MOUSE_ENABLE
+        bool           am_state_redraw = false;
+        static uint8_t last_am_state   = 0xFF;
+        if (last_am_state != get_auto_mouse_enable()) {
+            last_am_state   = get_auto_mouse_enable();
+            am_state_redraw = true;
+        }
+
         if (am_state_redraw) {
             static int max_ams_xpos = 0;
             xpos += 10;
@@ -282,7 +252,14 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             }
             qp_rect(ili9341_display, xpos, ypos, max_ams_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
+#    endif
 
+        bool           sp_state_redraw = false;
+        static uint8_t last_sp_state   = 0xFF;
+        if (last_sp_state != charybdis_get_pointer_sniping_enabled()) {
+            last_sp_state   = charybdis_get_pointer_sniping_enabled();
+            sp_state_redraw = true;
+        }
         if (sp_state_redraw) {
             static int max_sps_xpos = 0;
             xpos += 10;
@@ -303,21 +280,19 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             last_keymap_config.raw  = keymap_config.raw;
             static int max_bpm_xpos = 0;
             xpos                    = 5;
-            const char* buf0        = "NKRO ";
-            const char* buf1        = "CRCT ";
+            const char* buf0        = "NKRO";
+            const char* buf1        = "CRCT";
             const char* buf2        = "1SHOT";
             qp_drawimage(ili9341_display, xpos, ypos, last_keymap_config.swap_lctl_lgui ? cg_on : cg_off);
             xpos += cg_off->width + 5;
-            xpos +=
-                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf0, last_keymap_config.nkro ? 153 : 255,
-                                    255, 255, last_keymap_config.nkro ? 153 : 255, 255, 0) +
-                5;
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf0,
+                                        last_keymap_config.nkro ? 153 : 255, 255, 255, 0, 0, 0) +
+                    5;
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf1,
-                                        last_keymap_config.autocorrect_enable ? 153 : 255, 255, 255,
-                                        last_keymap_config.autocorrect_enable ? 153 : 255, 255, 0);
+                                        last_keymap_config.autocorrect_enable ? 153 : 255, 255, 255, 0, 0, 0) +
+                    5;
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf2,
-                                        last_keymap_config.oneshot_enable ? 153 : 255, 255, 255,
-                                        last_keymap_config.oneshot_enable ? 153 : 255, 255, 0);
+                                        last_keymap_config.oneshot_enable ? 153 : 255, 255, 255, 0, 0, 0);
             if (max_bpm_xpos < xpos) {
                 max_bpm_xpos = xpos;
             }
@@ -331,24 +306,20 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             static uint16_t max_upm_xpos = 0;
             xpos                         = cg_off->width + 10;
             const char* buf0             = "AUDIO";
-            const char* buf1             = "CLCK ";
-            const char* buf2             = "HOST ";
-            const char* buf3             = "SWAP ";
+            const char* buf1             = "CLCK";
+            const char* buf2             = "HOST";
+            const char* buf3             = "SWAP";
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf0,
-                                        last_user_state.audio_enable ? 153 : 255, 255, 255,
-                                        last_user_state.audio_enable ? 153 : 255, 255, 0) +
+                                        last_user_state.audio_enable ? 153 : 255, 255, 255, 0, 0, 0) +
                     5;
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf1,
-                                        last_user_state.audio_clicky_enable ? 153 : 255, 255, 255,
-                                        last_user_state.audio_clicky_enable ? 153 : 255, 255, 0) +
+                                        last_user_state.audio_clicky_enable ? 153 : 255, 255, 255, 0, 0, 0) +
                     5;
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf2,
-                                        last_user_state.host_driver_disabled ? 153 : 255, 255, 255,
-                                        last_user_state.host_driver_disabled ? 153 : 255, 255, 0) +
+                                        !last_user_state.host_driver_disabled ? 153 : 255, 255, 255, 0, 0, 0) +
                     5;
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf3,
-                                        last_user_state.swap_hands ? 153 : 255, 255, 255,
-                                        last_user_state.swap_hands ? 153 : 255, 255, 0);
+                                        last_user_state.swap_hands ? 153 : 255, 255, 255, 0, 0, 0);
             if (max_upm_xpos < xpos) {
                 max_upm_xpos = xpos;
             }
@@ -381,13 +352,45 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             qp_rect(ili9341_display, xpos, ypos, max_led_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
 
+        ypos += font_oled->line_height + 4;
+        static uint8_t last_mods    = {0};
+        uint8_t        current_mods = get_mods() | get_weak_mods() | get_oneshot_mods();
+        if (hue_redraw || last_mods != current_mods) {
+            last_mods                    = current_mods;
+            static uint16_t max_mod_xpos = 0;
+            xpos                         = 5;
+            const char* buf0             = "Shift";
+            const char* buf1             = "Control";
+            const char* buf2             = "Alt";
+            const char* buf3             = "GUI";
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char*)"Modifiers:", 153, 255,
+                                        255, 255, 255, 0) +
+                    5;
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf0,
+                                        last_mods & MOD_MASK_SHIFT ? 153 : 255, 255, 255, 255, 255, 0) +
+                    5;
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf1,
+                                        last_mods & MOD_MASK_CTRL ? 153 : 255, 255, 255, 255, 255, 0) +
+                    5;
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf2,
+                                        last_mods & MOD_MASK_ALT ? 153 : 255, 255, 255, 255, 255, 0) +
+                    5;
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf3,
+                                        last_mods & MOD_MASK_GUI ? 153 : 255, 255, 255, 255, 255, 0) +
+                    5;
+            if (max_mod_xpos < xpos) {
+                max_mod_xpos = xpos;
+            }
+            qp_rect(ili9341_display, xpos, ypos, max_mod_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
+        }
+
 #if defined(RGBLIGHT_ENABLE)
         ypos += font_oled->line_height + 4;
         if (hue_redraw || rgb_effect_redraw) {
-            static int max_rgb_xpos = 0;
+            static uint16_t max_rgb_xpos = 0;
             xpos                    = 5;
-            snprintf(buf, sizeof(buf), "RGB Light: %s", rgblight_name(curr_effect));
-            for (int i = 5; i < sizeof(buf); ++i) {
+            snprintf(buf, sizeof(buf), "RGB Light Mode: %s", rgblight_name(curr_effect));
+            for (uint16_t i = 16; i < sizeof(buf); ++i) {
                 if (buf[i] == 0)
                     break;
                 else if (buf[i] == '_')
@@ -404,16 +407,30 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 max_rgb_xpos = xpos;
             }
             qp_rect(ili9341_display, xpos, ypos, max_rgb_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
+
+            ypos += font_oled->line_height + 4;
+            static uint16_t max_hsv_xpos = 0;
+            xpos                         = 5;
+            snprintf(buf, sizeof(buf), "RGB Light HSV: %3d, %3d, %3d", rgblight_get_hue(), rgblight_get_sat(),
+                     rgblight_get_val());
+            xpos +=
+                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            if (max_hsv_xpos < xpos) {
+                max_hsv_xpos = xpos;
+            }
+            qp_rect(ili9341_display, xpos, ypos, max_hsv_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, max_hsv_xpos + 5, ypos, max_hsv_xpos + 25, ypos + font_oled->line_height - 1,
+                    rgblight_get_hue(), rgblight_get_sat(), rgblight_get_val(), true);
         }
 #endif // RGBLIGHT_ENABLE
 
 #if defined(RGB_MATRIX_ENABLE)
         ypos += font_oled->line_height + 4;
         if (hue_redraw || rgb_effect_redraw) {
-            static int max_rgb_xpos = 0;
+            static uint16_t max_rgb_xpos = 0;
             xpos                    = 5;
-            snprintf(buf, sizeof(buf), "RGB Matrix: %s", rgb_matrix_name(curr_effect));
-            for (int i = 5; i < sizeof(buf); ++i) {
+            snprintf(buf, sizeof(buf), "RGB Matrix Mode: %s", rgb_matrix_name(curr_effect));
+            for (uint16_t i = 17; i < sizeof(buf); ++i) {
                 if (buf[i] == 0)
                     break;
                 else if (buf[i] == '_')
@@ -430,8 +447,33 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 max_rgb_xpos = xpos;
             }
             qp_rect(ili9341_display, xpos, ypos, max_rgb_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
+
+            ypos += font_oled->line_height + 4;
+            static uint16_t max_hsv_xpos = 0;
+            xpos                         = 5;
+            snprintf(buf, sizeof(buf), "RGB Matrix HSV: %3d, %3d, %3d", rgb_matrix_get_hue(), rgb_matrix_get_sat(),
+                     rgb_matrix_get_val());
+            xpos +=
+                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            if (max_hsv_xpos < xpos) {
+                max_hsv_xpos = xpos;
+            }
+            qp_rect(ili9341_display, xpos, ypos, max_hsv_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, max_hsv_xpos + 5, ypos, max_hsv_xpos + 25, ypos + font_oled->line_height - 1,
+                    rgb_matrix_get_hue(), rgb_matrix_get_sat(), rgb_matrix_get_val(), true);
         }
 #endif // RGB_MATRIX_ENABLE
+
+        bool                 layer_state_redraw = false, dl_state_redraw = false;
+        static layer_state_t last_layer_state = 0, last_dl_state = 0;
+        if (last_layer_state != layer_state) {
+            last_layer_state   = layer_state;
+            layer_state_redraw = true;
+        }
+        if (last_dl_state != default_layer_state) {
+            last_dl_state   = default_layer_state;
+            dl_state_redraw = true;
+        }
 
         ypos += font_oled->line_height + 4;
         if (hue_redraw || dl_state_redraw || layer_state_redraw) {
@@ -539,6 +581,11 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 #endif
 
 #ifdef KEYLOGGER_ENABLE // keep at very end
+        static uint32_t last_klog_update = 0;
+        if (timer_elapsed32(last_klog_update) > 125 || keylogger_has_changed) {
+            last_klog_update = timer_read32();
+        }
+
         ypos = height - (font_mono->line_height + 2);
         if (keylogger_has_changed) {
             static int max_klog_xpos = 0;

@@ -1,14 +1,8 @@
-// Copyright 2022 QMK -- generated source code only, image retains original copyright
+// Copyright 2024 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #pragma once
 
-extern painter_device_t      ili9341_display;
-extern painter_font_handle_t font;
-
-void housekeeping_task_quantum_painter(void);
-void keyboard_post_init_quantum_painter(void);
-void suspend_power_down_quantum_painter(void);
-void suspend_wakeup_init_quantum_painter(void);
-void shutdown_quantum_painter(void);
-bool process_record_user_quantum_painter(uint16_t keycode, keyrecord_t* record);
+void init_display_ili9341(void);
+void ili9341_display_power(bool on);
+void ili9341_draw_user(void);

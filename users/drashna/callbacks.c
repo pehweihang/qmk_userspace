@@ -9,8 +9,8 @@
 #ifdef DISPLAY_DRIVER_ENABLE
 #    include "display/display.h"
 #endif // DISPLAY_DRIVER_ENABLE
-#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
-#    include "display/painter/ili9341_display.h"
+#ifdef QUANTUM_PAINTER_ENABLE
+#    include "display/painter/painter.h"
 #endif
 
 #ifdef CUSTOM_DYNAMIC_MACROS_ENABLE

@@ -1,10 +1,11 @@
+// Copyright 2024 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "drashna.h"
 #include "qp.h"
-#include "display/painter/fonts.qff.h"
-#include "display/painter/graphics.qgf.h"
-#include "display/painter/graphics/assets.h"
 #include "qp_comms.h"
 #include "display/display.h"
+#include "display/painter/painter.h"
 #include "display/painter/ili9341_display.h"
 #ifdef CUSTOM_SPLIT_TRANSPORT_SYNC
 #    include "split/transport_sync.h"
@@ -15,163 +16,58 @@
 #include <ctype.h>
 
 painter_device_t      ili9341_display;
+
 painter_font_handle_t font_thintel, font_mono, font_oled;
 
-static painter_image_handle_t frame;
-static painter_image_handle_t lock_caps_on;
-static painter_image_handle_t lock_caps_off;
-static painter_image_handle_t lock_num_on;
-static painter_image_handle_t lock_num_off;
-static painter_image_handle_t lock_scrl_on;
-static painter_image_handle_t lock_scrl_off;
-static painter_image_handle_t cg_on;
-static painter_image_handle_t cg_off;
-static painter_image_handle_t mouse_icon;
-
-/**
- * @brief Truncates text to fit within a certain width
- *
- * @param text original text
- * @param max_width max width in pixels
- * @param font font being used
- * @return char* truncated text
- */
-char* truncate_text(const char* text, uint16_t max_width, painter_font_handle_t font) {
-    static char truncated_text[256];
-    strncpy(truncated_text, text, sizeof(truncated_text) - 1);
-    truncated_text[sizeof(truncated_text) - 1] = '\0';
-
-    uint16_t text_width = qp_textwidth(font, truncated_text);
-    if (text_width <= max_width) {
-        return truncated_text;
-    }
-
-    size_t len = strlen(truncated_text);
-    while (len > 0 && text_width > max_width) {
-        truncated_text[--len] = '\0';
-        text_width            = qp_textwidth(font, truncated_text);
-    }
-
-    if (len > 3) {
-        truncated_text[len - 3] = '.';
-        truncated_text[len - 2] = '.';
-        truncated_text[len - 1] = '.';
-    }
-
-    return truncated_text;
-}
-
-/**
- * @brief Truncate text, but from start of string, instead of end
- *
- * @param text
- * @param max_width
- * @param font
- * @return char*
- */
-char* truncate_text_from_start(const char* text, uint16_t max_width, painter_font_handle_t font) {
-    static char truncated_text[256];
-    strncpy(truncated_text, text, sizeof(truncated_text) - 1);
-    truncated_text[sizeof(truncated_text) - 1] = '\0';
-
-    uint16_t text_width = qp_textwidth(font, truncated_text);
-    if (text_width <= max_width) {
-        return truncated_text;
-    }
-
-    size_t len         = strlen(truncated_text);
-    size_t start_index = 0;
-    while (start_index < len && text_width > max_width) {
-        start_index++;
-        text_width = qp_textwidth(font, truncated_text + start_index);
-    }
-
-    return truncated_text + start_index;
-}
-
-/**
- * @brief Renders full character set of characters that can be displayed in 4 lines:
- *
- *   abcdefghijklmnopqrstuvwxyz
- *   ABCDEFGHIJKLMNOPQRSTUVWXYZ
- *   01234567890 !@#$%^&*()
- *   __+-=[]{}\\|;:'",.<>/?
- *
- * @param display quantum painter device to write to
- * @param x_offset x offset to start rendering at
- * @param max_pos array to store max x position of each line for clearing after rerendering
- * @param ypos y position to start rendering at
- * @param font font to use
- * @param hue_fg text hue
- * @param sat_fg text saturation
- * @param val_fg text value
- * @param hue_bg background hue
- * @param sat_bg background saturation
- * @param val_bg background value
- */
-void render_character_set(painter_device_t display, uint16_t* x_offset, uint16_t* max_pos, uint16_t* ypos,
-                          painter_font_handle_t font, uint8_t hue_fg, uint8_t sat_fg, uint8_t val_fg, uint8_t hue_bg,
-                          uint8_t sat_bg, uint8_t val_bg) {
-    uint16_t xpos    = *x_offset;
-    char     buf[30] = {0};
-    snprintf(buf, sizeof(buf), "abcdefghijklmnopqrstuvwxyz");
-    xpos += qp_drawtext_recolor(display, xpos, *ypos, font, buf, hue_fg, sat_fg, val_fg, hue_bg, sat_bg, val_bg);
-
-    if (max_pos[0] < xpos) {
-        max_pos[0] = xpos;
-    }
-    qp_rect(display, xpos, *ypos, max_pos[0], *ypos + font->line_height, 0, 0, 0, true);
-    *ypos += font->line_height + 4;
-    xpos = *x_offset;
-    snprintf(buf, sizeof(buf), "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-    xpos += qp_drawtext_recolor(display, xpos, *ypos, font, buf, hue_fg, sat_fg, val_fg, hue_bg, sat_bg, val_bg);
-
-    if (max_pos[1] < xpos) {
-        max_pos[1] = xpos;
-    }
-    qp_rect(display, xpos, *ypos, max_pos[1], *ypos + font->line_height, 0, 0, 0, true);
-    *ypos += font->line_height + 4;
-    xpos = *x_offset;
-    snprintf(buf, sizeof(buf), "01234567890 !@#$%%^&*()");
-    xpos += qp_drawtext_recolor(display, xpos, *ypos, font, buf, hue_fg, sat_fg, val_fg, hue_bg, sat_bg, val_bg);
-
-    if (max_pos[2] < xpos) {
-        max_pos[2] = xpos;
-    }
-    qp_rect(ili9341_display, xpos, *ypos, max_pos[2], *ypos + font->line_height, 0, 0, 0, true);
-    *ypos += font->line_height + 4;
-    xpos = *x_offset;
-    snprintf(buf, sizeof(buf), "__+-=[]{}\\|;:'\",.<>/?");
-    xpos += qp_drawtext_recolor(display, xpos, *ypos, font, buf, hue_fg, sat_fg, val_fg, hue_bg, sat_bg, val_bg);
-
-    if (max_pos[3] < xpos) {
-        max_pos[3] = xpos;
-    }
-    qp_rect(display, xpos, *ypos, max_pos[3], *ypos + font->line_height, 0, 0, 0, true);
-    *ypos += font->line_height + 4;
-}
+painter_image_handle_t frame;
+painter_image_handle_t lock_caps_on, lock_caps_off;
+painter_image_handle_t lock_num_on, lock_num_off;
+painter_image_handle_t lock_scrl_on, lock_scrl_off;
+painter_image_handle_t cg_on, cg_off;
+painter_image_handle_t mouse_icon;
 
 /**
  * @brief Initializes the display, clears it and sets frame and title
  *
- * @param device display to use
- * @param rotation rotation to use
  */
-void init_and_clear(painter_device_t device, painter_rotation_t rotation) {
+void init_display_ili9341(void) {
+    font_thintel = qp_load_font_mem(font_thintel15);
+    font_mono    = qp_load_font_mem(font_ProggyTiny15);
+    font_oled    = qp_load_font_mem(font_oled_font);
+    frame        = qp_load_image_mem(gfx_frame);
+
+    // ters1 = qp_load_image_mem(gfx_ters1);
+    lock_caps_on  = qp_load_image_mem(gfx_lock_caps_ON);
+    lock_caps_off = qp_load_image_mem(gfx_lock_caps_OFF);
+    lock_num_on   = qp_load_image_mem(gfx_lock_NUM_ON);
+    lock_num_off  = qp_load_image_mem(gfx_lock_NUM_OFF);
+    lock_scrl_on  = qp_load_image_mem(gfx_lock_scrl_ON);
+    lock_scrl_off = qp_load_image_mem(gfx_lock_scrl_OFF);
+    // test_anim = qp_load_image_mem(gfx_test_anim);
+    // matrix = qp_load_image_mem(gfx_matrix);
+    cg_on      = qp_load_image_mem(gfx_cg_on);
+    cg_off     = qp_load_image_mem(gfx_cg_off);
+    mouse_icon = qp_load_image_mem(gfx_mouse_icon);
+
+    ili9341_display =
+        qp_ili9341_make_spi_device(240, 320, DISPLAY_CS_PIN, DISPLAY_DC_PIN, DISPLAY_RST_PIN, DISPLAY_SPI_DIVIDER, 0);
+
+    wait_ms(50);
+
     uint16_t width;
     uint16_t height;
 
-    qp_init(device, rotation);
+    qp_init(ili9341_display, QP_ROTATION_180);
     // if needs inversion
-#if 0
-    qp_comms_start(device);
-    qp_comms_command(device, ILI9XXX_CMD_INVERT_OFF);
-    qp_comms_stop(device);
+#ifdef DISPLAY_INVERTED
+    qp_comms_start(ili9341_display);
+    qp_comms_command(ili9341_display, ILI9XXX_CMD_INVERT_OFF);
+    qp_comms_stop(ili9341_display);
 #endif
-    qp_get_geometry(device, &width, &height, NULL, NULL, NULL);
-    qp_clear(device);
-    qp_rect(device, 0, 0, width - 1, height - 1, 0, 0, 0, true);
-    qp_drawimage_recolor(device, 0, 0, frame, 0, 0, 255, 0, 0, 0);
+    qp_get_geometry(ili9341_display, &width, &height, NULL, NULL, NULL);
+    qp_clear(ili9341_display);
+    qp_rect(ili9341_display, 0, 0, width - 1, height - 1, 0, 0, 0, true);
+    qp_drawimage_recolor(ili9341_display, 0, 0, frame, 0, 0, 255, 0, 0, 0);
 
     char title[50] = {0};
     snprintf(title, sizeof(title), "%s", PRODUCT);
@@ -180,12 +76,17 @@ void init_and_clear(painter_device_t device, painter_rotation_t rotation) {
         title_width = width - 54;
     }
     uint8_t title_xpos = (width - title_width) / 2;
-    qp_drawtext_recolor(device, title_xpos, 2, font_thintel, truncate_text(title, title_width, font_thintel), 0, 0, 0,
-                        0, 0, 255);
+    qp_drawtext_recolor(ili9341_display, title_xpos, 2, font_thintel,
+                        truncate_text(title, title_width, font_thintel, false, false), 0, 0, 0, 0, 0, 255);
     qp_close_image(frame);
+    qp_power(ili9341_display, true);
 }
 
-void draw_ui_user(void) {
+void ili9341_display_power(bool on) {
+    qp_power(ili9341_display, on);
+}
+
+__attribute__((weak)) void ili9341_draw_user(void) {
     bool            hue_redraw = false;
     static uint16_t last_hue   = {0xFFFF};
 #if defined(RGBLIGHT_ENABLE) || defined(RGB_MATRIX_ENABLE)
@@ -630,80 +531,4 @@ void draw_ui_user(void) {
 #endif
     }
     qp_flush(ili9341_display);
-}
-
-void housekeeping_task_quantum_painter(void) {
-    draw_ui_user();
-}
-
-void keyboard_post_init_quantum_painter(void) {
-    font_thintel = qp_load_font_mem(font_thintel15);
-    font_mono    = qp_load_font_mem(font_ProggyTiny15);
-    font_oled    = qp_load_font_mem(font_oled_font);
-    frame        = qp_load_image_mem(gfx_frame);
-
-    // ters1 = qp_load_image_mem(gfx_ters1);
-    lock_caps_on  = qp_load_image_mem(gfx_lock_caps_ON);
-    lock_caps_off = qp_load_image_mem(gfx_lock_caps_OFF);
-    lock_num_on   = qp_load_image_mem(gfx_lock_NUM_ON);
-    lock_num_off  = qp_load_image_mem(gfx_lock_NUM_OFF);
-    lock_scrl_on  = qp_load_image_mem(gfx_lock_scrl_ON);
-    lock_scrl_off = qp_load_image_mem(gfx_lock_scrl_OFF);
-    // test_anim = qp_load_image_mem(gfx_test_anim);
-    // matrix = qp_load_image_mem(gfx_matrix);
-    cg_on      = qp_load_image_mem(gfx_cg_on);
-    cg_off     = qp_load_image_mem(gfx_cg_off);
-    mouse_icon = qp_load_image_mem(gfx_mouse_icon);
-
-#ifdef BACKLIGHT_ENABLE
-    backlight_level_noeeprom(BACKLIGHT_LEVELS);
-#elif defined(BACKLIGHT_PIN)
-    gpio_set_pin_output_push_pull(BACKLIGHT_PIN);
-    gpio_write_pin_high(BACKLIGHT_PIN);
-#endif
-    wait_ms(150);
-
-    ili9341_display =
-        qp_ili9341_make_spi_device(240, 320, DISPLAY_CS_PIN, DISPLAY_DC_PIN, DISPLAY_RST_PIN, DISPLAY_SPI_DIVIDER, 0);
-    init_and_clear(ili9341_display, QP_ROTATION_180);
-    qp_power(ili9341_display, true);
-
-    wait_ms(50);
-}
-
-#ifdef BACKLIGHT_ENABLE
-static uint8_t last_backlight = 255;
-#endif
-
-void suspend_power_down_quantum_painter(void) {
-#ifdef BACKLIGHT_ENABLE
-    if (last_backlight == 255) {
-        last_backlight = get_backlight_level();
-    }
-    backlight_set(0);
-#elif defined(BACKLIGHT_PIN)
-    gpio_write_pin_low(BACKLIGHT_PIN);
-#endif
-    qp_power(ili9341_display, false);
-}
-
-void suspend_wakeup_init_quantum_painter(void) {
-    qp_power(ili9341_display, true);
-#ifdef BACKLIGHT_ENABLE
-    if (last_backlight != 255) {
-        backlight_set(last_backlight);
-    }
-    last_backlight = 255;
-#elif defined(BACKLIGHT_PIN)
-    gpio_write_pin_high(BACKLIGHT_PIN);
-#endif
-}
-
-void shutdown_quantum_painter(void) {
-#ifdef BACKLIGHT_ENABLE
-    backlight_set(0);
-#elif defined(BACKLIGHT_PIN)
-    gpio_write_pin_low(BACKLIGHT_PIN);
-#endif
-    qp_power(ili9341_display, false);
 }

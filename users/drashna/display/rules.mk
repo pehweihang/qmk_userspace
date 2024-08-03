@@ -11,13 +11,14 @@ ifeq ($(strip $(CUSTOM_QUANTUM_PAINTER_ENABLE)), yes)
             SRC += $(USER_PATH)/display/painter/ili9341_display.c
         endif
 
-        SRC += $(USER_PATH)/display/painter/fonts.qff.c \
+        SRC += $(USER_PATH)/display/painter/painter.c \
                $(USER_PATH)/display/painter/graphics.qgf.c
     endif
 endif
 
 ifeq ($(strip $(QUANTUM_PAINTER_ENABLE)), yes)
     SRC += \
+        $(USER_PATH)/display/painter/fonts.qff.c \
         $(USER_PATH)/display/painter/graphics/asuka-240x320.qgf.c \
         $(USER_PATH)/display/painter/graphics/anime-girl-jacket-240x320.qgf.c \
         $(USER_PATH)/display/painter/graphics/neon-genesis-evangelion-initial-machine-00-240x320.qgf.c \

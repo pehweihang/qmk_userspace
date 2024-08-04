@@ -11,6 +11,9 @@
 #ifdef CUSTOM_SPLIT_TRANSPORT_SYNC
 #    include "split/transport_sync.h"
 #endif
+#ifdef RTC_ENABLE
+#    include "features/rtc/rtc.h"
+#endif
 
 #include <math.h>
 #include <stdio.h>
@@ -604,6 +607,34 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             keylogger_has_changed = false;
         }
 #endif
+
+#ifdef RTC_ENABLE
+        ypos -= (font_oled->line_height + 4);
+        static uint16_t rtc_timer  = 0;
+        bool            rtc_redraw = false;
+        if (timer_elapsed(rtc_timer) > 125 && rtc_is_connected()) {
+            rtc_timer  = timer_read();
+            rtc_redraw = true;
+        }
+        if (hue_redraw || rtc_redraw) {
+            static uint16_t max_rtc_xpos = 0;
+            xpos                         = 5;
+            snprintf(buf, sizeof(buf), "RTC Date/Time: %s", rtc_read_date_time_str());
+
+            uint8_t title_width = qp_textwidth(font_oled, buf);
+            if (title_width > (width - 6)) {
+                title_width = width - 6;
+            }
+            uint8_t title_xpos = (width - title_width) / 2;
+
+            xpos += qp_drawtext_recolor(ili9341_display, title_xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue,
+                                        255, 0);
+            if (max_rtc_xpos < xpos) {
+                max_rtc_xpos = xpos;
+            }
+            qp_rect(ili9341_display, xpos, ypos, max_rtc_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
+        }
+#endif // RTC_ENABLE
     }
     qp_flush(ili9341_display);
 }

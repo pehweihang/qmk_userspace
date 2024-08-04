@@ -123,10 +123,26 @@ void render_character_set(painter_device_t display, uint16_t* x_offset, uint16_t
     *ypos += font->line_height + 4;
 }
 
+#ifdef BACKLIGHT_ENABLE
+static uint8_t last_backlight = 255;
+#endif
+
 void housekeeping_task_quantum_painter(void) {
 #ifdef QUANTUM_PAINTER_ILI9341_ENABLE
     ili9341_draw_user();
 #endif // QUANTUM_PAINTER_ILI9341_ENABLE
+#if (QUANTUM_PAINTER_DISPLAY_TIMEOUT) > 0
+    if (last_input_activity_elapsed() > QUANTUM_PAINTER_DISPLAY_TIMEOUT) {
+#    if defined(BACKLIGHT_ENABLE)
+        if (last_backlight == 255) {
+            last_backlight = get_backlight_level();
+        }
+        backlight_set(0);
+#    elif defined(BACKLIGHT_PIN)
+        gpio_write_pin_low(BACKLIGHT_PIN);
+#    endif // BACKLIGHT_ENABLE
+    }
+#endif // QUANTUM_PAINTER_DISPLAY_TIMEOUT
 }
 
 void keyboard_post_init_quantum_painter(void) {
@@ -141,10 +157,6 @@ void keyboard_post_init_quantum_painter(void) {
     init_display_ili9341();
 #endif // QUANTUM_PAINTER_ILI9341_ENABLE
 }
-
-#ifdef BACKLIGHT_ENABLE
-static uint8_t last_backlight = 255;
-#endif
 
 void suspend_power_down_quantum_painter(void) {
 #ifdef BACKLIGHT_ENABLE

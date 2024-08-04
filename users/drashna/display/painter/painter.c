@@ -131,8 +131,8 @@ void qp_backlight_enable(void) {
 #ifdef BACKLIGHT_ENABLE
     if (last_backlight != 255) {
         backlight_level_noeeprom(last_backlight);
+        last_backlight = 255;
     }
-    last_backlight = 255;
 #elif defined(BACKLIGHT_PIN)
     gpio_write_pin_high(BACKLIGHT_PIN);
 #endif // BACKLIGHT_ENABLE
@@ -142,8 +142,8 @@ void qp_backlight_disable(void) {
 #ifdef BACKLIGHT_ENABLE
     if (last_backlight == 255) {
         last_backlight = get_backlight_level();
+        backlight_level_noeeprom(0);
     }
-    backlight_level_noeeprom(0);
 #elif defined(BACKLIGHT_PIN)
     gpio_write_pin_low(BACKLIGHT_PIN);
 #endif // BACKLIGHT_ENABLE

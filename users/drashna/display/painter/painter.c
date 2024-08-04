@@ -153,7 +153,7 @@ void housekeeping_task_quantum_painter(void) {
     ili9341_draw_user();
 #endif // QUANTUM_PAINTER_ILI9341_ENABLE
 #if (QUANTUM_PAINTER_DISPLAY_TIMEOUT) > 0
-    if (last_input_activity_elapsed() > QUANTUM_PAINTER_DISPLAY_TIMEOUT) {
+    if (is_keyboard_master() && (last_input_activity_elapsed() > QUANTUM_PAINTER_DISPLAY_TIMEOUT)) {
         qp_backlight_disable();
     } else {
         qp_backlight_enable();

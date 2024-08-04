@@ -137,7 +137,7 @@ void housekeeping_task_quantum_painter(void) {
         if (last_backlight == 255) {
             last_backlight = get_backlight_level();
         }
-        backlight_set(0);
+        backlight_level_noeeprom(0);
 #    elif defined(BACKLIGHT_PIN)
         gpio_write_pin_low(BACKLIGHT_PIN);
 #    endif // BACKLIGHT_ENABLE
@@ -163,7 +163,7 @@ void suspend_power_down_quantum_painter(void) {
     if (last_backlight == 255) {
         last_backlight = get_backlight_level();
     }
-    backlight_set(0);
+    backlight_level_noeeprom(0);
 #elif defined(BACKLIGHT_PIN)
     gpio_write_pin_low(BACKLIGHT_PIN);
 #endif
@@ -178,7 +178,7 @@ void suspend_wakeup_init_quantum_painter(void) {
 #endif // QUANTUM_PAINTER_ILI9341_ENABLE
 #ifdef BACKLIGHT_ENABLE
     if (last_backlight != 255) {
-        backlight_set(last_backlight);
+        backlight_level_noeeprom(last_backlight);
     }
     last_backlight = 255;
 #elif defined(BACKLIGHT_PIN)

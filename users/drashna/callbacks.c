@@ -162,6 +162,9 @@ void                       suspend_wakeup_init_user(void) {
 #ifdef WATCHDOG_ENABLE
     suspend_wakeup_init_watchdog();
 #endif
+    void last_matrix_activity_trigger(void);
+    last_matrix_activity_trigger();
+
     set_is_device_suspended(false);
 #ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
     suspend_wakeup_init_quantum_painter();

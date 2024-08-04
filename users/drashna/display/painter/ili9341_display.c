@@ -70,6 +70,10 @@ void init_display_ili9341(void) {
     qp_get_geometry(ili9341_display, &width, &height, NULL, NULL, NULL);
     qp_clear(ili9341_display);
     qp_rect(ili9341_display, 0, 0, width - 1, height - 1, 0, 0, 0, true);
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Initial render of frame/logo
+
     if (is_keyboard_master()) {
         frame = qp_load_image_mem(gfx_frame);
         qp_drawimage_recolor(ili9341_display, 0, 0, frame, 0, 0, 255, 0, 0, 0);
@@ -132,8 +136,11 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
     if (is_keyboard_master()) {
         char     buf[50] = {0};
-        uint16_t ypos    = 16;
+        uint16_t ypos    = 18;
         uint16_t xpos    = 5;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // LED Lock Indicators
 
 #ifdef QP_LOCK_LOGO_ENABLE
         static led_t last_led_state = {0};
@@ -151,6 +158,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
         ypos += lock_caps_on->height + 4;
 #endif // QP_LOCK_LOGO_ENABLE
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //  WPM
 
         static uint16_t max_wpm_xpos = 0;
 #ifdef WPM_ENABLE
@@ -174,6 +184,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         }
 #endif // WPM_ENABLE
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Matrix Scan rate
+
         bool            scan_redraw      = false;
         static uint32_t last_scan_update = 0;
         if (timer_elapsed32(last_scan_update) > 125) {
@@ -191,6 +204,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             }
             qp_rect(ili9341_display, xpos, ypos, max_scans_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Pointing Device CPI
 
 #ifdef POINTING_DEVICE_ENABLE
         static uint16_t last_cpi   = {0xFFFF};
@@ -218,6 +234,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         //     qp_drawimage(ili9341_display, xpos, ypos, mouse_icon);
         // }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Pointing Device Drag Scroll
+
         bool            ds_state_redraw = false;
         static uint32_t last_ds_state   = 0xFFFFFFFF;
         if (last_ds_state != charybdis_get_pointer_dragscroll_enabled()) {
@@ -238,6 +257,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             }
             qp_rect(ili9341_display, xpos, ypos, max_dss_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Pointing Device Auto Mouse Layer
 
 #    ifdef POINTING_DEVICE_AUTO_MOUSE_ENABLE
         bool           am_state_redraw = false;
@@ -260,6 +282,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         }
 #    endif
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Pointing Device Sniping mode
+
         bool           sp_state_redraw = false;
         static uint8_t last_sp_state   = 0xFF;
         if (last_sp_state != charybdis_get_pointer_sniping_enabled()) {
@@ -279,6 +304,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             qp_rect(ili9341_display, xpos, ypos, max_sps_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
 #endif // POINTING_DEVICE_ENABLE
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Keymap config (nkro, autocorrect, oneshots)
 
         ypos += font_oled->line_height + 4;
         static keymap_config_t last_keymap_config = {0};
@@ -304,6 +332,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             }
             qp_rect(ili9341_display, xpos, ypos, max_bpm_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Device Config (Audio, Audio Clicky, Host Driver lock, Swap Hands)
 
         ypos += font_oled->line_height + 4;
         static user_runtime_config_t last_user_state = {0};
@@ -332,6 +363,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             qp_rect(ili9341_display, xpos, ypos, max_upm_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // LED Lock indicator (text)
+
         ypos += font_oled->line_height + 4;
         static led_t last_led_state = {0};
         if (hue_redraw || last_led_state.raw != host_keyboard_led_state().raw) {
@@ -357,6 +391,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             }
             qp_rect(ili9341_display, xpos, ypos, max_led_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Mods
 
         ypos += font_oled->line_height + 4;
         static uint8_t last_mods    = {0};
@@ -389,6 +426,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             }
             qp_rect(ili9341_display, xpos, ypos, max_mod_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //  RGB Light Settings
 
 #if defined(RGBLIGHT_ENABLE)
         ypos += font_oled->line_height + 4;
@@ -430,6 +470,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         }
 #endif // RGBLIGHT_ENABLE
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // RGB Matrix Settings
+
 #if defined(RGB_MATRIX_ENABLE)
         ypos += font_oled->line_height + 4;
         if (hue_redraw || rgb_effect_redraw) {
@@ -469,6 +512,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                     rgb_matrix_get_hue(), rgb_matrix_get_sat(), rgb_matrix_get_val(), true);
         }
 #endif // RGB_MATRIX_ENABLE
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //  Default layer state
 
         bool                 layer_state_redraw = false, dl_state_redraw = false;
         static layer_state_t last_layer_state = 0, last_dl_state = 0;
@@ -510,6 +556,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             qp_rect(ili9341_display, xpos, ypos, max_layer_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Layer State
+
         if (hue_redraw || layer_state_redraw) {
             const char* layer_name = "default";
             switch (get_highest_layer(layer_state)) {
@@ -540,6 +589,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             }
             qp_rect(ili9341_display, xpos, ypos, max_layer_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Autocorrection values
 
 #ifdef AUTOCORRECT_ENABLE
         ypos += font_oled->line_height + 4;
@@ -572,6 +624,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         }
 #endif // AUTOCORRECT_ENABLE
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Font test
+
 #if 0
         ypos += font_oled->line_height + 4;
         if (hue_redraw) {
@@ -585,6 +640,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                                  255, 0);
         }
 #endif
+
+        // Keylogger
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifdef KEYLOGGER_ENABLE // keep at very end
         static uint32_t last_klog_update = 0;
@@ -607,6 +665,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             keylogger_has_changed = false;
         }
 #endif
+
+        // RTC
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifdef RTC_ENABLE
         ypos -= (font_oled->line_height + 4);

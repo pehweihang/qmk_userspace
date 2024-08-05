@@ -23,6 +23,9 @@ extern bool swap_hands;
 #ifdef CUSTOM_OLED_DRIVER
 #    include "display/oled/oled_stuff.h"
 #endif
+#ifndef FORCED_SYNC_THROTTLE_MS
+#    define FORCED_SYNC_THROTTLE_MS 100
+#endif // FORCED_SYNC_THROTTLE_MS
 
 extern userspace_config_t userspace_config;
 _Static_assert(sizeof(userspace_config_t) <= RPC_M2S_BUFFER_SIZE,
@@ -166,7 +169,7 @@ void user_transport_sync(void) {
 #if defined(AUTOCORRECT_ENABLE)
         static char temp_autocorrected_str[2][22] = {0};
 #endif
-        if (timer_elapsed32(last_sync[5]) > 500 && !is_device_suspended()) {
+        if (timer_elapsed32(last_sync[5]) > FORCED_SYNC_THROTTLE_MS && !is_device_suspended()) {
             transaction_rpc_send(RPC_ID_USER_SUSPEND_STATE_SYNC, sizeof(bool), &needs_sync);
             last_sync[5] = timer_read32();
         }
@@ -175,8 +178,8 @@ void user_transport_sync(void) {
             needs_sync = true;
             memcpy(&last_user_state, &transport_user_state, sizeof(transport_user_state));
         }
-        // Send to slave every 500ms regardless of state change
-        if (timer_elapsed32(last_sync[0]) > 250) {
+        // Send to slave every FORCED_SYNC_THROTTLE_MS regardless of state change
+        if (timer_elapsed32(last_sync[0]) > FORCED_SYNC_THROTTLE_MS) {
             needs_sync = true;
         }
 
@@ -194,8 +197,8 @@ void user_transport_sync(void) {
             memcpy(&last_keymap, &transport_keymap_config, sizeof(transport_keymap_config));
         }
 
-        // Send to slave every 500ms regardless of state change
-        if (timer_elapsed32(last_sync[1]) > 250) {
+        // Send to slave every FORCED_SYNC_THROTTLE_MS regardless of state change
+        if (timer_elapsed32(last_sync[1]) > FORCED_SYNC_THROTTLE_MS) {
             needs_sync = true;
         }
 
@@ -214,8 +217,8 @@ void user_transport_sync(void) {
             memcpy(&last_config, &user_state, sizeof(transport_userspace_config));
         }
 
-        // Send to slave every 500ms regardless of state change
-        if (timer_elapsed32(last_sync[2]) > 250) {
+        // Send to slave every FORCED_SYNC_THROTTLE_MS regardless of state change
+        if (timer_elapsed32(last_sync[2]) > FORCED_SYNC_THROTTLE_MS) {
             needs_sync = true;
         }
 
@@ -234,7 +237,7 @@ void user_transport_sync(void) {
             needs_sync = true;
             memcpy(&keylog_temp, &oled_keylog_str, OLED_KEYLOGGER_LENGTH + 1);
         }
-        if (timer_elapsed32(last_sync[3]) > 250) {
+        if (timer_elapsed32(last_sync[3]) > FORCED_SYNC_THROTTLE_MS) {
             needs_sync = true;
         }
 
@@ -251,7 +254,7 @@ void user_transport_sync(void) {
             needs_sync = true;
             memcpy(&temp_autocorrected_str, &autocorrected_str, sizeof(autocorrected_str));
         }
-        if (timer_elapsed32(last_sync[4]) > 250) {
+        if (timer_elapsed32(last_sync[4]) > FORCED_SYNC_THROTTLE_MS) {
             needs_sync = true;
         }
 

@@ -466,7 +466,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             }
             qp_rect(ili9341_display, xpos, ypos, max_hsv_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
             qp_rect(ili9341_display, max_hsv_xpos + 5, ypos, max_hsv_xpos + 25, ypos + font_oled->line_height - 1,
-                    rgblight_get_hue(), rgblight_get_sat(), rgblight_get_val(), true);
+                    rgblight_get_hue(), rgblight_get_sat(), (uint8_t)(rgblight_get_val() * 0xFF / RGBLIGHT_LIMIT_VAL),
+                    true);
         }
 #endif // RGBLIGHT_ENABLE
 
@@ -509,7 +510,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             }
             qp_rect(ili9341_display, xpos, ypos, max_hsv_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
             qp_rect(ili9341_display, max_hsv_xpos + 5, ypos, max_hsv_xpos + 25, ypos + font_oled->line_height - 1,
-                    rgb_matrix_get_hue(), rgb_matrix_get_sat(), rgb_matrix_get_val(), true);
+                    rgb_matrix_get_hue(), rgb_matrix_get_sat(),
+                    (uint8_t)(rgb_matrix_get_val() * 0xFF / RGB_MATRIX_MAXIMUM_BRIGHTNESS), true);
         }
 #endif // RGB_MATRIX_ENABLE
 

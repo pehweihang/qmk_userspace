@@ -8,6 +8,7 @@
 #include "progmem.h"
 
 extern bool               keylogger_has_changed;
+extern bool               layer_map_has_updated;
 extern const char PROGMEM code_to_name[256];
 
 bool process_record_display_driver(uint16_t keycode, keyrecord_t* record);

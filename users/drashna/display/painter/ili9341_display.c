@@ -14,6 +14,9 @@
 #ifdef RTC_ENABLE
 #    include "features/rtc/rtc.h"
 #endif
+#ifdef LAYER_MAP_ENABLE
+#    include "features/layer_map.h"
+#endif
 
 #include <math.h>
 #include <stdio.h>
@@ -698,6 +701,36 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             qp_rect(ili9341_display, xpos, ypos, max_rtc_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
 #endif // RTC_ENABLE
+
+        //  Layer Map render
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#ifdef LAYER_MAP_ENABLE
+        ypos -= (font_oled->line_height + 4) * LAYER_MAP_ROWS;
+        if (hue_redraw || layer_map_has_updated) {
+            uint16_t temp_ypos = ypos;
+            for (uint8_t y = 0; y < LAYER_MAP_ROWS; y++) {
+                xpos = 25;
+                for (uint8_t x = 0; x < LAYER_MAP_COLS; x++) {
+                    uint16_t keycode = extract_basic_keycode(layer_map[y][x], NULL, false);
+                    char     code    = 0;
+                    if (keycode > 0xFF) {
+                        keycode = KC_SPC;
+                    }
+                    if (keycode < ARRAY_SIZE(code_to_name)) {
+                        code = pgm_read_byte(&code_to_name[keycode]);
+                    }
+                    snprintf(buf, sizeof(buf), "%c", code);
+                    xpos += qp_drawtext_recolor(ili9341_display, xpos, temp_ypos, font_oled, buf, curr_hue, 255, 255, 0,
+                                                0, peek_matrix_layer_map(y, x) ? 255 : 0) +
+                            5;
+                }
+                temp_ypos += font_oled->line_height + 4;
+            }
+            layer_map_has_updated = false;
+        }
+
+#endif
     }
     qp_flush(ili9341_display);
 }

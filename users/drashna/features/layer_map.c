@@ -10,6 +10,9 @@
 volatile uint16_t layer_map[LAYER_MAP_ROWS][LAYER_MAP_COLS] = {0};
 static bool       layer_map_set                             = false;
 extern bool       peek_matrix(uint8_t row_index, uint8_t col_index, bool read_raw);
+#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+extern bool layer_map_has_updated;
+#endif
 
 void set_layer_map(void) {
     layer_map_set = true;
@@ -41,6 +44,9 @@ void populate_layer_map(void) {
         }
         // xprintf("\n");
     }
+#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+    layer_map_has_updated = true;
+#endif
 }
 
 bool peek_matrix_layer_map(uint8_t row, uint8_t col) {
@@ -50,7 +56,7 @@ bool peek_matrix_layer_map(uint8_t row, uint8_t col) {
     }
     return peek_matrix(layer_remap[row][col].row, layer_remap[row][col].col, false);
 #else
-    if (row = > KEYLOC_DIP_SWITCH_OFF) {
+    if (row >= KEYLOC_DIP_SWITCH_OFF) {
         return false;
     }
     return peek_matrix(row, col, false);

@@ -20,6 +20,9 @@ char qp_keylog_str[QP_KEYLOGGER_LENGTH] = {0};
 #ifdef KEYLOGGER_ENABLE
 bool keylogger_has_changed = true;
 #endif
+#ifdef LAYER_MAP_ENABLE
+__attribute__((unused)) bool layer_map_has_updated = true;
+#endif
 
 // clang-format off
 const char PROGMEM code_to_name[256] = {

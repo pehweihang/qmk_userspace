@@ -109,7 +109,12 @@ bool ds1307_init(rtc_time_t *time) {
         dprintf("DS1307: Failed to initialize\n");
     }
 
-    if (ds1307_has_lost_power()) {
+#ifdef RTC_FORCE_INIT
+    if (true)
+#else
+    if (ds1307_has_lost_power())
+#endif
+    {
         // If there is an issue with the RTC config, then manually set the RTC time to the compile time
         // It's not exact, but it's better than nothing. Can be adjusted manually, later.
         xprintf("DS1307: Clock not running. Setting to compiled date/time as fallback\n");

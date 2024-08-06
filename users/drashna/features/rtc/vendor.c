@@ -55,7 +55,12 @@ void vendor_rtc_get_time(rtc_time_t *time) {
 bool vendor_rtc_init(rtc_time_t *time) {
     vendor_rtc_get_time(time);
 
-    if (time->year < 2000) {
+#ifdef RTC_FORCE_INIT
+    if (true)
+#else
+    if (time->year < 2000)
+#endif
+    {
         dprintf("Vendor RTC: Date/time not set. Setting to compiled date/time as fallback!\n");
         vendor_rtc_set_time(convert_date_time(__DATE__, __TIME__));
     } else {

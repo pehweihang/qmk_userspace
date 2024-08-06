@@ -11,6 +11,9 @@ ifeq ($(strip $(RTC_ENABLE)), yes)
         POST_CONFIG_H += $(USER_PATH)/features/rtc/config.h
         VPATH += $(USER_PATH)/features/rtc/
 
+        ifeq ($(strip $(RTC_FORCE_INIT)), yes)
+            OPT_DEFS += -DRTC_FORCE_INIT
+        endif
         ifeq ($(strip $(RTC_DRIVER)), vendor)
             OPT_DEFS += -DHAL_USE_RTC=TRUE
         else

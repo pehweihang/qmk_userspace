@@ -472,6 +472,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             qp_rect(ili9341_display, max_hsv_xpos + 5, ypos, max_hsv_xpos + 25, ypos + font_oled->line_height - 1,
                     rgblight_get_hue(), rgblight_get_sat(), (uint8_t)(rgblight_get_val() * 0xFF / RGBLIGHT_LIMIT_VAL),
                     true);
+        } else {
+            // we called ypos inside the function ... to make sure we don't skip a line on future passes ....
+            ypos += font_oled->line_height + 4;
         }
 #endif // RGBLIGHT_ENABLE
 
@@ -516,6 +519,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             qp_rect(ili9341_display, max_hsv_xpos + 5, ypos, max_hsv_xpos + 25, ypos + font_oled->line_height - 1,
                     rgb_matrix_get_hue(), rgb_matrix_get_sat(),
                     (uint8_t)(rgb_matrix_get_val() * 0xFF / RGB_MATRIX_MAXIMUM_BRIGHTNESS), true);
+        } else {
+            // we called ypos inside the function ... to make sure we don't skip a line on future passes ....
+            ypos += font_oled->line_height + 4;
         }
 #endif // RGB_MATRIX_ENABLE
 
@@ -627,6 +633,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
 
             autocorrect_str_has_changed = false;
+        } else {
+            // we called ypos inside the function ... to make sure we don't skip a line on future passes ....
+            ypos += font_oled->line_height + 4;
         }
 #endif // AUTOCORRECT_ENABLE
 

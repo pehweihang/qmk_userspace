@@ -176,7 +176,7 @@ void render_default_layer_state(uint8_t col, uint8_t line) {
 
     if (old_state != default_layer_state) {
         snprintf(layer_state_buffer, sizeof(layer_state_buffer), "%-10s",
-                 get_layer_name_string(default_layer_state, false));
+                 get_layer_name_string(default_layer_state, false, true));
         old_state = default_layer_state;
     }
     oled_write(layer_state_buffer, false);

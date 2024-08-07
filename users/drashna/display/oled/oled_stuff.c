@@ -45,11 +45,7 @@ bool is_oled_enabled = true, is_oled_force_off = false, oled_screensaver_enabled
 uint32_t               oled_timer = 0;
 extern oled_rotation_t oled_rotation;
 extern uint8_t         oled_rotation_width;
-#ifdef DISPLAY_KEYLOGGER_ENABLE
-char oled_keylog_str[OLED_KEYLOGGER_LENGTH + 1] = {0};
-#endif // DISPLAY_KEYLOGGER_ENABLE
-
-deferred_token kittoken;
+deferred_token         kittoken;
 
 extern uint8_t         oled_buffer[OLED_MATRIX_SIZE];
 extern OLED_BLOCK_TYPE oled_dirty;
@@ -158,7 +154,7 @@ void render_keylogger_status(uint8_t col, uint8_t line) {
     oled_set_cursor(col, line);
 #    endif
     oled_write_P(PSTR(OLED_RENDER_KEYLOGGER), false);
-    oled_write(oled_keylog_str, false);
+    oled_write(display_keylogger_string, false);
 #endif // DISPLAY_KEYLOGGER_ENABLE
 }
 
@@ -1053,6 +1049,7 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     rotation            = oled_init_keymap(rotation, has_run);
 
     if (has_run) {
+        oled_set_brightness(userspace_config.oled_brightness);
         return rotation;
     }
 
@@ -1140,7 +1137,7 @@ bool oled_task_user(void) {
 #    ifdef DISPLAY_KEYLOGGER_ENABLE
     if (is_keyboard_left()) {
         oled_set_cursor(4, num_of_rows);
-        oled_write(oled_keylog_str, true);
+        oled_write(display_keylogger_string, true);
     } else
 #    endif // DISPLAY_KEYLOGGER_ENABLE
     {

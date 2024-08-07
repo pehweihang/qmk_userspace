@@ -634,7 +634,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         if (keylogger_has_changed) {
             static int max_klog_xpos = 0;
             xpos                     = 27;
-            snprintf(buf, sizeof(buf), "Keylogger: %s", qp_keylog_str);
+            snprintf(buf, sizeof(buf), "Keylogger: %s", display_keylogger_string);
 
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_mono, buf, 0, 255, 0, 0, 0, 255);
 

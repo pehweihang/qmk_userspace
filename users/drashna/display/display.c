@@ -3,26 +3,22 @@
 
 #if defined(OLED_ENABLE) && defined(CUSTOM_OLED_DRIVER)
 #    include "display/oled/oled_stuff.h"
-#    ifdef DISPLAY_KEYLOGGER_ENABLE
-extern char oled_keylog_str[OLED_KEYLOGGER_LENGTH + 1];
-#    endif
-#endif
+#endif // OLED_ENABLE && CUSTOM_OLED_DRIVER
 #if defined(QUANTUM_PAINTER_ENABLE) && defined(CUSTOM_QUANTUM_PAINTER_ENABLE)
 #    include "qp.h"
 #    ifdef CUSTOM_QUANTUM_PAINTER_ILI9341
 #        include "display/painter/ili9341_display.h"
 #    endif // CUSTOM_QUANTUM_PAINTER_ILI9341
-#    ifdef DISPLAY_KEYLOGGER_ENABLE
-char qp_keylog_str[QP_KEYLOGGER_LENGTH] = {0};
-#    endif // DISPLAY_KEYLOGGER_ENABLE
 #endif     // QUANTUM_PAINTER_ENABLE && CUSTOM_QUANTUM_PAINTER_ENABLE
 
 #ifdef DISPLAY_KEYLOGGER_ENABLE
 bool keylogger_has_changed = true;
+char display_keylogger_string[DISPLAY_KEYLOGGER_LENGTH + 1] = {0};
 #endif // DISPLAY_KEYLOGGER_ENABLE
+
 #ifdef LAYER_MAP_ENABLE
 __attribute__((unused)) bool layer_map_has_updated = true;
-#endif
+#endif // LAYER_MAP_ENABLE
 
 // clang-format off
 const char PROGMEM code_to_name[256] = {
@@ -87,12 +83,7 @@ __attribute__((unused)) static void add_keylog(uint16_t keycode, keyrecord_t* re
 bool process_record_display_driver(uint16_t keycode, keyrecord_t* record) {
     if (record->event.pressed) {
 #ifdef DISPLAY_KEYLOGGER_ENABLE
-#    if defined(OLED_ENABLE) && defined(CUSTOM_OLED_DRIVER)
-        add_keylog(keycode, record, oled_keylog_str, (OLED_KEYLOGGER_LENGTH + 1));
-#endif // OLED_ENABLE && CUSTOM_OLED_DRIVER
-#if defined(QUANTUM_PAINTER_ENABLE) && defined(CUSTOM_QUANTUM_PAINTER_ENABLE)
-        add_keylog(keycode, record, qp_keylog_str, QP_KEYLOGGER_LENGTH);
-#endif // QUANTUM_PAINTER_ENABLE && CUSTOM_QUANTUM_PAINTER_ENABLE
+        add_keylog(keycode, record, display_keylogger_string, (DISPLAY_KEYLOGGER_LENGTH + 1));
 #endif // DISPLAY_KEYLOGGER_ENABLE
     }
     return true;
@@ -106,13 +97,12 @@ bool process_record_display_driver(uint16_t keycode, keyrecord_t* record) {
 void keyboard_post_init_display_driver(void) {
 #ifdef DISPLAY_KEYLOGGER_ENABLE
     if (is_keyboard_master()) {
-#    if defined(OLED_ENABLE) && defined(CUSTOM_OLED_DRIVER)
-        memset(oled_keylog_str, ' ', OLED_KEYLOGGER_LENGTH);
-        oled_keylog_str[OLED_KEYLOGGER_LENGTH] = '\0';
-#    endif // OLED_ENABLE && CUSTOM_OLED_DRIVER
 #    if defined(QUANTUM_PAINTER_ENABLE) && defined(CUSTOM_QUANTUM_PAINTER_ENABLE)
-        memset(qp_keylog_str, '_', QP_KEYLOGGER_LENGTH);
+        memset(display_keylogger_string, '_', DISPLAY_KEYLOGGER_LENGTH);
+#    else  // QUANTUM_PAINTER_ENABLE && CUSTOM_QUANTUM_PAINTER_ENABLE
+        memset(display_keylogger_string, ' ', DISPLAY_KEYLOGGER_LENGTH);
 #    endif // QUANTUM_PAINTER_ENABLE && CUSTOM_QUANTUM_PAINTER_ENABLE
+        display_keylogger_string[DISPLAY_KEYLOGGER_LENGTH] = '\0';
     }
 #endif // DISPLAY_KEYLOGGER_ENABLE
 }

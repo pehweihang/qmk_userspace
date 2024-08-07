@@ -20,9 +20,9 @@ extern bool           delayed_tasks_run;
 #ifdef SWAP_HANDS_ENABLE
 extern bool swap_hands;
 #endif
-#ifdef CUSTOM_OLED_DRIVER
-#    include "display/oled/oled_stuff.h"
-#endif
+#ifdef DISPLAY_DRIVER_ENABLE
+#    include "display/display.h"
+#endif // DISPLAY_DRIVER_ENABLEj
 #ifndef FORCED_SYNC_THROTTLE_MS
 #    define FORCED_SYNC_THROTTLE_MS 100
 #endif // FORCED_SYNC_THROTTLE_MS
@@ -70,11 +70,11 @@ void autocorrect_string_sync(uint8_t initiator2target_buffer_size, const void* i
 #endif
 void keylogger_string_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
                            uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
-#if defined(CUSTOM_OLED_DRIVER) && defined(DISPLAY_KEYLOGGER_ENABLE)
-    if (initiator2target_buffer_size == (OLED_KEYLOGGER_LENGTH + 1)) {
-        memcpy(&oled_keylog_str, initiator2target_buffer, initiator2target_buffer_size);
+#if defined(DISPLAY_DRIVER_ENABLE) && defined(DISPLAY_KEYLOGGER_ENABLE)
+    if (initiator2target_buffer_size == (DISPLAY_KEYLOGGER_LENGTH + 1)) {
+        memcpy(&display_keylogger_string, initiator2target_buffer, initiator2target_buffer_size);
     }
-#endif // CUSTOM_OLED_DRIVER && DISPLAY_KEYLOGGER_ENABLE
+#endif // DISPLAY_DRIVER_ENABLE && DISPLAY_KEYLOGGER_ENABLE
 }
 
 void suspend_state_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
@@ -127,7 +127,7 @@ void user_transport_update(void) {
 #ifdef CAPS_WORD_ENABLE
         user_state.is_caps_word = is_caps_word_on();
 #endif
-        transport_user_state            = user_state.raw;
+        transport_user_state = user_state.raw;
     } else {
         keymap_config.raw    = transport_keymap_config;
         userspace_config.raw = transport_userspace_config;
@@ -161,8 +161,8 @@ void user_transport_sync(void) {
         static uint16_t last_keymap = 0;
         static uint32_t last_config = 0, last_sync[6], last_user_state = 0;
         bool            needs_sync = false;
-#if defined(CUSTOM_OLED_DRIVER) && defined(DISPLAY_KEYLOGGER_ENABLE)
-        static char keylog_temp[OLED_KEYLOGGER_LENGTH + 1] = {0};
+#if defined(DISPLAY_DRIVER_ENABLE) && defined(DISPLAY_KEYLOGGER_ENABLE)
+        static char keylog_temp[DISPLAY_KEYLOGGER_LENGTH + 1] = {0};
 #endif
 #if defined(AUTOCORRECT_ENABLE)
         static char temp_autocorrected_str[2][22] = {0};
@@ -229,11 +229,11 @@ void user_transport_sync(void) {
             needs_sync = false;
         }
 
-#if defined(CUSTOM_OLED_DRIVER) && defined(DISPLAY_KEYLOGGER_ENABLE)
+#if defined(DISPLAY_DRIVER_ENABLE) && defined(DISPLAY_KEYLOGGER_ENABLE)
         // Check if the state values are different
-        if (memcmp(&oled_keylog_str, &keylog_temp, OLED_KEYLOGGER_LENGTH + 1)) {
+        if (memcmp(&display_keylogger_string, &keylog_temp, (DISPLAY_KEYLOGGER_LENGTH + 1))) {
             needs_sync = true;
-            memcpy(&keylog_temp, &oled_keylog_str, OLED_KEYLOGGER_LENGTH + 1);
+            memcpy(&keylog_temp, &display_keylogger_string, (DISPLAY_KEYLOGGER_LENGTH + 1));
         }
         if (timer_elapsed32(last_sync[3]) > FORCED_SYNC_THROTTLE_MS) {
             needs_sync = true;
@@ -241,7 +241,8 @@ void user_transport_sync(void) {
 
         // Perform the sync if requested
         if (needs_sync) {
-            if (transaction_rpc_send(RPC_ID_USER_OLED_KEYLOG_STR, OLED_KEYLOGGER_LENGTH + 1, &oled_keylog_str)) {
+            if (transaction_rpc_send(RPC_ID_USER_OLED_KEYLOG_STR, (DISPLAY_KEYLOGGER_LENGTH + 1),
+                                     &display_keylogger_string)) {
                 last_sync[3] = timer_read32();
             }
             needs_sync = false;
@@ -274,7 +275,6 @@ void housekeeping_task_transport_sync(void) {
     // Data sync from master to slave
     user_transport_sync();
 }
-
 
 #if 0
 // lets define a custom data type to make things easier to work with

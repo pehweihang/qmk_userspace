@@ -12,7 +12,7 @@
 #endif     // QUANTUM_PAINTER_ENABLE && CUSTOM_QUANTUM_PAINTER_ENABLE
 
 #ifdef DISPLAY_KEYLOGGER_ENABLE
-bool keylogger_has_changed = true;
+bool keylogger_has_changed                                  = true;
 char display_keylogger_string[DISPLAY_KEYLOGGER_LENGTH + 1] = {0};
 #endif // DISPLAY_KEYLOGGER_ENABLE
 
@@ -85,8 +85,12 @@ bool process_record_display_driver(uint16_t keycode, keyrecord_t* record) {
 #ifdef DISPLAY_KEYLOGGER_ENABLE
         add_keylog(keycode, record, display_keylogger_string, (DISPLAY_KEYLOGGER_LENGTH + 1));
 #endif // DISPLAY_KEYLOGGER_ENABLE
+#ifdef OLED_ENABLE
+        process_record_user_oled(keycode, record);
+#endif // OLED_ENABLE
     }
     return true;
+    ;
 }
 
 /**

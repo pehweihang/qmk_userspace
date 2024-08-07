@@ -49,4 +49,7 @@ ifeq ($(strip $(DISPLAY_DRIVER_REQUIRED)), yes)
     DEFERRED_EXEC_ENABLE = yes
     SRC += $(USER_PATH)/display/display.c
     OPT_DEFS += -DDISPLAY_DRIVER_ENABLE
+    ifeq ($(strip $(DISPLAY_KEYLOGGER_ENABLE)), yes)
+        OPT_DEFS += -DDISPLAY_KEYLOGGER_ENABLE
+    endif
 endif

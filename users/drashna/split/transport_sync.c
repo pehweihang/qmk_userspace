@@ -68,14 +68,14 @@ void autocorrect_string_sync(uint8_t initiator2target_buffer_size, const void* i
     }
 }
 #endif
-#if defined(CUSTOM_OLED_DRIVER) && defined(KEYLOGGER_ENABLE)
 void keylogger_string_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
                            uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
+#if defined(CUSTOM_OLED_DRIVER) && defined(DISPLAY_KEYLOGGER_ENABLE)
     if (initiator2target_buffer_size == (OLED_KEYLOGGER_LENGTH + 1)) {
         memcpy(&oled_keylog_str, initiator2target_buffer, initiator2target_buffer_size);
     }
+#endif // CUSTOM_OLED_DRIVER && DISPLAY_KEYLOGGER_ENABLE
 }
-#endif
 
 void suspend_state_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
                         uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
@@ -101,9 +101,7 @@ void keyboard_post_init_transport_sync(void) {
 #if defined(AUTOCORRECT_ENABLE)
     transaction_register_rpc(RPC_ID_USER_AUTOCORRECT_STR, autocorrect_string_sync);
 #endif
-#if defined(CUSTOM_OLED_DRIVER) && defined(KEYLOGGER_ENABLE)
     transaction_register_rpc(RPC_ID_USER_OLED_KEYLOG_STR, keylogger_string_sync);
-#endif
     transaction_register_rpc(RPC_ID_USER_SUSPEND_STATE_SYNC, suspend_state_sync);
 }
 
@@ -163,7 +161,7 @@ void user_transport_sync(void) {
         static uint16_t last_keymap = 0;
         static uint32_t last_config = 0, last_sync[6], last_user_state = 0;
         bool            needs_sync = false;
-#if defined(CUSTOM_OLED_DRIVER) && defined(KEYLOGGER_ENABLE)
+#if defined(CUSTOM_OLED_DRIVER) && defined(DISPLAY_KEYLOGGER_ENABLE)
         static char keylog_temp[OLED_KEYLOGGER_LENGTH + 1] = {0};
 #endif
 #if defined(AUTOCORRECT_ENABLE)
@@ -231,7 +229,7 @@ void user_transport_sync(void) {
             needs_sync = false;
         }
 
-#if defined(CUSTOM_OLED_DRIVER) && defined(KEYLOGGER_ENABLE)
+#if defined(CUSTOM_OLED_DRIVER) && defined(DISPLAY_KEYLOGGER_ENABLE)
         // Check if the state values are different
         if (memcmp(&oled_keylog_str, &keylog_temp, OLED_KEYLOGGER_LENGTH + 1)) {
             needs_sync = true;

@@ -624,7 +624,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         // Keylogger
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifdef KEYLOGGER_ENABLE // keep at very end
+#ifdef DISPLAY_KEYLOGGER_ENABLE // keep at very end
         static uint32_t last_klog_update = 0;
         if (timer_elapsed32(last_klog_update) > 125 || keylogger_has_changed) {
             last_klog_update = timer_read32();
@@ -644,7 +644,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             // qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 255, true);
             keylogger_has_changed = false;
         }
-#endif
+#endif // DISPLAY_KEYLOGGER_ENABLE
 
         // RTC
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

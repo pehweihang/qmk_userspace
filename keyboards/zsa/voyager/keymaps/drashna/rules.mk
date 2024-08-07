@@ -10,7 +10,7 @@ WATCHDOG_ENABLE       = yes
 EEPROM_DRIVER         = i2c
 OLED_ENABLE           = yes
 WPM_ENABLE            = yes
-KEYLOGGER_ENABLE      = yes
+DISPLAY_KEYLOGGER_ENABLE = yes
 
 POINTING_DEVICE_ENABLE = yes
 POINTING_DEVICE_DRIVER = cirque_pinnacle_i2c

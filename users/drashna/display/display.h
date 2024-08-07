@@ -14,7 +14,7 @@ extern const char PROGMEM code_to_name[256];
 bool process_record_display_driver(uint16_t keycode, keyrecord_t* record);
 void keyboard_post_init_display_driver(void);
 
-#ifdef KEYLOGGER_ENABLE
+#ifdef DISPLAY_KEYLOGGER_ENABLE
 #    ifndef QP_KEYLOGGER_LENGTH
 #        define QP_KEYLOGGER_LENGTH 20
 #    endif

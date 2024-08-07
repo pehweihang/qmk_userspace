@@ -38,6 +38,7 @@ ifeq ($(strip $(KEYBOARD)), handwired/tractyl_manuform/5x6_right/f411)
     OVERLOAD_FEATURES                = yes
     HAPTIC_ENABLE                    = yes
     HAPTIC_DRIVER                    = drv2605l
+    RTC_DRIVER                       = ds3231
     WATCHDOG_ENABLE                  = yes
 endif
 
@@ -55,7 +56,6 @@ ifeq ($(strip $(OVERLOAD_FEATURES)), yes)
     SWAP_HANDS_ENABLE                = yes
     WPM_ENABLE                       = yes
     RTC_ENABLE                       = yes
-    RTC_DRIVER                       = ds3231
     SENTENCE_CASE_ENABLE             = yes
-    KEYLOGGER_ENABLE                 = yes
+    DISPLAY_KEYLOGGER_ENABLE         = yes
 endif

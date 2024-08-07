@@ -45,9 +45,9 @@ bool is_oled_enabled = true, is_oled_force_off = false, oled_screensaver_enabled
 uint32_t               oled_timer = 0;
 extern oled_rotation_t oled_rotation;
 extern uint8_t         oled_rotation_width;
-#ifdef KEYLOGGER_ENABLE
+#ifdef DISPLAY_KEYLOGGER_ENABLE
 char oled_keylog_str[OLED_KEYLOGGER_LENGTH + 1] = {0};
-#endif
+#endif // DISPLAY_KEYLOGGER_ENABLE
 
 deferred_token kittoken;
 
@@ -153,13 +153,13 @@ bool process_record_user_oled(uint16_t keycode, keyrecord_t *record) {
  *
  */
 void render_keylogger_status(uint8_t col, uint8_t line) {
-#ifdef KEYLOGGER_ENABLE
+#ifdef DISPLAY_KEYLOGGER_ENABLE
 #    ifdef OLED_DISPLAY_VERBOSE
     oled_set_cursor(col, line);
 #    endif
     oled_write_P(PSTR(OLED_RENDER_KEYLOGGER), false);
     oled_write(oled_keylog_str, false);
-#endif
+#endif // DISPLAY_KEYLOGGER_ENABLE
 }
 
 /**
@@ -1137,12 +1137,12 @@ bool oled_task_user(void) {
     oled_set_cursor(0, num_of_rows);
     oled_write_raw_P(footer_image2, sizeof(footer_image2));
 
-#    ifdef KEYLOGGER_ENABLE
+#    ifdef DISPLAY_KEYLOGGER_ENABLE
     if (is_keyboard_left()) {
         oled_set_cursor(4, num_of_rows);
         oled_write(oled_keylog_str, true);
     } else
-#    endif // KEYLOGGER_ENABLE
+#    endif // DISPLAY_KEYLOGGER_ENABLE
     {
         render_unicode_mode_small(4, num_of_rows, true);
     }

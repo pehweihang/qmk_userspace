@@ -311,10 +311,10 @@ bool get_keyboard_lock(void) {
     return host_driver_disabled;
 }
 
-const char *get_layer_name_string(layer_state_t state, bool alt_name) {
+const char *get_layer_name_string(layer_state_t state, bool alt_name, bool is_default) {
     switch (get_highest_layer(state)) {
         case _QWERTY:
-            return alt_name ? "Num Pad" : "QWERTY";
+            return alt_name ? "Num Pad" : is_default ? "QWERTY" : "Base";
         case _COLEMAK:
             return "Colemak";
         case _COLEMAK_DH:

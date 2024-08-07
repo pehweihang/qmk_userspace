@@ -541,25 +541,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
         ypos += font_oled->line_height + 4;
         if (hue_redraw || dl_state_redraw || layer_state_redraw) {
-            const char* dl_name = "unknown";
-            switch (get_highest_layer(default_layer_state)) {
-                case _COLEMAK_DH:
-                    dl_name = "COLEMAK_DH";
-                    break;
-                case _COLEMAK:
-                    dl_name = "COLEMAK";
-                    break;
-                case _QWERTY:
-                    dl_name = "QWERTY";
-                    break;
-                case _DVORAK:
-                    dl_name = "DVORAK";
-                    break;
-            }
-
             static int max_layer_xpos = 0;
             xpos                      = 5;
-            snprintf(buf, sizeof(buf), "LAYOUT: %s", dl_name);
+            snprintf(buf, sizeof(buf), "LAYOUT: %s", get_layer_name_string(layer_state, false, true));
             xpos +=
                 qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_layer_xpos < xpos) {
@@ -572,28 +556,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         // Layer State
 
         if (hue_redraw || layer_state_redraw) {
-            const char* layer_name = "default";
-            switch (get_highest_layer(layer_state)) {
-                case _MOUSE:
-                    layer_name = "mouse";
-                    break;
-                case _LOWER:
-                    layer_name = "lower";
-                    break;
-                case _RAISE:
-                    layer_name = "raise";
-                    break;
-                case _ADJUST:
-                    layer_name = "adjust";
-                    break;
-                case _MEDIA:
-                    layer_name = "keypad";
-                    break;
-            }
-
             static int max_layer_xpos = 0;
             xpos                      = 5 + (qp_textwidth(font_oled, "LAYOUT: COLEMAK_DH"));
-            snprintf(buf, sizeof(buf), "LAYER: %s", layer_name);
+            snprintf(buf, sizeof(buf), "LAYER: %s", get_layer_name_string(layer_state, false, false));
             xpos +=
                 qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_layer_xpos < xpos) {

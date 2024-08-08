@@ -3,6 +3,7 @@
 
 #include "action.h"
 #include "drashna.h"
+#include "keyboard.h"
 #ifdef LAYER_MAP_ENABLE
 #    include "layer_map.h"
 #endif
@@ -32,6 +33,8 @@ void keyboard_post_init_unicode(void);
 #if defined(LAYER_LOCK_ENABLE) && defined(LAYER_LOCK_IDLE_TIMEOUT)
 #    include "layer_lock.h"
 #endif
+
+user_runtime_config_t user_state;
 
 __attribute__((weak)) void keyboard_pre_init_keymap(void) {}
 void                       keyboard_pre_init_user(void) {
@@ -329,6 +332,27 @@ void                       matrix_slave_scan_user(void) {
 
 __attribute__((weak)) void housekeeping_task_keymap(void) {}
 void                       housekeeping_task_user(void) {
+    if (is_keyboard_master()) {
+#ifdef AUDIO_ENABLE
+        user_state.audio_enable        = is_audio_on();
+        user_state.audio_clicky_enable = is_clicky_on();
+#endif
+#if defined(POINTING_DEVICE_ENABLE) && defined(POINTING_DEVICE_AUTO_MOUSE_ENABLE)
+        user_state.tap_toggling = get_auto_mouse_toggle();
+#endif
+#ifdef UNICODE_COMMON_ENABLE
+        user_state.unicode_mode        = unicode_config.input_mode;
+        user_state.unicode_typing_mode = unicode_typing_mode;
+#endif
+#ifdef SWAP_HANDS_ENABLE
+        user_state.swap_hands = swap_hands;
+#endif
+        user_state.host_driver_disabled = get_keyboard_lock();
+#ifdef CAPS_WORD_ENABLE
+        user_state.is_caps_word = is_caps_word_on();
+#endif
+    }
+
 #ifdef WATCHDOG_ENABLE
     watchdog_task();
 #endif // WATCHDOG_ENABLE

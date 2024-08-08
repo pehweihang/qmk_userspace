@@ -27,7 +27,6 @@ extern bool swap_hands;
 #    define FORCED_SYNC_THROTTLE_MS 100
 #endif // FORCED_SYNC_THROTTLE_MS
 
-extern userspace_config_t userspace_config;
 _Static_assert(sizeof(userspace_config_t) <= RPC_M2S_BUFFER_SIZE,
                "userspace_config_t is larger than split buffer size!");
 _Static_assert(sizeof(user_runtime_config_t) <= RPC_M2S_BUFFER_SIZE,
@@ -35,8 +34,6 @@ _Static_assert(sizeof(user_runtime_config_t) <= RPC_M2S_BUFFER_SIZE,
 
 uint16_t transport_keymap_config    = 0;
 uint32_t transport_userspace_config = 0, transport_user_state = 0;
-
-user_runtime_config_t user_state;
 
 void user_state_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
                      uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
@@ -109,24 +106,6 @@ void user_transport_update(void) {
     if (is_keyboard_master()) {
         transport_keymap_config    = keymap_config.raw;
         transport_userspace_config = userspace_config.raw;
-#ifdef AUDIO_ENABLE
-        user_state.audio_enable        = is_audio_on();
-        user_state.audio_clicky_enable = is_clicky_on();
-#endif
-#if defined(POINTING_DEVICE_ENABLE) && defined(POINTING_DEVICE_AUTO_MOUSE_ENABLE)
-        user_state.tap_toggling = get_auto_mouse_toggle();
-#endif
-#ifdef UNICODE_COMMON_ENABLE
-        user_state.unicode_mode        = unicode_config.input_mode;
-        user_state.unicode_typing_mode = unicode_typing_mode;
-#endif
-#ifdef SWAP_HANDS_ENABLE
-        user_state.swap_hands = swap_hands;
-#endif
-        user_state.host_driver_disabled = get_keyboard_lock();
-#ifdef CAPS_WORD_ENABLE
-        user_state.is_caps_word = is_caps_word_on();
-#endif
         transport_user_state = user_state.raw;
     } else {
         keymap_config.raw    = transport_keymap_config;

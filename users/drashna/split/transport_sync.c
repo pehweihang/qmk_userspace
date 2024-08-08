@@ -27,6 +27,7 @@ extern bool swap_hands;
 #    define FORCED_SYNC_THROTTLE_MS 100
 #endif // FORCED_SYNC_THROTTLE_MS
 
+// Make sure that the structs are not larger than the buffer size for synchronization
 _Static_assert(sizeof(userspace_config_t) <= RPC_M2S_BUFFER_SIZE,
                "userspace_config_t is larger than split buffer size!");
 _Static_assert(sizeof(user_runtime_config_t) <= RPC_M2S_BUFFER_SIZE,
@@ -35,18 +36,44 @@ _Static_assert(sizeof(user_runtime_config_t) <= RPC_M2S_BUFFER_SIZE,
 uint16_t transport_keymap_config    = 0;
 uint32_t transport_userspace_config = 0, transport_user_state = 0;
 
+/**
+ * @brief Syncs user state between halves of split keyboard
+ *
+ * @param initiator2target_buffer_size
+ * @param initiator2target_buffer
+ * @param target2initiator_buffer_size
+ * @param target2initiator_buffer
+ */
 void user_state_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
                      uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
     if (initiator2target_buffer_size == sizeof(transport_user_state)) {
         memcpy(&transport_user_state, initiator2target_buffer, initiator2target_buffer_size);
     }
 }
+
+/**
+ * @brief Syncs keymap_config between halves of split keyboard
+ *
+ * @param initiator2target_buffer_size
+ * @param initiator2target_buffer
+ * @param target2initiator_buffer_size
+ * @param target2initiator_buffer
+ */
 void user_keymap_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
                       uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
     if (initiator2target_buffer_size == sizeof(transport_keymap_config)) {
         memcpy(&transport_keymap_config, initiator2target_buffer, initiator2target_buffer_size);
     }
 }
+
+/**
+ * @brief Syncs userspace_config between halves of split keyboard
+ *
+ * @param initiator2target_buffer_size
+ * @param initiator2target_buffer
+ * @param target2initiator_buffer_size
+ * @param target2initiator_buffer
+ */
 void user_config_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
                       uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
     if (initiator2target_buffer_size == sizeof(transport_userspace_config)) {
@@ -58,6 +85,14 @@ void user_config_sync(uint8_t initiator2target_buffer_size, const void* initiato
 extern char autocorrected_str[2][22];
 _Static_assert(sizeof(autocorrected_str) <= RPC_M2S_BUFFER_SIZE, "Autocorrect array larger than buffer size!");
 
+/**
+ * @brief Sycn Autoccetion string between halves of split keyboard
+ *
+ * @param initiator2target_buffer_size
+ * @param initiator2target_buffer
+ * @param target2initiator_buffer_size
+ * @param target2initiator_buffer
+ */
 void autocorrect_string_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
                              uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
     if (initiator2target_buffer_size == (sizeof(autocorrected_str))) {
@@ -65,6 +100,15 @@ void autocorrect_string_sync(uint8_t initiator2target_buffer_size, const void* i
     }
 }
 #endif
+
+/**
+ * @brief Sync keylogger string between halves of split keyboard
+ *
+ * @param initiator2target_buffer_size
+ * @param initiator2target_buffer
+ * @param target2initiator_buffer_size
+ * @param target2initiator_buffer
+ */
 void keylogger_string_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
                            uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
 #if defined(DISPLAY_DRIVER_ENABLE) && defined(DISPLAY_KEYLOGGER_ENABLE)
@@ -74,6 +118,14 @@ void keylogger_string_sync(uint8_t initiator2target_buffer_size, const void* ini
 #endif // DISPLAY_DRIVER_ENABLE && DISPLAY_KEYLOGGER_ENABLE
 }
 
+/**
+ * @brief Sync suspend state between halves of split keyboard
+ *
+ * @param initiator2target_buffer_size
+ * @param initiator2target_buffer
+ * @param target2initiator_buffer_size
+ * @param target2initiator_buffer
+ */
 void suspend_state_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
                         uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
     bool suspend_state = false;
@@ -83,6 +135,11 @@ void suspend_state_sync(uint8_t initiator2target_buffer_size, const void* initia
     }
 }
 
+/**
+ * @brief Send the suspend state to the other half of the split keyboard
+ *
+ * @param status
+ */
 void send_device_suspend_state(bool status) {
     if (is_device_suspended() != status && is_keyboard_master()) {
         transaction_rpc_send(RPC_ID_USER_SUSPEND_STATE_SYNC, sizeof(bool), &status);
@@ -90,6 +147,10 @@ void send_device_suspend_state(bool status) {
     }
 }
 
+/**
+ * @brief Initialize the transport sync
+ *
+ */
 void keyboard_post_init_transport_sync(void) {
     // Register keyboard state sync split transaction
     transaction_register_rpc(RPC_ID_USER_STATE_SYNC, user_state_sync);
@@ -102,6 +163,10 @@ void keyboard_post_init_transport_sync(void) {
     transaction_register_rpc(RPC_ID_USER_SUSPEND_STATE_SYNC, suspend_state_sync);
 }
 
+/**
+ * @brief Updates config values for split syncing
+ *
+ */
 void user_transport_update(void) {
     if (is_keyboard_master()) {
         transport_keymap_config    = keymap_config.raw;
@@ -134,6 +199,10 @@ void user_transport_update(void) {
     }
 }
 
+/**
+ * @brief Send data over split to the other half of the keyboard
+ *
+ */
 void user_transport_sync(void) {
     if (is_keyboard_master()) {
         // Keep track of the last state, so that we can tell if we need to propagate to slave

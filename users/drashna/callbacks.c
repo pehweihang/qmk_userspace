@@ -36,6 +36,10 @@ void keyboard_post_init_unicode(void);
 
 user_runtime_config_t user_state;
 
+/**
+ * @brief Keyboard Pre-Initialization
+ *
+ */
 __attribute__((weak)) void keyboard_pre_init_keymap(void) {}
 void                       keyboard_pre_init_user(void) {
     eeconfig_read_user_config(&userspace_config.raw);
@@ -50,14 +54,6 @@ void                       keyboard_pre_init_user(void) {
 // functions in the keymaps
 // Call user matrix init, set default RGB colors and then
 // call the keymap's init function
-
-#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
-void keyboard_post_init_qp(void);
-#endif
-
-#if defined(OS_DETECTION_ENABLE) && defined(DEFERRED_EXEC_ENABLE)
-uint32_t startup_exec(uint32_t trigger_time, void *cb_arg);
-#endif
 
 __attribute__((weak)) void keyboard_post_init_keymap(void) {}
 void                       keyboard_post_init_user(void) {
@@ -74,6 +70,7 @@ void                       keyboard_post_init_user(void) {
     keyboard_post_init_transport_sync();
 #endif
 #ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+    void keyboard_post_init_qp(void);
     keyboard_post_init_quantum_painter();
 #endif
 #ifdef I2C_SCANNER_ENABLE
@@ -103,10 +100,13 @@ void                       keyboard_post_init_user(void) {
 #ifdef WATCHDOG_ENABLE
     watchdog_init();
 #endif
-
     keyboard_post_init_keymap();
 }
 
+/**
+ * @brief Callback for software shutdown
+ *
+ */
 __attribute__((weak)) bool shutdown_keymap(bool jump_to_bootloader) {
     return true;
 }
@@ -133,6 +133,10 @@ bool shutdown_user(bool jump_to_bootloader) {
     return true;
 }
 
+/**
+ * @brief Suspend power down callback (constantly called when suspended)
+ *
+ */
 __attribute__((weak)) void suspend_power_down_keymap(void) {}
 
 void suspend_power_down_user(void) {
@@ -160,11 +164,16 @@ void suspend_power_down_user(void) {
     suspend_power_down_keymap();
 }
 
+/**
+ * @brief Suspend wake-up callback (only called when actually waking up)
+ *
+ */
 __attribute__((weak)) void suspend_wakeup_init_keymap(void) {}
 void                       suspend_wakeup_init_user(void) {
 #ifdef WATCHDOG_ENABLE
     suspend_wakeup_init_watchdog();
 #endif
+    // hack for re-enabling oleds/lights/etc when woken from usb
     void last_matrix_activity_trigger(void);
     last_matrix_activity_trigger();
 
@@ -270,11 +279,19 @@ layer_state_t default_layer_state_set_user(layer_state_t state) {
     return state;
 }
 
+/**
+ * @brief USB Host Lock LED callback
+ *
+ */
 __attribute__((weak)) void led_set_keymap(uint8_t usb_led) {}
 void                       led_set_user(uint8_t usb_led) {
     led_set_keymap(usb_led);
 }
 
+/**
+ * @brief EEPROM comfiguration initialization
+ *
+ */
 __attribute__((weak)) void eeconfig_init_keymap(void) {}
 void                       eeconfig_init_user(void) {
     userspace_config.raw              = 0;
@@ -295,6 +312,10 @@ void                       eeconfig_init_user(void) {
     eeconfig_init_keymap();
 }
 
+/**
+ * @brief When EEPROM size is larger, init everything but first 4 bytes
+ *
+ */
 void eeconfig_init_user_datablock(void) {
 #if (EECONFIG_USER_DATA_SIZE) > 4
     uint8_t eeconfig_empty_temp[(EECONFIG_USER_DATA_SIZE)-4] = {0};
@@ -302,10 +323,18 @@ void eeconfig_init_user_datablock(void) {
 #endif
 }
 
+/**
+ * @brief Matrix scan callback ... only use for matrix scan rate task
+ *
+ */
 void matrix_scan_user(void) {
     matrix_scan_rate_task();
 }
 
+/**
+ * @brief Handle slave side scanning of keyboard
+ *
+ */
 #ifdef SPLIT_KEYBOARD
 __attribute__((weak)) void matrix_slave_scan_keymap(void) {}
 void                       matrix_slave_scan_user(void) {
@@ -330,6 +359,11 @@ void                       matrix_slave_scan_user(void) {
 }
 #endif
 
+/**
+ * @brief Housekeyping task
+ *
+ * sets user_state config to be synced later or just used. Also runs other "every tick" tasks
+ */
 __attribute__((weak)) void housekeeping_task_keymap(void) {}
 void                       housekeeping_task_user(void) {
     if (is_keyboard_master()) {

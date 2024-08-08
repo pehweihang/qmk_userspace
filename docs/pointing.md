@@ -4,15 +4,11 @@ To disable the customized pointing device code and implement it at the keymap, a
 
 ## Automatic Mouse Layer
 
-Movement on the optical sensor triggers a layer that has all of the mouse keys on that layer.  After a set time, the layer will automatically turn itself off after 650ms.
-
-Also, using mousekeys will extend the amount of time that the layer will stay active. 
-
-Additionally, layer keys for the mouse layer will lock the layer on.
+***Deprecated*** - Functionality moved to core
 
 ## Gaming
 
-When the gamepad or diablo layers are enabled, the mouse layer is locked on, as well. 
+When the gamepad or diablo layers are enabled, the mouse layer is locked on, as well.
 
 ## Keycodes
 

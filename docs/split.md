@@ -8,22 +8,28 @@ Additionally, this supports a watchdog timer reset for the secondary split side.
 
 ## User State Config 
 
-The User states that it sync are: 
+The User states that it sync are:
 
 * Audio Enable status
 * Audio Clicky states
 * Unicode mode
+* Unicode typing mode
 * Pointing Device tap toggle status
 * Swap Hands status
 * Host Driver status
+* Caps Word status
 
 ## Userspace Config
 
-The userspace config states that are synced are: 
+The userspace config states that are synced are:
 
 * RGB layer indication
 * "is overwatch" status
 * nuke switch
 * Swapped numbers
 * RGB Matrix idle animation
-* Autocorrect enable status
+* Autocorrect status (original and corrected strings)
+* matrix scan rate printing
+* oled brightness
+* oled display lock on status
+* pointing device acceleration

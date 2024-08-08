@@ -16,7 +16,7 @@ RGB Matrix uses a custom, per board implementation, at the moment.
 
 ### RGB Light Startup Animation
 
-On startup, if enabled, the board will cycle through the entire hue wheel, starting and ending on the default layer color. 
+On startup, if enabled, the board will cycle through the entire hue wheel, starting and ending on the default layer color.
 
 ```c
 void keyboard_post_init_rgb(void) {

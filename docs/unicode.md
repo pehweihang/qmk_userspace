@@ -23,5 +23,4 @@ There are a number of unicode typing modes. This replaces the normal alpha keys 
 * `KC_ZALGO` - t̨͕͙̺͍͐̾ĥ̻ï̳̻̗̜͔ͦs͎̠͈͓͗̀ i̶̫ͭ̆s̛̫̻̜̝͑͡ z̩͈̠͗a͚̜̓͜l͈̟g͋͢͝ò͚ͥ͘͡͞ ḿ̴̡̻̼̔ͪò͔̭̿ͪ̍ḏ̻̊̄̈e̳͕̤ͣͯ
 * `KC_NOMODE` - this is the normal typing mode with no unicode glyphs
 
-
-Credit goes to ridingqwerty and tzarc for the unicode typing modes. 
+Credit goes to ridingqwerty and tzarc for the unicode typing modes.

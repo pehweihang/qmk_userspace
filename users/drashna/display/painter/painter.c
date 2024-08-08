@@ -81,46 +81,30 @@ char* truncate_text(const char* text, uint16_t max_width, painter_font_handle_t 
  * @param sat_bg background saturation
  * @param val_bg background value
  */
+static const char* test_text[] = {
+    // did intentionally skip PROGMEM here :)
+    "abcdefghijklmnopqrstuvwxyz",
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+    "01234567890 !@#$%%^&*()",
+    "__+-=[]{}\\|;:'\",.<>/?",
+};
+
 void render_character_set(painter_device_t display, uint16_t* x_offset, uint16_t* max_pos, uint16_t* ypos,
                           painter_font_handle_t font, uint8_t hue_fg, uint8_t sat_fg, uint8_t val_fg, uint8_t hue_bg,
                           uint8_t sat_bg, uint8_t val_bg) {
-    uint16_t xpos    = *x_offset;
-    char     buf[30] = {0};
-    snprintf(buf, sizeof(buf), "abcdefghijklmnopqrstuvwxyz");
-    xpos += qp_drawtext_recolor(display, xpos, *ypos, font, buf, hue_fg, sat_fg, val_fg, hue_bg, sat_bg, val_bg);
+    for (uint8_t i = 0; i < 4; ++i) {
+        uint16_t width = qp_drawtext_recolor(display, *x_offset, *ypos, font, test_text[i], hue_fg, sat_fg, val_fg,
+                                             hue_bg, sat_bg, val_bg);
 
-    if (max_pos[0] < xpos) {
-        max_pos[0] = xpos;
-    }
-    qp_rect(display, xpos, *ypos, max_pos[0], *ypos + font->line_height, 0, 0, 0, true);
-    *ypos += font->line_height + 4;
-    xpos = *x_offset;
-    snprintf(buf, sizeof(buf), "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-    xpos += qp_drawtext_recolor(display, xpos, *ypos, font, buf, hue_fg, sat_fg, val_fg, hue_bg, sat_bg, val_bg);
+        // clean up after the line (?)
+        if (width < max_pos[i]) {
+            qp_rect(display, *x_offset + width, *ypos, *x_offset + width + max_pos[i], *ypos + font->line_height, 0, 0,
+                    0, true);
+        }
 
-    if (max_pos[1] < xpos) {
-        max_pos[1] = xpos;
+        // move down for next line
+        *ypos += font->line_height;
     }
-    qp_rect(display, xpos, *ypos, max_pos[1], *ypos + font->line_height, 0, 0, 0, true);
-    *ypos += font->line_height + 4;
-    xpos = *x_offset;
-    snprintf(buf, sizeof(buf), "01234567890 !@#$%%^&*()");
-    xpos += qp_drawtext_recolor(display, xpos, *ypos, font, buf, hue_fg, sat_fg, val_fg, hue_bg, sat_bg, val_bg);
-
-    if (max_pos[2] < xpos) {
-        max_pos[2] = xpos;
-    }
-    qp_rect(display, xpos, *ypos, max_pos[2], *ypos + font->line_height, 0, 0, 0, true);
-    *ypos += font->line_height + 4;
-    xpos = *x_offset;
-    snprintf(buf, sizeof(buf), "__+-=[]{}\\|;:'\",.<>/?");
-    xpos += qp_drawtext_recolor(display, xpos, *ypos, font, buf, hue_fg, sat_fg, val_fg, hue_bg, sat_bg, val_bg);
-
-    if (max_pos[3] < xpos) {
-        max_pos[3] = xpos;
-    }
-    qp_rect(display, xpos, *ypos, max_pos[3], *ypos + font->line_height, 0, 0, 0, true);
-    *ypos += font->line_height + 4;
 }
 
 #ifdef BACKLIGHT_ENABLE

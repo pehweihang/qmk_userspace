@@ -195,6 +195,13 @@ void oneshot_locked_mods_changed_user(uint8_t mods) {
 #    endif
 #endif
 
+/**
+ * @brief Generates a string of the layer state bitmask
+ *
+ * @param buffer char string buffer to write to
+ * @param state layer state bitmask
+ * @param default_state default layer state bitmask (so we can represent default layer differently)
+ */
 void format_layer_bitmap_string(char *buffer, layer_state_t state, layer_state_t default_state) {
     for (int i = 0; i < 16; i++) {
         if (i == 0 || i == 4 || i == 8 || i == 12) {
@@ -289,6 +296,9 @@ bool process_detected_host_os_user(os_variant_t detected_os) {
 static host_driver_t *host_driver          = 0;
 static bool           host_driver_disabled = false;
 
+/**
+ * @brief Mount/Umount the keyboard USB driver
+ */
 void set_keyboard_lock(bool status) {
     if (!status && !host_get_driver()) {
         host_set_driver(host_driver);
@@ -303,14 +313,32 @@ void set_keyboard_lock(bool status) {
     host_driver_disabled = status;
 }
 
+/**
+ * @brief Toggles the keyboard lock status
+ *
+ */
 void toggle_keyboard_lock(void) {
     set_keyboard_lock(!host_driver_disabled);
 }
 
+/**
+ * @brief Get the keyboard lock status
+ *
+ * @return true
+ * @return false
+ */
 bool get_keyboard_lock(void) {
     return host_driver_disabled;
 }
 
+/**
+ * @brief Get the layer name string object
+ *
+ * @param state layer state bitmask
+ * @param alt_name Use altname?
+ * @param is_default do we want the default layer's name?
+ * @return const char* Layer name in string format
+ */
 const char *get_layer_name_string(layer_state_t state, bool alt_name, bool is_default) {
     switch (get_highest_layer(state)) {
         case _QWERTY:
@@ -342,6 +370,10 @@ const char *get_layer_name_string(layer_state_t state, bool alt_name, bool is_de
     }
 }
 
+/**
+ * @brief hack for snprintf warning
+ *
+ */
 #define snprintf_nowarn(...)                                       \
     __extension__({                                                \
         _Pragma("GCC diagnostic push");                            \
@@ -405,6 +437,14 @@ bool is_gaming_layer_active(layer_state_t state) {
     return (state & (1 << _GAMEPAD)) || (state & (1 << _DIABLO)) || (state & (1 << _DIABLOII));
 }
 
+/**
+ * @brief Grabs the basic keycode from a quantum keycode
+ *
+ * @param keycode extended keycode to extract from
+ * @param record keyrecord used for checking tap count/hold
+ * @param check_hold do we check for hold keycode status
+ * @return uint16_t returns the basic keycode
+ */
 uint16_t extract_basic_keycode(uint16_t keycode, keyrecord_t *record, bool check_hold) {
     if (IS_QK_MOD_TAP(keycode)) {
         if (record->tap.count || !check_hold) {

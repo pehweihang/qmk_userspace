@@ -6,7 +6,6 @@
 #include "drashna.h"
 #include "qp.h"
 #include "qp_comms.h"
-#include "display/display.h"
 #include "display/painter/painter.h"
 #include "display/painter/ili9341_display.h"
 #ifdef CUSTOM_SPLIT_TRANSPORT_SYNC

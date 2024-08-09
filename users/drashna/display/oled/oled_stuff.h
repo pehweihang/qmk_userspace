@@ -19,6 +19,7 @@
 #include "quantum.h"
 #include "oled_driver.h"
 #include "oled_assets.h"
+#include "display/display.h"
 #ifdef DEFFERED_EXEC_ENABLE
 extern deferred_token kittoken;
 #endif

@@ -7,6 +7,7 @@
 #include "display/painter/fonts.qff.h"
 #include "display/painter/graphics.qgf.h"
 #include "display/painter/graphics/assets.h"
+#include "display/display.h"
 
 void housekeeping_task_quantum_painter(void);
 void keyboard_post_init_quantum_painter(void);

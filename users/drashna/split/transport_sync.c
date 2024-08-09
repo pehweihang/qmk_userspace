@@ -84,7 +84,7 @@ void user_config_sync(uint8_t initiator2target_buffer_size, const void* initiato
 #if defined(AUTOCORRECT_ENABLE)
 extern char autocorrected_str[2][22];
 _Static_assert(sizeof(autocorrected_str) <= RPC_M2S_BUFFER_SIZE, "Autocorrect array larger than buffer size!");
-
+#endif
 /**
  * @brief Sycn Autoccetion string between halves of split keyboard
  *
@@ -95,11 +95,12 @@ _Static_assert(sizeof(autocorrected_str) <= RPC_M2S_BUFFER_SIZE, "Autocorrect ar
  */
 void autocorrect_string_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
                              uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
+#if defined(AUTOCORRECT_ENABLE)
     if (initiator2target_buffer_size == (sizeof(autocorrected_str))) {
         memcpy(&autocorrected_str, initiator2target_buffer, initiator2target_buffer_size);
     }
-}
 #endif
+}
 
 /**
  * @brief Sync keylogger string between halves of split keyboard
@@ -156,10 +157,8 @@ void keyboard_post_init_transport_sync(void) {
     transaction_register_rpc(RPC_ID_USER_STATE_SYNC, user_state_sync);
     transaction_register_rpc(RPC_ID_USER_KEYMAP_SYNC, user_keymap_sync);
     transaction_register_rpc(RPC_ID_USER_CONFIG_SYNC, user_config_sync);
-#if defined(AUTOCORRECT_ENABLE)
     transaction_register_rpc(RPC_ID_USER_AUTOCORRECT_STR, autocorrect_string_sync);
-#endif
-    transaction_register_rpc(RPC_ID_USER_OLED_KEYLOG_STR, keylogger_string_sync);
+    transaction_register_rpc(RPC_ID_USER_DISPLAY_KEYLOG_STR, keylogger_string_sync);
     transaction_register_rpc(RPC_ID_USER_SUSPEND_STATE_SYNC, suspend_state_sync);
 }
 
@@ -289,7 +288,7 @@ void user_transport_sync(void) {
 
         // Perform the sync if requested
         if (needs_sync) {
-            if (transaction_rpc_send(RPC_ID_USER_OLED_KEYLOG_STR, (DISPLAY_KEYLOGGER_LENGTH + 1),
+            if (transaction_rpc_send(RPC_ID_USER_DISPLAY_KEYLOG_STR, (DISPLAY_KEYLOGGER_LENGTH + 1),
                                      &display_keylogger_string)) {
                 last_sync[3] = timer_read32();
             }

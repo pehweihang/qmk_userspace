@@ -560,3 +560,6 @@
 #define FP_PASTE_SOUND E__NOTE(_B4), E__NOTE(_B3)
 
 #define FP_SAVE_SOUND E__NOTE(_F4), E__NOTE(_F5)
+
+#define ZSA_STARTUP  SONG(E__NOTE(_DS5), E__NOTE(_D5), E__NOTE(_AS4), Q__NOTE(_F5))
+#define ZSA_SHUTDOWN SONG(E__NOTE(_D5), E__NOTE(_F5), E__NOTE(_C5), Q__NOTE(_AS4))

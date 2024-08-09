@@ -6,13 +6,13 @@
 #include <qp.h>
 
 extern const uint32_t gfx_apple_logo_length;
-extern const uint8_t  gfx_apple_logo[80];
+extern const uint8_t  gfx_apple_logo[213];
 
 extern const uint32_t gfx_windows_logo_length;
-extern const uint8_t  gfx_windows_logo[80];
+extern const uint8_t  gfx_windows_logo[326];
 
 extern const uint32_t gfx_linux_logo_length;
-extern const uint8_t  gfx_linux_logo[80];
+extern const uint8_t  gfx_linux_logo[214];
 
 extern const uint32_t gfx_cg_off_length;
 extern const uint8_t  gfx_cg_off[940];

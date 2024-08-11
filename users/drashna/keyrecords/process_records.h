@@ -97,6 +97,8 @@ enum userspace_custom_keycodes {
 
     LAYER_LOCK,
 
+    DISPLAY_MENU,
+
     USER_SAFE_RANGE,
 };
 

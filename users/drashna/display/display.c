@@ -70,6 +70,7 @@ __attribute__((unused)) static void add_keylog(uint16_t keycode, keyrecord_t* re
     }
 }
 
+bool process_record_menu(uint16_t keycode, keyrecord_t* record);
 /**
  * @brief Keycode handler for oled display.
  *
@@ -88,9 +89,11 @@ bool process_record_display_driver(uint16_t keycode, keyrecord_t* record) {
 #ifdef OLED_ENABLE
         process_record_user_oled(keycode, record);
 #endif // OLED_ENABLE
+#if defined(QUANTUM_PAINTER_ENABLE)
+        return process_record_menu(keycode, record);
+#endif // QUANTUM_PAINTER_ENABLE
     }
     return true;
-    ;
 }
 
 /**

@@ -12,7 +12,8 @@ ifeq ($(strip $(CUSTOM_QUANTUM_PAINTER_ENABLE)), yes)
         endif
 
         SRC += $(USER_PATH)/display/painter/painter.c \
-               $(USER_PATH)/display/painter/graphics.qgf.c
+               $(USER_PATH)/display/painter/graphics.qgf.c \
+               $(USER_PATH)/display/painter/menu.c
     endif
 endif
 

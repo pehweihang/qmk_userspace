@@ -2,7 +2,6 @@
 // Copyright 2018-2024 Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "display/painter/graphics/samurai-cyberpunk-minimal-dark-8k-b3-240x320.qgf.h"
 #include "drashna.h"
 #include "qp.h"
 #include "qp_comms.h"

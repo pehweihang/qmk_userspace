@@ -78,6 +78,58 @@ void display_handler_unicode(char *text_buffer, size_t buffer_len) {
 
     strncpy(text_buffer, "Unknown", buffer_len);
 }
+static bool menu_handler_unicode_typing(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            unicode_typing_mode = (unicode_typing_mode - 1) % UNICODE_MODE_COUNT;
+            return false;
+        case menu_input_right:
+            unicode_typing_mode = (unicode_typing_mode + 1) % UNICODE_MODE_COUNT;
+            return false;
+        default:
+            return true;
+    }
+}
+void display_handler_unicode_typing(char *text_buffer, size_t buffer_len) {
+    switch (unicode_typing_mode) {
+        case UCTM_NO_MODE:
+            strncpy(text_buffer, "Normal", buffer_len - 1); // Normal
+            return;
+        case UCTM_WIDE:
+            strncpy(text_buffer, "Wide", buffer_len - 1); // ｗｉｄｅ
+            return;
+        case UCTM_SCRIPT:
+            strncpy(text_buffer, "Script", buffer_len - 1); // 𝓢𝓬𝓻𝓲𝓹𝓽
+            return;
+        case UCTM_BLOCKS:
+            strncpy(text_buffer, "Blocks", buffer_len - 1); // 🅱🅻🅾🅲🅺🆂
+            return;
+        case UCTM_REGIONAL:
+            strncpy(text_buffer, "Regional",
+                    buffer_len - 1); // 🇷‌‌🇪‌‌🇬‌‌🇮‌‌🇴‌‌🇳‌‌🇦‌‌🇱‌‌
+            return;
+        case UCTM_AUSSIE:
+            strncpy(text_buffer, "Aussie", buffer_len - 1); // ǝᴉssnɐ
+            return;
+        case UCTM_ZALGO:
+            strncpy(text_buffer, "Zalgo", buffer_len - 1); // z̴̬̙̐̋͢ā̸̧̺͂ͥ͐͟l̵̪̻͎̈ͭ̋͠g̦ͥo͚ͫͣ
+            return;
+        case UCTM_SUPER:
+            strncpy(text_buffer, "SuperScript", buffer_len - 1); // ˢᵘᵖᵉʳˢᶜʳᶦᵖᵗ
+            return;
+        case UCTM_COMIC:
+            strncpy(text_buffer, "Comic", buffer_len - 1); // ƈơɱıƈ
+            return;
+        case UCTM_FRAKTUR:
+            strncpy(text_buffer, "Fraktur", buffer_len - 1); // 𝔉𝔯𝔞𝔨𝔱𝔲𝔯
+            return;
+        case UCTM_DOUBLE_STRUCK:
+            strncpy(text_buffer, "Double Struck", buffer_len - 1); // 𝕯𝖔𝖚𝖇𝖑𝖊 𝕾𝖙𝖗𝖚𝖈𝖐
+            return;
+    }
+
+    strncpy(text_buffer, "Unknown", buffer_len);
+}
 
 static bool menu_handler_rgbenabled(menu_input_t input) {
     switch (input) {
@@ -179,7 +231,22 @@ void display_handler_rgbspeed(char *text_buffer, size_t buffer_len) {
     snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_speed());
 }
 
-menu_entry_t rgb_entries[] = {
+menu_entry_t unicode_entries[] = {
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Unicode mode",
+        .child.menu_handler    = menu_handler_unicode,
+        .child.display_handler = display_handler_unicode,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Unicode Typing Mode",
+        .child.menu_handler    = menu_handler_unicode_typing,
+        .child.display_handler = display_handler_unicode_typing,
+    },
+};
+
+menu_entry_t rgb_matrix_entries[] = {
     {
         .flags                 = menu_flag_is_value,
         .text                  = "RGB enabled",
@@ -219,15 +286,23 @@ menu_entry_t rgb_entries[] = {
 };
 
 menu_entry_t root_entries[] = {
-    {.flags                 = menu_flag_is_value,
-     .text                  = "Unicode mode",
-     .child.menu_handler    = menu_handler_unicode,
-     .child.display_handler = display_handler_unicode},
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Unicode mode",
+        .child.menu_handler    = menu_handler_unicode,
+        .child.display_handler = display_handler_unicode,
+    },
     {
         .flags              = menu_flag_is_parent,
-        .text               = "RGB settings",
-        .parent.children    = rgb_entries,
-        .parent.child_count = sizeof(rgb_entries) / sizeof(rgb_entries[0]),
+        .text               = "Unicode Settings",
+        .parent.children    = unicode_entries,
+        .parent.child_count = ARRAY_SIZE(unicode_entries),
+    },
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "RGB Matrix Settings",
+        .parent.children    = rgb_matrix_entries,
+        .parent.child_count = ARRAY_SIZE(rgb_matrix_entries),
     },
 };
 
@@ -235,7 +310,7 @@ menu_entry_t root = {
     .flags              = menu_flag_is_parent,
     .text               = "Configuration",
     .parent.children    = root_entries,
-    .parent.child_count = sizeof(root_entries) / sizeof(root_entries[0]),
+    .parent.child_count = ARRAY_SIZE(root_entries),
 };
 
 typedef struct _menu_state_t {

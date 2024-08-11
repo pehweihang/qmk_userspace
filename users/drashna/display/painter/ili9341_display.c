@@ -690,8 +690,10 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             }
             layer_map_has_updated = false;
         }
-
 #endif
+
+        void render_menu(painter_device_t display, uint16_t width, uint16_t height);
+        render_menu(ili9341_display, width, height);
     }
     qp_flush(ili9341_display);
 }

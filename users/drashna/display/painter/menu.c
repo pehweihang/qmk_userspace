@@ -368,7 +368,7 @@ bool process_record_menu(uint16_t keycode, keyrecord_t *record) {
 
 extern painter_font_handle_t font_thintel, font_mono, font_oled;
 
-void render_menu(painter_device_t display) {
+void render_menu(painter_device_t display, uint16_t width, uint16_t height) {
     static menu_state_t last_state;
     if (memcmp(&last_state, &state, sizeof(menu_state_t)) == 0) {
         return;
@@ -378,18 +378,18 @@ void render_menu(painter_device_t display) {
     memcpy(&last_state, &state, sizeof(menu_state_t));
 
     if (state.is_in_menu) {
-        qp_rect(display, 0, 0, 239, 319, 0, 0, 0, true);
+        qp_rect(display, 0, 0, width - 1, height - 1, 0, 0, 0, true);
 
         uint8_t       hue      = rgb_matrix_get_hue();
         menu_entry_t *menu     = get_current_menu();
         menu_entry_t *selected = get_selected_menu_item();
 
         int y = 80;
-        qp_rect(display, 0, y, 239, y + 3, hue, 255, 255, true);
+        qp_rect(display, 0, y, width, y + 3, hue, 255, 255, true);
         y += 8;
         qp_drawtext(display, 8, y, font_oled, menu->text);
         y += font_oled->line_height + 4;
-        qp_rect(display, 0, y, 239, y + 3, hue, 255, 255, true);
+        qp_rect(display, 0, y, width, y + 3, hue, 255, 255, true);
         y += 8;
         for (int i = 0; i < menu->parent.child_count; ++i) {
             menu_entry_t *child = &menu->parent.children[i];
@@ -408,10 +408,10 @@ void render_menu(painter_device_t display) {
                 qp_drawtext(display, 8 + x, y, font_oled, buf);
             }
             y += font_oled->line_height + 4;
-            qp_rect(display, 0, y, 239, y, hue, 255, 255, true);
+            qp_rect(display, 0, y, width - 1, y, hue, 255, 255, true);
             y += 5;
         }
     } else {
-        qp_rect(display, 0, 0, 239, 319, 0, 0, 0, true);
+        qp_rect(display, 0, 0, width - 1, height - 1, 0, 0, 0, true);
     }
 }

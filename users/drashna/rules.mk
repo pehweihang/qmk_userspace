@@ -57,8 +57,6 @@ ifeq ($(strip $(HARDWARE_DEBUG_ENABLE)), yes)
     LTO_ENABLE := no
     OPT := 0
     OPT_DEFS += -g
-else
-    OPT = fast
 endif
 
 ifeq ($(strip $(DEBUG_MATRIX_SCAN_RATE_ENABLE)), yes)

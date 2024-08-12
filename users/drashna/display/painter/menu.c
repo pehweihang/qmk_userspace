@@ -443,10 +443,10 @@ bool process_record_menu(uint16_t keycode, keyrecord_t *record) {
 
 extern painter_font_handle_t font_thintel, font_mono, font_oled;
 
-void render_menu(painter_device_t display, uint16_t width, uint16_t height) {
+bool render_menu(painter_device_t display, uint16_t width, uint16_t height) {
     static menu_state_t last_state;
     if (memcmp(&last_state, &state, sizeof(menu_state_t)) == 0) {
-        return;
+        return state.is_in_menu;
     }
 
     state.dirty = false;
@@ -486,7 +486,9 @@ void render_menu(painter_device_t display, uint16_t width, uint16_t height) {
             qp_rect(display, 0, y, width - 1, y, hue, 255, 255, true);
             y += 5;
         }
+        return true;
     } else {
-        qp_rect(display, 0, 0, width - 1, height - 1, 0, 0, 0, true);
+        // qp_rect(display, 0, 0, width - 1, height - 1, 0, 0, 0, true);
+        return false;
     }
 }

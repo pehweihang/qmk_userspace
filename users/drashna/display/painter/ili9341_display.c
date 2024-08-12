@@ -33,6 +33,29 @@ painter_image_handle_t windows_logo, apple_logo, linux_logo;
 painter_image_handle_t mouse_icon;
 
 /**
+ * @brief Draws the initial frame on the screen
+ *
+ * @param display
+ */
+void render_frame(painter_device_t display) {
+    uint16_t width;
+    uint16_t height;
+    qp_get_geometry(ili9341_display, &width, &height, NULL, NULL, NULL);
+
+    qp_drawimage_recolor(ili9341_display, 0, 0, frame, 0, 0, 255, 0, 0, 0);
+
+    char title[50] = {0};
+    snprintf(title, sizeof(title), "%s", PRODUCT);
+    uint8_t title_width = qp_textwidth(font_thintel, title);
+    if (title_width > (width - 55)) {
+        title_width = width - 55;
+    }
+    uint8_t title_xpos = (width - title_width) / 2;
+    qp_drawtext_recolor(ili9341_display, title_xpos, 2, font_thintel,
+                        truncate_text(title, title_width, font_thintel, false, false), 0, 0, 0, 0, 0, 255);
+}
+
+/**
  * @brief Initializes the display, clears it and sets frame and title
  *
  */
@@ -80,22 +103,12 @@ void init_display_ili9341(void) {
 
     if (is_keyboard_master()) {
         frame = qp_load_image_mem(gfx_frame);
-        qp_drawimage_recolor(ili9341_display, 0, 0, frame, 0, 0, 255, 0, 0, 0);
-
-        char title[50] = {0};
-        snprintf(title, sizeof(title), "%s", PRODUCT);
-        uint8_t title_width = qp_textwidth(font_thintel, title);
-        if (title_width > (width - 55)) {
-            title_width = width - 55;
-        }
-        uint8_t title_xpos = (width - title_width) / 2;
-        qp_drawtext_recolor(ili9341_display, title_xpos, 2, font_thintel,
-                            truncate_text(title, title_width, font_thintel, false, false), 0, 0, 0, 0, 0, 255);
+        render_frame(ili9341_display);
     } else {
         frame = qp_load_image_mem(gfx_samurai_cyberpunk_minimal_dark_8k_b3_240x320);
         qp_drawimage_recolor(ili9341_display, 0, 0, frame, 0, 0, 255, 0, 0, 0);
+        qp_close_image(frame);
     }
-    qp_close_image(frame);
     qp_power(ili9341_display, true);
 }
 
@@ -142,6 +155,18 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         char     buf[50] = {0};
         uint16_t ypos    = 18;
         uint16_t xpos    = 5;
+
+        bool        render_menu(painter_device_t display, uint16_t width, uint16_t height);
+        static bool menu_on_screen = false;
+        bool        menu_temp      = render_menu(ili9341_display, width, height);
+        if (menu_temp != menu_on_screen) {
+            menu_on_screen = menu_temp;
+            if (!menu_on_screen) {
+                render_frame(ili9341_display);
+                qp_flush(ili9341_display);
+            }
+            return;
+        }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // LED Lock Indicators
@@ -691,9 +716,6 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             layer_map_has_updated = false;
         }
 #endif
-
-        void render_menu(painter_device_t display, uint16_t width, uint16_t height);
-        render_menu(ili9341_display, width, height);
     }
     qp_flush(ili9341_display);
 }

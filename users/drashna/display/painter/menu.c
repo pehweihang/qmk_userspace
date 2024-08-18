@@ -58,23 +58,23 @@ static bool menu_handler_display(menu_input_t input) {
 void display_handler_display(char *text_buffer, size_t buffer_len) {
     switch (display_mode) {
         case 0:
-            strncpy(text_buffer, ": Console", buffer_len - 1);
+            strncpy(text_buffer, "Console", buffer_len - 1);
             return;
         case 1:
-            strncpy(text_buffer, ": Layer Map", buffer_len - 1);
+            strncpy(text_buffer, "Layer Map", buffer_len - 1);
             return;
         case 2:
-            strncpy(text_buffer, ": Font 1", buffer_len - 1);
+            strncpy(text_buffer, "Font 1", buffer_len - 1);
             return;
         case 3:
-            strncpy(text_buffer, ": Font 2", buffer_len - 1);
+            strncpy(text_buffer, "Font 2", buffer_len - 1);
             return;
         case 4:
-            strncpy(text_buffer, ": Font 3", buffer_len - 1);
+            strncpy(text_buffer, "Font 3", buffer_len - 1);
             return;
     }
 
-    strncpy(text_buffer, ": Unknown", buffer_len);
+    strncpy(text_buffer, "Unknown", buffer_len);
 }
 
 static bool menu_handler_unicode(menu_input_t input) {
@@ -93,26 +93,26 @@ static bool menu_handler_unicode(menu_input_t input) {
 void display_handler_unicode(char *text_buffer, size_t buffer_len) {
     switch (get_unicode_input_mode()) {
         case UNICODE_MODE_MACOS:
-            strncpy(text_buffer, ": macOS", buffer_len - 1);
+            strncpy(text_buffer, "macOS", buffer_len - 1);
             return;
         case UNICODE_MODE_LINUX:
-            strncpy(text_buffer, ": Linux", buffer_len - 1);
+            strncpy(text_buffer, "Linux", buffer_len - 1);
             return;
         case UNICODE_MODE_BSD:
-            strncpy(text_buffer, ": BSD", buffer_len - 1);
+            strncpy(text_buffer, "BSD", buffer_len - 1);
             return;
         case UNICODE_MODE_WINDOWS:
-            strncpy(text_buffer, ": Windows", buffer_len - 1);
+            strncpy(text_buffer, "Windows", buffer_len - 1);
             return;
         case UNICODE_MODE_WINCOMPOSE:
-            strncpy(text_buffer, ": WinCompose", buffer_len - 1);
+            strncpy(text_buffer, "WinCompose", buffer_len - 1);
             return;
         case UNICODE_MODE_EMACS:
-            strncpy(text_buffer, ": Emacs", buffer_len - 1);
+            strncpy(text_buffer, "Emacs", buffer_len - 1);
             return;
     }
 
-    strncpy(text_buffer, ": Unknown", buffer_len);
+    strncpy(text_buffer, "Unknown", buffer_len);
 }
 
 static bool menu_handler_unicode_typing(menu_input_t input) {
@@ -513,17 +513,17 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
         uint16_t y = start_y;
         qp_rect(display, start_x, y, render_width, y + 3, 0, 0, 255, true);
         y += 6;
-        qp_drawtext(display, start_x + 8, y, font_oled, menu->text);
+        qp_drawtext(display, start_x + 4, y, font_oled, menu->text);
         y += font_oled->line_height + 2;
         qp_rect(display, start_x, y, render_width, y + 3, 0, 0, 255, true);
         y += 6;
         for (int i = 0; i < menu->parent.child_count; ++i) {
             menu_entry_t *child = &menu->parent.children[i];
-            uint16_t      x;
+            uint16_t      x     = start_x + 8;
             if (child == selected) {
-                x = qp_drawtext_recolor(display, start_x + 8, y, font_oled, child->text, HSV_GREEN, 85, 255, 0);
+                x += qp_drawtext_recolor(display, x, y, font_oled, child->text, HSV_GREEN, 85, 255, 0);
             } else {
-                x = qp_drawtext_recolor(display, start_x + 8, y, font_oled, child->text, HSV_RED, 0, 255, 0);
+                x += qp_drawtext_recolor(display, x, y, font_oled, child->text, 0, 0, 255, 0, 255, 0);
             }
             if (child->flags & menu_flag_is_parent) {
                 qp_drawtext(display, 8 + x, y, font_oled, "  >");

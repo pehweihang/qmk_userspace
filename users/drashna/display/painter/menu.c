@@ -4,78 +4,13 @@
 
 #include "drashna.h"
 #include <printf.h>
-#include <qp.h>
 #include "display/painter/menu.h"
 #include "display/painter/painter.h"
 #include "process_keycode/process_unicode_common.h"
 #include "unicode.h"
 
-typedef enum _menu_flags_t {
-    menu_flag_is_parent = (1 << 0),
-    menu_flag_is_value  = (1 << 1),
-} menu_flags_t;
-
-typedef enum _menu_input_t {
-    menu_input_exit,
-    menu_input_back,
-    menu_input_enter,
-    menu_input_up,
-    menu_input_down,
-    menu_input_left,
-    menu_input_right,
-} menu_input_t;
-
-typedef struct _menu_entry_t {
-    menu_flags_t flags;
-    const char  *text;
-    union {
-        struct {
-            struct _menu_entry_t *children;
-            size_t                child_count;
-        } parent;
-        struct {
-            bool (*menu_handler)(menu_input_t input);
-            void (*display_handler)(char *text_buffer, size_t buffer_len);
-        } child;
-    };
-} menu_entry_t;
-
-uint8_t display_mode = 0;
-
-static bool menu_handler_display(menu_input_t input) {
-    switch (display_mode) {
-        case menu_input_left:
-            display_mode = (display_mode - 1) % 5;
-            return false;
-        case menu_input_right:
-            display_mode = (display_mode + 1) % 5;
-            return false;
-        default:
-            return true;
-    }
-}
-
-void display_handler_display(char *text_buffer, size_t buffer_len) {
-    switch (display_mode) {
-        case 0:
-            strncpy(text_buffer, "Console", buffer_len - 1);
-            return;
-        case 1:
-            strncpy(text_buffer, "Layer Map", buffer_len - 1);
-            return;
-        case 2:
-            strncpy(text_buffer, "Font 1", buffer_len - 1);
-            return;
-        case 3:
-            strncpy(text_buffer, "Font 2", buffer_len - 1);
-            return;
-        case 4:
-            strncpy(text_buffer, "Font 3", buffer_len - 1);
-            return;
-    }
-
-    strncpy(text_buffer, "Unknown", buffer_len);
-}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Unicode
 
 static bool menu_handler_unicode(menu_input_t input) {
     switch (input) {
@@ -167,6 +102,24 @@ void display_handler_unicode_typing(char *text_buffer, size_t buffer_len) {
 
     strncpy(text_buffer, "Unknown", buffer_len);
 }
+
+menu_entry_t unicode_entries[] = {
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Unicode mode",
+        .child.menu_handler    = menu_handler_unicode,
+        .child.display_handler = display_handler_unicode,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Unicode Typing Mode",
+        .child.menu_handler    = menu_handler_unicode_typing,
+        .child.display_handler = display_handler_unicode_typing,
+    },
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// RGB Matrix
 
 static bool menu_handler_rgbenabled(menu_input_t input) {
     switch (input) {
@@ -268,21 +221,6 @@ void display_handler_rgbspeed(char *text_buffer, size_t buffer_len) {
     snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_speed());
 }
 
-menu_entry_t unicode_entries[] = {
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Unicode mode",
-        .child.menu_handler    = menu_handler_unicode,
-        .child.display_handler = display_handler_unicode,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Unicode Typing Mode",
-        .child.menu_handler    = menu_handler_unicode_typing,
-        .child.display_handler = display_handler_unicode_typing,
-    },
-};
-
 menu_entry_t rgb_matrix_entries[] = {
     {
         .flags                 = menu_flag_is_value,
@@ -322,6 +260,49 @@ menu_entry_t rgb_matrix_entries[] = {
     },
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Display options
+
+uint8_t display_mode = 0;
+
+static bool menu_handler_display(menu_input_t input) {
+    switch (display_mode) {
+        case menu_input_left:
+            display_mode = (display_mode - 1) % 5;
+            return false;
+        case menu_input_right:
+            display_mode = (display_mode + 1) % 5;
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_display(char *text_buffer, size_t buffer_len) {
+    switch (display_mode) {
+        case 0:
+            strncpy(text_buffer, "Console", buffer_len - 1);
+            return;
+        case 1:
+            strncpy(text_buffer, "Layer Map", buffer_len - 1);
+            return;
+        case 2:
+            strncpy(text_buffer, "Font 1", buffer_len - 1);
+            return;
+        case 3:
+            strncpy(text_buffer, "Font 2", buffer_len - 1);
+            return;
+        case 4:
+            strncpy(text_buffer, "Font 3", buffer_len - 1);
+            return;
+    }
+
+    strncpy(text_buffer, ": Unknown", buffer_len);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Root menu
+
 menu_entry_t root_entries[] = {
     {
         .flags                 = menu_flag_is_value,
@@ -348,6 +329,9 @@ menu_entry_t root_entries[] = {
         .parent.child_count = ARRAY_SIZE(rgb_matrix_entries),
     },
 };
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Root Title
 
 menu_entry_t root = {
     .flags              = menu_flag_is_parent,

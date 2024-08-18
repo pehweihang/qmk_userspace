@@ -150,7 +150,7 @@ static bool menu_handler_rgbmode(menu_input_t input) {
 }
 
 void display_handler_rgbmode(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_mode());
+    snprintf(text_buffer, buffer_len - 1, "%s", rgb_matrix_get_effect_name());
 }
 
 static bool menu_handler_rgbhue(menu_input_t input) {

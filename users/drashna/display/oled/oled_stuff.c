@@ -514,29 +514,17 @@ void render_rgb_mode(uint8_t col, uint8_t line) {
 
 #ifdef RGB_MATRIX_ENABLE
     if (mode != rgb_matrix_get_mode()) {
-        snprintf(buf, sizeof(buf), "%-20s", rgb_matrix_name(rgb_matrix_get_mode()));
+        snprintf(buf, sizeof(buf), "%-20s", rgb_matrix_get_effect_name());
         mode        = rgb_matrix_get_mode();
         need_update = true;
     }
 #elif RGBLIGHT_ENABLE
     if (mode != rgblight_get_mode()) {
-        snprintf(buf, sizeof(buf), "%-20s", rgblight_name(rgblight_get_mode()));
+        snprintf(buf, sizeof(buf), "%-20s", rgblight_get_effect_name());
         mode        = rgblight_get_mode();
         need_update = true;
     }
 #endif
-    if (need_update) {
-        for (uint8_t i = 1; i < sizeof(buf); ++i) {
-            if (buf[i] == 0)
-                break;
-            else if (buf[i] == '_')
-                buf[i] = ' ';
-            else if (buf[i - 1] == ' ')
-                buf[i] = toupper(buf[i]);
-            else if (buf[i - 1] != ' ')
-                buf[i] = tolower(buf[i]);
-        }
-    }
 
     oled_write(buf, false);
 }

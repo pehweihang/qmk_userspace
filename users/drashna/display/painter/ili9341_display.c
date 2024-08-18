@@ -438,17 +438,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         if (hue_redraw || rgb_effect_redraw) {
             static uint16_t max_rgb_xpos = 0;
             xpos                         = 5;
-            snprintf(buf, sizeof(buf), "RGB Light Mode: %s", rgblight_name(curr_effect));
-            for (uint16_t i = 16; i < sizeof(buf); ++i) {
-                if (buf[i] == 0)
-                    break;
-                else if (buf[i] == '_')
-                    buf[i] = ' ';
-                else if (buf[i - 1] == ' ')
-                    buf[i] = toupper(buf[i]);
-                else if (buf[i - 1] != ' ')
-                    buf[i] = tolower(buf[i]);
-            }
+            snprintf(buf, sizeof(buf), "RGB Light Mode: %s", rgblight_get_effect_name());
 
             xpos +=
                 qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
@@ -485,17 +475,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         if (hue_redraw || rgb_effect_redraw) {
             static uint16_t max_rgb_xpos = 0;
             xpos                         = 5;
-            snprintf(buf, sizeof(buf), "RGB Matrix Mode: %s", rgb_matrix_name(curr_effect));
-            for (uint16_t i = 17; i < sizeof(buf); ++i) {
-                if (buf[i] == 0)
-                    break;
-                else if (buf[i] == '_')
-                    buf[i] = ' ';
-                else if (buf[i - 1] == ' ')
-                    buf[i] = toupper(buf[i]);
-                else if (buf[i - 1] != ' ')
-                    buf[i] = tolower(buf[i]);
-            }
+            snprintf(buf, sizeof(buf), "RGB Matrix Mode: %s", rgb_matrix_get_effect_name());
 
             xpos +=
                 qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);

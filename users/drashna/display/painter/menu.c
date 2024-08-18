@@ -1,12 +1,11 @@
 // Copyright 2018-2024 Nick Brassel (@tzarc)
+// Copyright 2024 Drashna (@drashna)
 // SPDX-License-Identifier: GPL-2.0-or-later
+
 #include "drashna.h"
-#include <stdbool.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <string.h>
 #include <printf.h>
 #include <qp.h>
+#include "display/painter/menu.h"
 #include "display/painter/painter.h"
 #include "process_keycode/process_unicode_common.h"
 #include "unicode.h"
@@ -40,6 +39,43 @@ typedef struct _menu_entry_t {
         } child;
     };
 } menu_entry_t;
+
+uint8_t display_mode = 0;
+
+static bool menu_handler_display(menu_input_t input) {
+    switch (display_mode) {
+        case menu_input_left:
+            display_mode = (display_mode - 1) % 5;
+            return false;
+        case menu_input_right:
+            display_mode = (display_mode + 1) % 5;
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_display(char *text_buffer, size_t buffer_len) {
+    switch (display_mode) {
+        case 0:
+            strncpy(text_buffer, ": Console", buffer_len - 1);
+            return;
+        case 1:
+            strncpy(text_buffer, ": Layer Map", buffer_len - 1);
+            return;
+        case 2:
+            strncpy(text_buffer, ": Font 1", buffer_len - 1);
+            return;
+        case 3:
+            strncpy(text_buffer, ": Font 2", buffer_len - 1);
+            return;
+        case 4:
+            strncpy(text_buffer, ": Font 3", buffer_len - 1);
+            return;
+    }
+
+    strncpy(text_buffer, ": Unknown", buffer_len);
+}
 
 static bool menu_handler_unicode(menu_input_t input) {
     switch (input) {
@@ -78,6 +114,7 @@ void display_handler_unicode(char *text_buffer, size_t buffer_len) {
 
     strncpy(text_buffer, ": Unknown", buffer_len);
 }
+
 static bool menu_handler_unicode_typing(menu_input_t input) {
     switch (input) {
         case menu_input_left:
@@ -288,9 +325,9 @@ menu_entry_t rgb_matrix_entries[] = {
 menu_entry_t root_entries[] = {
     {
         .flags                 = menu_flag_is_value,
-        .text                  = "Unicode mode",
-        .child.menu_handler    = menu_handler_unicode,
-        .child.display_handler = display_handler_unicode,
+        .text                  = "Display Option",
+        .child.menu_handler    = menu_handler_display,
+        .child.display_handler = display_handler_display,
     },
     {
         .flags              = menu_flag_is_parent,
@@ -304,6 +341,12 @@ menu_entry_t root_entries[] = {
         .parent.children    = rgb_matrix_entries,
         .parent.child_count = ARRAY_SIZE(rgb_matrix_entries),
     },
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "RGB Light Settings",
+        .parent.children    = rgb_matrix_entries,
+        .parent.child_count = ARRAY_SIZE(rgb_matrix_entries),
+    },
 };
 
 menu_entry_t root = {
@@ -313,15 +356,8 @@ menu_entry_t root = {
     .parent.child_count = ARRAY_SIZE(root_entries),
 };
 
-typedef struct _menu_state_t {
-    bool    dirty;
-    bool    is_in_menu;
-    uint8_t selected_child;
-    uint8_t menu_stack[8];
-} menu_state_t;
-
-static menu_state_t state = {
-#ifndef DISPLAY_MENU_ENABLED_DEFAULT
+menu_state_t display_menu_state = {
+#ifdef DISPLAY_MENU_ENABLED_DEFAULT
     .dirty          = false,
     .is_in_menu     = false,
     .menu_stack     = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
@@ -329,29 +365,29 @@ static menu_state_t state = {
 #else
     .dirty          = true,
     .is_in_menu     = true,
-    .menu_stack     = {0x02, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
+    .menu_stack     = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
     .selected_child = 0x00,
 #endif
 };
 
 menu_entry_t *get_current_menu(void) {
-    if (state.selected_child == 0xFF) {
+    if (display_menu_state.selected_child == 0xFF) {
         return NULL;
     }
 
     menu_entry_t *entry = &root;
-    for (int i = 0; i < sizeof(state.menu_stack); ++i) {
-        if (state.menu_stack[i] == 0xFF) {
+    for (int i = 0; i < sizeof(display_menu_state.menu_stack); ++i) {
+        if (display_menu_state.menu_stack[i] == 0xFF) {
             return entry;
         }
-        entry = &entry->parent.children[state.menu_stack[i]];
+        entry = &entry->parent.children[display_menu_state.menu_stack[i]];
     }
 
     return entry;
 }
 
 menu_entry_t *get_selected_menu_item(void) {
-    return &(get_current_menu()->parent.children[state.selected_child]);
+    return &(get_current_menu()->parent.children[display_menu_state.selected_child]);
 }
 
 bool menu_handle_input(menu_input_t input) {
@@ -359,23 +395,24 @@ bool menu_handle_input(menu_input_t input) {
     menu_entry_t *selected = get_selected_menu_item();
     switch (input) {
         case menu_input_exit:
-            state.is_in_menu = false;
-            memset(state.menu_stack, 0xFF, sizeof(state.menu_stack));
-            state.selected_child = 0xFF;
+            display_menu_state.is_in_menu = false;
+            memset(display_menu_state.menu_stack, 0xFF, sizeof(display_menu_state.menu_stack));
+            display_menu_state.selected_child = 0xFF;
             return false;
         case menu_input_back:
             // Iterate backwards through the stack and remove the last entry
-            for (uint8_t i = 0; i < sizeof(state.menu_stack); ++i) {
-                if (state.menu_stack[sizeof(state.menu_stack) - 1 - i] != 0xFF) {
-                    state.selected_child = state.menu_stack[sizeof(state.menu_stack) - 1 - i];
-                    state.menu_stack[sizeof(state.menu_stack) - 1 - i] = 0xFF;
+            for (uint8_t i = 0; i < sizeof(display_menu_state.menu_stack); ++i) {
+                if (display_menu_state.menu_stack[sizeof(display_menu_state.menu_stack) - 1 - i] != 0xFF) {
+                    display_menu_state.selected_child =
+                        display_menu_state.menu_stack[sizeof(display_menu_state.menu_stack) - 1 - i];
+                    display_menu_state.menu_stack[sizeof(display_menu_state.menu_stack) - 1 - i] = 0xFF;
                     break;
                 }
 
                 // If we've dropped out of the last entry in the stack, exit the menu
-                if (i == sizeof(state.menu_stack) - 1) {
-                    state.is_in_menu     = false;
-                    state.selected_child = 0xFF;
+                if (i == sizeof(display_menu_state.menu_stack) - 1) {
+                    display_menu_state.is_in_menu     = false;
+                    display_menu_state.selected_child = 0xFF;
                 }
             }
             return false;
@@ -383,25 +420,27 @@ bool menu_handle_input(menu_input_t input) {
             // Only attempt to enter the next menu if we're a parent object
             if (selected->flags & menu_flag_is_parent) {
                 // Iterate forwards through the stack and add the selected entry
-                for (uint8_t i = 0; i < sizeof(state.menu_stack); ++i) {
-                    if (state.menu_stack[i] == 0xFF) {
-                        state.menu_stack[i]  = state.selected_child;
-                        state.selected_child = 0;
+                for (uint8_t i = 0; i < sizeof(display_menu_state.menu_stack); ++i) {
+                    if (display_menu_state.menu_stack[i] == 0xFF) {
+                        display_menu_state.menu_stack[i]  = display_menu_state.selected_child;
+                        display_menu_state.selected_child = 0;
                         break;
                     }
                 }
             }
             return false;
         case menu_input_up:
-            state.selected_child = (state.selected_child + menu->parent.child_count - 1) % menu->parent.child_count;
+            display_menu_state.selected_child =
+                (display_menu_state.selected_child + menu->parent.child_count - 1) % menu->parent.child_count;
             return false;
         case menu_input_down:
-            state.selected_child = (state.selected_child + menu->parent.child_count + 1) % menu->parent.child_count;
+            display_menu_state.selected_child =
+                (display_menu_state.selected_child + menu->parent.child_count + 1) % menu->parent.child_count;
             return false;
         case menu_input_left:
         case menu_input_right:
             if (selected->flags & menu_flag_is_value) {
-                state.dirty = true;
+                display_menu_state.dirty = true;
                 return selected->child.menu_handler(input);
             }
             return false;
@@ -411,13 +450,13 @@ bool menu_handle_input(menu_input_t input) {
 }
 
 bool process_record_menu(uint16_t keycode, keyrecord_t *record) {
-    if (keycode == DISPLAY_MENU && record->event.pressed && !state.is_in_menu) {
-        state.is_in_menu     = true;
-        state.selected_child = 0;
+    if (keycode == DISPLAY_MENU && record->event.pressed && !display_menu_state.is_in_menu) {
+        display_menu_state.is_in_menu     = true;
+        display_menu_state.selected_child = 0;
         return false;
     }
 
-    if (state.is_in_menu) {
+    if (display_menu_state.is_in_menu) {
         if (record->event.pressed) {
             switch (keycode) {
                 case DISPLAY_MENU:
@@ -454,30 +493,30 @@ extern painter_font_handle_t font_thintel, font_mono, font_oled;
 
 bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, uint16_t width, uint16_t height) {
     static menu_state_t last_state;
-    if (memcmp(&last_state, &state, sizeof(menu_state_t)) == 0) {
-        return state.is_in_menu;
+    if (memcmp(&last_state, &display_menu_state, sizeof(menu_state_t)) == 0) {
+        return display_menu_state.is_in_menu;
     }
 
-    state.dirty = false;
-    memcpy(&last_state, &state, sizeof(menu_state_t));
+    display_menu_state.dirty = false;
+    memcpy(&last_state, &display_menu_state, sizeof(menu_state_t));
 
     uint16_t render_width  = width - start_x;
     uint16_t render_height = height - start_y;
 
-    if (state.is_in_menu) {
+    if (display_menu_state.is_in_menu) {
         qp_rect(display, start_x, start_y, render_width - 1, render_height - 1, 0, 0, 0, true);
 
-        uint8_t       hue      = rgb_matrix_get_hue();
+        // uint8_t       hue      = rgb_matrix_get_hue();
         menu_entry_t *menu     = get_current_menu();
         menu_entry_t *selected = get_selected_menu_item();
 
         uint16_t y = start_y;
-        qp_rect(display, start_x, y, render_width, y + 3, hue, 255, 255, true);
-        y += 8;
+        qp_rect(display, start_x, y, render_width, y + 3, 0, 0, 255, true);
+        y += 6;
         qp_drawtext(display, start_x + 8, y, font_oled, menu->text);
-        y += font_oled->line_height + 4;
-        qp_rect(display, start_x, y, render_width, y + 3, hue, 255, 255, true);
-        y += 8;
+        y += font_oled->line_height + 2;
+        qp_rect(display, start_x, y, render_width, y + 3, 0, 0, 255, true);
+        y += 6;
         for (int i = 0; i < menu->parent.child_count; ++i) {
             menu_entry_t *child = &menu->parent.children[i];
             uint16_t      x;
@@ -494,9 +533,9 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
                 child->child.display_handler(buf, sizeof(buf));
                 qp_drawtext(display, 8 + x, y, font_oled, buf);
             }
-            y += font_oled->line_height + 4;
-            qp_rect(display, start_x, y, render_width, y, hue, 255, 255, true);
-            y += 5;
+            y += font_oled->line_height + 2;
+            qp_rect(display, start_x, y, render_width, y, 0, 0, 255, true);
+            y += 3;
         }
         return true;
     }

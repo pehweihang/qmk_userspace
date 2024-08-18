@@ -178,16 +178,20 @@ const char *rgblight_name(uint8_t effect) {
 
 const char *rgblight_get_effect_name(void) {
     static char buf[32] = {0};
-    snprintf(buf, sizeof(buf), "%s", rgblight_name(rgblight_get_mode()));
-    for (uint8_t i = 1; i < sizeof(buf); ++i) {
-        if (buf[i] == 0)
-            break;
-        else if (buf[i] == '_')
-            buf[i] = ' ';
-        else if (buf[i - 1] == ' ')
-            buf[i] = toupper(buf[i]);
-        else if (buf[i - 1] != ' ')
-            buf[i] = tolower(buf[i]);
+    static uint8_t last_effect = 0;
+    if (last_effect != rgblight_get_mode()) {
+        last_effect = rgblight_get_mode();
+        snprintf(buf, sizeof(buf), "%s", rgblight_name(rgblight_get_mode()));
+        for (uint8_t i = 1; i < sizeof(buf); ++i) {
+            if (buf[i] == 0)
+                break;
+            else if (buf[i] == '_')
+                buf[i] = ' ';
+            else if (buf[i - 1] == ' ')
+                buf[i] = toupper(buf[i]);
+            else if (buf[i - 1] != ' ')
+                buf[i] = tolower(buf[i]);
+        }
     }
     return buf;
 }

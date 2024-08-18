@@ -21,7 +21,7 @@ __attribute__((unused)) bool layer_map_has_updated = true;
 #endif // LAYER_MAP_ENABLE
 
 // clang-format off
-const char PROGMEM code_to_name[256] = {
+__attribute__((weak)) const char PROGMEM code_to_name[256] = {
 //   0    1    2    3    4    5    6    7    8    9    A    B    c    D    E    F
     ' ', ' ', ' ', ' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',  // 0x
     'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1', '2',  // 1x

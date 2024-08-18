@@ -13,4 +13,5 @@ void          rgblight_sethsv_default_helper(uint8_t index);
 void          rgblight_shutdown(bool jump_to_bootloader);
 
 const char *rgblight_name(uint8_t effect);
+const char *rgblight_get_effect_name(void);
 bool        is_rgblight_startup_running(void);

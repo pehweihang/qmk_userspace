@@ -321,7 +321,7 @@ typedef struct _menu_state_t {
 } menu_state_t;
 
 static menu_state_t state = {
-#ifdef DISPLAY_MENU_ENABLED_DEFAULT
+#ifndef DISPLAY_MENU_ENABLED_DEFAULT
     .dirty          = false,
     .is_in_menu     = false,
     .menu_stack     = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},

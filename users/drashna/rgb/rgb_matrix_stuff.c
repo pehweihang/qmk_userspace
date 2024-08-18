@@ -3,6 +3,7 @@
 
 #include "drashna.h"
 #include "rgb_matrix.h"
+#include <ctype.h>
 #include "lib/lib8tion/lib8tion.h"
 extern led_config_t g_led_config;
 
@@ -244,7 +245,7 @@ const char *rgb_matrix_name(uint8_t effect) {
 
 const char *rgb_matrix_get_effect_name(void) {
     static char buf[32] = {0};
-    buf                 = rgb_matrix_name(rgb_matrix_get_mode());
+    snprintf(buf, sizeof(buf), "%s", rgb_matrix_name(rgb_matrix_get_mode()));
     for (uint8_t i = 1; i < sizeof(buf); ++i) {
         if (buf[i] == 0)
             break;

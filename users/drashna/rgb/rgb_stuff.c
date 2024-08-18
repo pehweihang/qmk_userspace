@@ -4,6 +4,7 @@
 #include "drashna.h"
 #include "rgb_stuff.h"
 #include "eeprom.h"
+#include <ctype.h>
 
 bool has_initialized;
 
@@ -177,7 +178,7 @@ const char *rgblight_name(uint8_t effect) {
 
 const char *rgblight_get_effect_name(void) {
     static char buf[32] = {0};
-    buf                 = rgblight_name(rgblight_get_mode());
+    snprintf(buf, sizeof(buf), "%s", rgblight_name(rgblight_get_mode()));
     for (uint8_t i = 1; i < sizeof(buf); ++i) {
         if (buf[i] == 0)
             break;

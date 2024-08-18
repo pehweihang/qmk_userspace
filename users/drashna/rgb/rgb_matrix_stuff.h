@@ -17,3 +17,4 @@ bool rgb_matrix_indicators_keymap(void);
 void rgb_matrix_shutdown(bool jump_to_bootloader);
 
 const char *rgb_matrix_name(uint8_t effect);
+const char *rgb_matrix_get_effect_name(void);

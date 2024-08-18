@@ -241,3 +241,19 @@ const char *rgb_matrix_name(uint8_t effect) {
             return "UNKNOWN";
     }
 }
+
+const char *rgb_matrix_get_effect_name(void) {
+    static char buf[32] = {0};
+    buf                 = rgb_matrix_name(rgb_matrix_get_mode());
+    for (uint8_t i = 1; i < sizeof(buf); ++i) {
+        if (buf[i] == 0)
+            break;
+        else if (buf[i] == '_')
+            buf[i] = ' ';
+        else if (buf[i - 1] == ' ')
+            buf[i] = toupper(buf[i]);
+        else if (buf[i - 1] != ' ')
+            buf[i] = tolower(buf[i]);
+    }
+    return buf;
+}

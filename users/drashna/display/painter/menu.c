@@ -57,26 +57,26 @@ static bool menu_handler_unicode(menu_input_t input) {
 void display_handler_unicode(char *text_buffer, size_t buffer_len) {
     switch (get_unicode_input_mode()) {
         case UNICODE_MODE_MACOS:
-            strncpy(text_buffer, "macOS", buffer_len - 1);
+            strncpy(text_buffer, ": macOS", buffer_len - 1);
             return;
         case UNICODE_MODE_LINUX:
-            strncpy(text_buffer, "Linux", buffer_len - 1);
+            strncpy(text_buffer, ": Linux", buffer_len - 1);
             return;
         case UNICODE_MODE_BSD:
-            strncpy(text_buffer, "BSD", buffer_len - 1);
+            strncpy(text_buffer, ": BSD", buffer_len - 1);
             return;
         case UNICODE_MODE_WINDOWS:
-            strncpy(text_buffer, "Windows", buffer_len - 1);
+            strncpy(text_buffer, ": Windows", buffer_len - 1);
             return;
         case UNICODE_MODE_WINCOMPOSE:
-            strncpy(text_buffer, "WinCompose", buffer_len - 1);
+            strncpy(text_buffer, ": WinCompose", buffer_len - 1);
             return;
         case UNICODE_MODE_EMACS:
-            strncpy(text_buffer, "Emacs", buffer_len - 1);
+            strncpy(text_buffer, ": Emacs", buffer_len - 1);
             return;
     }
 
-    strncpy(text_buffer, "Unknown", buffer_len);
+    strncpy(text_buffer, ": Unknown", buffer_len);
 }
 static bool menu_handler_unicode_typing(menu_input_t input) {
     switch (input) {
@@ -320,10 +320,19 @@ typedef struct _menu_state_t {
     uint8_t menu_stack[8];
 } menu_state_t;
 
-static menu_state_t state = {.dirty          = false,
-                             .is_in_menu     = false,
-                             .menu_stack     = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
-                             .selected_child = 0xFF};
+static menu_state_t state = {
+#ifdef DISPLAY_MENU_ENABLED_DEFAULT
+    .dirty          = false,
+    .is_in_menu     = false,
+    .menu_stack     = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
+    .selected_child = 0xFF,
+#else
+    .dirty          = true,
+    .is_in_menu     = true,
+    .menu_stack     = {0x02, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
+    .selected_child = 0x00,
+#endif
+};
 
 menu_entry_t *get_current_menu(void) {
     if (state.selected_child == 0xFF) {
@@ -356,7 +365,7 @@ bool menu_handle_input(menu_input_t input) {
             return false;
         case menu_input_back:
             // Iterate backwards through the stack and remove the last entry
-            for (int i = 0; i < sizeof(state.menu_stack); ++i) {
+            for (uint8_t i = 0; i < sizeof(state.menu_stack); ++i) {
                 if (state.menu_stack[sizeof(state.menu_stack) - 1 - i] != 0xFF) {
                     state.selected_child = state.menu_stack[sizeof(state.menu_stack) - 1 - i];
                     state.menu_stack[sizeof(state.menu_stack) - 1 - i] = 0xFF;
@@ -374,7 +383,7 @@ bool menu_handle_input(menu_input_t input) {
             // Only attempt to enter the next menu if we're a parent object
             if (selected->flags & menu_flag_is_parent) {
                 // Iterate forwards through the stack and add the selected entry
-                for (int i = 0; i < sizeof(state.menu_stack); ++i) {
+                for (uint8_t i = 0; i < sizeof(state.menu_stack); ++i) {
                     if (state.menu_stack[i] == 0xFF) {
                         state.menu_stack[i]  = state.selected_child;
                         state.selected_child = 0;
@@ -443,7 +452,7 @@ bool process_record_menu(uint16_t keycode, keyrecord_t *record) {
 
 extern painter_font_handle_t font_thintel, font_mono, font_oled;
 
-bool render_menu(painter_device_t display, uint16_t width, uint16_t height) {
+bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, uint16_t width, uint16_t height) {
     static menu_state_t last_state;
     if (memcmp(&last_state, &state, sizeof(menu_state_t)) == 0) {
         return state.is_in_menu;
@@ -452,27 +461,30 @@ bool render_menu(painter_device_t display, uint16_t width, uint16_t height) {
     state.dirty = false;
     memcpy(&last_state, &state, sizeof(menu_state_t));
 
+    uint16_t render_width  = width - start_x;
+    uint16_t render_height = height - start_y;
+
     if (state.is_in_menu) {
-        qp_rect(display, 0, 0, width - 1, height - 1, 0, 0, 0, true);
+        qp_rect(display, start_x, start_y, render_width - 1, render_height - 1, 0, 0, 0, true);
 
         uint8_t       hue      = rgb_matrix_get_hue();
         menu_entry_t *menu     = get_current_menu();
         menu_entry_t *selected = get_selected_menu_item();
 
-        int y = 80;
-        qp_rect(display, 0, y, width, y + 3, hue, 255, 255, true);
+        uint16_t y = start_y;
+        qp_rect(display, start_x, y, render_width, y + 3, hue, 255, 255, true);
         y += 8;
-        qp_drawtext(display, 8, y, font_oled, menu->text);
+        qp_drawtext(display, start_x + 8, y, font_oled, menu->text);
         y += font_oled->line_height + 4;
-        qp_rect(display, 0, y, width, y + 3, hue, 255, 255, true);
+        qp_rect(display, start_x, y, render_width, y + 3, hue, 255, 255, true);
         y += 8;
         for (int i = 0; i < menu->parent.child_count; ++i) {
             menu_entry_t *child = &menu->parent.children[i];
             uint16_t      x;
             if (child == selected) {
-                x = qp_drawtext_recolor(display, 8, y, font_oled, child->text, HSV_GREEN, 85, 255, 0);
+                x = qp_drawtext_recolor(display, start_x + 8, y, font_oled, child->text, HSV_GREEN, 85, 255, 0);
             } else {
-                x = qp_drawtext_recolor(display, 8, y, font_oled, child->text, HSV_RED, 0, 255, 0);
+                x = qp_drawtext_recolor(display, start_x + 8, y, font_oled, child->text, HSV_RED, 0, 255, 0);
             }
             if (child->flags & menu_flag_is_parent) {
                 qp_drawtext(display, 8 + x, y, font_oled, "  >");
@@ -483,12 +495,10 @@ bool render_menu(painter_device_t display, uint16_t width, uint16_t height) {
                 qp_drawtext(display, 8 + x, y, font_oled, buf);
             }
             y += font_oled->line_height + 4;
-            qp_rect(display, 0, y, width - 1, y, hue, 255, 255, true);
+            qp_rect(display, start_x, y, render_width, y, hue, 255, 255, true);
             y += 5;
         }
         return true;
-    } else {
-        // qp_rect(display, 0, 0, width - 1, height - 1, 0, 0, 0, true);
-        return false;
     }
+    return false;
 }

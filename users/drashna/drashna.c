@@ -134,7 +134,7 @@ float autocorrect_song[][2] = SONG(PLOVER_GOODBYE_SOUND);
 // 2 strings, 2q chars each + null terminator. max autocorrect length is 19 chars but 128px/6 supports 21 chars
 char autocorrected_str[2][21] = {"    automatically\0", "      corrected\0"};
 char autocorrected_str_raw[2][21] = {"automatically\0", "corrected\0"};
-bool autocorrect_str_has_changed = false;
+bool autocorrect_str_has_changed  = false;
 
 bool apply_autocorrect(uint8_t backspaces, const char *str, char *typo, char *correct) {
     if (is_gaming_layer_active(layer_state)) {

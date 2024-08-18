@@ -156,18 +156,6 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         uint16_t ypos    = 18;
         uint16_t xpos    = 5;
 
-        bool        render_menu(painter_device_t display, uint16_t width, uint16_t height);
-        static bool menu_on_screen = false;
-        bool        menu_temp      = render_menu(ili9341_display, width, height);
-        if (menu_temp != menu_on_screen) {
-            menu_on_screen = menu_temp;
-            if (!menu_on_screen) {
-                render_frame(ili9341_display);
-                qp_flush(ili9341_display);
-            }
-            return;
-        }
-
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // LED Lock Indicators
 
@@ -585,6 +573,12 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         ypos += font_oled->line_height + 4;
         extern bool autocorrect_str_has_changed;
         extern char autocorrected_str_raw[2][21];
+        static uint32_t autocorrect_timer = 0;
+        if (timer_elapsed(autocorrect_timer) > 125) {
+            autocorrect_timer           = timer_read();
+            autocorrect_str_has_changed = true;
+        }
+
         if (hue_redraw || autocorrect_str_has_changed) {
             static int max_klog_xpos = 0;
             xpos                     = 5;
@@ -617,7 +611,10 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Font test
+        bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, uint16_t width, uint16_t height);
+        if (!render_menu(ili9341_display, 2, ypos, width - 1, height)) {
 
+        }
 #if 0
         ypos += font_oled->line_height + 4;
         if (hue_redraw) {
@@ -691,7 +688,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         //  Layer Map render
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifdef LAYER_MAP_ENABLE
+#if 0
+#    ifdef LAYER_MAP_ENABLE
         ypos -= (font_oled->line_height + 4) * LAYER_MAP_ROWS;
         if (hue_redraw || layer_map_has_updated) {
             uint16_t temp_ypos = ypos;
@@ -715,6 +713,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             }
             layer_map_has_updated = false;
         }
+#    endif
 #endif
     }
     qp_flush(ili9341_display);

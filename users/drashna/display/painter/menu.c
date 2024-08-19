@@ -409,7 +409,7 @@ menu_entry_t root = {
 };
 
 menu_state_t display_menu_state = {
-#ifdef DISPLAY_MENU_ENABLED_DEFAULT
+#ifndef DISPLAY_MENU_ENABLED_DEFAULT
     .dirty          = false,
     .is_in_menu     = false,
     .menu_stack     = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
@@ -417,7 +417,7 @@ menu_state_t display_menu_state = {
 #else
     .dirty          = true,
     .is_in_menu     = true,
-    .menu_stack     = {0x02, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
+    .menu_stack     = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
     .selected_child = 0x00,
 #endif
 };

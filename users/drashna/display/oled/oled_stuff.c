@@ -508,25 +508,23 @@ void render_rgb_hsv(uint8_t col, uint8_t line) {
 
 void render_rgb_mode(uint8_t col, uint8_t line) {
     oled_set_cursor(col, line);
-    __attribute__((unused)) static uint8_t mode;
-    bool                                   need_update = false;
-    static char                            buf[21]     = {0};
+#if defined(RGB_MATRIX_ENABLE) || defined(RGBLIGHT_ENABLE)
+    static uint8_t mode;
+    static char    buf[21] = {0};
 
-#ifdef RGB_MATRIX_ENABLE
+#    ifdef RGB_MATRIX_ENABLE
     if (mode != rgb_matrix_get_mode()) {
         snprintf(buf, sizeof(buf), "%-20s", rgb_matrix_get_effect_name());
-        mode        = rgb_matrix_get_mode();
-        need_update = true;
+        mode = rgb_matrix_get_mode();
     }
-#elif RGBLIGHT_ENABLE
+#    elif RGBLIGHT_ENABLE
     if (mode != rgblight_get_mode()) {
         snprintf(buf, sizeof(buf), "%-20s", rgblight_get_effect_name());
-        mode        = rgblight_get_mode();
-        need_update = true;
+        mode = rgblight_get_mode();
     }
-#endif
-
+#    endif
     oled_write(buf, false);
+#endif
 }
 
 void render_wpm(uint8_t padding, uint8_t col, uint8_t line) {

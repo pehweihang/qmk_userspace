@@ -125,9 +125,9 @@ static bool menu_handler_rgbenabled(menu_input_t input) {
     switch (input) {
         case menu_input_left:
         case menu_input_right:
-            if (display_menu_state.selected_child == 2) {
+            if (display_menu_state.menu_stack[0] == 2) {
                 rgb_matrix_toggle();
-            } else if (display_menu_state.selected_child == 3) {
+            } else if (display_menu_state.menu_stack[0] == 3) {
                 rgblight_toggle();
             }
             return false;
@@ -137,9 +137,9 @@ static bool menu_handler_rgbenabled(menu_input_t input) {
 }
 
 void display_handler_rgbenabled(char *text_buffer, size_t buffer_len) {
-    if (display_menu_state.selected_child == 2) {
+    if (display_menu_state.menu_stack[0] == 2) {
         snprintf(text_buffer, buffer_len - 1, "%s", rgb_matrix_is_enabled() ? "on" : "off");
-    } else if (display_menu_state.selected_child == 3) {
+    } else if (display_menu_state.menu_stack[0] == 3) {
         snprintf(text_buffer, buffer_len - 1, "%s", rgblight_is_enabled() ? "on" : "off");
     }
 }
@@ -147,16 +147,16 @@ void display_handler_rgbenabled(char *text_buffer, size_t buffer_len) {
 static bool menu_handler_rgbmode(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            if (display_menu_state.selected_child == 2) {
+            if (display_menu_state.menu_stack[0] == 2) {
                 rgb_matrix_step_reverse();
-            } else if (display_menu_state.selected_child == 3) {
+            } else if (display_menu_state.menu_stack[0] == 3) {
                 rgblight_step_reverse();
             }
             return false;
         case menu_input_right:
-            if (display_menu_state.selected_child == 2) {
+            if (display_menu_state.menu_stack[0] == 2) {
                 rgb_matrix_step();
-            } else if (display_menu_state.selected_child == 3) {
+            } else if (display_menu_state.menu_stack[0] == 3) {
                 rgblight_step();
             }
             return false;
@@ -166,9 +166,9 @@ static bool menu_handler_rgbmode(menu_input_t input) {
 }
 
 void display_handler_rgbmode(char *text_buffer, size_t buffer_len) {
-    if (display_menu_state.selected_child == 2) {
-        snprintf(text_buffer, buffer_len - 1, "%s", rgb_matrix_get_mode_name());
-    } else if (display_menu_state.selected_child == 3) {
+    if (display_menu_state.menu_stack[0] == 2) {
+        snprintf(text_buffer, buffer_len - 1, "%s", rgb_matrix_get_effect_name());
+    } else if (display_menu_state.menu_stack[0] == 3) {
         snprintf(text_buffer, buffer_len - 1, "%s", rgblight_get_effect_name());
     }
 }
@@ -176,16 +176,16 @@ void display_handler_rgbmode(char *text_buffer, size_t buffer_len) {
 static bool menu_handler_rgbhue(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            if (display_menu_state.selected_child == 2) {
+            if (display_menu_state.menu_stack[0] == 2) {
                 rgb_matrix_decrease_hue();
-            } else if (display_menu_state.selected_child == 3) {
+            } else if (display_menu_state.menu_stack[0] == 3) {
                 rgblight_decrease_hue();
             }
             return false;
         case menu_input_right:
-            if (display_menu_state.selected_child == 2) {
+            if (display_menu_state.menu_stack[0] == 2) {
                 rgb_matrix_increase_hue();
-            } else if (display_menu_state.selected_child == 3) {
+            } else if (display_menu_state.menu_stack[0] == 3) {
                 rgblight_increase_hue();
             }
             return false;
@@ -195,9 +195,9 @@ static bool menu_handler_rgbhue(menu_input_t input) {
 }
 
 void display_handler_rgbhue(char *text_buffer, size_t buffer_len) {
-    if (display_menu_state.selected_child == 2) {
+    if (display_menu_state.menu_stack[0] == 2) {
         snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_hue());
-    } else if (display_menu_state.selected_child == 3) {
+    } else if (display_menu_state.menu_stack[0] == 3) {
         snprintf(text_buffer, buffer_len - 1, "%d", (int)rgblight_get_hue());
     }
 }
@@ -205,16 +205,16 @@ void display_handler_rgbhue(char *text_buffer, size_t buffer_len) {
 static bool menu_handler_rgbsat(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            if (display_menu_state.selected_child == 2) {
+            if (display_menu_state.menu_stack[0] == 2) {
                 rgb_matrix_decrease_sat();
-            } else if (display_menu_state.selected_child == 3) {
+            } else if (display_menu_state.menu_stack[0] == 3) {
                 rgblight_decrease_sat();
             }
             return false;
         case menu_input_right:
-            if (display_menu_state.selected_child == 2) {
+            if (display_menu_state.menu_stack[0] == 2) {
                 rgb_matrix_increase_sat();
-            } else if (display_menu_state.selected_child == 3) {
+            } else if (display_menu_state.menu_stack[0] == 3) {
                 rgblight_increase_sat();
             }
             return false;
@@ -230,16 +230,16 @@ void display_handler_rgbsat(char *text_buffer, size_t buffer_len) {
 static bool menu_handler_rgbval(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            if (display_menu_state.selected_child == 2) {
+            if (display_menu_state.menu_stack[0] == 2) {
                 rgb_matrix_decrease_val();
-            } else if (display_menu_state.selected_child == 3) {
+            } else if (display_menu_state.menu_stack[0] == 3) {
                 rgblight_decrease_val();
             }
             return false;
         case menu_input_right:
-            if (display_menu_state.selected_child == 2) {
+            if (display_menu_state.menu_stack[0] == 2) {
                 rgb_matrix_increase_val();
-            } else if (display_menu_state.selected_child == 3) {
+            } else if (display_menu_state.menu_stack[0] == 3) {
                 rgblight_increase_val();
             }
             return false;
@@ -249,9 +249,9 @@ static bool menu_handler_rgbval(menu_input_t input) {
 }
 
 void display_handler_rgbval(char *text_buffer, size_t buffer_len) {
-    if (display_menu_state.selected_child == 2) {
+    if (display_menu_state.menu_stack[0] == 2) {
         snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_val());
-    } else if (display_menu_state.selected_child == 3) {
+    } else if (display_menu_state.menu_stack[0] == 3) {
         snprintf(text_buffer, buffer_len - 1, "%d", (int)rgblight_get_val());
     }
 }
@@ -259,16 +259,16 @@ void display_handler_rgbval(char *text_buffer, size_t buffer_len) {
 static bool menu_handler_rgbspeed(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            if (display_menu_state.selected_child == 2) {
+            if (display_menu_state.menu_stack[0] == 2) {
                 rgb_matrix_decrease_speed();
-            } else if (display_menu_state.selected_child == 3) {
+            } else if (display_menu_state.menu_stack[0] == 3) {
                 rgblight_decrease_speed();
             }
             return false;
         case menu_input_right:
-            if (display_menu_state.selected_child == 2) {
+            if (display_menu_state.menu_stack[0] == 2) {
                 rgb_matrix_increase_speed();
-            } else if (display_menu_state.selected_child == 3) {
+            } else if (display_menu_state.menu_stack[0] == 3) {
                 rgblight_increase_speed();
             }
             return false;
@@ -278,9 +278,9 @@ static bool menu_handler_rgbspeed(menu_input_t input) {
 }
 
 void display_handler_rgbspeed(char *text_buffer, size_t buffer_len) {
-    if (display_menu_state.selected_child == 2) {
+    if (display_menu_state.menu_stack[0] == 2) {
         snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_speed());
-    } else if (display_menu_state.selected_child == 3) {
+    } else if (display_menu_state.menu_stack[0] == 3) {
         snprintf(text_buffer, buffer_len - 1, "%d", (int)rgblight_get_speed());
     }
 }
@@ -417,13 +417,13 @@ menu_state_t display_menu_state = {
 #else
     .dirty          = true,
     .is_in_menu     = true,
-    .menu_stack     = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
+    .menu_stack     = {0x02, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
     .selected_child = 0x00,
 #endif
 };
 
 menu_entry_t *get_current_menu(void) {
-    if (display_menu_state.selected_child == 0xFF) {
+    if (display_menu_state.menu_stack[0] == 0xFF) {
         return NULL;
     }
 

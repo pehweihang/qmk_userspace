@@ -4,6 +4,7 @@
 
 #include "drashna.h"
 #include "qp.h"
+#include "qp_ili9xxx_opcodes.h"
 #include "qp_comms.h"
 #include "display/painter/painter.h"
 #include "display/painter/ili9341_display.h"
@@ -88,15 +89,16 @@ void init_display_ili9341(void) {
     uint16_t height;
 
     qp_init(ili9341_display, QP_ROTATION_180);
-    // if needs inversion
-#ifdef DISPLAY_INVERTED
-    qp_comms_start(ili9341_display);
-    qp_comms_command(ili9341_display, ILI9XXX_CMD_INVERT_OFF);
-    qp_comms_stop(ili9341_display);
-#endif
     qp_get_geometry(ili9341_display, &width, &height, NULL, NULL, NULL);
     qp_clear(ili9341_display);
     qp_rect(ili9341_display, 0, 0, width - 1, height - 1, 0, 0, 0, true);
+
+    // if needs inversion, run it only afetr the clear and rect functions or otherwise it won't work
+#ifdef DISPLAY_ILI9341_INVERTED
+    qp_comms_start(ili9341_display);
+    qp_comms_command(ili9341_display, ILI9XXX_CMD_INVERT_ON);
+    qp_comms_stop(ili9341_display);
+#endif // DISPLAY_ILI9341_INVERTED
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Initial render of frame/logo
@@ -110,6 +112,7 @@ void init_display_ili9341(void) {
         qp_close_image(frame);
     }
     qp_power(ili9341_display, true);
+    qp_flush(ili9341_display);
 }
 
 void ili9341_display_power(bool on) {

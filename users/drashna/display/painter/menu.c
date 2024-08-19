@@ -125,7 +125,11 @@ static bool menu_handler_rgbenabled(menu_input_t input) {
     switch (input) {
         case menu_input_left:
         case menu_input_right:
-            rgb_matrix_toggle();
+            if (display_menu_state.selected_child == 2) {
+                rgb_matrix_toggle();
+            } else if (display_menu_state.selected_child == 3) {
+                rgblight_toggle();
+            }
             return false;
         default:
             return true;
@@ -133,16 +137,28 @@ static bool menu_handler_rgbenabled(menu_input_t input) {
 }
 
 void display_handler_rgbenabled(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%s", rgb_matrix_is_enabled() ? "on" : "off");
+    if (display_menu_state.selected_child == 2) {
+        snprintf(text_buffer, buffer_len - 1, "%s", rgb_matrix_is_enabled() ? "on" : "off");
+    } else if (display_menu_state.selected_child == 3) {
+        snprintf(text_buffer, buffer_len - 1, "%s", rgblight_is_enabled() ? "on" : "off");
+    }
 }
 
 static bool menu_handler_rgbmode(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            rgb_matrix_step_reverse();
+            if (display_menu_state.selected_child == 2) {
+                rgb_matrix_step_reverse();
+            } else if (display_menu_state.selected_child == 3) {
+                rgblight_step_reverse();
+            }
             return false;
         case menu_input_right:
-            rgb_matrix_step();
+            if (display_menu_state.selected_child == 2) {
+                rgb_matrix_step();
+            } else if (display_menu_state.selected_child == 3) {
+                rgblight_step();
+            }
             return false;
         default:
             return true;
@@ -150,16 +166,28 @@ static bool menu_handler_rgbmode(menu_input_t input) {
 }
 
 void display_handler_rgbmode(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%s", rgb_matrix_get_effect_name());
+    if (display_menu_state.selected_child == 2) {
+        snprintf(text_buffer, buffer_len - 1, "%s", rgb_matrix_get_mode_name());
+    } else if (display_menu_state.selected_child == 3) {
+        snprintf(text_buffer, buffer_len - 1, "%s", rgblight_get_effect_name());
+    }
 }
 
 static bool menu_handler_rgbhue(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            rgb_matrix_decrease_hue();
+            if (display_menu_state.selected_child == 2) {
+                rgb_matrix_decrease_hue();
+            } else if (display_menu_state.selected_child == 3) {
+                rgblight_decrease_hue();
+            }
             return false;
         case menu_input_right:
-            rgb_matrix_increase_hue();
+            if (display_menu_state.selected_child == 2) {
+                rgb_matrix_increase_hue();
+            } else if (display_menu_state.selected_child == 3) {
+                rgblight_increase_hue();
+            }
             return false;
         default:
             return true;
@@ -167,16 +195,28 @@ static bool menu_handler_rgbhue(menu_input_t input) {
 }
 
 void display_handler_rgbhue(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_hue());
+    if (display_menu_state.selected_child == 2) {
+        snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_hue());
+    } else if (display_menu_state.selected_child == 3) {
+        snprintf(text_buffer, buffer_len - 1, "%d", (int)rgblight_get_hue());
+    }
 }
 
 static bool menu_handler_rgbsat(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            rgb_matrix_decrease_sat();
+            if (display_menu_state.selected_child == 2) {
+                rgb_matrix_decrease_sat();
+            } else if (display_menu_state.selected_child == 3) {
+                rgblight_decrease_sat();
+            }
             return false;
         case menu_input_right:
-            rgb_matrix_increase_sat();
+            if (display_menu_state.selected_child == 2) {
+                rgb_matrix_increase_sat();
+            } else if (display_menu_state.selected_child == 3) {
+                rgblight_increase_sat();
+            }
             return false;
         default:
             return true;
@@ -190,10 +230,18 @@ void display_handler_rgbsat(char *text_buffer, size_t buffer_len) {
 static bool menu_handler_rgbval(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            rgb_matrix_decrease_val();
+            if (display_menu_state.selected_child == 2) {
+                rgb_matrix_decrease_val();
+            } else if (display_menu_state.selected_child == 3) {
+                rgblight_decrease_val();
+            }
             return false;
         case menu_input_right:
-            rgb_matrix_increase_val();
+            if (display_menu_state.selected_child == 2) {
+                rgb_matrix_increase_val();
+            } else if (display_menu_state.selected_child == 3) {
+                rgblight_increase_val();
+            }
             return false;
         default:
             return true;
@@ -201,16 +249,28 @@ static bool menu_handler_rgbval(menu_input_t input) {
 }
 
 void display_handler_rgbval(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_val());
+    if (display_menu_state.selected_child == 2) {
+        snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_val());
+    } else if (display_menu_state.selected_child == 3) {
+        snprintf(text_buffer, buffer_len - 1, "%d", (int)rgblight_get_val());
+    }
 }
 
 static bool menu_handler_rgbspeed(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            rgb_matrix_decrease_speed();
+            if (display_menu_state.selected_child == 2) {
+                rgb_matrix_decrease_speed();
+            } else if (display_menu_state.selected_child == 3) {
+                rgblight_decrease_speed();
+            }
             return false;
         case menu_input_right:
-            rgb_matrix_increase_speed();
+            if (display_menu_state.selected_child == 2) {
+                rgb_matrix_increase_speed();
+            } else if (display_menu_state.selected_child == 3) {
+                rgblight_increase_speed();
+            }
             return false;
         default:
             return true;
@@ -218,43 +278,47 @@ static bool menu_handler_rgbspeed(menu_input_t input) {
 }
 
 void display_handler_rgbspeed(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_speed());
+    if (display_menu_state.selected_child == 2) {
+        snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_speed());
+    } else if (display_menu_state.selected_child == 3) {
+        snprintf(text_buffer, buffer_len - 1, "%d", (int)rgblight_get_speed());
+    }
 }
 
 menu_entry_t rgb_matrix_entries[] = {
     {
         .flags                 = menu_flag_is_value,
-        .text                  = "RGB enabled",
+        .text                  = "RGB Enabled",
         .child.menu_handler    = menu_handler_rgbenabled,
         .child.display_handler = display_handler_rgbenabled,
     },
     {
         .flags                 = menu_flag_is_value,
-        .text                  = "RGB mode",
+        .text                  = "RGB Mode",
         .child.menu_handler    = menu_handler_rgbmode,
         .child.display_handler = display_handler_rgbmode,
     },
     {
         .flags                 = menu_flag_is_value,
-        .text                  = "RGB hue",
+        .text                  = "RGB Hue",
         .child.menu_handler    = menu_handler_rgbhue,
         .child.display_handler = display_handler_rgbhue,
     },
     {
         .flags                 = menu_flag_is_value,
-        .text                  = "RGB saturation",
+        .text                  = "RGB Saturation",
         .child.menu_handler    = menu_handler_rgbsat,
         .child.display_handler = display_handler_rgbsat,
     },
     {
         .flags                 = menu_flag_is_value,
-        .text                  = "RGB value",
+        .text                  = "RGB Value",
         .child.menu_handler    = menu_handler_rgbval,
         .child.display_handler = display_handler_rgbval,
     },
     {
         .flags                 = menu_flag_is_value,
-        .text                  = "RGB speed",
+        .text                  = "RGB Speed",
         .child.menu_handler    = menu_handler_rgbspeed,
         .child.display_handler = display_handler_rgbspeed,
     },
@@ -304,30 +368,34 @@ void display_handler_display(char *text_buffer, size_t buffer_len) {
 // Root menu
 
 menu_entry_t root_entries[] = {
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Display Option",
-        .child.menu_handler    = menu_handler_display,
-        .child.display_handler = display_handler_display,
-    },
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "Unicode Settings",
-        .parent.children    = unicode_entries,
-        .parent.child_count = ARRAY_SIZE(unicode_entries),
-    },
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "RGB Matrix Settings",
-        .parent.children    = rgb_matrix_entries,
-        .parent.child_count = ARRAY_SIZE(rgb_matrix_entries),
-    },
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "RGB Light Settings",
-        .parent.children    = rgb_matrix_entries,
-        .parent.child_count = ARRAY_SIZE(rgb_matrix_entries),
-    },
+    [0] =
+        {
+            .flags                 = menu_flag_is_value,
+            .text                  = "Display Option",
+            .child.menu_handler    = menu_handler_display,
+            .child.display_handler = display_handler_display,
+        },
+    [1] =
+        {
+            .flags              = menu_flag_is_parent,
+            .text               = "Unicode Settings",
+            .parent.children    = unicode_entries,
+            .parent.child_count = ARRAY_SIZE(unicode_entries),
+        },
+    [2] =
+        {
+            .flags              = menu_flag_is_parent,
+            .text               = "RGB Matrix Settings",
+            .parent.children    = rgb_matrix_entries,
+            .parent.child_count = ARRAY_SIZE(rgb_matrix_entries),
+        },
+    [3] =
+        {
+            .flags              = menu_flag_is_parent,
+            .text               = "RGB Light Settings",
+            .parent.children    = rgb_matrix_entries,
+            .parent.child_count = ARRAY_SIZE(rgb_matrix_entries),
+        },
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

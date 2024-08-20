@@ -13,6 +13,10 @@ extern bool       peek_matrix(uint8_t row_index, uint8_t col_index, bool read_ra
 #ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
 extern bool layer_map_has_updated;
 #endif
+#if defined(SWAP_HANDS_ENABLE) && defined(ENCODER_MAP_ENABLE)
+#    include "encoder.h"
+extern const uint8_t PROGMEM encoder_hand_swap_config[NUM_ENCODERS];
+#endif // SWAP_HANDS_ENABLE && ENCODER_MAP_ENABLE
 
 void set_layer_map(void) {
     layer_map_set = true;
@@ -30,13 +34,17 @@ void populate_layer_map(void) {
 
 #ifdef SWAP_HANDS_ENABLE
             if (is_swap_hands_on()) {
+                if (key.row < MATRIX_ROWS && key.col < MATRIX_COLS) {
 #    ifdef LAYER_MAP_REMAPPING
-                key.row = pgm_read_byte(&hand_swap_config[layer_remap[i][j].row][layer_remap[i][j].col].row);
-                key.col = pgm_read_byte(&hand_swap_config[layer_remap[i][j].row][layer_remap[i][j].col].col);
+                    key.row = pgm_read_byte(&hand_swap_config[layer_remap[i][j].row][layer_remap[i][j].col].row);
+                    key.col = pgm_read_byte(&hand_swap_config[layer_remap[i][j].row][layer_remap[i][j].col].col);
 #    else
-                key.row = pgm_read_byte(&hand_swap_config[i][j].row);
-                key.col = pgm_read_byte(&hand_swap_config[i][j].col);
+                    key.row = pgm_read_byte(&hand_swap_config[i][j].row);
+                    key.col = pgm_read_byte(&hand_swap_config[i][j].col);
 #    endif
+                } else if (key.row == KEYLOC_ENCODER_CCW || key.row == KEYLOC_ENCODER_CW) {
+                    key.col = pgm_read_byte(&encoder_hand_swap_config[key.col]);
+                }
             }
 #endif
             layer_map[i][j] = keymap_key_to_keycode(layer_switch_get_layer(key), key);

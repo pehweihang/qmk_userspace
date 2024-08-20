@@ -223,70 +223,65 @@ void format_layer_bitmap_string(char *buffer, layer_state_t state, layer_state_t
 }
 
 #if defined(OS_DETECTION_ENABLE)
+typedef struct {
+    bool    swap_ctl_gui;
+    uint8_t unicode_input_mode;
+} os_detection_config_t;
 
 bool process_detected_host_os_user(os_variant_t detected_os) {
     if (is_keyboard_master()) {
-        bool is_mac = (detected_os == OS_MACOS) || (detected_os == OS_IOS);
-        if (keymap_config.swap_lctl_lgui != is_mac) {
-            keymap_config.swap_lctl_lgui = keymap_config.swap_rctl_rgui = is_mac;
-        }
-#    ifdef UNICODE_COMMON_ENABLE
-        set_unicode_input_mode_soft(keymap_config.swap_lctl_lgui ? UNICODE_MODE_MACOS : UNICODE_MODE_WINCOMPOSE);
-#    endif
+        os_detection_config_t os_detection_config = {
+            .swap_ctl_gui       = false,
+            .unicode_input_mode = UNICODE_MODE_WINCOMPOSE,
+        };
         switch (detected_os) {
             case OS_UNSURE:
                 xprintf("unknown OS Detected\n");
                 break;
             case OS_LINUX:
-#    ifdef UNICODE_COMMON_ENABLE
-                set_unicode_input_mode_soft(UNICODE_MODE_LINUX);
-#    endif // UNICODE_COMMON_ENABLE
                 xprintf("Linux Detected\n");
+                os_detection_config.unicode_input_mode = UNICODE_MODE_LINUX;
                 break;
             case OS_WINDOWS:
-#    ifdef UNICODE_COMMON_ENABLE
-                set_unicode_input_mode_soft(UNICODE_MODE_WINCOMPOSE);
-#    endif // UNICODE_COMMON_ENABLE
                 xprintf("Windows Detected\n");
                 break;
 #    if 0
             case OS_WINDOWS_UNSURE:
-#        ifdef UNICODE_COMMON_ENABLE
-                set_unicode_input_mode_soft(UNICODE_MODE_WINCOMPOSE);
-#        endif // UNICODE_COMMON_ENABLE
                 xprintf("Windows? Detected\n");
                 break;
 #    endif
             case OS_MACOS:
-#    ifdef UNICODE_COMMON_ENABLE
-                set_unicode_input_mode_soft(UNICODE_MODE_MACOS);
-#    endif // UNICODE_COMMON_ENABLE
                 xprintf("MacOS Detected\n");
+                os_detection_config = {
+                    .swap_ctl_gui       = true,
+                    .unicode_input_mode = UNICODE_MODE_MACOS,
+                };
                 break;
             case OS_IOS:
-#    ifdef UNICODE_COMMON_ENABLE
-                set_unicode_input_mode_soft(UNICODE_MODE_MACOS);
-#    endif // UNICODE_COMMON_ENABLE
                 xprintf("iOS Detected\n");
+                os_detection_config = {
+                    .swap_ctl_gui       = true,
+                    .unicode_input_mode = UNICODE_MODE_MACOS,
+                };
                 break;
 #    if 0
             case OS_PS5:
-#        ifdef UNICODE_COMMON_ENABLE
-                set_unicode_input_mode_soft(UNICODE_MODE_LINUX);
-#        endif // UNICODE_COMMON_ENABLE
                 xprintf("PlayStation 5 Detected\n");
+                os_detection_config.unicode_input_mode = UNICODE_MODE_LINUX;
                 break;
             case OS_HANDHELD:
-#        ifdef UNICODE_COMMON_ENABLE
-                set_unicode_input_mode_soft(UNICODE_MODE_LINUX);
-#        endif // UNICODE_COMMON_ENABLE
                 xprintf("Nintend Switch/Quest 2 Detected\n");
+                os_detection_config.unicode_input_mode = UNICODE_MODE_LINUX;
                 break;
 #    endif
             default:
                 xprintf("Unknown OS Detected\n");
                 break;
         }
+        keymap_config.swap_lctl_lgui = keymap_config.swap_rctl_rgui = os_detection_config.swap_ctl_gui;
+#    ifdef UNICODE_COMMON_ENABLE
+        set_unicode_input_mode_soft(os_detection_config.unicode_input_mode);
+#    endif
     }
 
     return true;

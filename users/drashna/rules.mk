@@ -43,6 +43,7 @@ endif
 
 ifeq ($(strip $(I2C_SCANNER_ENABLE)), yes)
     OPT_DEFS += -DI2C_SCANNER_ENABLE
+    I2C_DRIVER_REQUIRED = yes
     CONSOLE_ENABLE := yes
 endif
 

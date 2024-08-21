@@ -88,7 +88,7 @@ void init_display_ili9341(void) {
     uint16_t width;
     uint16_t height;
 
-    qp_init(ili9341_display, QP_ROTATION_180);
+    qp_init(ili9341_display, QP_ROTATION_0);
     qp_get_geometry(ili9341_display, &width, &height, NULL, NULL, NULL);
     qp_clear(ili9341_display);
     qp_rect(ili9341_display, 0, 0, width - 1, height - 1, 0, 0, 0, true);

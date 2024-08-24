@@ -597,6 +597,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, uint16_t width, uint16_t height);
         static bool last_render_menu = false;
         bool        did_render_menu  = render_menu(ili9341_display, 2, ypos, width - 1, height);
+        bool        menu_redraw      = false;
         if (!did_render_menu) {
             ypos += font_oled->line_height + 4;
 
@@ -605,7 +606,11 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 menu_redraw      = true;
             }
             extern uint8_t display_mode;
-            if (hue_redraw || menu_redraw || layer_map_has_updated) {
+            if (hue_redraw || menu_redraw
+#ifdef LAYER_MAP_ENABLE
+                || layer_map_has_updated
+#endif
+            ) {
                 xpos                             = 5;
                 static uint16_t max_font_xpos[4] = {0};
                 switch (display_mode) {
@@ -626,17 +631,17 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                                 if (keycode < ARRAY_SIZE(code_to_name)) {
                                     code = pgm_read_byte(&code_to_name[keycode]);
                                 }
-                                snprintf(buf, sizeof(buf), "%c", code);
-                                xpos += qp_drawtext_recolor(ili9341_display, xpos, temp_ypos, font_oled, buf, curr_hue,
-                                                            255, 255, 0, 0, peek_matrix_layer_map(y, x) ? 255 : 0) +
-                                        5;
+                                xpos +=
+                                    qp_drawtext_recolor(ili9341_display, xpos, temp_ypos, font_oled, &code, curr_hue,
+                                                        255, 255, 0, 0, peek_matrix_layer_map(y, x) ? 255 : 0);
+                                xpos += qp_drawtext_recolor(ili9341_display, xpos, temp_ypos, font_oled, " ", curr_hue,
+                                                            255, 255, 0, 0, 0);
                             }
                             temp_ypos += font_oled->line_height + 4;
                         }
                         layer_map_has_updated = false;
-#endif
-
                         break;
+#endif
                     case 1:
                         render_character_set(ili9341_display, &xpos, max_font_xpos, &ypos, font_thintel, curr_hue, 255,
                                              255, curr_hue, 255, 0);

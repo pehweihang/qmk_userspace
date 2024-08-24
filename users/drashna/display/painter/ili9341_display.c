@@ -525,7 +525,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         if (hue_redraw || dl_state_redraw || layer_state_redraw) {
             static int max_layer_xpos = 0;
             xpos                      = 5;
-            snprintf(buf, sizeof(buf), "LAYOUT: %s", get_layer_name_string(layer_state, false, true));
+            snprintf(buf, sizeof(buf), "LAYOUT: %s", get_layer_name_string(default_layer_state, false, true));
             xpos +=
                 qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_layer_xpos < xpos) {

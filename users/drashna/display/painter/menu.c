@@ -168,9 +168,12 @@ static bool menu_handler_rgbmode(menu_input_t input) {
 void display_handler_rgbmode(char *text_buffer, size_t buffer_len) {
     if (display_menu_state.menu_stack[0] == 2) {
         snprintf(text_buffer, buffer_len - 1, "%s", rgb_matrix_get_effect_name());
-    } else if (display_menu_state.menu_stack[0] == 3) {
+    }
+#ifdef RGBLIGHT_ENABLE
+    else if (display_menu_state.menu_stack[0] == 3) {
         snprintf(text_buffer, buffer_len - 1, "%s", rgblight_get_effect_name());
     }
+#endif
 }
 
 static bool menu_handler_rgbhue(menu_input_t input) {

@@ -655,13 +655,14 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             }
         }
 
-        // Keylogger
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Keylogger
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifdef DISPLAY_KEYLOGGER_ENABLE // keep at very end
         static uint32_t last_klog_update = 0;
         if (timer_elapsed32(last_klog_update) > 125 || keylogger_has_changed) {
             last_klog_update = timer_read32();
+            keylogger_has_changed = true;
         }
 
         ypos = height - (font_mono->line_height + 2);

@@ -65,8 +65,7 @@ __attribute__((unused)) static void add_keylog(uint16_t keycode, keyrecord_t* re
     memmove(str, str + 1, length - 2);
 
     if (keycode < ARRAY_SIZE(code_to_name)) {
-        str[(length - 2)]     = pgm_read_byte(&code_to_name[keycode]);
-        keylogger_has_changed = false;
+        str[(length - 2)] = pgm_read_byte(&code_to_name[keycode]);
     }
 }
 
@@ -93,6 +92,7 @@ bool process_record_display_driver(uint16_t keycode, keyrecord_t* record) {
         return process_record_menu(keycode, record);
 #endif // QUANTUM_PAINTER_ENABLE
     }
+    keylogger_has_changed = true;
     return true;
 }
 

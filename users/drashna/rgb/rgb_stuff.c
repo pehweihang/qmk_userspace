@@ -201,3 +201,14 @@ void rgblight_shutdown(bool jump_to_bootloader) {
     rgblight_mode_noeeprom(1);
     rgblight_setrgb(rgblight_get_val(), 0x00, 0x00);
 }
+
+extern rgblight_config_t rgblight_config;
+
+bool has_rgblight_config_changed(void) {
+    static rgblight_config_t last_config = {0};
+    bool                     has_changed = memcmp(&last_config, &rgblight_config, sizeof(rgblight_config_t));
+    if (has_changed) {
+        memcpy(&last_config, &rgblight_config, sizeof(rgblight_config_t));
+    }
+    return has_changed;
+}

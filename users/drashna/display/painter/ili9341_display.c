@@ -141,17 +141,17 @@ __attribute__((weak)) void ili9341_draw_user(void) {
     qp_get_geometry(ili9341_display, &width, &height, NULL, NULL, NULL);
 
 #if defined(RGB_MATRIX_ENABLE) || defined(RGBLIGHT_ENABLE)
-    bool            rgb_effect_redraw = false;
-    static uint16_t last_effect       = 0xFFFF;
+    bool rgb_redraw = false;
 #    if defined(RGB_MATRIX_ENABLE)
-    uint8_t curr_effect = rgb_matrix_get_mode();
-#    else
-    uint8_t curr_effect = rgblight_get_mode();
-#    endif
-    if (last_effect != curr_effect) {
-        last_effect       = curr_effect;
-        rgb_effect_redraw = true;
+    if (has_rgblight_config_changed()) {
+        rgb_redraw = true;
     }
+#    endif
+#    if defined(RGBLIGHT_ENABLE)
+    if (has_rgblight_config_changed()) {
+        rgb_redraw = true;
+    }
+#    endif
 #endif
 
     if (is_keyboard_master()) {
@@ -438,7 +438,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
 #if defined(RGBLIGHT_ENABLE)
         ypos += font_oled->line_height + 4;
-        if (hue_redraw || rgb_effect_redraw) {
+        if (hue_redraw || rgb_redraw) {
             static uint16_t max_rgb_xpos = 0;
             xpos                         = 5;
             snprintf(buf, sizeof(buf), "RGB Light Mode: %s", rgblight_get_effect_name());
@@ -475,7 +475,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
 #if defined(RGB_MATRIX_ENABLE)
         ypos += font_oled->line_height + 4;
-        if (hue_redraw || rgb_effect_redraw) {
+        if (hue_redraw || rgb_redraw) {
             static uint16_t max_rgb_xpos = 0;
             xpos                         = 5;
             snprintf(buf, sizeof(buf), "RGB Matrix Mode: %s", rgb_matrix_get_effect_name());
@@ -563,27 +563,26 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         }
 
         if (hue_redraw || autocorrect_str_has_changed) {
-            static int max_klog_xpos = 0;
-            xpos                     = 5;
+            static uint16_t max_klog_xpos[2] = {0};
+            xpos                             = 5;
             snprintf(buf, sizeof(buf), "Autocorrected: %s", autocorrected_str_raw[0]);
             xpos +=
                 qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
 
-            if (max_klog_xpos < xpos) {
-                max_klog_xpos = xpos;
+            if (max_klog_xpos[0] < xpos) {
+                max_klog_xpos[0] = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_klog_xpos[0], ypos + font_oled->line_height, 0, 0, 0, true);
 
             ypos += font_oled->line_height + 4;
-            max_klog_xpos = 0;
-            xpos          = 5;
+            xpos = 5;
             snprintf(buf, sizeof(buf), "Original Text: %s", autocorrected_str_raw[1]);
             xpos +=
                 qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
-            if (max_klog_xpos < xpos) {
-                max_klog_xpos = xpos;
+            if (max_klog_xpos[1] < xpos) {
+                max_klog_xpos[1] = xpos;
             }
-            qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, xpos, ypos, max_klog_xpos[1], ypos + font_oled->line_height, 0, 0, 0, true);
 
             autocorrect_str_has_changed = false;
         } else {
@@ -660,13 +659,13 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             }
         }
 
-    // Keylogger
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Keylogger
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifdef DISPLAY_KEYLOGGER_ENABLE // keep at very end
         static uint32_t last_klog_update = 0;
         if (timer_elapsed32(last_klog_update) > 125 || keylogger_has_changed) {
-            last_klog_update = timer_read32();
+            last_klog_update      = timer_read32();
             keylogger_has_changed = true;
         }
 

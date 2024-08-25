@@ -262,3 +262,14 @@ const char *rgb_matrix_get_effect_name(void) {
     }
     return buf;
 }
+
+extern rgb_config_t rgb_matrix_config;
+
+bool has_rgb_matrix_config_changed(void) {
+    static rgb_config_t last_config = {0};
+    bool                has_changed = memcmp(&last_config, &rgb_matrix_config, sizeof(rgb_config_t));
+    if (has_changed) {
+        memcpy(&last_config, &rgb_matrix_config, sizeof(rgb_config_t));
+    }
+    return has_changed;
+}

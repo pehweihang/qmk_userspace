@@ -143,7 +143,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 #if defined(RGB_MATRIX_ENABLE) || defined(RGBLIGHT_ENABLE)
     bool rgb_redraw = false;
 #    if defined(RGB_MATRIX_ENABLE)
-    if (has_rgblight_config_changed()) {
+    if (has_rgb_matrix_config_changed()) {
         rgb_redraw = true;
     }
 #    endif

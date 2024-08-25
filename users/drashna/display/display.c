@@ -92,7 +92,9 @@ bool process_record_display_driver(uint16_t keycode, keyrecord_t* record) {
         return process_record_menu(keycode, record);
 #endif // QUANTUM_PAINTER_ENABLE
     }
+#ifdef DISPLAY_KEYLOGGER_ENABLE
     keylogger_has_changed = true;
+#endif // DISPLAY_KEYLOGGER_ENABLE
     return true;
 }
 

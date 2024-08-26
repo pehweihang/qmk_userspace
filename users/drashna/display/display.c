@@ -95,6 +95,9 @@ bool process_record_display_driver(uint16_t keycode, keyrecord_t* record) {
 #ifdef DISPLAY_KEYLOGGER_ENABLE
     keylogger_has_changed = true;
 #endif // DISPLAY_KEYLOGGER_ENABLE
+#ifdef LAYER_MAP_ENABLE
+    layer_map_has_updated = true;
+#endif // LAYER_MAP_ENABLE
     return true;
 }
 

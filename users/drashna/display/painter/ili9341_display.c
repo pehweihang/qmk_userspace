@@ -591,25 +591,28 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         }
 #endif // AUTOCORRECT_ENABLE
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // Font test
         bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, uint16_t width, uint16_t height);
         static bool last_render_menu = false;
         bool        did_render_menu  = render_menu(ili9341_display, 2, ypos, width - 1, height);
         bool        menu_redraw      = false;
         if (!did_render_menu) {
             ypos += font_oled->line_height + 4;
-
+            static uint32_t block_timer = 0;
+            if (timer_elapsed(block_timer) > 125) {
+                block_timer = timer_read();
+                menu_redraw = true;
+            }
             if (last_render_menu != did_render_menu) {
                 last_render_menu = did_render_menu;
                 menu_redraw      = true;
             }
-            extern uint8_t display_mode;
-            if (hue_redraw || menu_redraw
 #ifdef LAYER_MAP_ENABLE
-                || layer_map_has_updated
+            if (layer_map_has_updated) {
+                menu_redraw = true;
+            }
 #endif
-            ) {
+            extern uint8_t display_mode;
+            if (hue_redraw || menu_redraw) {
                 xpos                             = 5;
                 static uint16_t max_font_xpos[4] = {0};
                 switch (display_mode) {
@@ -617,22 +620,22 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                         //  Layer Map render
                         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifdef LAYER_MAP_ENABLE
-                        // ypos -= (font_oled->line_height + 4) * LAYER_MAP_ROWS;
                         uint16_t temp_ypos = ypos;
                         for (uint8_t y = 0; y < LAYER_MAP_ROWS; y++) {
                             xpos = 25;
                             for (uint8_t x = 0; x < LAYER_MAP_COLS; x++) {
                                 uint16_t keycode = extract_basic_keycode(layer_map[y][x], NULL, false);
-                                char     code    = 0;
+                                char     code[2] = {0};
+
                                 if (keycode > 0xFF) {
                                     keycode = KC_SPC;
                                 }
                                 if (keycode < ARRAY_SIZE(code_to_name)) {
-                                    code = pgm_read_byte(&code_to_name[keycode]);
+                                    code[0] = pgm_read_byte(&code_to_name[keycode]);
                                 }
-                                xpos +=
-                                    qp_drawtext_recolor(ili9341_display, xpos, temp_ypos, font_oled, &code, curr_hue,
-                                                        255, 255, 0, 0, peek_matrix_layer_map(y, x) ? 255 : 0);
+                                xpos += qp_drawtext_recolor(ili9341_display, xpos, temp_ypos, font_oled, code, curr_hue,
+                                                            255, peek_matrix_layer_map(y, x) ? 0 : 255, curr_hue, 255,
+                                                            peek_matrix_layer_map(y, x) ? 255 : 0);
                                 xpos += qp_drawtext_recolor(ili9341_display, xpos, temp_ypos, font_oled, " ", curr_hue,
                                                             255, 255, 0, 0, 0);
                             }

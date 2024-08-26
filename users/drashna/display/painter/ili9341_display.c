@@ -56,6 +56,12 @@ void render_frame(painter_device_t display) {
                         truncate_text(title, title_width, font_thintel, false, false), 0, 0, 0, 0, 0, 255);
 }
 
+__attribute__((weak)) void init_display_ili9341_inversion(painter_device_t display) {
+    qp_comms_start(display);
+    qp_comms_command(display, ILI9XXX_CMD_INVERT_ON);
+    qp_comms_stop(display);
+}
+
 /**
  * @brief Initializes the display, clears it and sets frame and title
  *
@@ -94,12 +100,7 @@ void init_display_ili9341(void) {
     qp_rect(ili9341_display, 0, 0, width - 1, height - 1, 0, 0, 0, true);
 
     // if needs inversion, run it only afetr the clear and rect functions or otherwise it won't work
-#ifdef DISPLAY_ILI9341_INVERTED
-    qp_comms_start(ili9341_display);
-    qp_comms_command(ili9341_display, ILI9XXX_CMD_INVERT_ON);
-    qp_comms_stop(ili9341_display);
-#endif // DISPLAY_ILI9341_INVERTED
-
+    init_display_ili9341_inversion();
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Initial render of frame/logo
 

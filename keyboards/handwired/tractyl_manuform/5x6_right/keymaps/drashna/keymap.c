@@ -55,9 +55,17 @@ const uint8_t led_mapping[RGBLIGHT_LED_COUNT] = {0,  1,  2,  3,  32, 31, 12, 13,
                                                  28, 59, 61, 60, 46, 45, 62, 63, 36, 35, 34, 33};
 #endif
 
-#if defined(QUANTUM_PAINTER_ENABLE) && !defined(CUSTOM_QUANTUM_PAINTER_ENABLE)
-#    include "qp.h"
-#    include "display/painter/graphics/assets.h"
+#if defined(QUANTUM_PAINTER_ENABLE)
+#    if defined(CUSTOM_QUANTUM_PAINTER_ENABLE)
+#        include "qp_ili9xxx_opcodes.h"
+void init_display_ili9341_inversion(painter_device_t display) {
+    qp_comms_start(display);
+    qp_comms_command(display, is_keyboard_left() ? ILI9XXX_CMD_INVERT_ON : ILI9XXX_CMD_INVERT_ON);
+    qp_comms_stop(display);
+}
+#    else // CUSTOM_QUANTUM_PAINTER_ENABLE
+#        include "qp.h"
+#        include "display/painter/graphics/assets.h"
 
 static painter_device_t       display;
 static painter_image_handle_t my_image;
@@ -80,4 +88,5 @@ void keyboard_post_init_keymap(void) {
     // my_image = qp_load_image_mem(gfx_asuka_240x320);
     qp_close_image(my_image);
 }
-#endif
+#    endif // CUSTOM_QUANTUM_PAINTER_ENABLE
+#endif     // QUANTUM_PAINTER_ENABLE

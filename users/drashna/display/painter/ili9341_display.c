@@ -591,12 +591,12 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         }
 #endif // AUTOCORRECT_ENABLE
 
+        ypos += font_oled->line_height + 4;
         bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, uint16_t width, uint16_t height);
         static bool last_render_menu = false;
         bool        did_render_menu  = render_menu(ili9341_display, 2, ypos, width - 1, height);
         bool        menu_redraw      = false;
         if (!did_render_menu) {
-            ypos += font_oled->line_height + 4;
             static uint32_t block_timer = 0;
             if (timer_elapsed(block_timer) > 125) {
                 block_timer = timer_read();

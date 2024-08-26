@@ -649,28 +649,31 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                             //  Layer Map render
                             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifdef LAYER_MAP_ENABLE
-                            uint16_t temp_ypos = ypos;
-                            for (uint8_t y = 0; y < LAYER_MAP_ROWS; y++) {
-                                xpos = 25;
-                                for (uint8_t x = 0; x < LAYER_MAP_COLS; x++) {
-                                    uint16_t keycode = extract_basic_keycode(layer_map[y][x], NULL, false);
-                                    char     code[2] = {0};
+                            {
+                                uint16_t temp_ypos = ypos;
+                                for (uint8_t y = 0; y < LAYER_MAP_ROWS; y++) {
+                                    xpos = 25;
+                                    for (uint8_t x = 0; x < LAYER_MAP_COLS; x++) {
+                                        uint16_t keycode = extract_basic_keycode(layer_map[y][x], NULL, false);
+                                        char     code[2] = {0};
 
-                                    if (keycode > 0xFF) {
-                                        keycode = KC_SPC;
-                                    }
-                                    if (keycode < ARRAY_SIZE(code_to_name)) {
-                                        code[0] = pgm_read_byte(&code_to_name[keycode]);
-                                    }
-                                    xpos += qp_drawtext_recolor(ili9341_display, xpos, temp_ypos, font_oled, code,
+                                        if (keycode > 0xFF) {
+                                            keycode = KC_SPC;
+                                        }
+                                        if (keycode < ARRAY_SIZE(code_to_name)) {
+                                            code[0] = pgm_read_byte(&code_to_name[keycode]);
+                                        }
+                                        xpos +=
+                                            qp_drawtext_recolor(ili9341_display, xpos, temp_ypos, font_oled, code,
                                                                 curr_hue, 255, peek_matrix_layer_map(y, x) ? 0 : 255,
                                                                 curr_hue, 255, peek_matrix_layer_map(y, x) ? 255 : 0);
-                                    xpos += qp_drawtext_recolor(ili9341_display, xpos, temp_ypos, font_oled, " ",
-                                                                curr_hue, 255, 255, 0, 0, 0);
-                                }
-                                temp_ypos += font_oled->line_height + 4;
+                                        xpos += qp_drawtext_recolor(ili9341_display, xpos, temp_ypos, font_oled, " ",
+                                                                    curr_hue, 255, 255, 0, 0, 0);
+                                    }
+                                    temp_ypos += font_oled->line_height + 4;
                             }
                             layer_map_has_updated = false;
+                            }
                             break;
 #endif
                         case 1:

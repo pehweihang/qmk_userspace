@@ -100,7 +100,7 @@ void init_display_ili9341(void) {
     qp_rect(ili9341_display, 0, 0, width - 1, height - 1, 0, 0, 0, true);
 
     // if needs inversion, run it only afetr the clear and rect functions or otherwise it won't work
-    init_display_ili9341_inversion();
+    init_display_ili9341_inversion(ili9341_display);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Initial render of frame/logo
 

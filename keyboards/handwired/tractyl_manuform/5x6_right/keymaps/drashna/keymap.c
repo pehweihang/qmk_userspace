@@ -58,9 +58,10 @@ const uint8_t led_mapping[RGBLIGHT_LED_COUNT] = {0,  1,  2,  3,  32, 31, 12, 13,
 #if defined(QUANTUM_PAINTER_ENABLE)
 #    if defined(CUSTOM_QUANTUM_PAINTER_ENABLE)
 #        include "qp_ili9xxx_opcodes.h"
+#        include "qp_comms.h"
 void init_display_ili9341_inversion(painter_device_t display) {
     qp_comms_start(display);
-    qp_comms_command(display, is_keyboard_left() ? ILI9XXX_CMD_INVERT_ON : ILI9XXX_CMD_INVERT_ON);
+    qp_comms_command(display, is_keyboard_left() ? ILI9XXX_CMD_INVERT_OFF : ILI9XXX_CMD_INVERT_ON);
     qp_comms_stop(display);
 }
 #    else // CUSTOM_QUANTUM_PAINTER_ENABLE

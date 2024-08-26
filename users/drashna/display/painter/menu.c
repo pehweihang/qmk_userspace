@@ -424,7 +424,7 @@ menu_state_t display_menu_state = {
 
 menu_entry_t *get_current_menu(void) {
     if (display_menu_state.menu_stack[0] == 0xFF) {
-        return NULL;
+        return &root;
     }
 
     menu_entry_t *entry = &root;
@@ -552,11 +552,10 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
     display_menu_state.dirty = false;
     memcpy(&last_state, &display_menu_state, sizeof(menu_state_t));
 
-    uint16_t render_width  = width - start_x;
-    uint16_t render_height = height - start_y;
+    uint16_t render_width = width - start_x;
 
     if (display_menu_state.is_in_menu) {
-        qp_rect(display, start_x, start_y, render_width - 1, render_height - 1, 0, 0, 0, true);
+        qp_rect(display, start_x, start_y, render_width - 1, height - 1, 0, 0, 0, true);
 
         // uint8_t       hue      = rgb_matrix_get_hue();
         menu_entry_t *menu     = get_current_menu();

@@ -594,18 +594,18 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         ypos += font_oled->line_height + 4;
         bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, uint16_t width, uint16_t height);
         static bool last_render_menu = false;
-        bool        did_render_menu  = render_menu(ili9341_display, 2, ypos, width - 1, height);
+        bool        did_render_menu =
+            render_menu(ili9341_display, 2, ypos, width - 1, height - (font_oled->line_height * 2 + 6));
         bool        menu_redraw      = false;
-        if (!did_render_menu) {
+        if (did_render_menu) {
+            last_render_menu = true;
+        } else {
             static uint32_t block_timer = 0;
             if (timer_elapsed(block_timer) > 125) {
                 block_timer = timer_read();
                 menu_redraw = true;
             }
-            if (last_render_menu != did_render_menu) {
-                last_render_menu = did_render_menu;
-                menu_redraw      = true;
-            }
+
 #ifdef LAYER_MAP_ENABLE
             if (layer_map_has_updated) {
                 menu_redraw = true;
@@ -633,10 +633,10 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                     console_needs_redraw = true;
                 }
             } else {
-                if (console_needs_redraw) {
-                    qp_rect(ili9341_display, 5, ypos, width - 5 - 1,
+                if (console_needs_redraw || last_render_menu) {
+                    qp_rect(ili9341_display, 2, ypos, width - 2 - 1,
                             ypos + (font_oled->line_height + 4) * DISPLAY_CONSOLE_LOG_LINE_NUM, curr_hue, 255, 0, true);
-                    console_needs_redraw = false;
+                    console_needs_redraw = last_render_menu = false;
                 }
 #endif
 

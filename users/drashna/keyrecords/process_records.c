@@ -77,11 +77,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         return false;
     }
 #endif
-#ifdef DISPLAY_DRIVER_ENABLE
-    process_record_display_driver(keycode, record);
-#endif // DISPLAY_DRIVER_ENABLE
-
     if (!(process_record_keymap(keycode, record) && process_record_secrets(keycode, record)
+#ifdef DISPLAY_DRIVER_ENABLE
+          && process_record_display_driver(keycode, record)
+#endif // DISPLAY_DRIVER_ENABLE
 #ifdef CUSTOM_RGB_MATRIX
           && process_record_user_rgb_matrix(keycode, record)
 #endif

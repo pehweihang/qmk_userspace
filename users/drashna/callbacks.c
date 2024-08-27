@@ -4,6 +4,8 @@
 #include "action.h"
 #include "drashna.h"
 #include "keyboard.h"
+#include "sendchar.h"
+
 #ifdef LAYER_MAP_ENABLE
 #    include "layer_map.h"
 #endif
@@ -42,6 +44,7 @@ user_runtime_config_t user_state;
  */
 __attribute__((weak)) void keyboard_pre_init_keymap(void) {}
 void                       keyboard_pre_init_user(void) {
+    print_set_sendchar(drashna_sendchar);
     eeconfig_read_user_config(&userspace_config.raw);
     if (!userspace_config.check) {
         eeconfig_init_user();

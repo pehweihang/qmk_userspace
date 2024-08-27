@@ -612,7 +612,6 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 menu_redraw = true;
             }
 #endif
-#ifdef SENDCHAR_DRIVER_CUSTOM
             extern uint32_t sendchar_timer;
             static bool     console_needs_redraw = false;
             static uint32_t last_log_redraw      = 0;
@@ -639,7 +638,6 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                             ypos + (font_oled->line_height + 4) * DISPLAY_CONSOLE_LOG_LINE_NUM, curr_hue, 255, 0, true);
                     console_needs_redraw = last_render_menu = false;
                 }
-#endif
 
                 extern uint8_t display_mode;
                 if (hue_redraw || menu_redraw) {
@@ -693,9 +691,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                             break;
                     }
                 }
-#ifdef SENDCHAR_DRIVER_CUSTOM
             }
-#endif
         }
 
         // Keylogger

@@ -725,12 +725,10 @@ void render_mouse_mode(uint8_t col, uint8_t line) {
 }
 
 void render_console_output(uint8_t col, uint8_t line) {
-#ifdef SENDCHAR_DRIVER_CUSTOM
     for (uint8_t i = 0; i < DISPLAY_CONSOLE_LOG_LINE_NUM; i++) {
         oled_set_cursor(col, line + i);
         oled_write(logline_ptrs[i], false);
     }
-#endif
 }
 
 void render_status_right(void) {

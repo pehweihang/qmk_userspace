@@ -38,6 +38,8 @@ static bool process_record_konami_code(uint16_t keycode, keyrecord_t *record) {
             case QK_TOGGLE_LAYER ... QK_TOGGLE_LAYER_MAX:
             case QK_ONE_SHOT_LAYER ... QK_ONE_SHOT_LAYER_MAX:
             case QK_LAYER_TAP_TOGGLE ... QK_LAYER_TAP_TOGGLE_MAX:
+            case KC_BACKSPACE:
+            case KC_DELETE:
                 // Messing with layers, ignore but don't reset the counter.
                 break;
             case QK_MOD_TAP ... QK_MOD_TAP_MAX:

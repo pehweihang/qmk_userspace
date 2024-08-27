@@ -5,6 +5,7 @@
 #include "process_records.h"
 #include "drashna.h"
 #include "version.h"
+#include "names.h"
 #ifdef OS_DETECTION_ENABLE
 #    include "os_detection.h"
 #endif
@@ -60,7 +61,7 @@ static bool process_record_konami_code(uint16_t keycode, keyrecord_t *record) {
             case KC_A:
             case KC_ENTER:
                 if (keycode == pgm_read_word(&konami_code[konami_index])) {
-                    // dprintf("Konami code: key released: %s\n", key_name(keycode, false));
+                    dprintf("Konami code: key released: %s\n", key_name(keycode, false));
                     konami_index++;
                     if (konami_index == ARRAY_SIZE(konami_code)) {
                         konami_index = 0;

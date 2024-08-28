@@ -606,20 +606,6 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 block_redraw = true;
             }
 
-            // #ifdef LAYER_MAP_ENABLE
-            //             if (layer_map_has_updated) {
-            //                 menu_redraw = true;
-            //             }
-            // #endif
-
-            //             static bool     console_needs_redraw = false;
-            //             static uint32_t last_log_redraw      = 0;
-            //             static uint8_t  last_display_mode    = 0xFF;
-
-            //             if (timer_elapsed32(last_log_redraw) > 50 && display_mode == 0) {
-            //                 last_log_redraw      = timer_read32();
-            //                 console_needs_redraw = true;
-            //             }
             static uint8_t last_display_mode = 0xFF;
             if (last_display_mode != userspace_config.display_mode) {
                 last_display_mode       = userspace_config.display_mode;

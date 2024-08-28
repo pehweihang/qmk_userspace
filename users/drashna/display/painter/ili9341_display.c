@@ -594,105 +594,108 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
         ypos += font_oled->line_height + 4;
         bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, uint16_t width, uint16_t height);
-        static bool last_render_menu = false;
-        bool        did_render_menu =
-            render_menu(ili9341_display, 2, ypos, width - 1, height - (font_oled->line_height * 2 + 6));
-        bool menu_redraw = false;
-        if (did_render_menu) {
-            last_render_menu = true;
+        static bool force_full_block_redraw = false;
+
+        if (render_menu(ili9341_display, 2, ypos, width - 1, height - (font_oled->line_height * 2 + 6))) {
+            force_full_block_redraw = true;
         } else {
-            static uint32_t block_timer = 0;
+            static uint32_t block_timer  = 0;
+            bool            block_redraw = false;
             if (timer_elapsed(block_timer) > 125) {
-                block_timer = timer_read();
-                menu_redraw = true;
+                block_timer  = timer_read();
+                block_redraw = true;
             }
 
-#ifdef LAYER_MAP_ENABLE
-            if (layer_map_has_updated) {
-                menu_redraw = true;
-            }
-#endif
-            static bool     console_needs_redraw = false;
-            static uint32_t last_log_redraw      = 0;
-            static uint8_t  last_display_mode    = 0xFF;
+            // #ifdef LAYER_MAP_ENABLE
+            //             if (layer_map_has_updated) {
+            //                 menu_redraw = true;
+            //             }
+            // #endif
 
+            //             static bool     console_needs_redraw = false;
+            //             static uint32_t last_log_redraw      = 0;
+            //             static uint8_t  last_display_mode    = 0xFF;
+
+            //             if (timer_elapsed32(last_log_redraw) > 50 && display_mode == 0) {
+            //                 last_log_redraw      = timer_read32();
+            //                 console_needs_redraw = true;
+            //             }
             extern uint8_t display_mode;
-            if (timer_elapsed32(last_log_redraw) > 50 && display_mode == 0) {
-                last_log_redraw      = timer_read32();
-                console_needs_redraw = true;
-            }
+            static uint8_t last_display_mode = 0xFF;
             if (last_display_mode != display_mode) {
-                last_display_mode    = display_mode;
-                console_needs_redraw = menu_redraw = true;
+                last_display_mode       = display_mode;
+                force_full_block_redraw = true;
             }
 
-            if (console_needs_redraw || last_render_menu) {
+            if (force_full_block_redraw) {
                 qp_rect(ili9341_display, 2, ypos, width - 2 - 1,
                         ypos + (font_oled->line_height + 4) * DISPLAY_CONSOLE_LOG_LINE_NUM, curr_hue, 255, 0, true);
-                console_needs_redraw = last_render_menu = false;
+                force_full_block_redraw = false;
+                block_redraw            = true;
             }
 
-            if (hue_redraw || menu_redraw) {
-                xpos                             = 5;
-                static uint16_t max_font_xpos[4] = {0};
-                switch (display_mode) {
-                    case 0:
-                        {
-                            static uint16_t max_line_width = 0;
-                            for (uint8_t i = 0; i < DISPLAY_CONSOLE_LOG_LINE_NUM; i++) {
-                                xpos = 5;
-                                xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, logline_ptrs[i],
-                                                            curr_hue, 255, 255, curr_hue, 255, 0);
-                                if (max_line_width < xpos) {
-                                    max_line_width = xpos;
-                                }
-                                qp_rect(ili9341_display, xpos, ypos, max_line_width, ypos + font_oled->line_height, 0,
-                                        0, 0, true);
-                                ypos += font_oled->line_height + 4;
+            xpos = 5;
+            switch (display_mode) {
+                case 0:
+                    if (hue_redraw || block_redraw || console_log_needs_redraw) {
+                        static uint16_t max_line_width = 0;
+                        for (uint8_t i = 0; i < DISPLAY_CONSOLE_LOG_LINE_NUM; i++) {
+                            xpos = 5;
+                            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, logline_ptrs[i],
+                                                        curr_hue, 255, 255, curr_hue, 255, 0);
+                            if (max_line_width < xpos) {
+                                max_line_width = xpos;
                             }
+                            qp_rect(ili9341_display, xpos, ypos, max_line_width, ypos + font_oled->line_height, 0, 0, 0,
+                                    true);
+                            ypos += font_oled->line_height + 4;
                         }
-                        break;
-                    case 1:
-                        //  Layer Map render
-                        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                        console_log_needs_redraw = false;
+                    }
+                    break;
+                case 1:
+                    //  Layer Map render
+                    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifdef LAYER_MAP_ENABLE
-                        {
-                            uint16_t temp_ypos = ypos;
-                            for (uint8_t y = 0; y < LAYER_MAP_ROWS; y++) {
-                                xpos = 25;
-                                for (uint8_t x = 0; x < LAYER_MAP_COLS; x++) {
-                                    uint16_t keycode = extract_basic_keycode(layer_map[y][x], NULL, false);
-                                    char     code[2] = {0};
+                    if (hue_redraw || block_redraw || layer_map_has_updated) {
+                        uint16_t temp_ypos = ypos;
+                        for (uint8_t y = 0; y < LAYER_MAP_ROWS; y++) {
+                            xpos = 25;
+                            for (uint8_t x = 0; x < LAYER_MAP_COLS; x++) {
+                                uint16_t keycode = extract_basic_keycode(layer_map[y][x], NULL, false);
+                                char     code[2] = {0};
 
-                                    if (keycode > 0xFF) {
-                                        keycode = KC_SPC;
-                                    }
-                                    if (keycode < ARRAY_SIZE(code_to_name)) {
-                                        code[0] = pgm_read_byte(&code_to_name[keycode]);
-                                    }
-                                    xpos += qp_drawtext_recolor(ili9341_display, xpos, temp_ypos, font_oled, code,
-                                                                curr_hue, 255, peek_matrix_layer_map(y, x) ? 0 : 255,
-                                                                curr_hue, 255, peek_matrix_layer_map(y, x) ? 255 : 0);
-                                    xpos += qp_drawtext_recolor(ili9341_display, xpos, temp_ypos, font_oled, " ",
-                                                                curr_hue, 255, 255, 0, 0, 0);
+                                if (keycode > 0xFF) {
+                                    keycode = KC_SPC;
                                 }
-                                temp_ypos += font_oled->line_height + 4;
+                                if (keycode < ARRAY_SIZE(code_to_name)) {
+                                    code[0] = pgm_read_byte(&code_to_name[keycode]);
+                                }
+                                xpos += qp_drawtext_recolor(ili9341_display, xpos, temp_ypos, font_oled, code, curr_hue,
+                                                            255, peek_matrix_layer_map(y, x) ? 0 : 255, curr_hue, 255,
+                                                            peek_matrix_layer_map(y, x) ? 255 : 0);
+                                xpos += qp_drawtext_recolor(ili9341_display, xpos, temp_ypos, font_oled, " ", curr_hue,
+                                                            255, 255, 0, 0, 0);
                             }
-                            layer_map_has_updated = false;
+                            temp_ypos += font_oled->line_height + 4;
                         }
-                        break;
+                        layer_map_has_updated = false;
+                    }
+                    break;
 #endif
-                    case 2:
-                        render_character_set(ili9341_display, &xpos, max_font_xpos, &ypos, font_thintel, curr_hue, 255,
+                case 2:
+                    if (hue_redraw || block_redraw) {
+                        static uint16_t max_font_xpos[3][4] = {0};
+                        render_character_set(ili9341_display, &xpos, max_font_xpos[0], &ypos, font_thintel, curr_hue,
+                                             255, 255, curr_hue, 255, 0);
+                        render_character_set(ili9341_display, &xpos, max_font_xpos[1], &ypos, font_mono, curr_hue, 255,
                                              255, curr_hue, 255, 0);
-                        render_character_set(ili9341_display, &xpos, max_font_xpos, &ypos, font_mono, curr_hue, 255,
+                        render_character_set(ili9341_display, &xpos, max_font_xpos[2], &ypos, font_oled, curr_hue, 255,
                                              255, curr_hue, 255, 0);
-                        render_character_set(ili9341_display, &xpos, max_font_xpos, &ypos, font_oled, curr_hue, 255,
-                                             255, curr_hue, 255, 0);
-                        break;
-                    default:
-                        break;
-                }
+                    }
+                    break;
+                default:
+                    break;
             }
         }
 

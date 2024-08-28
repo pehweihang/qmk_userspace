@@ -10,8 +10,43 @@
 #include "unicode.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Display options
+
+static bool menu_handler_display(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            userspace_config.display_mode = (userspace_config.display_mode - 1) % 3;
+            eeconfig_update_user_config(&userspace_config.raw);
+            return false;
+        case menu_input_right:
+            userspace_config.display_mode = (userspace_config.display_mode + 1) % 3;
+            eeconfig_update_user_config(&userspace_config.raw);
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_display(char *text_buffer, size_t buffer_len) {
+    switch (userspace_config.display_mode) {
+        case 0:
+            strncpy(text_buffer, "Console", buffer_len - 1);
+            return;
+        case 1:
+            strncpy(text_buffer, "Layer Map", buffer_len - 1);
+            return;
+        case 2:
+            strncpy(text_buffer, "Fonts", buffer_len - 1);
+            return;
+    }
+
+    strncpy(text_buffer, ": Unknown", buffer_len);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Unicode
 
+#ifdef UNICODE_COMMON_ENABLE
 static bool menu_handler_unicode(menu_input_t input) {
     switch (input) {
         case menu_input_left:
@@ -117,19 +152,161 @@ menu_entry_t unicode_entries[] = {
         .child.display_handler = display_handler_unicode_typing,
     },
 };
+#endif // UNICODE_COMMON_ENABLE
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // RGB Matrix
 
+#ifdef RGB_MATRIX_ENABLE
+static bool menu_handler_rm_enabled(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            rgb_matrix_toggle();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_rm_enabled(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", rgb_matrix_is_enabled() ? "on" : "off");
+}
+
+static bool menu_handler_rm_mode(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            rgb_matrix_step_reverse();
+            return false;
+        case menu_input_right:
+            rgb_matrix_step();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_rm_mode(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", rgb_matrix_get_effect_name());
+}
+
+static bool menu_handler_rm_hue(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            rgb_matrix_decrease_hue();
+            return false;
+        case menu_input_right:
+            rgb_matrix_increase_hue();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_rm_hue(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_hue());
+}
+
+static bool menu_handler_rm_sat(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            rgb_matrix_decrease_sat();
+            return false;
+        case menu_input_right:
+            rgb_matrix_increase_sat();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_rm_sat(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_sat());
+}
+
+static bool menu_handler_rm_val(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            rgb_matrix_decrease_val();
+            return false;
+        case menu_input_right:
+            rgb_matrix_increase_val();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_rm_val(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_val());
+}
+
+static bool menu_handler_rm_speed(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            rgb_matrix_decrease_speed();
+            return false;
+        case menu_input_right:
+            rgb_matrix_increase_speed();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_rm_speed(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_speed());
+}
+
+menu_entry_t rgb_matrix_entries[] = {
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "RGB Enabled",
+        .child.menu_handler    = menu_handler_rm_enabled,
+        .child.display_handler = display_handler_rm_enabled,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "RGB Mode",
+        .child.menu_handler    = menu_handler_rm_mode,
+        .child.display_handler = display_handler_rm_mode,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "RGB Hue",
+        .child.menu_handler    = menu_handler_rm_hue,
+        .child.display_handler = display_handler_rm_hue,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "RGB Saturation",
+        .child.menu_handler    = menu_handler_rm_sat,
+        .child.display_handler = display_handler_rm_sat,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "RGB Value",
+        .child.menu_handler    = menu_handler_rm_val,
+        .child.display_handler = display_handler_rm_val,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "RGB Speed",
+        .child.menu_handler    = menu_handler_rm_speed,
+        .child.display_handler = display_handler_rm_speed,
+    },
+};
+#endif // RGB_MATRIX_ENABLE
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// RGB Light
+
+#ifdef RGBLIGHT_ENABLE
 static bool menu_handler_rgbenabled(menu_input_t input) {
     switch (input) {
         case menu_input_left:
         case menu_input_right:
-            if (display_menu_state.menu_stack[0] == 2) {
-                rgb_matrix_toggle();
-            } else if (display_menu_state.menu_stack[0] == 3) {
-                rgblight_toggle();
-            }
+            rgblight_toggle();
             return false;
         default:
             return true;
@@ -137,28 +314,16 @@ static bool menu_handler_rgbenabled(menu_input_t input) {
 }
 
 void display_handler_rgbenabled(char *text_buffer, size_t buffer_len) {
-    if (display_menu_state.menu_stack[0] == 2) {
-        snprintf(text_buffer, buffer_len - 1, "%s", rgb_matrix_is_enabled() ? "on" : "off");
-    } else if (display_menu_state.menu_stack[0] == 3) {
-        snprintf(text_buffer, buffer_len - 1, "%s", rgblight_is_enabled() ? "on" : "off");
-    }
+    snprintf(text_buffer, buffer_len - 1, "%s", rgblight_is_enabled() ? "on" : "off");
 }
 
 static bool menu_handler_rgbmode(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            if (display_menu_state.menu_stack[0] == 2) {
-                rgb_matrix_step_reverse();
-            } else if (display_menu_state.menu_stack[0] == 3) {
-                rgblight_step_reverse();
-            }
+            rgblight_step_reverse();
             return false;
         case menu_input_right:
-            if (display_menu_state.menu_stack[0] == 2) {
-                rgb_matrix_step();
-            } else if (display_menu_state.menu_stack[0] == 3) {
-                rgblight_step();
-            }
+            rgblight_step();
             return false;
         default:
             return true;
@@ -166,31 +331,16 @@ static bool menu_handler_rgbmode(menu_input_t input) {
 }
 
 void display_handler_rgbmode(char *text_buffer, size_t buffer_len) {
-    if (display_menu_state.menu_stack[0] == 2) {
-        snprintf(text_buffer, buffer_len - 1, "%s", rgb_matrix_get_effect_name());
-    }
-#ifdef RGBLIGHT_ENABLE
-    else if (display_menu_state.menu_stack[0] == 3) {
-        snprintf(text_buffer, buffer_len - 1, "%s", rgblight_get_effect_name());
-    }
-#endif
+    snprintf(text_buffer, buffer_len - 1, "%s", rgblight_get_effect_name());
 }
 
 static bool menu_handler_rgbhue(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            if (display_menu_state.menu_stack[0] == 2) {
-                rgb_matrix_decrease_hue();
-            } else if (display_menu_state.menu_stack[0] == 3) {
-                rgblight_decrease_hue();
-            }
+            rgblight_decrease_hue();
             return false;
         case menu_input_right:
-            if (display_menu_state.menu_stack[0] == 2) {
-                rgb_matrix_increase_hue();
-            } else if (display_menu_state.menu_stack[0] == 3) {
-                rgblight_increase_hue();
-            }
+            rgblight_increase_hue();
             return false;
         default:
             return true;
@@ -198,28 +348,16 @@ static bool menu_handler_rgbhue(menu_input_t input) {
 }
 
 void display_handler_rgbhue(char *text_buffer, size_t buffer_len) {
-    if (display_menu_state.menu_stack[0] == 2) {
-        snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_hue());
-    } else if (display_menu_state.menu_stack[0] == 3) {
-        snprintf(text_buffer, buffer_len - 1, "%d", (int)rgblight_get_hue());
-    }
+    snprintf(text_buffer, buffer_len - 1, "%d", (int)rgblight_get_hue());
 }
 
 static bool menu_handler_rgbsat(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            if (display_menu_state.menu_stack[0] == 2) {
-                rgb_matrix_decrease_sat();
-            } else if (display_menu_state.menu_stack[0] == 3) {
-                rgblight_decrease_sat();
-            }
+            rgblight_decrease_sat();
             return false;
         case menu_input_right:
-            if (display_menu_state.menu_stack[0] == 2) {
-                rgb_matrix_increase_sat();
-            } else if (display_menu_state.menu_stack[0] == 3) {
-                rgblight_increase_sat();
-            }
+            rgblight_increase_sat();
             return false;
         default:
             return true;
@@ -227,24 +365,16 @@ static bool menu_handler_rgbsat(menu_input_t input) {
 }
 
 void display_handler_rgbsat(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_sat());
+    snprintf(text_buffer, buffer_len - 1, "%d", (int)rgblighti_get_sat());
 }
 
 static bool menu_handler_rgbval(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            if (display_menu_state.menu_stack[0] == 2) {
-                rgb_matrix_decrease_val();
-            } else if (display_menu_state.menu_stack[0] == 3) {
-                rgblight_decrease_val();
-            }
+            rgblight_decrease_val();
             return false;
         case menu_input_right:
-            if (display_menu_state.menu_stack[0] == 2) {
-                rgb_matrix_increase_val();
-            } else if (display_menu_state.menu_stack[0] == 3) {
-                rgblight_increase_val();
-            }
+            rgblight_increase_val();
             return false;
         default:
             return true;
@@ -252,28 +382,16 @@ static bool menu_handler_rgbval(menu_input_t input) {
 }
 
 void display_handler_rgbval(char *text_buffer, size_t buffer_len) {
-    if (display_menu_state.menu_stack[0] == 2) {
-        snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_val());
-    } else if (display_menu_state.menu_stack[0] == 3) {
-        snprintf(text_buffer, buffer_len - 1, "%d", (int)rgblight_get_val());
-    }
+    snprintf(text_buffer, buffer_len - 1, "%d", (int)rgblight_get_val());
 }
 
 static bool menu_handler_rgbspeed(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            if (display_menu_state.menu_stack[0] == 2) {
-                rgb_matrix_decrease_speed();
-            } else if (display_menu_state.menu_stack[0] == 3) {
-                rgblight_decrease_speed();
-            }
+            rgblight_decrease_speed();
             return false;
         case menu_input_right:
-            if (display_menu_state.menu_stack[0] == 2) {
-                rgb_matrix_increase_speed();
-            } else if (display_menu_state.menu_stack[0] == 3) {
-                rgblight_increase_speed();
-            }
+            rgblight_increase_speed();
             return false;
         default:
             return true;
@@ -281,14 +399,10 @@ static bool menu_handler_rgbspeed(menu_input_t input) {
 }
 
 void display_handler_rgbspeed(char *text_buffer, size_t buffer_len) {
-    if (display_menu_state.menu_stack[0] == 2) {
-        snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_speed());
-    } else if (display_menu_state.menu_stack[0] == 3) {
-        snprintf(text_buffer, buffer_len - 1, "%d", (int)rgblight_get_speed());
-    }
+    snprintf(text_buffer, buffer_len - 1, "%d", (int)rgblight_get_speed());
 }
 
-menu_entry_t rgb_matrix_entries[] = {
+menu_entry_t rgb_light_entries[] = {
     {
         .flags                 = menu_flag_is_value,
         .text                  = "RGB Enabled",
@@ -326,74 +440,243 @@ menu_entry_t rgb_matrix_entries[] = {
         .child.display_handler = display_handler_rgbspeed,
     },
 };
+#endif // RGBLIGHT_ENABLE
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Display options
+// Backlight
 
-static bool menu_handler_display(menu_input_t input) {
+#ifdef BACKLIGHT_ENABLE
+static bool menu_handler_bl_enabled(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            userspace_config.display_mode = (userspace_config.display_mode - 1) % 3;
-            eeconfig_update_user_config(&userspace_config.raw);
-            return false;
         case menu_input_right:
-            userspace_config.display_mode = (userspace_config.display_mode + 1) % 3;
-            eeconfig_update_user_config(&userspace_config.raw);
+            backlight_toggle();
             return false;
         default:
             return true;
     }
 }
 
-void display_handler_display(char *text_buffer, size_t buffer_len) {
-    switch (userspace_config.display_mode) {
-        case 0:
-            strncpy(text_buffer, "Console", buffer_len - 1);
-            return;
-        case 1:
-            strncpy(text_buffer, "Layer Map", buffer_len - 1);
-            return;
-        case 2:
-            strncpy(text_buffer, "Fonts", buffer_len - 1);
-            return;
-    }
-
-    strncpy(text_buffer, ": Unknown", buffer_len);
+void display_handler_bl_enabled(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", is_backlight_enabled() ? "on" : "off");
 }
+
+static bool menu_handler_bl_level(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            backlight_decrease();
+            return false;
+        case menu_input_right:
+            backlight_increase();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_bl_level(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%d", (int)get_backlight_level());
+}
+
+menu_entry_t backlight_entries[] = {
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Backlight Enabled",
+        .child.menu_handler    = menu_handler_bl_enabled,
+        .child.display_handler = display_handler_bl_enabled,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Backlight Level",
+        .child.menu_handler    = menu_handler_bl_level,
+        .child.display_handler = display_handler_bl_level,
+    },
+};
+#endif // BACKLIGHT_ENABLE
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Audio
+
+#ifdef AUDIO_ENABLE
+static bool menu_handler_audio_enabled(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            audio_toggle();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_audio_enabled(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", audio_is_on() ? "on" : "off");
+}
+
+static bool menu_handler_music_enabled(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            music_toggle();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_music_enabled(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", is_music_on() ? "on" : "off");
+}
+
+static bool menu_handler_audio_clicky_enabled(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            clicky_toggle();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_audio_clicky_enabled(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", is_clicky_on() ? "on" : "off");
+}
+
+static bool menu_handler_audio_clicky_freq(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            clicky_freq_down();
+            return false;
+        case menu_input_right:
+            clicky_freq_up();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_audio_clicky_freq(char *text_buffer, size_t buffer_len) {
+    extern float clicky_freq;
+    snprintf(text_buffer, buffer_len - 1, "%f", (float)clicky_freq);
+}
+
+menu_entry_t audio_entries[] = {
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Audio Enabled",
+        .child.menu_handler    = menu_handler_audio_enabled,
+        .child.display_handler = display_handler_audio_enabled,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Music Mode Enabled",
+        .child.menu_handler    = menu_handler_music_enabled,
+        .child.display_handler = display_handler_music_enabled,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Audio Clicky Enabled",
+        .child.menu_handler    = menu_handler_audio_clicky_enabled,
+        .child.display_handler = display_handler_audio_clicky_enabled,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Audio Clicky Frequency",
+        .child.menu_handler    = menu_handler_audio_clicky_freq,
+        .child.display_handler = display_handler_audio_clicky_freq,
+    },
+};
+#endif // AUDIO_ENABLE
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Pointing Device
+
+#ifdef POINTING_DEVICE_ENABLE
+
+static bool menu_handler_auto_mouse_layer(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            set_auto_mouse_enable(!get_auto_mouse_enable());
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_auto_mouse_layer(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", get_auto_mouse_enable() ? "on" : "off");
+}
+
+menu_entry_t pointing_entries[] = {{
+    .flags                 = menu_flag_is_value,
+    .text                  = "Auto Mouse Layer",
+    .child.menu_handler    = menu_handler_auto_mouse_layer,
+    .child.display_handler = display_handler_auto_mouse_layer,
+}};
+#endif // POINTING_DEVICE_ENABLE
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Root menu
 
 menu_entry_t root_entries[] = {
-    [0] =
-        {
-            .flags                 = menu_flag_is_value,
-            .text                  = "Display Option",
-            .child.menu_handler    = menu_handler_display,
-            .child.display_handler = display_handler_display,
-        },
-    [1] =
-        {
-            .flags              = menu_flag_is_parent,
-            .text               = "Unicode Settings",
-            .parent.children    = unicode_entries,
-            .parent.child_count = ARRAY_SIZE(unicode_entries),
-        },
-    [2] =
-        {
-            .flags              = menu_flag_is_parent,
-            .text               = "RGB Matrix Settings",
-            .parent.children    = rgb_matrix_entries,
-            .parent.child_count = ARRAY_SIZE(rgb_matrix_entries),
-        },
-    [3] =
-        {
-            .flags              = menu_flag_is_parent,
-            .text               = "RGB Light Settings",
-            .parent.children    = rgb_matrix_entries,
-            .parent.child_count = ARRAY_SIZE(rgb_matrix_entries),
-        },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Display Option",
+        .child.menu_handler    = menu_handler_display,
+        .child.display_handler = display_handler_display,
+    },
+#ifdef UNICODE_COMMON_ENABLE
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "Unicode Settings",
+        .parent.children    = unicode_entries,
+        .parent.child_count = ARRAY_SIZE(unicode_entries),
+    },
+#endif // UNICODE_COMMON_ENABLE
+#ifdef RGB_MATRIX_ENABLE
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "RGB Matrix Settings",
+        .parent.children    = rgb_matrix_entries,
+        .parent.child_count = ARRAY_SIZE(rgb_matrix_entries),
+    },
+#endif // RGB_MATRIX_ENABLE
+#ifdef RGBLIGHT_ENABLE
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "RGB Light Settings",
+        .parent.children    = rgb_light_entries,
+        .parent.child_count = ARRAY_SIZE(rgb_matrix_entries),
+    },
+#endif // RGBLIGHT_ENABLE
+#ifdef BACKLIGHT_ENABLE
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "Backlight Settings",
+        .parent.children    = backlight_entries,
+        .parent.child_count = ARRAY_SIZE(backlight_entries),
+    },
+#endif // BACKLIGHT_ENABLE
+#ifdef AUDIO_ENABLE
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "Audio Settings",
+        .parent.children    = audio_entries,
+        .parent.child_count = ARRAY_SIZE(audio_entries),
+    },
+#endif // AUDIO_ENABLE
+#ifdef POINTING_DEVICE_ENABLE
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "Pointing Device Settings",
+        .parent.children    = pointing_entries,
+        .parent.child_count = ARRAY_SIZE(pointing_entries),
+    },
+#endif // POINTING_DEVICE_ENABLE
 };
+
+_Static_assert(ARRAY_SIZE(root_entries) <= 8, "Too many root menu entries");
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Root Title

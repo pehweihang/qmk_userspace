@@ -620,10 +620,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             //                 last_log_redraw      = timer_read32();
             //                 console_needs_redraw = true;
             //             }
-            extern uint8_t display_mode;
             static uint8_t last_display_mode = 0xFF;
-            if (last_display_mode != display_mode) {
-                last_display_mode       = display_mode;
+            if (last_display_mode != userspace_config.display_mode) {
+                last_display_mode       = userspace_config.display_mode;
                 force_full_block_redraw = true;
             }
 
@@ -635,7 +634,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             }
 
             xpos = 5;
-            switch (display_mode) {
+            switch (userspace_config.display_mode) {
                 case 0:
                     if (hue_redraw || block_redraw || console_log_needs_redraw) {
                         static uint16_t max_line_width = 0;

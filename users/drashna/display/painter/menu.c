@@ -330,15 +330,15 @@ menu_entry_t rgb_matrix_entries[] = {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Display options
 
-uint8_t display_mode = 0;
-
 static bool menu_handler_display(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            display_mode = (display_mode - 1) % 3;
+            userspace_config.display_mode = (userspace_config.display_mode - 1) % 3;
+            eeconfig_update_user_config(&userspace_config.raw);
             return false;
         case menu_input_right:
-            display_mode = (display_mode + 1) % 3;
+            userspace_config.display_mode = (userspace_config.display_mode + 1) % 3;
+            eeconfig_update_user_config(&userspace_config.raw);
             return false;
         default:
             return true;
@@ -346,7 +346,7 @@ static bool menu_handler_display(menu_input_t input) {
 }
 
 void display_handler_display(char *text_buffer, size_t buffer_len) {
-    switch (display_mode) {
+    switch (userspace_config.display_mode) {
         case 0:
             strncpy(text_buffer, "Console", buffer_len - 1);
             return;

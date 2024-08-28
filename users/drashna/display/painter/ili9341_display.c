@@ -569,6 +569,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             static uint16_t max_klog_xpos[2] = {0};
             xpos                             = 5;
             snprintf(buf, sizeof(buf), "Autocorrected: %s", autocorrected_str_raw[0]);
+            snprintf(buf, sizeof(buf), "%s", truncate_text(buf, width - 7, font_oled, false, false));
+
             xpos +=
                 qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
 
@@ -580,6 +582,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             ypos += font_oled->line_height + 4;
             xpos = 5;
             snprintf(buf, sizeof(buf), "Original Text: %s", autocorrected_str_raw[1]);
+            snprintf(buf, sizeof(buf), "%s", truncate_text(buf, width - 7, font_oled, false, false));
+
             xpos +=
                 qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_klog_xpos[1] < xpos) {

@@ -365,7 +365,7 @@ static bool menu_handler_rgbsat(menu_input_t input) {
 }
 
 void display_handler_rgbsat(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%d", (int)rgblighti_get_sat());
+    snprintf(text_buffer, buffer_len - 1, "%d", (int)rgblight_get_sat());
 }
 
 static bool menu_handler_rgbval(menu_input_t input) {
@@ -619,6 +619,15 @@ menu_entry_t pointing_entries[] = {{
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Root menu
 
+static bool menu_handler_more(menu_input_t input) {
+    switch (input) {
+        default:
+            return true;
+    }
+}
+
+void display_handler_more(char *text_buffer, size_t buffer_len) {}
+
 menu_entry_t root_entries[] = {
     {
         .flags                 = menu_flag_is_value,
@@ -674,6 +683,12 @@ menu_entry_t root_entries[] = {
         .parent.child_count = ARRAY_SIZE(pointing_entries),
     },
 #endif // POINTING_DEVICE_ENABLE
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "More....",
+        .child.menu_handler    = menu_handler_more,
+        .child.display_handler = display_handler_more,
+    },
 };
 
 _Static_assert(ARRAY_SIZE(root_entries) <= 8, "Too many root menu entries");

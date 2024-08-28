@@ -592,7 +592,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         }
 #endif // AUTOCORRECT_ENABLE
 
-        ypos += font_oled->line_height + 4;
+        ypos += font_oled->line_height + 1;
         bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, uint16_t width, uint16_t height);
         static bool force_full_block_redraw = false;
 
@@ -614,11 +614,12 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
             if (force_full_block_redraw) {
                 qp_rect(ili9341_display, 2, ypos, width - 2 - 1,
-                        ypos + (font_oled->line_height + 4) * DISPLAY_CONSOLE_LOG_LINE_NUM, curr_hue, 255, 0, true);
+                        ypos + (font_oled->line_height + 4) * DISPLAY_CONSOLE_LOG_LINE_NUM + 3, curr_hue, 255, 0, true);
                 force_full_block_redraw = false;
                 block_redraw            = true;
             }
 
+            ypos += 3;
             xpos = 5;
             switch (userspace_config.display_mode) {
                 case 0:
@@ -714,7 +715,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifdef RTC_ENABLE
-        ypos -= (font_oled->line_height + 4);
+        ypos -= (font_oled->line_height + 3);
         static uint16_t rtc_timer  = 0;
         bool            rtc_redraw = false;
         if (timer_elapsed(rtc_timer) > 125 && rtc_is_connected()) {

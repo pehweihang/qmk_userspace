@@ -443,6 +443,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             static uint16_t max_rgb_xpos = 0;
             xpos                         = 5;
             snprintf(buf, sizeof(buf), "RGB Light Mode: %s", rgblight_get_effect_name());
+            snprintf(buf, sizeof(buf), "%s", truncate_text(buf, width - 7, font_oled, false, false));
 
             xpos +=
                 qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
@@ -480,6 +481,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             static uint16_t max_rgb_xpos = 0;
             xpos                         = 5;
             snprintf(buf, sizeof(buf), "RGB Matrix Mode: %s", rgb_matrix_get_effect_name());
+            snprintf(buf, sizeof(buf), "%s", truncate_text(buf, width - 7, font_oled, false, false));
 
             xpos +=
                 qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);

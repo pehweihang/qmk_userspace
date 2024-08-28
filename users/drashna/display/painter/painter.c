@@ -14,6 +14,8 @@
  * @param text original text
  * @param max_width max width in pixels
  * @param font font being used
+ * @param from_start truncate from start or end
+ * @param add_ellipses add ellipses to truncated text
  * @return char* truncated text
  */
 char* truncate_text(const char* text, uint16_t max_width, painter_font_handle_t font, bool from_start,

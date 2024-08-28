@@ -557,7 +557,7 @@ static bool menu_handler_audio_clicky_freq(menu_input_t input) {
 
 void display_handler_audio_clicky_freq(char *text_buffer, size_t buffer_len) {
     extern float clicky_freq;
-    snprintf(text_buffer, buffer_len - 1, "%f", (float)clicky_freq);
+    snprintf(text_buffer, buffer_len - 1, "%.2f", (float)clicky_freq);
 }
 
 menu_entry_t audio_entries[] = {
@@ -867,9 +867,13 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
             menu_entry_t *child = &menu->parent.children[i];
             uint16_t      x     = start_x + 8;
             if (child == selected) {
-                x += qp_drawtext_recolor(display, x, y, font_oled, child->text, HSV_GREEN, 85, 255, 0);
+                x += qp_drawtext_recolor(display, x, y, font_oled,
+                                         truncate_text(child->text, render_width, font_oled, false, true), HSV_GREEN,
+                                         85, 255, 0);
             } else {
-                x += qp_drawtext_recolor(display, x, y, font_oled, child->text, 0, 0, 255, 0, 255, 0);
+                x += qp_drawtext_recolor(display, x, y, font_oled,
+                                         truncate_text(child->text, render_width, font_oled, false, true), 0, 0, 255, 0,
+                                         255, 0);
             }
             if (child->flags & menu_flag_is_parent) {
                 qp_drawtext(display, 8 + x, y, font_oled, "  >");

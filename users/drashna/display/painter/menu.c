@@ -16,6 +16,9 @@ static bool menu_handler_display(menu_input_t input) {
     switch (input) {
         case menu_input_left:
             userspace_config.display_mode = (userspace_config.display_mode - 1) % 3;
+            if (userspace_config.display_mode > 2) {
+                userspace_config.display_mode = 2;
+            }
             eeconfig_update_user_config(&userspace_config.raw);
             return false;
         case menu_input_right:
@@ -40,7 +43,7 @@ void display_handler_display(char *text_buffer, size_t buffer_len) {
             return;
     }
 
-    strncpy(text_buffer, ": Unknown", buffer_len);
+    strncpy(text_buffer, "Unknown", buffer_len);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -593,7 +596,7 @@ menu_entry_t audio_entries[] = {
 
 #ifdef POINTING_DEVICE_ENABLE
 
-static bool menu_handler_auto_mouse_layer(menu_input_t input) {
+static bool menu_handler_auto_mouse_enable(menu_input_t input) {
     switch (input) {
         case menu_input_left:
         case menu_input_right:
@@ -604,16 +607,41 @@ static bool menu_handler_auto_mouse_layer(menu_input_t input) {
     }
 }
 
-void display_handler_auto_mouse_layer(char *text_buffer, size_t buffer_len) {
+void display_handler_auto_mouse_enable(char *text_buffer, size_t buffer_len) {
     snprintf(text_buffer, buffer_len - 1, "%s", get_auto_mouse_enable() ? "on" : "off");
 }
 
-menu_entry_t pointing_entries[] = {{
-    .flags                 = menu_flag_is_value,
-    .text                  = "Auto Mouse Layer",
-    .child.menu_handler    = menu_handler_auto_mouse_layer,
-    .child.display_handler = display_handler_auto_mouse_layer,
-}};
+static bool menu_handler_auto_mouse_layer(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            set_auto_mouse_layer((get_auto_mouse_layer() - 1) % MAX_USER_LAYERS);
+            return false;
+        case menu_input_right:
+            set_auto_mouse_layer((get_auto_mouse_layer() + 1) % MAX_USER_LAYERS);
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_auto_mouse_layer(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", layer_name(get_auto_mouse_layer()));
+}
+
+menu_entry_t pointing_entries[] = {
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Auto Mouse Enable",
+        .child.menu_handler    = menu_handler_auto_mouse_enable,
+        .child.display_handler = display_handler_auto_mouse_enable,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Auto Mouse Layer",
+        .child.menu_handler    = menu_handler_auto_mouse_layer,
+        .child.display_handler = display_handler_auto_mouse_layer,
+    },
+};
 #endif // POINTING_DEVICE_ENABLE
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

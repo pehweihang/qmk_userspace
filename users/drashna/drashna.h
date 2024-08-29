@@ -8,6 +8,7 @@
 #include "keyrecords/wrappers.h"
 #include "keyrecords/process_records.h"
 #include "callbacks.h"
+#include "names.h"
 
 #if defined(RGBLIGHT_ENABLE)
 #    include "rgb/rgb_stuff.h"
@@ -48,6 +49,7 @@ enum userspace_layers {
     _LOWER,
     _RAISE,
     _ADJUST,
+    MAX_USER_LAYERS,
 };
 
 #define _MACROS          _MOUSE

@@ -204,7 +204,7 @@ const char *mod_name(uint16_t mod) {
     return buffer;
 }
 
-const char *key_name(uint16_t keycode, bool shifted) {
+const char *keycode_name(uint16_t keycode, bool shifted) {
     static char buffer[32];
     char        buf1[16];
     char        buf2[16];

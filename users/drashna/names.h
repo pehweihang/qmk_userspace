@@ -6,6 +6,6 @@
 
 #include <ctype.h>
 
-const char *key_name(uint16_t keycode, bool shifted);
+const char *keycode_name(uint16_t keycode, bool shifted);
 const char *layer_name(uint8_t layer);
 const char *mod_name(uint16_t mod);

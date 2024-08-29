@@ -628,6 +628,60 @@ void display_handler_auto_mouse_layer(char *text_buffer, size_t buffer_len) {
     snprintf(text_buffer, buffer_len - 1, "%s", layer_name(get_auto_mouse_layer()));
 }
 
+static bool menu_handler_auto_mouse_accel(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            userspace_config.enable_acceleration ^= 1;
+            eeconfig_update_user_config(&userspace_config.raw);
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_auto_mouse_accel(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.enable_acceleration ? "on" : "off");
+}
+
+extern bool     mouse_jiggler;
+extern uint16_t mouse_jiggler_timer;
+
+static bool menu_handler_mouse_jiggler(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            mouse_jiggler       = !mouse_jiggler;
+            mouse_jiggler_timer = timer_read();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_mouse_jiggler(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", mouse_jiggler ? "on" : "off");
+}
+
+#    if defined(KEYBOARD_handwired_tractyl_manuform) || defined(KEYBOARD_bastardkb_charybdis)
+static bool menu_handler_dpi_config(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            charybdis_cycle_pointer_default_dpi(false);
+            return false;
+        case menu_input_right:
+            charybdis_cycle_pointer_default_dpi(true);
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_dpi_config(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%d", (int)charybdis_get_pointer_default_dpi());
+}
+#    endif
+
 menu_entry_t pointing_entries[] = {
     {
         .flags                 = menu_flag_is_value,
@@ -641,6 +695,26 @@ menu_entry_t pointing_entries[] = {
         .child.menu_handler    = menu_handler_auto_mouse_layer,
         .child.display_handler = display_handler_auto_mouse_layer,
     },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Auto Mouse Acceleration",
+        .child.menu_handler    = menu_handler_auto_mouse_accel,
+        .child.display_handler = display_handler_auto_mouse_accel,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Mouse Jiggler",
+        .child.menu_handler    = menu_handler_mouse_jiggler,
+        .child.display_handler = display_handler_mouse_jiggler,
+    },
+#    if defined(KEYBOARD_handwired_tractyl_manuform) || defined(KEYBOARD_bastardkb_charybdis)
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "DPI Config",
+        .child.menu_handler    = menu_handler_dpi_config,
+        .child.display_handler = display_handler_dpi_config,
+    },
+#    endif
 };
 #endif // POINTING_DEVICE_ENABLE
 

@@ -266,10 +266,10 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         }
 
         ypos += font_oled->line_height + 4;
+        static uint16_t max_dss_xpos = 0;
         if (ds_state_redraw) {
-            static int max_dss_xpos = 0;
-            xpos                    = 5;
-            const char* buf         = "DRAG SCROLL";
+            xpos            = 5;
+            const char* buf = "DRAG SCROLL";
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf,
                                         charybdis_get_pointer_dragscroll_enabled() ? 153 : 255, 255, 255,
                                         charybdis_get_pointer_dragscroll_enabled() ? 153 : 255, 255, 0);
@@ -290,9 +290,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             am_state_redraw = true;
         }
 
+        static uint16_t max_ams_xpos = 0;
         if (am_state_redraw) {
-            static int max_ams_xpos = 0;
-            xpos += 10;
+            xpos            = 10 + max_dss_xpos;
             const char* buf = "Auto Layer";
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, get_auto_mouse_enable() ? 34 : 255,
                                         255, 255, charybdis_get_pointer_sniping_enabled() ? 34 : 255, 255, 0);
@@ -312,9 +312,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             last_sp_state   = charybdis_get_pointer_sniping_enabled();
             sp_state_redraw = true;
         }
+        static uint16_t max_sps_xpos = 0;
         if (sp_state_redraw) {
-            static int max_sps_xpos = 0;
-            xpos += 10;
+            xpos            = 10 + max_ams_xpos;
             const char* buf = "Sniping";
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf,
                                         charybdis_get_pointer_sniping_enabled() ? 153 : 255, 255, 255,

@@ -9,6 +9,27 @@
 #include "process_keycode/process_unicode_common.h"
 #include "unicode.h"
 
+#ifdef AUDIO_ENABLE
+#    include "audio.h"
+
+#    ifndef AG_NORM_SONG
+#        define AG_NORM_SONG SONG(AG_NORM_SOUND)
+#    endif
+#    ifndef AG_SWAP_SONG
+#        define AG_SWAP_SONG SONG(AG_SWAP_SOUND)
+#    endif
+#    ifndef CG_NORM_SONG
+#        define CG_NORM_SONG SONG(AG_NORM_SOUND)
+#    endif
+#    ifndef CG_SWAP_SONG
+#        define CG_SWAP_SONG SONG(AG_SWAP_SOUND)
+#    endif
+static float ag_norm_song[][2] = AG_NORM_SONG;
+static float ag_swap_song[][2] = AG_SWAP_SONG;
+static float cg_norm_song[][2] = CG_NORM_SONG;
+static float cg_swap_song[][2] = CG_SWAP_SONG;
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Display options
 
@@ -504,7 +525,11 @@ static bool menu_handler_audio_enabled(menu_input_t input) {
     switch (input) {
         case menu_input_left:
         case menu_input_right:
-            audio_toggle();
+            if (audio_is_on()) {
+                audio_off();
+            } else {
+                audio_on();
+            }
             return false;
         default:
             return true;
@@ -718,17 +743,236 @@ menu_entry_t pointing_entries[] = {
 };
 #endif // POINTING_DEVICE_ENABLE
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Root menu
-
-static bool menu_handler_more(menu_input_t input) {
+static bool menu_handler_keycode_ctrl_caps(menu_input_t input) {
     switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            keymap_config.swap_control_capslock = !keymap_config.swap_control_capslock;
+            eeconfig_update_keymap(keymap_config.raw);
+            return false;
         default:
             return true;
     }
 }
 
-void display_handler_more(char *text_buffer, size_t buffer_len) {}
+void display_handler_keycode_ctrl_caps(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", keymap_config.swap_control_capslock ? "swapped" : "normal");
+}
+
+static bool menu_handler_keycode_alt_gui(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            keymap_config.swap_lalt_lgui = keymap_config.swap_ralt_rgui = !keymap_config.swap_lalt_lgui;
+#ifdef AUDIO_ENABLE
+            if (keymap_config.swap_ralt_rgui) {
+                PLAY_SONG(ag_swap_song);
+            } else {
+                PLAY_SONG(ag_norm_song);
+            }
+#endif // AUDIO_ENABLE
+            eeconfig_update_keymap(keymap_config.raw);
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_keycode_alt_gui(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", keymap_config.swap_lalt_lgui ? "swapped" : "normal");
+}
+
+static bool menu_handler_keycode_ctrl_gui(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            keymap_config.swap_lctl_lgui = keymap_config.swap_rctl_rgui = !keymap_config.swap_lctl_lgui;
+#ifdef AUDIO_ENABLE
+            if (keymap_config.swap_rctl_rgui) {
+                PLAY_SONG(cg_swap_song);
+            } else {
+                PLAY_SONG(cg_norm_song);
+            }
+#endif // AUDIO_ENABLE
+            eeconfig_update_keymap(keymap_config.raw);
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_keycode_ctrl_gui(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", keymap_config.swap_lctl_lgui ? "swapped" : "normal");
+}
+
+static bool menu_handler_keycode_disable_gui(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            keymap_config.no_gui = !keymap_config.no_gui;
+            eeconfig_update_keymap(keymap_config.raw);
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_keycode_disable_gui(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", keymap_config.no_gui ? "disabled" : "enabled");
+}
+
+__attribute__((unused)) static bool menu_handler_keycode_grave_esc(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            keymap_config.swap_grave_esc = !keymap_config.swap_grave_esc;
+            eeconfig_update_keymap(keymap_config.raw);
+            return false;
+        default:
+            return true;
+    }
+}
+
+__attribute__((unused)) void display_handler_keycode_grave_esc(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", keymap_config.swap_grave_esc ? "swapped" : "normal");
+}
+
+__attribute__((unused)) static bool menu_handler_keycode_bslash_bspc(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            keymap_config.swap_backslash_backspace = !keymap_config.swap_backslash_backspace;
+            eeconfig_update_keymap(keymap_config.raw);
+            return false;
+        default:
+            return true;
+    }
+}
+
+__attribute__((unused)) void display_handler_keycode_bslash_bspc(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", keymap_config.swap_backslash_backspace ? "swapped" : "normal");
+}
+
+static bool menu_handler_keycode_nkro(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            keymap_config.nkro = !keymap_config.nkro;
+            clear_keyboard(); // clear first buffer to prevent stuck keys
+            eeconfig_update_keymap(keymap_config.raw);
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_keycode_nkro(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", keymap_config.nkro ? "on" : "off");
+}
+
+static bool menu_handler_keycode_oneshot(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            keymap_config.oneshot_enable = !keymap_config.oneshot_enable;
+            eeconfig_update_keymap(keymap_config.raw);
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_keycode_oneshot(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", keymap_config.oneshot_enable ? "on" : "off");
+}
+
+static bool menu_handler_keycode_autocorrect(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            keymap_config.autocorrect_enable = !keymap_config.autocorrect_enable;
+            eeconfig_update_keymap(keymap_config.raw);
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_keycode_autocorrect(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", keymap_config.autocorrect_enable ? "on" : "off");
+}
+
+menu_entry_t keymap_config_entries[] = {
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Control <-> Capslock",
+        .child.menu_handler    = menu_handler_keycode_ctrl_caps,
+        .child.display_handler = display_handler_keycode_ctrl_caps,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Alt <-> GUI",
+        .child.menu_handler    = menu_handler_keycode_alt_gui,
+        .child.display_handler = display_handler_keycode_alt_gui,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Control <-> GUI",
+        .child.menu_handler    = menu_handler_keycode_ctrl_gui,
+        .child.display_handler = display_handler_keycode_ctrl_gui,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Disable GUI",
+        .child.menu_handler    = menu_handler_keycode_disable_gui,
+        .child.display_handler = display_handler_keycode_disable_gui,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "N-Key Roll Over",
+        .child.menu_handler    = menu_handler_keycode_nkro,
+        .child.display_handler = display_handler_keycode_nkro,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Oneshot Keys",
+        .child.menu_handler    = menu_handler_keycode_oneshot,
+        .child.display_handler = display_handler_keycode_oneshot,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Autocorrect",
+        .child.menu_handler    = menu_handler_keycode_autocorrect,
+        .child.display_handler = display_handler_keycode_autocorrect,
+    },
+    // {
+    //     .flags                 = menu_flag_is_value,
+    //     .text                  = "Grave <-> Escape",
+    //     .child.menu_handler    = menu_handler_keycode_grave_esc,
+    //     .child.display_handler = display_handler_keycode_grave_esc,
+    // },
+    // {
+    //     .flags                 = menu_flag_is_value,
+    //     .text                  = "Backslash <-> Backspace",
+    //     .child.menu_handler    = menu_handler_keycode_bslash_bspc,
+    //     .child.display_handler = display_handler_keycode_bslash_bspc,
+    // },
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Buy More
+
+menu_entry_t buy_more_entries[] = {
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "Keymap Config",
+        .parent.children    = keymap_config_entries,
+        .parent.child_count = ARRAY_SIZE(keymap_config_entries),
+    },
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Root menu
 
 menu_entry_t root_entries[] = {
     {
@@ -786,10 +1030,10 @@ menu_entry_t root_entries[] = {
     },
 #endif // POINTING_DEVICE_ENABLE
     {
-        .flags                 = menu_flag_is_value,
-        .text                  = "More....",
-        .child.menu_handler    = menu_handler_more,
-        .child.display_handler = display_handler_more,
+        .flags              = menu_flag_is_parent,
+        .text               = "More...",
+        .parent.children    = buy_more_entries,
+        .parent.child_count = ARRAY_SIZE(buy_more_entries),
     },
 };
 

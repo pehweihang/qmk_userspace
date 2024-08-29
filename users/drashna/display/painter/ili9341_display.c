@@ -4,6 +4,7 @@
 
 #include "drashna.h"
 #include "qp.h"
+#include "qp_surface.h"
 #include "qp_ili9xxx_opcodes.h"
 #include "qp_comms.h"
 #include "display/painter/painter.h"
@@ -22,7 +23,7 @@
 #include <stdio.h>
 #include <ctype.h>
 
-painter_device_t ili9341_display;
+painter_device_t ili9341_display, menu_surface;
 
 painter_font_handle_t font_thintel, font_mono, font_oled;
 
@@ -32,6 +33,11 @@ painter_image_handle_t lock_num_on, lock_num_off;
 painter_image_handle_t lock_scrl_on, lock_scrl_off;
 painter_image_handle_t windows_logo, apple_logo, linux_logo;
 painter_image_handle_t mouse_icon;
+
+#define SURFACE_MENU_WIDTH  236
+#define SURFACE_MENU_HEIGHT 124
+
+uint8_t menu_buffer[SURFACE_REQUIRED_BUFFER_BYTE_SIZE(SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT, 16)];
 
 /**
  * @brief Draws the initial frame on the screen
@@ -88,6 +94,7 @@ void init_display_ili9341(void) {
 
     ili9341_display =
         qp_ili9341_make_spi_device(240, 320, DISPLAY_CS_PIN, DISPLAY_DC_PIN, DISPLAY_RST_PIN, DISPLAY_SPI_DIVIDER, 0);
+    menu_surface = qp_make_rgb565_surface(SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT, menu_buffer);
 
     wait_ms(50);
 
@@ -95,6 +102,7 @@ void init_display_ili9341(void) {
     uint16_t height;
 
     qp_init(ili9341_display, QP_ROTATION_0);
+    qp_init(menu_surface, QP_ROTATION_0);
     qp_get_geometry(ili9341_display, &width, &height, NULL, NULL, NULL);
     qp_clear(ili9341_display);
     qp_rect(ili9341_display, 0, 0, width - 1, height - 1, 0, 0, 0, true);
@@ -602,8 +610,11 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, uint16_t width, uint16_t height);
         static bool force_full_block_redraw = false;
 
-        if (render_menu(ili9341_display, 2, ypos, width - 1, height - (font_oled->line_height * 2 + 6))) {
-            force_full_block_redraw = true;
+        //        if (render_menu(ili9341_display, 2, ypos, width - 1, height - (font_oled->line_height * 2 + 6))) {
+        if (render_menu(menu_surface, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT)) {
+            if (qp_surface_draw(menu_surface, ili9341_display, 2, ypos, false)) {
+                force_full_block_redraw = true;
+            }
         } else {
             static uint32_t block_timer  = 0;
             bool            block_redraw = false;

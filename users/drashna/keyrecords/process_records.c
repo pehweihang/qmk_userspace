@@ -184,7 +184,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
           && process_layer_lock(keycode, record, LAYER_LOCK)
 #endif // LAYER_LOCK_ENABLE
 #ifdef CLAP_TRAP_ENABLE
-          && process_key_cancellation(keycode, record)
+          && process_clap_trap(keycode, record)
 #endif // CLAP_TRAP_ENABLE
           && true)) {
         return false;

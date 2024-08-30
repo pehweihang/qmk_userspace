@@ -103,7 +103,8 @@ typedef union {
         bool     enable_acceleration  : 1;
         uint8_t  display_mode         : 2;
         uint8_t  display_logo         : 4;
-        uint32_t reserved             : 7;
+        bool     clap_trap_enable     : 1;
+        uint32_t reserved             : 6;
         bool     check                : 1;
     };
 } userspace_config_t;

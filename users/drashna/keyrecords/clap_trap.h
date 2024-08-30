@@ -7,19 +7,19 @@
 #include <stdbool.h>
 #include "action.h"
 
-typedef struct key_cancellation_t {
+typedef struct clap_trap_t {
     uint16_t press, unpress;
-} key_cancellation_t;
+} clap_trap_t;
 
-bool process_key_cancellation(uint16_t keycode, keyrecord_t *record);
-bool process_key_cancellation_user(uint16_t keycode, keyrecord_t *record);
+bool process_clap_trap(uint16_t keycode, keyrecord_t *record);
+bool process_clap_trap_user(uint16_t keycode, keyrecord_t *record);
 
-bool key_cancellation_recovery_is_enabled(void);
-void key_cancellation_recovery_enable(void);
-void key_cancellation_recovery_disable(void);
-void key_cancellation_recovery_toggle(void);
+bool clap_trap_recovery_is_enabled(void);
+void clap_trap_recovery_enable(void);
+void clap_trap_recovery_disable(void);
+void clap_trap_recovery_toggle(void);
 
-bool key_cancellation_is_enabled(void);
-void key_cancellation_enable(void);
-void key_cancellation_disable(void);
-void key_cancellation_toggle(void);
+bool clap_trap_is_enabled(void);
+void clap_trap_enable(void);
+void clap_trap_disable(void);
+void clap_trap_toggle(void);

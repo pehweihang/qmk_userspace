@@ -75,4 +75,5 @@ ifeq ($(strip $(OVERLOAD_FEATURES)), yes)
     WPM_ENABLE                       = yes
     SENTENCE_CASE_ENABLE             = yes
     DISPLAY_KEYLOGGER_ENABLE         = yes
+    CLAP_TRAP_ENABLE                 = yes
 endif

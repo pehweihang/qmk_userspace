@@ -289,6 +289,7 @@ bool process_key_cancellation(uint16_t keycode, keyrecord_t *record) {
             uint16_t bitmask = 1 << (16 - i);
             if (comparison & bitmask) {
                 if (~(bitfield_keyreports_scratch & bitmask)) {
+                    wait_ms(rand() % 10);
                     del_key(buffer_keyreports[i]);
                 }
             } else {

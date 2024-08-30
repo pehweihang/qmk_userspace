@@ -44,6 +44,9 @@ static bool menu_handler_display(menu_input_t input) {
             return false;
         case menu_input_right:
             userspace_config.display_mode = (userspace_config.display_mode + 1) % 3;
+            if (userspace_config.display_mode > 2) {
+                userspace_config.display_mode = 0;
+            }
             eeconfig_update_user_config(&userspace_config.raw);
             return false;
         default:
@@ -113,9 +116,15 @@ static bool menu_handler_unicode_typing(menu_input_t input) {
     switch (input) {
         case menu_input_left:
             unicode_typing_mode = (unicode_typing_mode - 1) % UNICODE_MODE_COUNT;
+            if (unicode_typing_mode >= UNICODE_MODE_COUNT) {
+                unicode_typing_mode = UNICODE_MODE_COUNT - 1;
+            }
             return false;
         case menu_input_right:
             unicode_typing_mode = (unicode_typing_mode + 1) % UNICODE_MODE_COUNT;
+            if (unicode_typing_mode >= UNICODE_MODE_COUNT) {
+                unicode_typing_mode = 0;
+            }
             return false;
         default:
             return true;

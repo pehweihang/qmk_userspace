@@ -155,34 +155,34 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #endif // DISPLAY_DRIVER_ENABLE
 #ifdef CUSTOM_RGB_MATRIX
           && process_record_user_rgb_matrix(keycode, record)
-#endif
+#endif // CUSTOM_RGB_MATRIX
 #ifdef CUSTOM_RGBLIGHT
           && process_record_user_rgb_light(keycode, record)
-#endif
+#endif // CUSTOM_RGBLIGHT
 #ifdef CUSTOM_UNICODE_ENABLE
           && process_record_unicode(keycode, record)
-#endif
+#endif // CUSTOM_UNICODE_ENABLE
 #if defined(CUSTOM_POINTING_DEVICE)
           && process_record_pointing(keycode, record)
-#endif
+#endif // CUSTOM_POINTING_DEVICE
 #ifdef CUSTOM_DYNAMIC_MACROS_ENABLE
           && process_record_dynamic_macro(keycode, record)
-#endif
+#endif // CUSTOM_DYNAMIC_MACROS_ENABLE
 #ifdef CUSTOM_SHIFT_KEYS_ENABLE
           && process_custom_shift_keys(keycode, record)
-#endif
+#endif // CUSTOM_SHIFT_KEYS_ENABLE
 #ifdef SELECT_WORD_ENABLE
           && process_select_word(keycode, record, US_SELECT_WORD)
-#endif
+#endif // SELECT_WORD_ENABLE
 #ifdef SENTENCE_CASE_ENABLE
           && process_sentence_case(keycode, record)
-#endif
+#endif // SENTENCE_CASE_ENABLE
 #ifdef ORBITAL_MOUSE_ENABLE
           && process_orbital_mouse(keycode, record)
-#endif
+#endif // ORBITAL_MOUSE_ENABLE
 #ifdef LAYER_LOCK_ENABLE
           && process_layer_lock(keycode, record, LAYER_LOCK)
-#endif
+#endif // LAYER_LOCK_ENABLE
 #ifdef CLAP_TRAP_ENABLE
           && process_clap_trap(keycode, record)
 #endif // CLAP_TRAP_ENABLE
@@ -230,19 +230,19 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     rgb_matrix_set_flags(LED_FLAG_UNDERGLOW | LED_FLAG_KEYLIGHT | LED_FLAG_INDICATOR);
 #        if defined(CUSTOM_RGBLIGHT)
                     rgblight_enable_noeeprom();
-#        endif
-#    endif
+#        endif                                    // CUSTOM_RGBLIGHT
+#    endif                                        // CUSTOM_RGB_MATRIX
                     layer_state_set(layer_state); // This is needed to immediately set the layer color (looks better)
 #    if defined(CUSTOM_RGB_MATRIX)
                 } else {
                     rgb_matrix_set_flags(LED_FLAG_ALL);
 #        if defined(CUSTOM_RGBLIGHT)
                     rgblight_disable_noeeprom();
-#        endif
-#    endif
+#        endif // CUSTOM_RGBLIGHT
+#    endif     // CUSTOM_RGB_MATRIX
                 }
             }
-#endif // CUSTOM_RGBLIGHT
+#endif // CUSTOM_RGBLIGHT || CUSTOM_RGB_MATRIX
             break;
 
 #if defined(CUSTOM_RGBLIGHT) || defined(CUSTOM_RGB_MATRIX)
@@ -250,15 +250,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             // Split keyboards need to trigger on key-up for edge-case issue
 #    ifndef SPLIT_KEYBOARD
             if (record->event.pressed) {
-#    else
+#    else  // SPLIT_KEYBOARD
             if (!record->event.pressed) {
-#    endif
+#    endif // SPLIT_KEYBOARD
 #    if defined(CUSTOM_RGBLIGHT) && !defined(RGBLIGHT_DISABLE_KEYCODES)
                 rgblight_toggle();
-#    endif
+#    endif // CUSTOM_RGBLIGHT
 #    if defined(CUSTOM_RGB_MATRIX) && !defined(RGB_MATRIX_DISABLE_KEYCODES)
                 rgb_matrix_toggle();
-#    endif
+#    endif // CUSTOM_RGB_MATRIX
             }
             return false;
             break;
@@ -273,20 +273,20 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     dprintf("rgblight layer change [EEPROM]: %u\n", userspace_config.rgb_layer_change);
                     is_eeprom_updated = true;
                 }
-#    endif
+#    endif // CUSTOM_RGBLIGHT
 #    if defined(CUSTOM_RGB_MATRIX) && defined(RGB_MATRIX_FRAMEBUFFER_EFFECTS)
                 if (userspace_config.rgb_matrix_idle_anim) {
                     userspace_config.rgb_matrix_idle_anim = false;
                     dprintf("RGB Matrix Idle Animation [EEPROM]: %u\n", userspace_config.rgb_matrix_idle_anim);
                     is_eeprom_updated = true;
                 }
-#    endif
+#    endif // CUSTOM_RGB_MATRIX && RGB_MATRIX_FRAMEBUFFER_EFFECTS
                 if (is_eeprom_updated) {
                     eeconfig_update_user_config(&userspace_config.raw);
                 }
             }
             break;
-#endif
+#endif // CUSTOM_RGBLIGHT || CUSTOM_RGB_MATRIX
         case KEYLOCK:
             if (record->event.pressed) {
                 toggle_keyboard_lock();
@@ -303,7 +303,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 print_stored_setups();
             }
             return false;
-#endif
+#endif // OS_DETECTION_ENABLE && OS_DETECTION_DEBUG_ENABLE
         case US_MATRIX_SCAN_RATE_PRINT:
             if (record->event.pressed) {
                 userspace_config.matrix_scan_print ^= 1;
@@ -328,6 +328,6 @@ void                       post_process_record_user(uint16_t keycode, keyrecord_
             set_unicode_input_mode_soft(keymap_config.swap_lctl_lgui ? UNICODE_MODE_MACOS : UNICODE_MODE_WINCOMPOSE);
             break;
     }
-#endif
+#endif // OS_DETECTION_ENABLE && UNICODE_COMMON_ENABLE
     post_process_record_keymap(keycode, record);
 }

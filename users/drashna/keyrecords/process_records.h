@@ -21,6 +21,9 @@
 #ifdef UNICODE_COMMON_ENABLE
 #    include "keyrecords/unicode.h"
 #endif
+#ifdef CLAP_TRAP_ENABLE
+#    include "keyrecords/clap_trap.h"
+#endif // CLAP_TRAP_ENABLE
 
 enum userspace_custom_keycodes {
     VRSN = QK_USER,  // Prints QMK Firmware and board info

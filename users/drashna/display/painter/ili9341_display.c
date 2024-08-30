@@ -115,10 +115,6 @@ void init_display_ili9341(void) {
     if (is_keyboard_master()) {
         frame = qp_load_image_mem(gfx_frame);
         render_frame(ili9341_display);
-    } else {
-        frame = qp_load_image_mem(gfx_samurai_cyberpunk_minimal_dark_8k_b3_240x320);
-        qp_drawimage_recolor(ili9341_display, 0, 0, frame, 0, 0, 255, 0, 0, 0);
-        qp_close_image(frame);
     }
     qp_power(ili9341_display, true);
     qp_flush(ili9341_display);

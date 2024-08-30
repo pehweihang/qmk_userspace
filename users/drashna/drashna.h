@@ -102,7 +102,8 @@ typedef union {
         bool     oled_lock            : 1;
         bool     enable_acceleration  : 1;
         uint8_t  display_mode         : 2;
-        uint32_t reserved             : 11;
+        uint8_t  display_logo         : 4;
+        uint32_t reserved             : 7;
         bool     check                : 1;
     };
 } userspace_config_t;

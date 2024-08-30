@@ -70,6 +70,79 @@ void display_handler_display(char *text_buffer, size_t buffer_len) {
     strncpy(text_buffer, "Unknown", buffer_len);
 }
 
+static bool menu_handler_slave_image(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            userspace_config.display_logo = (userspace_config.display_logo - 1) % 10;
+            if (userspace_config.display_logo > 9) {
+                userspace_config.display_logo = 9;
+            }
+            eeconfig_update_user_config(&userspace_config.raw);
+            return false;
+        case menu_input_right:
+            userspace_config.display_logo = (userspace_config.display_logo + 1) % 10;
+            if (userspace_config.display_logo > 9) {
+                userspace_config.display_logo = 0;
+            }
+            eeconfig_update_user_config(&userspace_config.raw);
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_slave_side_image(char *text_buffer, size_t buffer_len) {
+    switch (userspace_config.display_logo) {
+        case 0:
+            strncpy(text_buffer, "Samurai", buffer_len - 1);
+            return;
+        case 1:
+            strncpy(text_buffer, "Anime Girl", buffer_len - 1);
+            return;
+        case 2:
+            strncpy(text_buffer, "Asuka", buffer_len - 1);
+            return;
+        case 3:
+            strncpy(text_buffer, "Eva Unit 00", buffer_len - 1);
+            return;
+        case 4:
+            strncpy(text_buffer, "Eva Unit 01", buffer_len - 1);
+            return;
+        case 5:
+            strncpy(text_buffer, "Eva Unit 02", buffer_len - 1);
+            return;
+        case 6:
+            strncpy(text_buffer, "Eva Unit 03", buffer_len - 1);
+            return;
+        case 7:
+            strncpy(text_buffer, "Eva Unit 04", buffer_len - 1);
+            return;
+        case 8:
+            strncpy(text_buffer, "Eva Unit 05", buffer_len - 1);
+            return;
+        case 9:
+            strncpy(text_buffer, "Eva Unit 06", buffer_len - 1);
+            return;
+    }
+
+    strncpy(text_buffer, "Unknown", buffer_len);
+}
+
+menu_entry_t display_option_entries[] = {
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Display Option",
+        .child.menu_handler    = menu_handler_display,
+        .child.display_handler = display_handler_display,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Slave Side Image",
+        .child.menu_handler    = menu_handler_slave_image,
+        .child.display_handler = display_handler_slave_side_image,
+    },
+};
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Unicode
 
@@ -985,10 +1058,10 @@ menu_entry_t buy_more_entries[] = {
 
 menu_entry_t root_entries[] = {
     {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Display Option",
-        .child.menu_handler    = menu_handler_display,
-        .child.display_handler = display_handler_display,
+        .flags              = menu_flag_is_parent,
+        .text               = "Display Option",
+        .parent.children    = display_option_entries,
+        .parent.child_count = ARRAY_SIZE(display_option_entries),
     },
 #ifdef UNICODE_COMMON_ENABLE
     {
@@ -1059,17 +1132,10 @@ menu_entry_t root = {
 };
 
 menu_state_t display_menu_state = {
-#ifndef DISPLAY_MENU_ENABLED_DEFAULT
     .dirty          = false,
     .is_in_menu     = false,
     .menu_stack     = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
     .selected_child = 0xFF,
-#else
-    .dirty          = true,
-    .is_in_menu     = true,
-    .menu_stack     = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
-    .selected_child = 0x00,
-#endif
 };
 
 menu_entry_t *get_current_menu(void) {

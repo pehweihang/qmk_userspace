@@ -763,6 +763,46 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             qp_rect(ili9341_display, xpos, ypos, max_rtc_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
 #endif // RTC_ENABLE
+    } else {
+        static uint8_t display_mode = 0xFF;
+        if (display_mode != userspace_config.display_logo) {
+            display_mode = userspace_config.display_logo;
+
+            switch (userspace_config.display_logo) {
+                case 0:
+                    frame = qp_load_image_mem(gfx_samurai_cyberpunk_minimal_dark_8k_b3_240x320);
+                    break;
+                case 1:
+                    frame = qp_load_image_mem(gfx_anime_girl_jacket_240x320);
+                    break;
+                case 2:
+                    frame = qp_load_image_mem(gfx_asuka_240x320);
+                    break;
+                case 3:
+                    frame = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_00_240x320);
+                    break;
+                case 4:
+                    frame = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_01_240x320);
+                    break;
+                case 5:
+                    frame = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_02_240x320);
+                    break;
+                case 6:
+                    frame = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_03_240x320);
+                    break;
+                case 7:
+                    frame = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_04_240x320);
+                    break;
+                case 8:
+                    frame = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_05_240x320);
+                    break;
+                case 9:
+                    frame = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_06_240x320);
+                    break;
+            }
+            qp_drawimage_recolor(ili9341_display, 0, 0, frame, 0, 0, 255, 0, 0, 0);
+            qp_close_image(frame);
+        }
     }
     qp_flush(ili9341_display);
 }

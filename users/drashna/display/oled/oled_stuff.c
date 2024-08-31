@@ -24,6 +24,7 @@
 #include "lib/lib8tion/lib8tion.h"
 #include <math.h>
 #include <stdio.h>
+#include "progmem.h"
 
 #ifdef RTC_ENABLE
 #    include "rtc.h"
@@ -1198,4 +1199,41 @@ void oled_shutdown(bool jump_to_bootloader) {
         oled_write_P(PSTR("   Please stand by   "), false);
     }
     oled_render_dirty(true);
+}
+
+void oled_write_compressed(compressed_oled_frame_t frame) {
+    uint16_t block_index = 0;
+    for (uint16_t i = 0; i < frame.data_len; i++) {
+        uint8_t bit          = i % 8;
+        uint8_t map_index    = i / 8;
+        uint8_t _block_map   = frame.block_map[map_index];
+        uint8_t nonzero_byte = (_block_map & (1 << bit));
+        if (nonzero_byte) {
+            const char data = frame.block_list[block_index++];
+            oled_write_raw_byte(data, i);
+        } else {
+            const char data = (const char)0x00;
+            oled_write_raw_byte(data, i);
+        }
+    }
+}
+#ifndef pgm_read_byte_near
+#    define pgm_read_byte_near(addr) pgm_read_byte(addr)
+#endif
+
+void oled_write_compressed_P(compressed_oled_frame_t frame) {
+    uint16_t block_index = 0;
+    for (uint16_t i = 0; i < frame.data_len; i++) {
+        uint8_t bit          = i % 8;
+        uint8_t map_index    = i / 8;
+        uint8_t _block_map   = (uint8_t)pgm_read_byte_near(frame.block_map + map_index);
+        uint8_t nonzero_byte = (_block_map & (1 << bit));
+        if (nonzero_byte) {
+            const char data = (const char)pgm_read_byte_near(frame.block_list + block_index++);
+            oled_write_raw_byte(data, i);
+        } else {
+            const char data = (const char)0x00;
+            oled_write_raw_byte(data, i);
+        }
+    }
 }

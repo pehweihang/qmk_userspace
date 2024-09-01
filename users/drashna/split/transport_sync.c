@@ -6,6 +6,7 @@
 #include "drashna.h"
 #include "transactions.h"
 #include <string.h>
+#include "split_util.h"
 
 #ifdef UNICODE_COMMON_ENABLE
 #    include "process_unicode_common.h"
@@ -316,6 +317,9 @@ void user_transport_sync(void) {
 }
 
 void housekeeping_task_transport_sync(void) {
+    if (!is_transport_connected()) {
+        return;
+    }
     // Update kb_state so we can send to slave
     user_transport_update();
 

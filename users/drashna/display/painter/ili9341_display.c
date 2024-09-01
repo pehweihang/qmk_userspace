@@ -760,6 +760,11 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         }
 #endif // RTC_ENABLE
     } else {
+#ifdef SPLIT_KEYBOARD
+        if (!is_transport_connected()) {
+            return;
+        }
+#endif
         static uint8_t display_mode = 0xFF;
         if (display_mode != userspace_config.display_logo) {
             display_mode = userspace_config.display_logo;

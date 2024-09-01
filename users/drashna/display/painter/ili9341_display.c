@@ -9,6 +9,9 @@
 #include "qp_comms.h"
 #include "display/painter/painter.h"
 #include "display/painter/ili9341_display.h"
+#ifdef SPLIT_KEYBOARD
+#    include "split_util.h"
+#endif // SPLIT_KEYBOARD
 #ifdef CUSTOM_SPLIT_TRANSPORT_SYNC
 #    include "split/transport_sync.h"
 #endif
@@ -764,7 +767,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         if (!is_transport_connected()) {
             return;
         }
-#endif
+#endif // SPLIT_KEYBOARD
         static uint8_t display_mode = 0xFF;
         if (display_mode != userspace_config.display_logo) {
             display_mode = userspace_config.display_logo;

@@ -135,6 +135,24 @@ void qp_backlight_disable(void) {
 #endif // BACKLIGHT_ENABLE
 }
 void housekeeping_task_quantum_painter(void) {
+#ifdef SPLIT_KEYBOARD
+    if (!is_keyboard_master()) {
+        static bool suspended = false;
+        bool        is_device_suspended(void);
+        if (suspended != is_device_suspended()) {
+            suspended = is_device_suspended();
+            if (suspended) {
+#    ifdef QUANTUM_PAINTER_ILI9341_ENABLE
+                ili9341_display_power(false);
+#    endif // QUANTUM_PAINTER_ILI9341_ENABLE
+            } else {
+#    ifdef QUANTUM_PAINTER_ILI9341_ENABLE
+                ili9341_display_power(true);
+#    endif // QUANTUM_PAINTER_ILI9341_ENABLE
+            }
+        }
+    }
+#endif
 #ifdef QUANTUM_PAINTER_ILI9341_ENABLE
     ili9341_draw_user();
 #endif // QUANTUM_PAINTER_ILI9341_ENABLE

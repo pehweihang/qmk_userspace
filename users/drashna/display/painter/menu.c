@@ -29,6 +29,10 @@ static float ag_swap_song[][2] = AG_SWAP_SONG;
 static float cg_norm_song[][2] = CG_NORM_SONG;
 static float cg_swap_song[][2] = CG_SWAP_SONG;
 #endif
+#ifndef DISPLAY_MENU_TIMEOUT
+#    define DISPLAY_MENU_TIMEOUT 30000
+#endif // !DISPLAY_MENU_TIMEOUT
+deferred_token menu_deferred_token = INVALID_DEFERRED_TOKEN;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Display options
@@ -1158,14 +1162,26 @@ menu_entry_t *get_selected_menu_item(void) {
     return &(get_current_menu()->parent.children[display_menu_state.selected_child]);
 }
 
+uint32_t display_menu_timeout_handler(uint32_t trigger_time, void *cb_arg) {
+    /* do something */
+    menu_handle_input(menu_input_exit);
+    return 0;
+}
+
 bool menu_handle_input(menu_input_t input) {
     menu_entry_t *menu     = get_current_menu();
     menu_entry_t *selected = get_selected_menu_item();
+    if (menu_deferred_token != INVALID_DEFERRED_TOKEN && input != menu_input_exit) {
+        extend_deferred_exec(menu_deferred_token, DISPLAY_MENU_TIMEOUT);
+    }
     switch (input) {
         case menu_input_exit:
             display_menu_state.is_in_menu = false;
             memset(display_menu_state.menu_stack, 0xFF, sizeof(display_menu_state.menu_stack));
             display_menu_state.selected_child = 0xFF;
+            if (cancel_deferred_exec(menu_deferred_token)) {
+                menu_deferred_token = INVALID_DEFERRED_TOKEN;
+            }
             return false;
         case menu_input_back:
             // Iterate backwards through the stack and remove the last entry
@@ -1221,7 +1237,37 @@ bool process_record_menu(uint16_t keycode, keyrecord_t *record) {
     if (keycode == DISPLAY_MENU && record->event.pressed && !display_menu_state.is_in_menu) {
         display_menu_state.is_in_menu     = true;
         display_menu_state.selected_child = 0;
+        menu_deferred_token               = defer_exec(DISPLAY_MENU_TIMEOUT, display_menu_timeout_handler, NULL);
         return false;
+    }
+
+    bool keep_processing = false;
+
+    switch (keycode) {
+        case QK_TO ... QK_TO_MAX:
+        case QK_MOMENTARY ... QK_MOMENTARY_MAX:
+        case QK_DEF_LAYER ... QK_DEF_LAYER_MAX:
+        case QK_TOGGLE_LAYER ... QK_TOGGLE_LAYER_MAX:
+        case QK_ONE_SHOT_LAYER ... QK_ONE_SHOT_LAYER_MAX:
+        case QK_LAYER_TAP_TOGGLE ... QK_LAYER_TAP_TOGGLE_MAX:
+        case QK_SWAP_HANDS ... QK_SWAP_HANDS_MAX:
+            keep_processing = true;
+            break;
+        case QK_LAYER_TAP ... QK_LAYER_TAP_MAX:
+            // Exclude hold keycode
+            if (!record->tap.count) {
+                keep_processing = true;
+            }
+            keycode = QK_LAYER_TAP_GET_TAP_KEYCODE(keycode);
+            break;
+        case QK_MOD_TAP ... QK_MOD_TAP_MAX:
+            // Exclude hold keycode
+            if (!record->tap.count) {
+                keep_processing = false;
+                break;
+            }
+            keycode = QK_MOD_TAP_GET_TAP_KEYCODE(keycode);
+            break;
     }
 
     if (display_menu_state.is_in_menu) {
@@ -1248,10 +1294,10 @@ bool process_record_menu(uint16_t keycode, keyrecord_t *record) {
                 case KC_D:
                     return menu_handle_input(menu_input_right);
                 default:
-                    return false;
+                    return keep_processing;
             }
         }
-        return false;
+        return keep_processing;
     }
 
     return true;

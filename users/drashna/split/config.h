@@ -7,7 +7,7 @@
 #define SPLIT_LAYER_STATE_ENABLE
 #define SPLIT_LED_STATE_ENABLE
 #define SPLIT_MODS_ENABLE
-#ifdef SPLIT_USB_DETECT
+#if (defined(__AVR__) && defined(SPLIT_USB_DETECT)) || (!defined(__AVR__) && !defined(USB_VBUS_PIN))
 #    define SPLIT_WATCHDOG_ENABLE
 #endif
 #define SPLIT_WPM_ENABLE

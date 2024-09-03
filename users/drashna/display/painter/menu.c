@@ -264,6 +264,24 @@ menu_entry_t unicode_entries[] = {
 };
 #endif // UNICODE_COMMON_ENABLE
 
+#if defined(RGB_MATRIX_ENABLE) || defined(RGBLIGHT_ENABLE)
+static bool menu_handler_rgb_layer(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            userspace_config.rgb_layer_change = !userspace_config.rgb_layer_change;
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_rgb_layer(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.rgb_layer_change ? "on" : "off");
+}
+
+#endif // RGB_MATRIX_ENABLE || RGBLIGHT_ENABLE
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // RGB Matrix
 
@@ -368,6 +386,21 @@ void display_handler_rm_speed(char *text_buffer, size_t buffer_len) {
     snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_speed());
 }
 
+static bool menu_handler_rgb_idle(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            userspace_config.rgb_matrix_idle_anim = !userspace_config.rgb_matrix_idle_anim;
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_rgb_idle(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.rgb_matrix_idle_anim ? "on" : "off");
+}
+
 menu_entry_t rgb_matrix_entries[] = {
     {
         .flags                 = menu_flag_is_value,
@@ -404,6 +437,18 @@ menu_entry_t rgb_matrix_entries[] = {
         .text                  = "RGB Speed",
         .child.menu_handler    = menu_handler_rm_speed,
         .child.display_handler = display_handler_rm_speed,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Layer Indication",
+        .child.menu_handler    = menu_handler_rgb_layer,
+        .child.display_handler = display_handler_rgb_layer,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Idle Animation",
+        .child.menu_handler    = menu_handler_rgb_idle,
+        .child.display_handler = display_handler_rgb_idle,
     },
 };
 #endif // RGB_MATRIX_ENABLE
@@ -548,6 +593,12 @@ menu_entry_t rgb_light_entries[] = {
         .text                  = "RGB Speed",
         .child.menu_handler    = menu_handler_rgbspeed,
         .child.display_handler = display_handler_rgbspeed,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Layer Indication",
+        .child.menu_handler    = menu_handler_rgb_layer,
+        .child.display_handler = display_handler_rgb_layer,
     },
 };
 #endif // RGBLIGHT_ENABLE

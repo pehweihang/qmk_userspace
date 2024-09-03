@@ -1142,7 +1142,7 @@ menu_entry_t root_entries[] = {
         .flags              = menu_flag_is_parent,
         .text               = "RGB Light Settings",
         .parent.children    = rgb_light_entries,
-        .parent.child_count = ARRAY_SIZE(rgb_matrix_entries),
+        .parent.child_count = ARRAY_SIZE(rgb_light_entries),
     },
 #endif // RGBLIGHT_ENABLE
 #ifdef BACKLIGHT_ENABLE

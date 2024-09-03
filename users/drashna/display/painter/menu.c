@@ -1386,8 +1386,9 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
         y += 6;
         for (int i = 0; i < menu->parent.child_count; ++i) {
             menu_entry_t *child = &menu->parent.children[i];
-            uint16_t      x     = start_x + 8;
+            uint16_t      x     = start_x + 2 + qp_textwidth(font_oled, ">");
             if (child == selected) {
+                qp_drawtext_recolor(display, start_x + 1, y, font_oled, ">", HSV_WHITE, 85, 255, 0);
                 x += qp_drawtext_recolor(display, x, y, font_oled,
                                          truncate_text(child->text, render_width, font_oled, false, true), HSV_GREEN,
                                          85, 255, 0);
@@ -1397,7 +1398,7 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
                                          255, 0);
             }
             if (child->flags & menu_flag_is_parent) {
-                qp_drawtext(display, 8 + x, y, font_oled, "  >");
+                qp_drawtext(display, render_width - (qp_textwidth(font_oled, ">") + 2), y, font_oled, ">");
             }
             if (child->flags & menu_flag_is_value) {
                 char buf[32] = {0};

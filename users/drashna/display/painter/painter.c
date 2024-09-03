@@ -178,13 +178,10 @@ void housekeeping_task_quantum_painter(void) {
 #endif
 }
 void keyboard_post_init_quantum_painter(void) {
-#ifdef BACKLIGHT_ENABLE
-    backlight_level_noeeprom(BACKLIGHT_LEVELS);
-#elif defined(BACKLIGHT_PIN)
+#if !defined(BACKLIGHT_ENABLE) && defined(BACKLIGHT_PIN)
     gpio_set_pin_output_push_pull(BACKLIGHT_PIN);
     gpio_write_pin_high(BACKLIGHT_PIN);
 #endif
-    wait_ms(150);
 #ifdef QUANTUM_PAINTER_ILI9341_ENABLE
     init_display_ili9341();
 #endif // QUANTUM_PAINTER_ILI9341_ENABLE

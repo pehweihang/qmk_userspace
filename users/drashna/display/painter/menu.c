@@ -272,7 +272,7 @@ static bool menu_handler_rgb_layer(menu_input_t input) {
     switch (input) {
         case menu_input_left:
         case menu_input_right:
-            userspace_config.rgb_layer_change = !userspace_config.rgb_layer_change;
+            rgb_layer_indication_toggle();
             return false;
         default:
             return true;
@@ -393,7 +393,7 @@ static bool menu_handler_rgb_idle(menu_input_t input) {
     switch (input) {
         case menu_input_left:
         case menu_input_right:
-            userspace_config.rgb_matrix_idle_anim = !userspace_config.rgb_matrix_idle_anim;
+            rgb_matrix_idle_anim_toggle();
             return false;
         default:
             return true;

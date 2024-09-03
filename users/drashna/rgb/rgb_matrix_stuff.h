@@ -19,3 +19,4 @@ void rgb_matrix_shutdown(bool jump_to_bootloader);
 const char *rgb_matrix_name(uint8_t effect);
 const char *rgb_matrix_get_effect_name(void);
 bool        has_rgb_matrix_config_changed(void);
+void        rgb_matrix_idle_anim_toggle(void);

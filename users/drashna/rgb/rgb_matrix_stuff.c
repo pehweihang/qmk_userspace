@@ -77,16 +77,9 @@ bool process_record_user_rgb_matrix(uint16_t keycode, keyrecord_t *record) {
 #endif
     switch (keycode) {
         case RGB_IDL: // This allows me to use underglow as layer indication, or as normal
-#if defined(RGB_MATRIX_ENABLE) && defined(RGB_MATRIX_FRAMEBUFFER_EFFECTS)
             if (record->event.pressed) {
-                userspace_config.rgb_matrix_idle_anim ^= 1;
-                dprintf("RGB Matrix Idle Animation [EEPROM]: %u\n", userspace_config.rgb_matrix_idle_anim);
-                eeconfig_update_user_config(&userspace_config.raw);
-                if (userspace_config.rgb_matrix_idle_anim) {
-                    rgb_matrix_mode_noeeprom(RGB_MATRIX_TYPING_HEATMAP);
-                }
+                rgb_matrix_idle_anim_toggle();
             }
-#endif
             break;
 #if defined(RGBLIGHT_ENABLE) && defined(RGBLIGHT_CUSTOM)
         case QK_RGB_MATRIX_VALUE_DOWN:
@@ -283,4 +276,15 @@ bool has_rgb_matrix_config_changed(void) {
         memcpy(&last_config, &rgb_matrix_config, sizeof(rgb_config_t));
     }
     return has_changed;
+}
+
+void rgb_matrix_idle_anim_toggle(void) {
+#if defined(RGB_MATRIX_ENABLE) && defined(RGB_MATRIX_FRAMEBUFFER_EFFECTS)
+    userspace_config.rgb_matrix_idle_anim ^= 1;
+    dprintf("RGB Matrix Idle Animation [EEPROM]: %u\n", userspace_config.rgb_matrix_idle_anim);
+    eeconfig_update_user_config(&userspace_config.raw);
+    if (userspace_config.rgb_matrix_idle_anim) {
+        rgb_matrix_mode_noeeprom(RGB_MATRIX_TYPING_HEATMAP);
+    }
+#endif
 }

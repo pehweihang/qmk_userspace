@@ -222,25 +222,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case KC_RGB_T: // This allows me to use underglow as layer indication, or as normal
 #if defined(CUSTOM_RGBLIGHT) || defined(CUSTOM_RGB_MATRIX)
             if (record->event.pressed) {
-                userspace_config.rgb_layer_change ^= 1;
-                dprintf("rgblight layer change [EEPROM]: %u\n", userspace_config.rgb_layer_change);
-                eeconfig_update_user_config(&userspace_config.raw);
-                if (userspace_config.rgb_layer_change) {
-#    if defined(CUSTOM_RGB_MATRIX)
-                    rgb_matrix_set_flags(LED_FLAG_UNDERGLOW | LED_FLAG_KEYLIGHT | LED_FLAG_INDICATOR);
-#        if defined(CUSTOM_RGBLIGHT)
-                    rgblight_enable_noeeprom();
-#        endif                                    // CUSTOM_RGBLIGHT
-#    endif                                        // CUSTOM_RGB_MATRIX
-                    layer_state_set(layer_state); // This is needed to immediately set the layer color (looks better)
-#    if defined(CUSTOM_RGB_MATRIX)
-                } else {
-                    rgb_matrix_set_flags(LED_FLAG_ALL);
-#        if defined(CUSTOM_RGBLIGHT)
-                    rgblight_disable_noeeprom();
-#        endif // CUSTOM_RGBLIGHT
-#    endif     // CUSTOM_RGB_MATRIX
-                }
+                rgb_layer_indication_toggle();
             }
 #endif // CUSTOM_RGBLIGHT || CUSTOM_RGB_MATRIX
             break;
@@ -330,4 +312,26 @@ void                       post_process_record_user(uint16_t keycode, keyrecord_
     }
 #endif // OS_DETECTION_ENABLE && UNICODE_COMMON_ENABLE
     post_process_record_keymap(keycode, record);
+}
+
+void rgb_layer_indication_toggle(void) {
+    userspace_config.rgb_layer_change ^= 1;
+    dprintf("rgblight layer change [EEPROM]: %u\n", userspace_config.rgb_layer_change);
+    eeconfig_update_user_config(&userspace_config.raw);
+    if (userspace_config.rgb_layer_change) {
+#if defined(CUSTOM_RGB_MATRIX)
+        rgb_matrix_set_flags(LED_FLAG_UNDERGLOW | LED_FLAG_KEYLIGHT | LED_FLAG_INDICATOR);
+#    if defined(CUSTOM_RGBLIGHT)
+        rgblight_enable_noeeprom();
+#    endif                            // CUSTOM_RGBLIGHT
+#endif                                // CUSTOM_RGB_MATRIX
+        layer_state_set(layer_state); // This is needed to immediately set the layer color (looks better)
+#if defined(CUSTOM_RGB_MATRIX)
+    } else {
+        rgb_matrix_set_flags(LED_FLAG_ALL);
+#    if defined(CUSTOM_RGBLIGHT)
+        rgblight_disable_noeeprom();
+#    endif // CUSTOM_RGBLIGHT
+#endif     // CUSTOM_RGB_MATRIX
+    }
 }

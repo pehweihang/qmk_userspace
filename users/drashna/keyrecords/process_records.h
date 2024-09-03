@@ -116,6 +116,7 @@ void post_process_record_keymap(uint16_t keycode, keyrecord_t *record);
 #ifdef CUSTOM_UNICODE_ENABLE
 bool process_record_unicode(uint16_t keycode, keyrecord_t *record);
 #endif
+void rgb_layer_indication_toggle(void);
 
 #define LOWER   MO(_LOWER)
 #define RAISE   MO(_RAISE)

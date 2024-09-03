@@ -769,6 +769,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         }
 #endif // SPLIT_KEYBOARD
         static uint8_t display_mode = 0xFF;
+        static bool    force_redraw = false;
         if (display_mode != userspace_config.display_logo) {
             display_mode = userspace_config.display_logo;
 
@@ -803,9 +804,30 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 case 9:
                     frame = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_06_240x320);
                     break;
+                case 10:
+                    force_redraw = true;
+                    qp_rect(ili9341_display, 0, 0, width - 1, height - 1, 0, 0, 0, true);
+                    qp_flush(ili9341_display);
+                    return;
             }
             qp_drawimage_recolor(ili9341_display, 0, 0, frame, 0, 0, 255, 0, 0, 0);
             qp_close_image(frame);
+        }
+        if (userspace_config.display_logo == 10) {
+            if (hue_redraw || force_redraw || console_log_needs_redraw) {
+                for (uint8_t i = 0; i < DISPLAY_CONSOLE_LOG_LINE_NUM; i++) {
+                    static uint16_t max_line_width = 5;
+                    uint16_t        xpos = 5, ypos = 3;
+                    xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, logline_ptrs[i], curr_hue, 255,
+                                                255, curr_hue, 255, 0);
+                    if (max_line_width < xpos) {
+                        max_line_width = xpos;
+                    }
+                    qp_rect(ili9341_display, xpos, ypos, max_line_width, ypos + font_oled->line_height, 0, 0, 0, true);
+                    ypos += font_oled->line_height + 4;
+                }
+                console_log_needs_redraw = force_redraw = false;
+            }
         }
     }
     qp_flush(ili9341_display);

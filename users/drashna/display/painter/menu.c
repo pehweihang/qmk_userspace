@@ -77,15 +77,15 @@ void display_handler_display(char *text_buffer, size_t buffer_len) {
 static bool menu_handler_slave_image(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            userspace_config.display_logo = (userspace_config.display_logo - 1) % 10;
-            if (userspace_config.display_logo > 9) {
-                userspace_config.display_logo = 9;
+            userspace_config.display_logo = (userspace_config.display_logo - 1) % 11;
+            if (userspace_config.display_logo > 10) {
+                userspace_config.display_logo = 10;
             }
             eeconfig_update_user_config(&userspace_config.raw);
             return false;
         case menu_input_right:
-            userspace_config.display_logo = (userspace_config.display_logo + 1) % 10;
-            if (userspace_config.display_logo > 9) {
+            userspace_config.display_logo = (userspace_config.display_logo + 1) % 11;
+            if (userspace_config.display_logo > 10) {
                 userspace_config.display_logo = 0;
             }
             eeconfig_update_user_config(&userspace_config.raw);
@@ -126,6 +126,9 @@ void display_handler_slave_side_image(char *text_buffer, size_t buffer_len) {
             return;
         case 9:
             strncpy(text_buffer, "Eva Unit 06", buffer_len - 1);
+            return;
+        case 10:
+            strncpy(text_buffer, "Console", buffer_len - 1);
             return;
     }
 

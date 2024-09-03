@@ -9,6 +9,7 @@
 #include "qp_comms.h"
 #include "display/painter/painter.h"
 #include "display/painter/ili9341_display.h"
+#include "display/painter/menu.h"
 #ifdef SPLIT_KEYBOARD
 #    include "split_util.h"
 #endif // SPLIT_KEYBOARD
@@ -153,11 +154,13 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 #    if defined(RGB_MATRIX_ENABLE)
     if (has_rgb_matrix_config_changed()) {
         rgb_redraw = true;
+        display_menu_set_dirty();
     }
 #    endif
 #    if defined(RGBLIGHT_ENABLE)
     if (has_rgblight_config_changed()) {
         rgb_redraw = true;
+        display_menu_set_dirty();
     }
 #    endif
 #endif
@@ -595,7 +598,6 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 #endif // AUTOCORRECT_ENABLE
 
         ypos += font_oled->line_height + 1;
-        bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, uint16_t width, uint16_t height);
         static bool force_full_block_redraw = false;
 
         //        if (render_menu(ili9341_display, 2, ypos, width - 1, height - (font_oled->line_height * 2 + 6))) {

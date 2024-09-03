@@ -1100,6 +1100,233 @@ menu_entry_t keymap_config_entries[] = {
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// RTC Config
+
+#ifdef RTC_ENABLE
+#    include "features/rtc/rtc.h"
+
+void display_handler_rtc_year(char *text_buffer, size_t buffer_len) {
+    if (rtc_is_connected()) {
+        snprintf(text_buffer, buffer_len - 1, "%04d", rtc_read_time_struct().year);
+    } else {
+        snprintf(text_buffer, buffer_len - 1, "Not Connected");
+    }
+}
+
+static bool menu_handler_rtc_year(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            // rtc_decrease_year();
+            return false;
+        case menu_input_right:
+            // rtc_increase_year();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_rtc_month(char *text_buffer, size_t buffer_len) {
+    if (rtc_is_connected()) {
+        snprintf(text_buffer, buffer_len - 1, "%02d", rtc_read_time_struct().month);
+    } else {
+        snprintf(text_buffer, buffer_len - 1, "Not Connected");
+    }
+}
+
+static bool menu_handler_rtc_month(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            // rtc_decrease_month();
+            return false;
+        case menu_input_right:
+            // rtc_increase_month();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_rtc_date(char *text_buffer, size_t buffer_len) {
+    if (rtc_is_connected()) {
+        snprintf(text_buffer, buffer_len - 1, "%02d", rtc_read_time_struct().date);
+    } else {
+        snprintf(text_buffer, buffer_len - 1, "Not Connected");
+    }
+}
+
+static bool menu_handler_rtc_date(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            // rtc_decrease_date();
+            return false;
+        case menu_input_right:
+            // rtc_increase_date();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_rtc_hour(char *text_buffer, size_t buffer_len) {
+    if (rtc_is_connected()) {
+        snprintf(text_buffer, buffer_len - 1, "%02d", rtc_read_time_struct().hour);
+    } else {
+        snprintf(text_buffer, buffer_len - 1, "Not Connected");
+    }
+}
+
+static bool menu_handler_rtc_hour(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            // rtc_decrease_hour();
+            return false;
+        case menu_input_right:
+            // rtc_increase_hour();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_rtc_minute(char *text_buffer, size_t buffer_len) {
+    if (rtc_is_connected()) {
+        snprintf(text_buffer, buffer_len - 1, "%02d", rtc_read_time_struct().minute);
+    } else {
+        snprintf(text_buffer, buffer_len - 1, "Not Connected");
+    }
+}
+
+static bool menu_handler_rtc_minute(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            // rtc_decrease_minute();
+            return false;
+        case menu_input_right:
+            // rtc_increase_minute();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_rtc_second(char *text_buffer, size_t buffer_len) {
+    if (rtc_is_connected()) {
+        snprintf(text_buffer, buffer_len - 1, "%02d", rtc_read_time_struct().second);
+    } else {
+        snprintf(text_buffer, buffer_len - 1, "Not Connected");
+    }
+}
+
+static bool menu_handler_rtc_second(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            // rtc_decrease_second();
+            return false;
+        case menu_input_right:
+            // rtc_increase_second();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_rtc_hour_format(char *text_buffer, size_t buffer_len) {
+    if (rtc_is_connected()) {
+        snprintf(text_buffer, buffer_len - 1, "%s", rtc_read_time_struct().format == RTC_FORMAT_24H ? "24H" : "12H");
+    } else {
+        snprintf(text_buffer, buffer_len - 1, "Not Connected");
+    }
+}
+
+static bool menu_handler_rtc_hour_format(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            // rtc_toggle_hour_format();
+            return false;
+        case menu_input_right:
+            // rtc_toggle_hour_format();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_rtc_dst(char *text_buffer, size_t buffer_len) {
+    if (rtc_is_connected()) {
+        snprintf(text_buffer, buffer_len - 1, "%s", rtc_read_time_struct().is_dst ? "on" : "off");
+    } else {
+        snprintf(text_buffer, buffer_len - 1, "Not Connected");
+    }
+}
+
+static bool menu_handler_rtc_dst(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            // rtc_toggle_dst();
+            return false;
+        case menu_input_right:
+            // rtc_toggle_dst();
+            return false;
+        default:
+            return true;
+    }
+}
+
+menu_entry_t rtc_config_entries[] = {
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Year",
+        .child.menu_handler    = menu_handler_rtc_year,
+        .child.display_handler = display_handler_rtc_year,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Month",
+        .child.menu_handler    = menu_handler_rtc_month,
+        .child.display_handler = display_handler_rtc_month,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Date",
+        .child.menu_handler    = menu_handler_rtc_date,
+        .child.display_handler = display_handler_rtc_date,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Hour",
+        .child.menu_handler    = menu_handler_rtc_hour,
+        .child.display_handler = display_handler_rtc_hour,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Minute",
+        .child.menu_handler    = menu_handler_rtc_minute,
+        .child.display_handler = display_handler_rtc_minute,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Second",
+        .child.menu_handler    = menu_handler_rtc_second,
+        .child.display_handler = display_handler_rtc_second,
+
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "12/24 Hour Format",
+        .child.menu_handler    = menu_handler_rtc_hour_format,
+        .child.display_handler = display_handler_rtc_hour_format,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "DST",
+        .child.menu_handler    = menu_handler_rtc_dst,
+        .child.display_handler = display_handler_rtc_dst,
+    },
+};
+#endif // RTC_ENABLE
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Buy More
 
 menu_entry_t buy_more_entries[] = {
@@ -1109,6 +1336,14 @@ menu_entry_t buy_more_entries[] = {
         .parent.children    = keymap_config_entries,
         .parent.child_count = ARRAY_SIZE(keymap_config_entries),
     },
+#ifdef RTC_ENABLE
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "RTC Config",
+        .parent.children    = rtc_config_entries,
+        .parent.child_count = ARRAY_SIZE(rtc_config_entries),
+    },
+#endif // RTC_ENABLE
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1412,4 +1647,8 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
         return true;
     }
     return false;
+}
+
+void display_menu_set_dirty(void) {
+    display_menu_state.dirty = true;
 }

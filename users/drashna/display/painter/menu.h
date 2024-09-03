@@ -54,3 +54,4 @@ menu_entry_t *get_selected_menu_item(void);
 bool          menu_handle_input(menu_input_t input);
 bool          process_record_menu(uint16_t keycode, keyrecord_t *record);
 bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, uint16_t width, uint16_t height);
+void          display_menu_set_dirty(void);

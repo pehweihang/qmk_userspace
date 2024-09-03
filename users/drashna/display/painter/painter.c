@@ -3,10 +3,14 @@
 
 #include "qp.h"
 #include "display/painter/painter.h"
+#include "display/painter/menu.h"
 #include <stdio.h>
 #if defined(QUANTUM_PAINTER_ILI9341_ENABLE) && defined(CUSTOM_QUANTUM_PAINTER_ILI9341)
 #    include "display/painter/ili9341_display.h"
 #endif // QUANTUM_PAINTER_ILI9341_ENABLE && CUSTOM_QUANTUM_PAINTER_ILI9341
+#ifdef RTC_ENABLE
+#    include "features/rtc/rtc.h"
+#endif // RTC_ENABLE
 
 /**
  * @brief Truncates text to fit within a certain width
@@ -153,6 +157,15 @@ void housekeeping_task_quantum_painter(void) {
         }
     }
 #endif
+#ifdef RTC_ENABLE
+    if (rtc_is_connected()) {
+        static uint8_t last_second = 0xFF;
+        if (rtc_read_time_struct().second != last_second) {
+            last_second = rtc_read_time_struct().second;
+            display_menu_set_dirty();
+        }
+    }
+#endif // RTC_ENABLE
 #ifdef QUANTUM_PAINTER_ILI9341_ENABLE
     ili9341_draw_user();
 #endif // QUANTUM_PAINTER_ILI9341_ENABLE

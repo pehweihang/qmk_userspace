@@ -203,8 +203,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         if (hue_redraw || wpm_redraw) {
             xpos = 5;
             snprintf(buf, sizeof(buf), "WPM: %3u", get_current_wpm());
-            xpos +=
-                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, 0, 0, 255, 0, 0, 0);
             if (max_wpm_xpos < xpos) {
                 max_wpm_xpos = xpos;
             }
@@ -225,8 +224,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         if (hue_redraw || scan_redraw) {
             xpos = max_wpm_xpos == 0 ? 5 : max_wpm_xpos + 10;
             snprintf(buf, sizeof(buf), "SCANS: %4lu", get_matrix_scan_rate());
-            xpos +=
-                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, 0, 0, 255, 0, 0, 0);
             if (max_scans_xpos < xpos) {
                 max_scans_xpos = xpos;
             }
@@ -249,8 +247,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         if (hue_redraw || cpi_redraw) {
             xpos = max_scans_xpos + 10;
             snprintf(buf, sizeof(buf), "CPI: %5u", curr_cpi);
-            xpos +=
-                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, 0, 0, 255, 0, 0, 0);
             if (max_cpi_xpos < xpos) {
                 max_cpi_xpos = xpos;
             }
@@ -452,8 +449,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             snprintf(buf, sizeof(buf), "RGB Light Mode: %s", rgblight_get_effect_name());
             snprintf(buf, sizeof(buf), "%s", truncate_text(buf, width - 7, font_oled, false, false));
 
-            xpos +=
-                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, 0, 0, 255, 0, 0, 0);
             if (max_rgb_xpos < xpos) {
                 max_rgb_xpos = xpos;
             }
@@ -464,8 +460,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             xpos                         = 5;
             snprintf(buf, sizeof(buf), "RGB Light HSV: %3d, %3d, %3d", rgblight_get_hue(), rgblight_get_sat(),
                      rgblight_get_val());
-            xpos +=
-                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, 0, 0, 255, 0, 0, 0);
             if (max_hsv_xpos < xpos) {
                 max_hsv_xpos = xpos;
             }
@@ -490,8 +485,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             snprintf(buf, sizeof(buf), "RGB Matrix Mode: %s", rgb_matrix_get_effect_name());
             snprintf(buf, sizeof(buf), "%s", truncate_text(buf, width - 7, font_oled, false, false));
 
-            xpos +=
-                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, 0, 0, 255, 0, 0, 0);
             if (max_rgb_xpos < xpos) {
                 max_rgb_xpos = xpos;
             }
@@ -502,8 +496,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             xpos                         = 5;
             snprintf(buf, sizeof(buf), "RGB Matrix HSV: %3d, %3d, %3d", rgb_matrix_get_hue(), rgb_matrix_get_sat(),
                      rgb_matrix_get_val());
-            xpos +=
-                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, 0, 0, 255, 0, 0, 0);
             if (max_hsv_xpos < xpos) {
                 max_hsv_xpos = xpos;
             }
@@ -536,8 +529,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             static int max_layer_xpos = 0;
             xpos                      = 5;
             snprintf(buf, sizeof(buf), "LAYOUT: %s", get_layer_name_string(default_layer_state, false, true));
-            xpos +=
-                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, 0, 0, 255, 0, 0, 0);
             if (max_layer_xpos < xpos) {
                 max_layer_xpos = xpos;
             }
@@ -551,8 +543,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             static int max_layer_xpos = 0;
             xpos                      = 5 + (qp_textwidth(font_oled, "LAYOUT: COLEMAK_DH"));
             snprintf(buf, sizeof(buf), "LAYER: %s", get_layer_name_string(layer_state, false, false));
-            xpos +=
-                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, 0, 0, 255, 0, 0, 0);
             if (max_layer_xpos < xpos) {
                 max_layer_xpos = xpos;
             }
@@ -578,8 +569,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             snprintf(buf, sizeof(buf), "Autocorrected: %s", autocorrected_str_raw[0]);
             snprintf(buf, sizeof(buf), "%s", truncate_text(buf, width - 7, font_oled, false, false));
 
-            xpos +=
-                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, 0, 0, 255, 0, 0, 0);
 
             if (max_klog_xpos[0] < xpos) {
                 max_klog_xpos[0] = xpos;
@@ -591,8 +581,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             snprintf(buf, sizeof(buf), "Original Text: %s", autocorrected_str_raw[1]);
             snprintf(buf, sizeof(buf), "%s", truncate_text(buf, width - 7, font_oled, false, false));
 
-            xpos +=
-                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, 0, 0, 255, 0, 0, 0);
             if (max_klog_xpos[1] < xpos) {
                 max_klog_xpos[1] = xpos;
             }
@@ -643,8 +632,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                         static uint16_t max_line_width = 0;
                         for (uint8_t i = 0; i < DISPLAY_CONSOLE_LOG_LINE_NUM; i++) {
                             xpos = 5;
-                            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, logline_ptrs[i],
-                                                        curr_hue, 255, 255, curr_hue, 255, 0);
+                            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, logline_ptrs[i], 0, 0,
+                                                        255, 0, 0, 0);
                             if (max_line_width < xpos) {
                                 max_line_width = xpos;
                             }
@@ -678,11 +667,11 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                                 if (keycode < ARRAY_SIZE(code_to_name)) {
                                     code[0] = pgm_read_byte(&code_to_name[keycode]);
                                 }
-                                xpos += qp_drawtext_recolor(ili9341_display, xpos, temp_ypos, font_oled, (char*)code,
-                                                            curr_hue, 255, peek_matrix_layer_map(y, x) ? 0 : 255,
-                                                            curr_hue, 255, peek_matrix_layer_map(y, x) ? 255 : 0);
-                                xpos += qp_drawtext_recolor(ili9341_display, xpos, temp_ypos, font_oled, " ", curr_hue,
-                                                            255, 255, 0, 0, 0);
+                                xpos += qp_drawtext_recolor(ili9341_display, xpos, temp_ypos, font_oled, (char*)code, 0,
+                                                            0, peek_matrix_layer_map(y, x) ? 0 : 255, 0, 0,
+                                                            peek_matrix_layer_map(y, x) ? 255 : 0);
+                                xpos += qp_drawtext_recolor(ili9341_display, xpos, temp_ypos, font_oled, " ", 0, 0, 0,
+                                                            0, 0, 0);
                             }
                             temp_ypos += font_oled->line_height + 4;
                         }
@@ -693,12 +682,12 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 case 2:
                     if (hue_redraw || block_redraw) {
                         static uint16_t max_font_xpos[3][4] = {0};
-                        render_character_set(ili9341_display, &xpos, max_font_xpos[0], &ypos, font_thintel, curr_hue,
-                                             255, 255, curr_hue, 255, 0);
-                        render_character_set(ili9341_display, &xpos, max_font_xpos[1], &ypos, font_mono, curr_hue, 255,
-                                             255, curr_hue, 255, 0);
-                        render_character_set(ili9341_display, &xpos, max_font_xpos[2], &ypos, font_oled, curr_hue, 255,
-                                             255, curr_hue, 255, 0);
+                        render_character_set(ili9341_display, &xpos, max_font_xpos[0], &ypos, font_thintel, 0, 0, 255,
+                                             0, 0, 0);
+                        render_character_set(ili9341_display, &xpos, max_font_xpos[1], &ypos, font_mono, 0, 0, 255, 0,
+                                             0, 0);
+                        render_character_set(ili9341_display, &xpos, max_font_xpos[2], &ypos, font_oled, 0, 0, 255, 0,
+                                             0, 0);
                     }
                     break;
                 default:
@@ -754,8 +743,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             }
             uint8_t title_xpos = (width - title_width) / 2;
 
-            xpos += qp_drawtext_recolor(ili9341_display, title_xpos, ypos, font_oled, buf, curr_hue, 255, 255, curr_hue,
-                                        255, 0);
+            xpos += qp_drawtext_recolor(ili9341_display, title_xpos, ypos, font_oled, buf, 0, 0, 255, 0, 0, 0);
             if (max_rtc_xpos < xpos) {
                 max_rtc_xpos = xpos;
             }

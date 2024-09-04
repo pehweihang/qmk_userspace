@@ -602,12 +602,11 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
         //        if (render_menu(ili9341_display, 2, ypos, width - 1, height - (font_oled->line_height * 2 + 6))) {
         if (render_menu(menu_surface, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT)) {
-            if (qp_surface_draw(menu_surface, ili9341_display, 2, ypos, false)) {
-                force_full_block_redraw = true;
-            }
+            force_full_block_redraw = true;
         } else {
             static uint32_t block_timer  = 0;
             bool            block_redraw = false;
+            uint16_t        surface_ypos = 0;
             if (timer_elapsed(block_timer) > 125) {
                 block_timer  = timer_read();
                 block_redraw = true;
@@ -620,28 +619,30 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             }
 
             if (force_full_block_redraw) {
-                qp_rect(ili9341_display, 2, ypos, width - 2 - 1,
-                        ypos + (font_oled->line_height + 4) * DISPLAY_CONSOLE_LOG_LINE_NUM + 3, curr_hue, 255, 0, true);
+                // qp_rect(ili9341_display, 2, ypos, width - 2 - 1,
+                //         ypos + (font_oled->line_height + 4) * DISPLAY_CONSOLE_LOG_LINE_NUM + 3, curr_hue, 255, 0,
+                //         true);
+                qp_rect(menu_surface, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT, 0, 0, 0, true);
                 force_full_block_redraw = false;
                 block_redraw            = true;
             }
 
-            ypos += 3;
-            xpos = 5;
+            surface_ypos += 3;
+            xpos = 3;
             switch (userspace_config.display_mode) {
                 case 0:
                     if (hue_redraw || block_redraw || console_log_needs_redraw) {
                         static uint16_t max_line_width = 0;
                         for (uint8_t i = 0; i < DISPLAY_CONSOLE_LOG_LINE_NUM; i++) {
                             xpos = 5;
-                            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, logline_ptrs[i], 0, 0,
-                                                        255, 0, 0, 0);
+                            xpos += qp_drawtext_recolor(menu_surface, xpos, surface_ypos, font_oled, logline_ptrs[i], 0,
+                                                        0, 255, 0, 0, 0);
                             if (max_line_width < xpos) {
                                 max_line_width = xpos;
                             }
-                            qp_rect(ili9341_display, xpos, ypos, max_line_width, ypos + font_oled->line_height, 0, 0, 0,
-                                    true);
-                            ypos += font_oled->line_height + 4;
+                            qp_rect(menu_surface, xpos, surface_ypos, max_line_width,
+                                    surface_ypos + font_oled->line_height, 0, 0, 0, true);
+                            surface_ypos += font_oled->line_height + 4;
                         }
                         console_log_needs_redraw = false;
                     }
@@ -651,9 +652,10 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifdef LAYER_MAP_ENABLE
                     if (hue_redraw || block_redraw || layer_map_has_updated) {
-                        uint16_t temp_ypos = ypos;
+                        surface_ypos += font_oled->line_height + 4;
+                        uint16_t temp_ypos = surface_ypos;
                         for (uint8_t y = 0; y < LAYER_MAP_ROWS; y++) {
-                            xpos = 25;
+                            xpos = 20;
                             for (uint8_t x = 0; x < LAYER_MAP_COLS; x++) {
                                 uint16_t keycode = extract_basic_keycode(layer_map[y][x], NULL, false);
                                 wchar_t  code[2] = {0};
@@ -669,11 +671,11 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                                 if (keycode < ARRAY_SIZE(code_to_name)) {
                                     code[0] = pgm_read_byte(&code_to_name[keycode]);
                                 }
-                                xpos += qp_drawtext_recolor(ili9341_display, xpos, temp_ypos, font_oled, (char*)code, 0,
-                                                            0, peek_matrix_layer_map(y, x) ? 0 : 255, 0, 0,
+                                xpos += qp_drawtext_recolor(menu_surface, xpos, temp_ypos, font_oled, (char*)code, 0, 0,
+                                                            peek_matrix_layer_map(y, x) ? 0 : 255, 0, 0,
                                                             peek_matrix_layer_map(y, x) ? 255 : 0);
-                                xpos += qp_drawtext_recolor(ili9341_display, xpos, temp_ypos, font_oled, " ", 0, 0, 0,
-                                                            0, 0, 0);
+                                xpos += qp_drawtext_recolor(menu_surface, xpos, temp_ypos, font_oled, " ", 0, 0, 0, 0,
+                                                            0, 0);
                             }
                             temp_ypos += font_oled->line_height + 4;
                         }
@@ -684,18 +686,19 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 case 2:
                     if (hue_redraw || block_redraw) {
                         static uint16_t max_font_xpos[3][4] = {0};
-                        render_character_set(ili9341_display, &xpos, max_font_xpos[0], &ypos, font_thintel, 0, 0, 255,
+                        render_character_set(menu_surface, &xpos, max_font_xpos[0], &surface_ypos, font_thintel, 0, 0,
+                                             255, 0, 0, 0);
+                        render_character_set(menu_surface, &xpos, max_font_xpos[1], &surface_ypos, font_mono, 0, 0, 255,
                                              0, 0, 0);
-                        render_character_set(ili9341_display, &xpos, max_font_xpos[1], &ypos, font_mono, 0, 0, 255, 0,
-                                             0, 0);
-                        render_character_set(ili9341_display, &xpos, max_font_xpos[2], &ypos, font_oled, 0, 0, 255, 0,
-                                             0, 0);
+                        render_character_set(menu_surface, &xpos, max_font_xpos[2], &surface_ypos, font_oled, 0, 0, 255,
+                                             0, 0, 0);
                     }
                     break;
                 default:
                     break;
             }
         }
+        qp_surface_draw(menu_surface, ili9341_display, 2, ypos, false);
 
         // Keylogger
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

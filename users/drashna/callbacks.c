@@ -342,25 +342,23 @@ void matrix_scan_user(void) {
 __attribute__((weak)) void matrix_slave_scan_keymap(void) {}
 void                       matrix_slave_scan_user(void) {
     matrix_scan_rate_task();
-#    if defined(AUDIO_ENABLE)
-#        ifdef AUDIO_INIT_DELAY
+#    if defined(AUDIO_ENABLE) && defined(AUDIO_INIT_DELAY)
     if (!is_keyboard_master()) {
         static bool     delayed_tasks_run  = false;
         static uint16_t delayed_task_timer = 0;
         if (!delayed_tasks_run) {
             if (!delayed_task_timer) {
                 delayed_task_timer = timer_read();
-            } else if (timer_elapsed(delayed_task_timer) > 300) {
+            } else if (timer_elapsed(delayed_task_timer) > 300 && is_transport_connected()) {
                 audio_startup();
                 delayed_tasks_run = true;
             }
         }
     }
-#        endif
-#    endif
+#    endif // AUDIO_ENABLE && AUDIO_INIT_DELAY
     matrix_slave_scan_keymap();
 }
-#endif
+#endif // SPLIT_KEYBOARD
 
 /**
  * @brief Housekeyping task

@@ -5,8 +5,8 @@
 
 #include <stdint.h>
 
-void eeconfig_read_user_config(uint32_t *data);
-void eeconfig_update_user_config(const uint32_t *data);
+void eeconfig_read_user_config(uint64_t *data);
+void eeconfig_update_user_config(const uint64_t *data);
 
 void eeconfig_read_user_data(void *data);
 void eeconfig_update_user_data(const void *data);

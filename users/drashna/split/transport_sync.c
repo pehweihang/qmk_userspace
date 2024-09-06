@@ -34,8 +34,9 @@ _Static_assert(sizeof(userspace_config_t) <= RPC_M2S_BUFFER_SIZE,
 _Static_assert(sizeof(user_runtime_config_t) <= RPC_M2S_BUFFER_SIZE,
                "user_runtime_config_t is larger than split buffer size!");
 
-uint16_t transport_keymap_config    = 0;
-uint32_t transport_userspace_config = 0, transport_user_state = 0;
+uint32_t transport_user_runtime_state = 0;
+uint16_t transport_keymap_config      = 0;
+uint64_t transport_userspace_config   = 0;
 
 /**
  * @brief Syncs user state between halves of split keyboard
@@ -206,9 +207,10 @@ void user_transport_update(void) {
 void user_transport_sync(void) {
     if (is_keyboard_master()) {
         // Keep track of the last state, so that we can tell if we need to propagate to slave
+        static uint32_t last_sync[6], last_user_state = 0;
         static uint16_t last_keymap = 0;
-        static uint32_t last_config = 0, last_sync[6], last_user_state = 0;
-        bool            needs_sync = false;
+        static uint64_t last_config = 0;
+        bool            needs_sync  = false;
 #if defined(DISPLAY_DRIVER_ENABLE) && defined(DISPLAY_KEYLOGGER_ENABLE)
         static char keylog_temp[DISPLAY_KEYLOGGER_LENGTH + 1] = {0};
 #endif

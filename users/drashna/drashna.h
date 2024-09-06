@@ -88,7 +88,7 @@ void format_layer_bitmap_string(char *buffer, layer_state_t state, layer_state_t
 void center_text(const char *text, char *output, uint8_t width);
 
 typedef union {
-    uint32_t raw;
+    uint64_t raw;
     struct {
         bool     rgb_layer_change     : 1;
         bool     is_overwatch         : 1;
@@ -109,7 +109,7 @@ typedef union {
     };
 } userspace_config_t;
 
-_Static_assert(sizeof(userspace_config_t) == sizeof(uint32_t), "Userspace EECONFIG out of spec.");
+_Static_assert(sizeof(userspace_config_t) == sizeof(uint64_t), "Userspace EECONFIG out of spec.");
 
 extern userspace_config_t userspace_config;
 

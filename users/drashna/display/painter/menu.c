@@ -135,6 +135,56 @@ void display_handler_slave_side_image(char *text_buffer, size_t buffer_len) {
     strncpy(text_buffer, "Unknown", buffer_len);
 }
 
+static bool menu_handler_display_hue(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            painter_decrease_hue();
+            return false;
+        case menu_input_right:
+            painter_increase_hue();
+            return false;
+        default:
+            return true;
+    }
+}
+void display_handler_display_hue(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%d", painter_get_hue());
+}
+
+static bool menu_handler_display_sat(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            painter_decrease_sat();
+            return false;
+        case menu_input_right:
+            painter_increase_sat();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_display_sat(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%d", painter_get_sat());
+}
+
+static bool menu_handler_display_val(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            painter_decrease_val();
+            return false;
+        case menu_input_right:
+            painter_increase_val();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_display_val(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%d", painter_get_val());
+}
+
 menu_entry_t display_option_entries[] = {
     {
         .flags                 = menu_flag_is_value,
@@ -147,6 +197,24 @@ menu_entry_t display_option_entries[] = {
         .text                  = "Slave Side Image",
         .child.menu_handler    = menu_handler_slave_image,
         .child.display_handler = display_handler_slave_side_image,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Display Hue",
+        .child.menu_handler    = menu_handler_display_hue,
+        .child.display_handler = display_handler_display_hue,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Display Saturation",
+        .child.menu_handler    = menu_handler_display_sat,
+        .child.display_handler = display_handler_display_sat,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Display Value",
+        .child.menu_handler    = menu_handler_display_val,
+        .child.display_handler = display_handler_display_val,
     },
 };
 
@@ -1611,37 +1679,39 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
         // uint8_t       hue      = rgb_matrix_get_hue();
         menu_entry_t *menu     = get_current_menu();
         menu_entry_t *selected = get_selected_menu_item();
+        HSV           hsv      = painter_get_hsv();
 
         uint16_t y = start_y;
-        qp_rect(display, start_x, y, render_width, y + 3, 0, 0, 255, true);
+        qp_rect(display, start_x, y, render_width, y + 3, hsv.h, hsv.s, hsv.v, true);
         y += 6;
-        qp_drawtext(display, start_x + 4, y, font_oled, menu->text);
+        qp_drawtext_recolor(display, start_x + 4, y, font_oled, menu->text, hsv.h, hsv.s, hsv.v, 0, 0, 0);
         y += font_oled->line_height + 2;
-        qp_rect(display, start_x, y, render_width, y + 3, 0, 0, 255, true);
+        qp_rect(display, start_x, y, render_width, y + 3, hsv.h, hsv.s, hsv.v, true);
         y += 6;
         for (int i = 0; i < menu->parent.child_count; ++i) {
             menu_entry_t *child = &menu->parent.children[i];
             uint16_t      x     = start_x + 2 + qp_textwidth(font_oled, ">");
             if (child == selected) {
-                qp_drawtext_recolor(display, start_x + 1, y, font_oled, ">", HSV_WHITE, 85, 255, 0);
+                qp_drawtext_recolor(display, start_x + 1, y, font_oled, ">", hsv.h, hsv.s, hsv.v, 85, 255, 0);
                 x += qp_drawtext_recolor(display, x, y, font_oled,
                                          truncate_text(child->text, render_width, font_oled, false, true), HSV_GREEN,
                                          85, 255, 0);
             } else {
                 x += qp_drawtext_recolor(display, x, y, font_oled,
-                                         truncate_text(child->text, render_width, font_oled, false, true), 0, 0, 255, 0,
-                                         255, 0);
+                                         truncate_text(child->text, render_width, font_oled, false, true), hsv.h, hsv.s,
+                                         hsv.v, 0, 255, 0);
             }
             if (child->flags & menu_flag_is_parent) {
-                qp_drawtext(display, render_width - (qp_textwidth(font_oled, ">") + 2), y, font_oled, ">");
+                qp_drawtext_recolor(display, render_width - (qp_textwidth(font_oled, ">") + 2), y, font_oled, ">",
+                                    hsv.h, hsv.s, hsv.v, 0, 0, 0);
             }
             if (child->flags & menu_flag_is_value) {
                 char buf[32] = {0};
                 child->child.display_handler(buf, sizeof(buf));
-                qp_drawtext(display, 8 + x, y, font_oled, buf);
+                qp_drawtext_recolor(display, 8 + x, y, font_oled, buf, hsv.h, hsv.s, hsv.v, 0, 0, 0);
             }
             y += font_oled->line_height + 2;
-            qp_rect(display, start_x, y, render_width, y, 0, 0, 255, true);
+            qp_rect(display, start_x, y, render_width, y, hsv.h, hsv.s, hsv.v, true);
             y += 3;
         }
         return true;

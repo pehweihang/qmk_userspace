@@ -305,6 +305,11 @@ void                       eeconfig_init_user(void) {
 #else
     userspace_config.oled_brightness = 255;
 #endif
+    userspace_config.painter_hsv = (HSV){
+        .h = 128,
+        .s = 255,
+        .v = 255,
+    };
 
     // ensure that nkro is enabled
     keymap_config.raw  = eeconfig_read_keymap();
@@ -320,8 +325,8 @@ void                       eeconfig_init_user(void) {
  *
  */
 void eeconfig_init_user_datablock(void) {
-#if (EECONFIG_USER_DATA_SIZE) > 4
-    uint8_t eeconfig_empty_temp[(EECONFIG_USER_DATA_SIZE)-4] = {0};
+#if (EECONFIG_USER_DATA_SIZE) > 8
+    uint8_t eeconfig_empty_temp[(EECONFIG_USER_DATA_SIZE)-8] = {0};
     eeconfig_update_user_data(eeconfig_empty_temp);
 #endif
 }

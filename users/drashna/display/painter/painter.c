@@ -5,6 +5,8 @@
 #include "display/painter/painter.h"
 #include "display/painter/menu.h"
 #include <stdio.h>
+#include "drashna.h"
+
 #if defined(QUANTUM_PAINTER_ILI9341_ENABLE) && defined(CUSTOM_QUANTUM_PAINTER_ILI9341)
 #    include "display/painter/ili9341_display.h"
 #endif // QUANTUM_PAINTER_ILI9341_ENABLE && CUSTOM_QUANTUM_PAINTER_ILI9341
@@ -229,19 +231,15 @@ void shutdown_quantum_painter(void) {
 #endif // PAINTER_SPD_STEP
 #include <lib/lib8tion/lib8tion.h>
 
-static HSV painter_hsv = {
-    .h = 128,
-    .s = 255,
-    .v = 255,
-};
-
 void painter_sethsv_eeprom_helper(uint8_t hue, uint8_t sat, uint8_t val, bool write_to_eeprom) {
-    painter_hsv.h = hue;
-    painter_hsv.s = sat;
-    painter_hsv.v = val;
-    // eeconfig_flag_rgb_matrix(write_to_eeprom);
-    dprintf("painter set hsv [%s]: %u,%u,%u\n", (write_to_eeprom) ? "EEPROM" : "NOEEPROM", painter_hsv.h, painter_hsv.s,
-            painter_hsv.v);
+    userspace_config.painter_hsv.h = hue;
+    userspace_config.painter_hsv.s = sat;
+    userspace_config.painter_hsv.v = val;
+    if (write_to_eeprom) {
+        eeconfig_update_user_config(&userspace_config.raw);
+    }
+    dprintf("painter set hsv [%s]: %u,%u,%u\n", (write_to_eeprom) ? "EEPROM" : "NOEEPROM",
+            userspace_config.painter_hsv.h, userspace_config.painter_hsv.s, userspace_config.painter_hsv.v);
 }
 void painter_sethsv_noeeprom(uint8_t hue, uint8_t sat, uint8_t val) {
     painter_sethsv_eeprom_helper(hue, sat, val, false);
@@ -251,20 +249,21 @@ void painter_sethsv(uint8_t hue, uint8_t sat, uint8_t val) {
 }
 
 HSV painter_get_hsv(void) {
-    return painter_hsv;
+    return userspace_config.painter_hsv;
 }
 uint8_t painter_get_hue(void) {
-    return painter_hsv.h;
+    return userspace_config.painter_hsv.h;
 }
 uint8_t painter_get_sat(void) {
-    return painter_hsv.s;
+    return userspace_config.painter_hsv.s;
 }
 uint8_t painter_get_val(void) {
-    return painter_hsv.v;
+    return userspace_config.painter_hsv.v;
 }
 
 void painter_increase_hue_helper(bool write_to_eeprom) {
-    painter_sethsv_eeprom_helper(painter_hsv.h + PAINTER_HUE_STEP, painter_hsv.s, painter_hsv.v, write_to_eeprom);
+    painter_sethsv_eeprom_helper(qadd8(userspace_config.painter_hsv.h, PAINTER_HUE_STEP),
+                                 userspace_config.painter_hsv.s, userspace_config.painter_hsv.v, write_to_eeprom);
 }
 void painter_increase_hue_noeeprom(void) {
     painter_increase_hue_helper(false);
@@ -274,7 +273,8 @@ void painter_increase_hue(void) {
 }
 
 void painter_decrease_hue_helper(bool write_to_eeprom) {
-    painter_sethsv_eeprom_helper(painter_hsv.h - PAINTER_HUE_STEP, painter_hsv.s, painter_hsv.v, write_to_eeprom);
+    painter_sethsv_eeprom_helper(qsub8(userspace_config.painter_hsv.h, PAINTER_HUE_STEP),
+                                 userspace_config.painter_hsv.s, userspace_config.painter_hsv.v, write_to_eeprom);
 }
 void painter_decrease_hue_noeeprom(void) {
     painter_decrease_hue_helper(false);
@@ -284,7 +284,9 @@ void painter_decrease_hue(void) {
 }
 
 void painter_increase_sat_helper(bool write_to_eeprom) {
-    painter_sethsv_eeprom_helper(painter_hsv.h, qadd8(painter_hsv.s, PAINTER_SAT_STEP), painter_hsv.v, write_to_eeprom);
+    painter_sethsv_eeprom_helper(userspace_config.painter_hsv.h,
+                                 qadd8(userspace_config.painter_hsv.s, PAINTER_SAT_STEP),
+                                 userspace_config.painter_hsv.v, write_to_eeprom);
 }
 void painter_increase_sat_noeeprom(void) {
     painter_increase_sat_helper(false);
@@ -294,7 +296,9 @@ void painter_increase_sat(void) {
 }
 
 void painter_decrease_sat_helper(bool write_to_eeprom) {
-    painter_sethsv_eeprom_helper(painter_hsv.h, qsub8(painter_hsv.s, PAINTER_SAT_STEP), painter_hsv.v, write_to_eeprom);
+    painter_sethsv_eeprom_helper(userspace_config.painter_hsv.h,
+                                 qsub8(userspace_config.painter_hsv.s, PAINTER_SAT_STEP),
+                                 userspace_config.painter_hsv.v, write_to_eeprom);
 }
 void painter_decrease_sat_noeeprom(void) {
     painter_decrease_sat_helper(false);
@@ -304,7 +308,8 @@ void painter_decrease_sat(void) {
 }
 
 void painter_increase_val_helper(bool write_to_eeprom) {
-    painter_sethsv_eeprom_helper(painter_hsv.h, painter_hsv.s, qadd8(painter_hsv.v, PAINTER_VAL_STEP), write_to_eeprom);
+    painter_sethsv_eeprom_helper(userspace_config.painter_hsv.h, userspace_config.painter_hsv.s,
+                                 qadd8(userspace_config.painter_hsv.v, PAINTER_VAL_STEP), write_to_eeprom);
 }
 void painter_increase_val_noeeprom(void) {
     painter_increase_val_helper(false);
@@ -314,7 +319,8 @@ void painter_increase_val(void) {
 }
 
 void painter_decrease_val_helper(bool write_to_eeprom) {
-    painter_sethsv_eeprom_helper(painter_hsv.h, painter_hsv.s, qsub8(painter_hsv.v, PAINTER_VAL_STEP), write_to_eeprom);
+    painter_sethsv_eeprom_helper(userspace_config.painter_hsv.h, userspace_config.painter_hsv.s,
+                                 qsub8(userspace_config.painter_hsv.v, PAINTER_VAL_STEP), write_to_eeprom);
 }
 void painter_decrease_val_noeeprom(void) {
     painter_decrease_val_helper(false);

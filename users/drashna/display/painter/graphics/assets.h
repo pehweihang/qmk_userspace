@@ -9,3 +9,5 @@
 #include "display/painter/graphics/neon-genesis-evangelion-initial-machine-240x320.qgf.h"
 #include "display/painter/graphics/samurai-cyberpunk-minimal-dark-8k-b3-240x320.qgf.h"
 #include "display/painter/graphics/frame.qgf.h"
+#include "display/painter/graphics/frame_top.qgf.h"
+#include "display/painter/graphics/frame_bottom.qgf.h"

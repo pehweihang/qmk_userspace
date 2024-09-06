@@ -45,10 +45,10 @@ uint32_t transport_userspace_config = 0, transport_user_state = 0;
  * @param target2initiator_buffer_size
  * @param target2initiator_buffer
  */
-void user_state_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
-                     uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
-    if (initiator2target_buffer_size == sizeof(transport_user_state)) {
-        memcpy(&transport_user_state, initiator2target_buffer, initiator2target_buffer_size);
+void user_runtime_state_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
+                             uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
+    if (initiator2target_buffer_size == sizeof(transport_user_runtime_state)) {
+        memcpy(&transport_user_runtime_state, initiator2target_buffer, initiator2target_buffer_size);
     }
 }
 
@@ -155,7 +155,7 @@ void send_device_suspend_state(bool status) {
  */
 void keyboard_post_init_transport_sync(void) {
     // Register keyboard state sync split transaction
-    transaction_register_rpc(RPC_ID_USER_STATE_SYNC, user_state_sync);
+    transaction_register_rpc(RPC_ID_USER_RUNTIME_STATE_SYNC, user_runtime_state_sync);
     transaction_register_rpc(RPC_ID_USER_KEYMAP_SYNC, user_keymap_sync);
     transaction_register_rpc(RPC_ID_USER_CONFIG_SYNC, user_config_sync);
     transaction_register_rpc(RPC_ID_USER_AUTOCORRECT_STR, autocorrect_string_sync);
@@ -169,13 +169,13 @@ void keyboard_post_init_transport_sync(void) {
  */
 void user_transport_update(void) {
     if (is_keyboard_master()) {
-        transport_keymap_config    = keymap_config.raw;
-        transport_userspace_config = userspace_config.raw;
-        transport_user_state = user_state.raw;
+        transport_user_runtime_state = user_state.raw;
+        transport_keymap_config      = keymap_config.raw;
+        transport_userspace_config   = userspace_config.raw;
     } else {
+        user_state.raw       = transport_user_runtime_state;
         keymap_config.raw    = transport_keymap_config;
         userspace_config.raw = transport_userspace_config;
-        user_state.raw       = transport_user_state;
 #ifdef UNICODE_COMMON_ENABLE
         unicode_config.input_mode = user_state.unicode_mode;
         unicode_typing_mode       = user_state.unicode_typing_mode;
@@ -220,9 +220,9 @@ void user_transport_sync(void) {
             last_sync[5] = timer_read32();
         }
         // Check if the state values are different
-        if (memcmp(&transport_user_state, &last_user_state, sizeof(transport_user_state))) {
+        if (memcmp(&transport_user_runtime_state, &last_user_state, sizeof(transport_user_runtime_state))) {
             needs_sync = true;
-            memcpy(&last_user_state, &transport_user_state, sizeof(transport_user_state));
+            memcpy(&last_user_state, &transport_user_runtime_state, sizeof(transport_user_runtime_state));
         }
         // Send to slave every FORCED_SYNC_THROTTLE_MS regardless of state change
         if (timer_elapsed32(last_sync[0]) > FORCED_SYNC_THROTTLE_MS) {
@@ -231,7 +231,8 @@ void user_transport_sync(void) {
 
         // Perform the sync if requested
         if (needs_sync) {
-            if (transaction_rpc_send(RPC_ID_USER_STATE_SYNC, sizeof(user_state), &user_state)) {
+            if (transaction_rpc_send(RPC_ID_USER_RUNTIME_STATE_SYNC, sizeof(transport_user_runtime_state),
+                                     &transport_user_runtime_state)) {
                 last_sync[0] = timer_read32();
             }
             needs_sync = false;
@@ -258,9 +259,9 @@ void user_transport_sync(void) {
         }
 
         // Check if the state values are different
-        if (memcmp(&user_state, &last_config, sizeof(transport_userspace_config))) {
+        if (memcmp(&transport_userspace_config, &last_config, sizeof(transport_userspace_config))) {
             needs_sync = true;
-            memcpy(&last_config, &user_state, sizeof(transport_userspace_config));
+            memcpy(&last_config, &transport_userspace_config, sizeof(transport_userspace_config));
         }
 
         // Send to slave every FORCED_SYNC_THROTTLE_MS regardless of state change

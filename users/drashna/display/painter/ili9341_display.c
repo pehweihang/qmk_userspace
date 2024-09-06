@@ -54,7 +54,7 @@ void render_frame(painter_device_t display) {
     qp_get_geometry(ili9341_display, &width, &height, NULL, NULL, NULL);
 
     HSV hsv = painter_get_hsv();
-    qp_drawimage_recolor(ili9341_display, 1, 0, frame_top, hsv.h, hsv.s, hsv.v, 0, 0, 0);
+    qp_drawimage_recolor(ili9341_display, 1, 2, frame_top, hsv.h, hsv.s, hsv.v, 0, 0, 0);
     qp_line(ili9341_display, 1, frame_top->height, 1, height - frame_bottom->height, hsv.h, hsv.s, hsv.v);
     qp_line(ili9341_display, width - 2, frame_top->height, width - 2, height - frame_bottom->height, hsv.h, hsv.s,
             hsv.v);
@@ -67,7 +67,7 @@ void render_frame(painter_device_t display) {
         title_width = width - 55;
     }
     uint8_t title_xpos = (width - title_width) / 2;
-    qp_drawtext_recolor(ili9341_display, title_xpos, 2, font_thintel,
+    qp_drawtext_recolor(ili9341_display, title_xpos, 4, font_thintel,
                         truncate_text(title, title_width, font_thintel, false, false), 0, 0, 0, hsv.h, hsv.s, hsv.v);
 }
 

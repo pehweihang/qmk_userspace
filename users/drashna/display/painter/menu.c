@@ -1625,8 +1625,18 @@ bool process_record_menu(uint16_t keycode, keyrecord_t *record) {
             }
             keycode = QK_MOD_TAP_GET_TAP_KEYCODE(keycode);
             break;
+#if defined(POINTING_DEVICE_ENABLE)
+        default:
+#    if defined(POINTING_DEVICE_AUTO_MOUSE_ENABLE)
+            if (IS_MOUSE_KEYCODE(keycode) || is_mouse_record_kb(keycode, record)) {
+                keep_processing = true;
+            }
+#    else  // POINTING_DEVICE_AUTO_MOUSE_ENABLE
+            keep_processing = IS_MOUSE_KEYCODE(keycode);
+#    endif // POINTING_DEVICE_AUTO_MOUSE_ENABLE
+            break;
+#endif // POINTING_DEVICE_ENABLE
     }
-
     if (display_menu_state.is_in_menu) {
         if (record->event.pressed) {
             switch (keycode) {

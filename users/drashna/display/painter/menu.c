@@ -1692,8 +1692,8 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
         HSV           hsv      = painter_get_hsv();
 
         uint16_t y = start_y;
-        qp_rect(display, start_x, y, render_width, y + 3, hsv.h, hsv.s, hsv.v, true);
-        y += 6;
+        qp_rect(display, start_x, y, render_width, y + 2, hsv.h, hsv.s, hsv.v, true);
+        y += 5;
         qp_drawtext_recolor(display, start_x + 4, y, font_oled, menu->text, hsv.h, hsv.s, hsv.v, 0, 0, 0);
         y += font_oled->line_height + 2;
         qp_rect(display, start_x, y, render_width, y + 3, hsv.h, hsv.s, hsv.v, true);

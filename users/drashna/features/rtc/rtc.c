@@ -211,6 +211,10 @@ void rtc_init(void) {
 #endif
 }
 
+/**
+ * @brief Perform the RTC task, periodically reading the RTC
+ *
+ */
 void rtc_task(void) {
     if (!rtc_initialized) {
         return;
@@ -238,11 +242,10 @@ void rtc_task(void) {
     }
 }
 
-// not sure if neede. Let people do it?
 /**
  * @brief Generates a string with the date
  *
- * @return char*
+ * @return char* MM/DD/YYYY
  */
 char *rtc_read_date_str(void) {
     char date_str_temp[14] = {0};
@@ -255,7 +258,7 @@ char *rtc_read_date_str(void) {
 /**
  * @brief Generates a string with the time
  *
- * @return char*
+ * @return char* HH:MM:SS
  */
 char *rtc_read_time_str(void) {
     char time_str_temp[12];
@@ -268,7 +271,7 @@ char *rtc_read_time_str(void) {
 /**
  * @brief Generates a string with the date and time
  *
- * @return char*
+ * @return char* MM/DD/YYYY HH:MM:SS
  */
 char *rtc_read_date_time_str(void) {
     static char date_time_str[21] = {0};
@@ -279,7 +282,7 @@ char *rtc_read_date_time_str(void) {
 /**
  * @brief Generates a string with the date and time in ISO 8601 format
  *
- * @return char*
+ * @return char* YYYY-MM-DDTHH:MM:SS
  */
 char *rtc_read_date_time_iso8601_str(void) {
     static char date_time_str[26] = {0};
@@ -333,18 +336,30 @@ void rtc_set_time(rtc_time_t time) {
 #endif // CUSTOM_QUANTUM_PAINTER_ENABLE
 }
 
+/**
+ * @brief Increment the year
+ *
+ */
 void rtc_year_increase(void) {
     rtc_time_t time = rtc_read_time_struct();
     time.year++;
     rtc_set_time(time);
 }
 
+/**
+ * @brief Decrement the year
+ *
+ */
 void rtc_year_decrease(void) {
     rtc_time_t time = rtc_read_time_struct();
     time.year--;
     rtc_set_time(time);
 }
 
+/**
+ * @brief Increment the month
+ *
+ */
 void rtc_month_increase(void) {
     rtc_time_t time = rtc_read_time_struct();
     time.month++;
@@ -354,6 +369,10 @@ void rtc_month_increase(void) {
     rtc_set_time(time);
 }
 
+/**
+ * @brief Decrement the month
+ *
+ */
 void rtc_month_decrease(void) {
     rtc_time_t time = rtc_read_time_struct();
     time.month--;
@@ -363,6 +382,10 @@ void rtc_month_decrease(void) {
     rtc_set_time(time);
 }
 
+/**
+ * @brief Increment the date
+ *
+ */
 void rtc_date_increase(void) {
     rtc_time_t time = rtc_read_time_struct();
     time.date++;
@@ -372,6 +395,10 @@ void rtc_date_increase(void) {
     rtc_set_time(time);
 }
 
+/**
+ * @brief Decrement the date
+ *
+ */
 void rtc_date_decrease(void) {
     rtc_time_t time = rtc_read_time_struct();
     time.date--;
@@ -381,6 +408,10 @@ void rtc_date_decrease(void) {
     rtc_set_time(time);
 }
 
+/**
+ * @brief Increment the hour
+ *
+ */
 void rtc_hour_increase(void) {
     rtc_time_t time = rtc_read_time_struct();
     time.hour++;
@@ -390,6 +421,10 @@ void rtc_hour_increase(void) {
     rtc_set_time(time);
 }
 
+/**
+ * @brief Decrement the hour
+ *
+ */
 void rtc_hour_decrease(void) {
     rtc_time_t time = rtc_read_time_struct();
     time.hour--;
@@ -399,6 +434,10 @@ void rtc_hour_decrease(void) {
     rtc_set_time(time);
 }
 
+/**
+ * @brief Increment the minute
+ *
+ */
 void rtc_minute_increase(void) {
     rtc_time_t time = rtc_read_time_struct();
     time.minute++;
@@ -408,6 +447,10 @@ void rtc_minute_increase(void) {
     rtc_set_time(time);
 }
 
+/**
+ * @brief Decrement the minute
+ *
+ */
 void rtc_minute_decrease(void) {
     rtc_time_t time = rtc_read_time_struct();
     time.minute--;
@@ -417,6 +460,10 @@ void rtc_minute_decrease(void) {
     rtc_set_time(time);
 }
 
+/**
+ * @brief Increment the second
+ *
+ */
 void rtc_second_increase(void) {
     rtc_time_t time = rtc_read_time_struct();
     time.second++;
@@ -426,6 +473,10 @@ void rtc_second_increase(void) {
     rtc_set_time(time);
 }
 
+/**
+ * @brief Decrement the second
+ *
+ */
 void rtc_second_decrease(void) {
     rtc_time_t time = rtc_read_time_struct();
     time.second--;
@@ -435,18 +486,30 @@ void rtc_second_decrease(void) {
     rtc_set_time(time);
 }
 
+/**
+ * @brief Toggle the AM/PM
+ *
+ */
 void rtc_am_pm_toggle(void) {
     rtc_time_t time = rtc_read_time_struct();
     time.am_pm      = (rtc_time_am_pm_t)(time.am_pm == RTC_AM ? RTC_PM : RTC_AM);
     rtc_set_time(time);
 }
 
+/**
+ * @brief Toggle the time format (12h/24h)
+ *
+ */
 void rtc_format_toggle(void) {
     rtc_time_t time = rtc_read_time_struct();
     time.format     = (rtc_time_format_t)(time.format == RTC_FORMAT_12H ? RTC_FORMAT_24H : RTC_FORMAT_12H);
     rtc_set_time(time);
 }
 
+/**
+ * @brief Toggle the daylight saving time
+ *
+ */
 void rtc_dst_toggle(void) {
     rtc_time_t time = rtc_read_time_struct();
     time.is_dst     = !time.is_dst;

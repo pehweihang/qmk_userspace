@@ -3,6 +3,14 @@
 
 #include "drashna.h"
 
+// USB Port Pin Definitions
+// black - GND
+// red - VCC
+// white - D+
+// blue - D-
+// green - CC1
+// yellow - SBU1
+
 #if defined(KEYBOARD_handwired_tractyl_manuform_5x6_right_f405)
 #    include "keymap_full.h"
 #else // KEYBOARD_handwired_tractyl_manuform_5x6_right_f405

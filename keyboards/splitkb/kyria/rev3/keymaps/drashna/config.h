@@ -37,12 +37,12 @@
 #    define SERIAL_USART_RX_PIN D2
 
 #    undef WS2812_DI_PIN
-#    define WS2812_DI_PIN      PAL_LINE(GPIOA, 3)
-#    define WS2812_PWM_DRIVER  PWMD15
-#    define WS2812_PWM_CHANNEL 2
+#    define WS2812_DI_PIN       PAL_LINE(GPIOA, 3)
+#    define WS2812_PWM_DRIVER   PWMD15
+#    define WS2812_PWM_CHANNEL  2
 #    define WS2812_PWM_PAL_MODE 9
-#    define WS2812_DMA_STREAM STM32_DMA1_STREAM5
-#    define WS2812_DMA_CHANNEL 5
+#    define WS2812_DMA_STREAM   STM32_DMA1_STREAM5
+#    define WS2812_DMA_CHANNEL  5
 
 #    define BOOTMAGIC_ROW          0
 #    define BOOTMAGIC_COLUMN       6

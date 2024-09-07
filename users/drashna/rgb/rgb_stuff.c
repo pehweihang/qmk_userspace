@@ -177,7 +177,7 @@ const char *rgblight_name(uint8_t effect) {
 }
 
 const char *rgblight_get_effect_name(void) {
-    static char buf[32] = {0};
+    static char    buf[32]     = {0};
     static uint8_t last_effect = 0;
     if (last_effect != rgblight_get_mode()) {
         last_effect = rgblight_get_mode();

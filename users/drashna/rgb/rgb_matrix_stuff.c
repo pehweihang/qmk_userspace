@@ -248,7 +248,7 @@ const char *rgb_matrix_name(uint8_t effect) {
 }
 
 const char *rgb_matrix_get_effect_name(void) {
-    static char buf[32] = {0};
+    static char    buf[32]     = {0};
     static uint8_t last_effect = 0;
     if (last_effect != rgb_matrix_get_mode()) {
         last_effect = rgb_matrix_get_mode();

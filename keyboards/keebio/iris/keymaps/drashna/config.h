@@ -9,8 +9,7 @@
 #    undef RGBLED_NUM
 #    define RGBLED_NUM 18 // Number of LEDs
 #    undef RGBLED_SPLIT
-#    define RGBLED_SPLIT \
-        { 9, 9 }
+#    define RGBLED_SPLIT                  {9, 9}
 #    define RGBLIGHT_HUE_STEP             8
 #    define RGBLIGHT_SAT_STEP             8
 #    define RGBLIGHT_VAL_STEP             8

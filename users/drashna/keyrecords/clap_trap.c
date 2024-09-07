@@ -202,9 +202,9 @@ bool process_clap_trap(uint16_t keycode, keyrecord_t *record) {
         }
     }
 
-        if (buffer_keyreport_count == 0) {
-            return true;
-        }
+    if (buffer_keyreport_count == 0) {
+        return true;
+    }
 
     ac_dprintf("buffer_keyreport_count: %d\n", buffer_keyreport_count);
 

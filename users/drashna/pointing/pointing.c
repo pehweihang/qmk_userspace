@@ -42,7 +42,7 @@ static uint16_t mouse_debounce_timer = 0;
 #    define MOUSE_JIGGLER_INTERVAL_MS 16
 #endif // MOUSE_JIGGLER_INTERVAL_MS
 
-static uint32_t     maccel_timer        = 0;
+static uint32_t maccel_timer = 0;
 
 static float maccel_a = POINTING_DEVICE_ACCEL_CURVE_A;
 static float maccel_b = POINTING_DEVICE_ACCEL_CURVE_B;
@@ -162,8 +162,8 @@ bool process_record_pointing(uint16_t keycode, keyrecord_t* record) {
             break;
         case PD_JIGGLER:
             if (record->event.pressed) {
-                mouse_jiggler_timer            = timer_read();
-                mouse_jiggler                  = !mouse_jiggler;
+                mouse_jiggler_timer = timer_read();
+                mouse_jiggler       = !mouse_jiggler;
             }
             break;
         default:

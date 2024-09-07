@@ -18,8 +18,7 @@
 #ifdef RGBLIGHT_ENABLE
 #    define WS2812_DI_PIN D3
 #    define RGBLED_NUM    16 // Number of LEDs
-#    define RGBLED_SPLIT \
-        { 8, 8 }
+#    define RGBLED_SPLIT  {8, 8}
 
 #    define RGBLIGHT_HUE_STEP             12
 #    define RGBLIGHT_SAT_STEP             12

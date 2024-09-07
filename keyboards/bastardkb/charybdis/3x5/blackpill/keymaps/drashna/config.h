@@ -21,18 +21,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef KEYBOARD_bastardkb_charybdis_3x5_blackpill
 
 #    undef MATRIX_ROW_PINS
-#    define MATRIX_ROW_PINS \
-        { B12, B13, B14, B15 }
+#    define MATRIX_ROW_PINS {B12, B13, B14, B15}
 #    undef MATRIX_COL_PINS
-#    define MATRIX_COL_PINS \
-        { A15, B3, B4, B5, B6 }
+#    define MATRIX_COL_PINS {A15, B3, B4, B5, B6}
 
 #    undef MATRIX_ROW_PINS_RIGHT
-#    define MATRIX_ROW_PINS_RIGHT \
-        { B12, B13, B14, B15 }
+#    define MATRIX_ROW_PINS_RIGHT {B12, B13, B14, B15}
 #    undef MATRIX_COL_PINS_RIGHT
-#    define MATRIX_COL_PINS_RIGHT \
-        { A15, B3, B4, B5, B6 }
+#    define MATRIX_COL_PINS_RIGHT {A15, B3, B4, B5, B6}
 
 #    define USB_VBUS_PIN B10
 #    undef SPLIT_HAND_PIN

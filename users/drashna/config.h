@@ -7,7 +7,6 @@
 #    include "audio_config.h"
 #endif // AUDIO_ENABLE
 
-
 #ifdef CONVERT_TO_PROTON_C
 // pins that are available but not present on Pro Micro
 #    define A3  PAL_LINE(GPIOA, 3)

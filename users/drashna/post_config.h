@@ -35,7 +35,6 @@
 #    endif
 #endif
 
-
 #ifdef MOUSEKEY_ENABLE
 // mouse movement config
 #    ifdef MK_3_SPEED

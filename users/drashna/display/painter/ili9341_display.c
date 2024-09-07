@@ -758,7 +758,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         static uint8_t display_mode = 0xFF;
         static bool    force_redraw = false;
         if (display_mode != userspace_config.display_logo) {
-            display_mode = userspace_config.display_logo;
+            display_mode                 = userspace_config.display_logo;
             painter_image_handle_t frame = NULL;
 
             switch (userspace_config.display_logo) {

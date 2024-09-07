@@ -2,6 +2,15 @@
 
 MAKEFLAGS += --no-print-directory
 
+# Deal with macOS
+ifeq ($(shell uname -s),Darwin)
+SED = gsed
+ECHO = gecho
+else
+SED = sed
+ECHO = echo
+endif
+
 QMK_USERSPACE := $(patsubst %/,%,$(dir $(shell realpath "$(lastword $(MAKEFILE_LIST))")))
 ifeq ($(QMK_USERSPACE),)
     QMK_USERSPACE := $(shell pwd)
@@ -18,7 +27,7 @@ endif
 .PHONY: format
 
 format:
-	@git ls-files | grep -E '\.(c|h|cpp|hpp|cxx|hxx|inc|inl)$$' | grep -vE '\.q[gf]f\.' | grep -vE '(ch|hal|mcu)conf\.h$$' | grep -vE 'board.[ch]$$' | grep -vE '.inl.h$$' | grep -vE 'mini-rv32ima.h$$' | while read file ; do \
-		$(ECHO) "\e[38;5;14mFormatting: $$file\e[0m" ; \
+	@git ls-files | grep -E '\.(c|h|cpp|hpp|cxx|hxx|inc|inl)$$' | grep -v autocorrect_data.h | grep -vE '\.q[gf]f\.' | grep -vE '(ch|hal|mcu)conf\.h$$' | grep -vE 'board.[ch]$$' | grep -vE '.inl.h$$' | grep -vE 'mini-rv32ima.h$$' | while read file ; do \
+		$(ECHO) -e "\e[38;5;14mFormatting: $$file\e[0m" ; \
 		clang-format -i "$$file" ; \
 	done

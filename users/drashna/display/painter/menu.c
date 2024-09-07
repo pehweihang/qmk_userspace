@@ -1184,10 +1184,10 @@ void display_handler_rtc_year(char *text_buffer, size_t buffer_len) {
 static bool menu_handler_rtc_year(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            // rtc_decrease_year();
+            rtc_year_decrease();
             return false;
         case menu_input_right:
-            // rtc_increase_year();
+            rtc_year_increase();
             return false;
         default:
             return true;
@@ -1205,10 +1205,10 @@ void display_handler_rtc_month(char *text_buffer, size_t buffer_len) {
 static bool menu_handler_rtc_month(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            // rtc_decrease_month();
+            rtc_month_decrease();
             return false;
         case menu_input_right:
-            // rtc_increase_month();
+            rtc_month_increase();
             return false;
         default:
             return true;
@@ -1226,10 +1226,10 @@ void display_handler_rtc_date(char *text_buffer, size_t buffer_len) {
 static bool menu_handler_rtc_date(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            // rtc_decrease_date();
+            rtc_date_decrease();
             return false;
         case menu_input_right:
-            // rtc_increase_date();
+            rtc_date_increase();
             return false;
         default:
             return true;
@@ -1247,10 +1247,10 @@ void display_handler_rtc_hour(char *text_buffer, size_t buffer_len) {
 static bool menu_handler_rtc_hour(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            // rtc_decrease_hour();
+            rtc_hour_decrease();
             return false;
         case menu_input_right:
-            // rtc_increase_hour();
+            rtc_hour_increase();
             return false;
         default:
             return true;
@@ -1268,10 +1268,10 @@ void display_handler_rtc_minute(char *text_buffer, size_t buffer_len) {
 static bool menu_handler_rtc_minute(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            // rtc_decrease_minute();
+            rtc_minute_decrease();
             return false;
         case menu_input_right:
-            // rtc_increase_minute();
+            rtc_minute_increase();
             return false;
         default:
             return true;
@@ -1289,10 +1289,10 @@ void display_handler_rtc_second(char *text_buffer, size_t buffer_len) {
 static bool menu_handler_rtc_second(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            // rtc_decrease_second();
+            rtc_second_decrease();
             return false;
         case menu_input_right:
-            // rtc_increase_second();
+            rtc_second_increase();
             return false;
         default:
             return true;
@@ -1310,10 +1310,8 @@ void display_handler_rtc_hour_format(char *text_buffer, size_t buffer_len) {
 static bool menu_handler_rtc_hour_format(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            // rtc_toggle_hour_format();
-            return false;
         case menu_input_right:
-            // rtc_toggle_hour_format();
+            rtc_format_toggle();
             return false;
         default:
             return true;
@@ -1331,10 +1329,8 @@ void display_handler_rtc_dst(char *text_buffer, size_t buffer_len) {
 static bool menu_handler_rtc_dst(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            // rtc_toggle_dst();
-            return false;
         case menu_input_right:
-            // rtc_toggle_dst();
+            rtc_dst_toggle();
             return false;
         default:
             return true;

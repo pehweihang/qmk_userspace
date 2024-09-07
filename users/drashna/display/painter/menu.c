@@ -1419,57 +1419,71 @@ menu_entry_t buy_more_entries[] = {
 
 menu_entry_t root_entries[] = {
     {
-        .flags              = menu_flag_is_parent,
-        .text               = "Display Option",
-        .parent.children    = display_option_entries,
-        .parent.child_count = ARRAY_SIZE(display_option_entries),
+        .flags                 = menu_flag_is_parent | menu_flag_is_value,
+        .text                  = "Display Option",
+        .parent.children       = display_option_entries,
+        .parent.child_count    = ARRAY_SIZE(display_option_entries),
+        .child.menu_handler    = menu_handler_display,
+        .child.display_handler = display_handler_display,
     },
 #ifdef UNICODE_COMMON_ENABLE
     {
-        .flags              = menu_flag_is_parent,
-        .text               = "Unicode Settings",
-        .parent.children    = unicode_entries,
-        .parent.child_count = ARRAY_SIZE(unicode_entries),
+        .flags                 = menu_flag_is_parent | menu_flag_is_value,
+        .text                  = "Unicode Settings",
+        .parent.children       = unicode_entries,
+        .parent.child_count    = ARRAY_SIZE(unicode_entries),
+        .child.menu_handler    = menu_handler_unicode_typing,
+        .child.display_handler = display_handler_unicode_typing,
     },
 #endif // UNICODE_COMMON_ENABLE
 #ifdef RGB_MATRIX_ENABLE
     {
-        .flags              = menu_flag_is_parent,
-        .text               = "RGB Matrix Settings",
-        .parent.children    = rgb_matrix_entries,
-        .parent.child_count = ARRAY_SIZE(rgb_matrix_entries),
+        .flags                 = menu_flag_is_parent | menu_flag_is_value,
+        .text                  = "RGB Matrix Settings",
+        .parent.children       = rgb_matrix_entries,
+        .parent.child_count    = ARRAY_SIZE(rgb_matrix_entries),
+        .child.menu_handler    = menu_handler_rm_enabled,
+        .child.display_handler = display_handler_rm_enabled,
     },
 #endif // RGB_MATRIX_ENABLE
 #ifdef RGBLIGHT_ENABLE
     {
-        .flags              = menu_flag_is_parent,
-        .text               = "RGB Light Settings",
-        .parent.children    = rgb_light_entries,
-        .parent.child_count = ARRAY_SIZE(rgb_light_entries),
+        .flags                 = menu_flag_is_parent | menu_flag_is_value,
+        .text                  = "RGB Light Settings",
+        .parent.children       = rgb_light_entries,
+        .parent.child_count    = ARRAY_SIZE(rgb_light_entries),
+        .child.menu_handler    = menu_handler_rgbenabled,
+        .child.display_handler = display_handler_rgbenabled,
     },
 #endif // RGBLIGHT_ENABLE
 #ifdef BACKLIGHT_ENABLE
     {
-        .flags              = menu_flag_is_parent,
-        .text               = "Backlight Settings",
-        .parent.children    = backlight_entries,
-        .parent.child_count = ARRAY_SIZE(backlight_entries),
+        .flags                 = menu_flag_is_parent | menu_flag_is_value,
+        .text                  = "Backlight Settings",
+        .parent.children       = backlight_entries,
+        .parent.child_count    = ARRAY_SIZE(backlight_entries),
+        .child.menu_handler    = menu_handler_bl_level,
+        .child.display_handler = display_handler_bl_level,
     },
 #endif // BACKLIGHT_ENABLE
 #ifdef AUDIO_ENABLE
     {
-        .flags              = menu_flag_is_parent,
-        .text               = "Audio Settings",
-        .parent.children    = audio_entries,
-        .parent.child_count = ARRAY_SIZE(audio_entries),
+        .flags                 = menu_flag_is_parent | menu_flag_is_value,
+        .text                  = "Audio Settings",
+        .parent.children       = audio_entries,
+        .parent.child_count    = ARRAY_SIZE(audio_entries),
+        .child.menu_handler    = menu_handler_audio_clicky_enabled,
+        .child.display_handler = display_handler_audio_clicky_enabled,
     },
 #endif // AUDIO_ENABLE
 #ifdef POINTING_DEVICE_ENABLE
     {
-        .flags              = menu_flag_is_parent,
-        .text               = "Pointing Device Settings",
-        .parent.children    = pointing_entries,
-        .parent.child_count = ARRAY_SIZE(pointing_entries),
+        .flags                 = menu_flag_is_parent,
+        .text                  = "Pointing Device Settings",
+        .parent.children       = pointing_entries,
+        .parent.child_count    = ARRAY_SIZE(pointing_entries),
+        .child.menu_handler    = menu_handler_dpi_config,
+        .child.display_handler = display_handler_dpi_config,
     },
 #endif // POINTING_DEVICE_ENABLE
     {

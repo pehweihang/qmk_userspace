@@ -404,7 +404,10 @@ void                       housekeeping_task_user(void) {
 #endif // CUSTOM_TAP_DANCE_ENABLE
 #if defined(CUSTOM_RGB_MATRIX)
     housekeeping_task_rgb_matrix();
-#endif
+#endif // CUSTOM_RGB_MATRIX
+#if defined(CUSTOM_RGBLIGHT)
+    housekeeping_task_rgb_light();
+#endif // CUSTOM_RGBLIGHT
 #ifdef I2C_SCANNER_ENABLE
     housekeeping_task_i2c_scanner();
 #endif

@@ -595,6 +595,9 @@ void display_handler_rgbsat(char *text_buffer, size_t buffer_len) {
 }
 
 static bool menu_handler_rgbval(menu_input_t input) {
+#    if defined(RGB_MATRIX_ENABLE) && defined(RGBLIGHT_CUSTOM_DRIVER)
+    return menu_handler_rm_val(input);
+#    endif
     switch (input) {
         case menu_input_left:
             rgblight_decrease_val();

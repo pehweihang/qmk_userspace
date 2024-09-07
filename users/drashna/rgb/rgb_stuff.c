@@ -12,17 +12,19 @@ void rgblight_sethsv_default_helper(uint8_t index) {
     rgblight_sethsv_at(rgblight_get_hue(), rgblight_get_sat(), rgblight_get_val(), index);
 }
 void rgblight_set_hsv_and_mode(uint8_t hue, uint8_t sat, uint8_t val, uint8_t mode) {
-    if (val > RGBLIGHT_LIMIT_VAL) {
-        val = RGBLIGHT_LIMIT_VAL;
-    }
-#ifdef RGB_MATRIX_ENABLE
+#if defined(RGB_MATRIX_ENABLE) && defined(RGBLIGHT_CUSTOM_DRIVER)
     if (val > rgb_matrix_get_val()) {
         val = rgb_matrix_get_val();
     }
-#endif
+#else  // RGB_MATRIX_ENABLE && RGBLIGHT_CUSTOM_DRIVER
     if (val > rgblight_get_val()) {
         val = rgblight_get_val();
     }
+#endif // RGB_MATRIX_ENABLE && RGBLIGHT_CUSTOM_DRIVER
+    if (val > RGBLIGHT_LIMIT_VAL) {
+        val = RGBLIGHT_LIMIT_VAL;
+    }
+
     rgblight_sethsv_noeeprom(hue, sat, val);
     // wait_us(175);  // Add a slight delay between color and mode to ensure it's processed correctly
     rgblight_mode_noeeprom(mode);
@@ -68,12 +70,20 @@ bool is_rgblight_startup_running(void) {
 #endif
 }
 
-void keyboard_post_init_rgb_light(void) {
-#ifdef RGB_MATRIX_ENABLE
+void housekeeping_task_rgb_light(void) {
+#if defined(RGB_MATRIX_ENABLE) && defined(RGBLIGHT_CUSTOM_DRIVER)
     if (rgblight_get_val() != rgb_matrix_get_val()) {
         rgblight_sethsv(rgblight_get_hue(), rgblight_get_sat(), rgb_matrix_get_val());
     }
-#endif // RGB_MATRIX_ENABLE
+#endif // RGB_MATRIX_ENABLE && RGBLIGHT_CUSTOM_DRIVER
+}
+
+void keyboard_post_init_rgb_light(void) {
+#if defined(RGB_MATRIX_ENABLE) && defined(RGBLIGHT_CUSTOM_DRIVER)
+    if (rgblight_get_val() != rgb_matrix_get_val()) {
+        rgblight_sethsv(rgblight_get_hue(), rgblight_get_sat(), rgb_matrix_get_val());
+    }
+#endif // RGB_MATRIX_ENABLE && RGBLIGHT_CUSTOM_DRIVER
 #if defined(RGBLIGHT_STARTUP_ANIMATION)
     is_enabled = rgblight_is_enabled();
     if (userspace_config.rgb_layer_change) {

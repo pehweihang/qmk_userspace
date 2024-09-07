@@ -297,3 +297,158 @@ __attribute__((weak)) uint32_t get_fattime(void) {
            ((uint32_t)rtc_time.date << 16U) | ((uint32_t)rtc_time.hour << 11U) | ((uint32_t)rtc_time.minute << 5U) |
            ((uint32_t)rtc_time.second >> 1U);
 }
+
+/**
+ * @brief Set the RTC Date and time
+ *
+ * @param year Set the year
+ * @param month Set the month
+ * @param date Set the date
+ * @param hour Set the hour
+ * @param minute Set the minute
+ * @param second Set the second
+ * @param format Set 12h or 24h format
+ * @param am_pm Set am or pm
+ * @param is_dst Set daylight saving time
+ */
+void rtc_set_time(rtc_time_t time) {
+    time.day_of_the_week = (rtc_time_day_of_the_week_t)day_of_the_week(time);
+    time.unixtime        = (uint32_t)convert_to_unixtime(time);
+
+#ifdef DS3231_RTC_DRIVER_ENABLE
+    ds3231_set_time(time);
+#endif // DS3231_RTC_DRIVER_ENABLE
+#ifdef DS1307_RTC_DRIVER_ENABLE
+    ds1307_set_time(time);
+#endif // DS1307_RTC_DRIVER_ENABLE
+#ifdef PCF8523_RTC_DRIVER_ENABLE
+    pcf8523_set_time(time);
+#endif // PCF8523_RTC_DRIVER_ENABLE
+#ifdef VENDOR_RTC_DRIVER_ENABLE
+    vendor_rtc_set_time(time);
+#endif // VENDOR_RTC_DRIVER_ENABLE
+#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+    void display_menu_set_dirty(void);
+    display_menu_set_dirty();
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
+}
+
+void rtc_year_increase(void) {
+    rtc_time_t time = rtc_read_time_struct();
+    time.year++;
+    rtc_set_time(time);
+}
+
+void rtc_year_decrease(void) {
+    rtc_time_t time = rtc_read_time_struct();
+    time.year--;
+    rtc_set_time(time);
+}
+
+void rtc_month_increase(void) {
+    rtc_time_t time = rtc_read_time_struct();
+    time.month++;
+    if (time.month > 12) {
+        time.month = 1;
+    }
+    rtc_set_time(time);
+}
+
+void rtc_month_decrease(void) {
+    rtc_time_t time = rtc_read_time_struct();
+    time.month--;
+    if (time.month < 1) {
+        time.month = 12;
+    }
+    rtc_set_time(time);
+}
+
+void rtc_date_increase(void) {
+    rtc_time_t time = rtc_read_time_struct();
+    time.date++;
+    if (time.date > pgm_read_byte(days_in_month + time.month - 1)) {
+        time.date = 1;
+    }
+    rtc_set_time(time);
+}
+
+void rtc_date_decrease(void) {
+    rtc_time_t time = rtc_read_time_struct();
+    time.date--;
+    if (time.date < 1) {
+        time.date = pgm_read_byte(days_in_month + time.month - 1);
+    }
+    rtc_set_time(time);
+}
+
+void rtc_hour_increase(void) {
+    rtc_time_t time = rtc_read_time_struct();
+    time.hour++;
+    if (time.hour > 23) {
+        time.hour = 0;
+    }
+    rtc_set_time(time);
+}
+
+void rtc_hour_decrease(void) {
+    rtc_time_t time = rtc_read_time_struct();
+    time.hour--;
+    if (time.hour < 0) {
+        time.hour = 23;
+    }
+    rtc_set_time(time);
+}
+
+void rtc_minute_increase(void) {
+    rtc_time_t time = rtc_read_time_struct();
+    time.minute++;
+    if (time.minute > 59) {
+        time.minute = 0;
+    }
+    rtc_set_time(time);
+}
+
+void rtc_minute_decrease(void) {
+    rtc_time_t time = rtc_read_time_struct();
+    time.minute--;
+    if (time.minute < 0) {
+        time.minute = 59;
+    }
+    rtc_set_time(time);
+}
+
+void rtc_second_increase(void) {
+    rtc_time_t time = rtc_read_time_struct();
+    time.second++;
+    if (time.second > 59) {
+        time.second = 0;
+    }
+    rtc_set_time(time);
+}
+
+void rtc_second_decrease(void) {
+    rtc_time_t time = rtc_read_time_struct();
+    time.second--;
+    if (time.second < 0) {
+        time.second = 59;
+    }
+    rtc_set_time(time);
+}
+
+void rtc_am_pm_toggle(void) {
+    rtc_time_t time = rtc_read_time_struct();
+    time.am_pm      = (rtc_time_am_pm_t)(time.am_pm == RTC_AM ? RTC_PM : RTC_AM);
+    rtc_set_time(time);
+}
+
+void rtc_format_toggle(void) {
+    rtc_time_t time = rtc_read_time_struct();
+    time.format     = (rtc_time_format_t)(time.format == RTC_FORMAT_12H ? RTC_FORMAT_24H : RTC_FORMAT_12H);
+    rtc_set_time(time);
+}
+
+void rtc_dst_toggle(void) {
+    rtc_time_t time = rtc_read_time_struct();
+    time.is_dst     = !time.is_dst;
+    rtc_set_time(time);
+}

@@ -1,9 +1,7 @@
 // Copyright 2021 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "action.h"
 #include "drashna.h"
-#include "keyboard.h"
 #include "sendchar.h"
 
 #ifdef LAYER_MAP_ENABLE
@@ -35,6 +33,9 @@ void keyboard_post_init_unicode(void);
 #if defined(LAYER_LOCK_ENABLE) && defined(LAYER_LOCK_IDLE_TIMEOUT)
 #    include "layer_lock.h"
 #endif
+#ifdef SPLIT_KEYBOARD
+#    include "split_util.h"
+#endif // SPLIT_KEYBOARD
 
 user_runtime_config_t user_state;
 

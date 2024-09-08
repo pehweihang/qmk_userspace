@@ -563,3 +563,9 @@
 
 #define ZSA_STARTUP E__NOTE(_DS5), E__NOTE(_D5), E__NOTE(_AS4), Q__NOTE(_F5)
 #define ZSA_GOODBYE E__NOTE(_D5), E__NOTE(_F5), E__NOTE(_C5), Q__NOTE(_AS4)
+
+#define KLOR_STARTUP_SOUND                                                                                   \
+    W__NOTE(_DS0), W__NOTE(_DS1), H__NOTE(_DS2), H__NOTE(_DS3), Q__NOTE(_DS4), Q__NOTE(_DS5), E__NOTE(_DS6), \
+        E__NOTE(_DS7), S__NOTE(_DS8), Q__NOTE(_GS0)
+
+#define KLOR_BYE_SOUND H__NOTE(_DS4), H__NOTE(_DS3), W__NOTE(_DS1)

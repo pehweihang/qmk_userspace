@@ -1642,6 +1642,8 @@ bool process_record_menu(uint16_t keycode, keyrecord_t *record) {
                 case DISPLAY_MENU:
                     return menu_handle_input(menu_input_exit);
                 case KC_ESC:
+                case KC_BSPC:
+                case KC_DEL:
                     return menu_handle_input(menu_input_back);
                 case KC_SPACE:
                 case KC_ENTER:

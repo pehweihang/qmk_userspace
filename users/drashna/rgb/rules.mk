@@ -24,3 +24,11 @@ ifeq ($(strip $(RGB_MATRIX_ENABLE)), yes)
         RGB_MATRIX_CUSTOM_USER = yes
     endif
 endif
+
+
+ifneq ($(strip $(RGBLIGHT_ENABLE)), yes)
+    ifneq ($(strip $(RGB_MATRIX_ENABLE)), yes)
+        $(info RGB_MATRIX and RGBLIGHT are not enabled.  Manually including colors as they are still needed)
+        SRC += $(QUANTUM_DIR)/color.c
+    endif
+endif

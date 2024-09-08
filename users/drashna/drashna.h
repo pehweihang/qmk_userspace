@@ -87,6 +87,10 @@ void tap_code16_nomods(uint16_t kc);
 void format_layer_bitmap_string(char *buffer, layer_state_t state, layer_state_t default_state);
 void center_text(const char *text, char *output, uint8_t width);
 
+#if !defined(RGB_MATRIX_ENABLE) && !defined(RGBLIGHT_ENABLE)
+#    include <quantum/color.h>
+#endif // !defined(RGB_MATRIX_ENABLE) && !defined(RGBLIGHT_ENABLE)
+
 typedef union {
     uint64_t raw;
     struct {

@@ -1,6 +1,5 @@
 
 #include "oled_driver.h"
-#include "oled_stuff.h"
 #include "timer.h"
 #include "util.h"
 
@@ -23,11 +22,8 @@ void render_oled_screensaver(void) {
     }
 
     // Draw frame to OLED
-#    ifdef OLED_DISPLAY_128X64
     oled_write_raw_P(screensaver[current_frame], ARRAY_SIZE(screensaver[current_frame]));
-#    else  // OLED_DISPLAY_128X32
-    oled_write_compressed_P(screensaver[current_frame]);
-#    endif // OLED_DISPLAY_128X64
+
 #else
     oled_off();
 #endif

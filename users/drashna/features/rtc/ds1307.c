@@ -113,7 +113,7 @@ bool ds1307_init(rtc_time_t *time) {
     if (true)
 #else
     if (ds1307_has_lost_power())
-#endif
+#endif // RTC_FORCE_INIT
     {
         // If there is an issue with the RTC config, then manually set the RTC time to the compile time
         // It's not exact, but it's better than nothing. Can be adjusted manually, later.

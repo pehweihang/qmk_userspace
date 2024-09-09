@@ -49,7 +49,7 @@ void housekeeping_task_rgb_matrix(void) {
         sync_timer_elapsed32(hypno_timer) > 15000) {
         rgb_matrix_mode_noeeprom(RGB_MATRIX_REST_MODE);
     }
-#endif
+#endif // RGB_MATRIX_FRAMEBUFFER_EFFECTS
 }
 
 void keyboard_post_init_rgb_matrix(void) {
@@ -57,7 +57,7 @@ void keyboard_post_init_rgb_matrix(void) {
     if (userspace_config.rgb_matrix_idle_anim) {
         rgb_matrix_mode_noeeprom(RGB_MATRIX_REST_MODE);
     }
-#endif
+#endif // RGB_MATRIX_FRAMEBUFFER_EFFECTS
     if (userspace_config.rgb_layer_change) {
         rgb_matrix_set_flags(LED_FLAG_UNDERGLOW | LED_FLAG_KEYLIGHT | LED_FLAG_INDICATOR);
     } else {
@@ -74,7 +74,7 @@ bool process_record_user_rgb_matrix(uint16_t keycode, keyrecord_t *record) {
     if (userspace_config.rgb_matrix_idle_anim && rgb_matrix_get_mode() == RGB_MATRIX_REST_MODE) {
         rgb_matrix_mode_noeeprom(RGB_MATRIX_TYPING_HEATMAP);
     }
-#endif
+#endif // RGB_MATRIX_FRAMEBUFFER_EFFECTS
     switch (keycode) {
         case RGB_IDL: // This allows me to use underglow as layer indication, or as normal
             if (record->event.pressed) {
@@ -96,7 +96,7 @@ bool process_record_user_rgb_matrix(uint16_t keycode, keyrecord_t *record) {
                 rgblight_sethsv(rgblight_get_hue(), rgblight_get_sat(), rgb_matrix_get_val());
             }
             return false;
-#endif
+#endif // RGBLIGHT_ENABLE && RGBLIGHT_CUSTOM
     }
     return true;
 }
@@ -118,7 +118,7 @@ const rgblight_driver_t rgblight_driver = {
     .init    = init,
     .setleds = setleds,
 };
-#endif
+#endif // RGBLIGHT_ENABLE && RGBLIGHT_CUSTOM
 
 __attribute__((weak)) bool rgb_matrix_indicators_advanced_keymap(uint8_t led_min, uint8_t led_max) {
     return true;
@@ -144,7 +144,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         for (uint8_t i = 0; i < RGBLIGHT_LED_COUNT; i++) {
             RGB_MATRIX_INDICATOR_SET_COLOR(led_mapping[i], led_array[i].r, led_array[i].g, led_array[i].b);
         }
-#else
+#else  // RGBLIGHT_ENABLE && RGBLIGHT_CUSTOM
         switch (get_highest_layer(layer_state & ~((layer_state_t)1 << _MOUSE))) {
             case _GAMEPAD:
                 rgb_matrix_layer_helper(HSV_ORANGE, 1, rgb_matrix_config.speed, LED_FLAG_MODIFIER, led_min, led_max);
@@ -187,7 +187,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
                 }
                 break;
         }
-#endif
+#endif // RGBLIGHT_ENABLE && RGBLIGHT_CUSTOM
     }
     return false;
 }
@@ -220,10 +220,10 @@ enum {
 #include "rgb_matrix_effects.inc"
 #ifdef RGB_MATRIX_CUSTOM_KB
 #    include "rgb_matrix_kb.inc"
-#endif
+#endif // RGB_MATRIX_CUSTOM_KB
 #ifdef RGB_MATRIX_CUSTOM_USER
 #    include "rgb_matrix_user.inc"
-#endif
+#endif // RGB_MATRIX_CUSTOM_USER
 #undef RGB_MATRIX_EFFECT
 };
 
@@ -237,10 +237,10 @@ const char *rgb_matrix_name(uint8_t effect) {
 #include "rgb_matrix_effects.inc"
 #ifdef RGB_MATRIX_CUSTOM_KB
 #    include "rgb_matrix_kb.inc"
-#endif
+#endif // RGB_MATRIX_CUSTOM_KB
 #ifdef RGB_MATRIX_CUSTOM_USER
 #    include "rgb_matrix_user.inc"
-#endif
+#endif // RGB_MATRIX_CUSTOM_USER
 #undef RGB_MATRIX_EFFECT
         default:
             return "UNKNOWN";
@@ -286,5 +286,5 @@ void rgb_matrix_idle_anim_toggle(void) {
     if (userspace_config.rgb_matrix_idle_anim) {
         rgb_matrix_mode_noeeprom(RGB_MATRIX_TYPING_HEATMAP);
     }
-#endif
+#endif // RGB_MATRIX_ENABLE && RGB_MATRIX_FRAMEBUFFER_EFFECTS
 }

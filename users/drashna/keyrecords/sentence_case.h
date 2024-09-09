@@ -75,9 +75,9 @@ bool process_sentence_case(uint16_t keycode, keyrecord_t* record);
  */
 #if SENTENCE_CASE_TIMEOUT > 0
 void sentence_case_task(void);
-#else
+#else  // SENTENCE_CASE_TIMEOUT > 0
 static inline void sentence_case_task(void) {}
-#endif
+#endif // SENTENCE_CASE_TIMEOUT > 0
 
 void sentence_case_on(void);     /**< Enables Sentence Case. */
 void sentence_case_off(void);    /**< Disables Sentence Case. */

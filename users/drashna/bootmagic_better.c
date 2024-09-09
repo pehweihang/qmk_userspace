@@ -30,8 +30,8 @@ void reset_keyboard(void);
 #        define BOOTMAGIC_DEBOUNCE (DEBOUNCE * 2)
 #    else
 #        define BOOTMAGIC_DEBOUNCE 30
-#    endif
-#endif
+#    endif // DEBOUNCE
+#endif     // BOOTMAGIC_DEBOUNCE
 
 void bootmagic_scan(void) {
     bool perform_reset = false;
@@ -47,7 +47,7 @@ void bootmagic_scan(void) {
     uint8_t row = BOOTMAGIC_ROW, col = BOOTMAGIC_COLUMN;
 #if defined(BOOTMAGIC_EEPROM_ROW) && defined(BOOTMAGIC_EEPROM_COLUMN)
     uint8_t row_e = BOOTMAGIC_EEPROM_ROW, col_e = BOOTMAGIC_EEPROM_COLUMN;
-#endif
+#endif // BOOTMAGIC_EEPROM_ROW && BOOTMAGIC_EEPROM_COLUMN
 
 #if defined(SPLIT_KEYBOARD) && defined(BOOTMAGIC_ROW_RIGHT) && defined(BOOTMAGIC_COLUMN_RIGHT)
     if (!is_keyboard_left()) {
@@ -57,16 +57,17 @@ void bootmagic_scan(void) {
         defined(BOOTMAGIC_EEPROM_COLUMN_RIGHT)
         row_e = BOOTMAGIC_EEPROM_ROW_RIGHT;
         col_e = BOOTMAGIC_EEPROM_COLUMN_RIGHT;
-#    endif
+#    endif // BOOTMAGIC_EEPROM_ROW && BOOTMAGIC_EEPROM_COLUMN && BOOTMAGIC_EEPROM_ROW_RIGHT &&
+           // BOOTMAGIC_EEPROM_COLUMN_RIGHT
     }
-#endif
+#endif // SPLIT_KEYBOARD && BOOTMAGIC_ROW_RIGHT && BOOTMAGIC_COLUMN_RIGHT
 
 #if defined(BOOTMAGIC_EEPROM_ROW) && defined(BOOTMAGIC_EEPROM_COLUMN)
     if (matrix_get_row(row_e) & (1 << col_e)) {
         eeconfig_disable();
         perform_reset = true;
     }
-#endif
+#endif // BOOTMAGIC_EEPROM_ROW && BOOTMAGIC_EEPROM_COLUMN
     if (matrix_get_row(row) & (1 << col)) {
         perform_reset = true;
     }
@@ -74,24 +75,24 @@ void bootmagic_scan(void) {
     if (!gpio_read_pin(BOOTLOADER_RESET_PIN)) {
         perform_reset = true;
     }
-#endif
+#endif // BOOTLOADER_RESET_PIN
 
     if (perform_reset) {
 #ifdef RGBLIGHT_ENABLE
         rgblight_init();
-#endif
+#endif // RGBLIGHT_ENABLE
 #ifdef RGB_MATRIX_ENABLE
         rgb_matrix_init();
-#endif
+#endif // RGB_MATRIX_ENABLE
 #ifdef LED_MATRIX_ENABLE
         led_matrix_init();
-#endif
+#endif // LED_MATRIX_ENABLE
 #ifdef BACKLIGHT_ENABLE
         backlight_init_ports();
-#endif
+#endif // BACKLIGHT_ENABLE
 #ifdef OLED_ENABLE
         oled_init(OLED_ROTATION_0);
-#endif
+#endif // OLED_ENABLE
         reset_keyboard();
     }
 }

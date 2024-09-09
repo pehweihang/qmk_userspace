@@ -122,6 +122,6 @@ void layer_lock_set_user(layer_state_t locked_layers);
  */
 #if LAYER_LOCK_IDLE_TIMEOUT > 0
 void layer_lock_task(void);
-#else
+#else  // LAYER_LOCK_IDLE_TIMEOUT > 0
 static inline void layer_lock_task(void) {}
 #endif // LAYER_LOCK_IDLE_TIMEOUT > 0

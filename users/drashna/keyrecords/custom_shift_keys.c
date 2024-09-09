@@ -41,7 +41,7 @@ bool process_custom_shift_keys(uint16_t keycode, keyrecord_t *record) {
         const uint8_t mods = get_mods();
 #ifndef NO_ACTION_ONESHOT
         if ((mods | get_weak_mods() | get_oneshot_mods()) & MOD_MASK_SHIFT) {
-#else
+#else // NO_ACTION_ONESHOT
         if ((mods | get_weak_mods()) & MOD_MASK_SHIFT) { // Shift is held.
 #endif // NO_ACTION_ONESHOT
        // Continue default handling if this is a tap-hold key being held.

@@ -16,7 +16,7 @@
 
 #ifndef PCF8523_I2C_TIMEOUT
 #    define PCF8523_I2C_TIMEOUT 10
-#endif
+#endif // !PCF8523_I2C_TIMEOUT
 
 typedef enum {
     PCF8523_TwoHours  = 0x00, /**< Offset made every two hours */

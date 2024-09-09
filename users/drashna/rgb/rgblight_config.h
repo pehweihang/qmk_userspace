@@ -9,4 +9,4 @@
 
 #ifdef RGBLIGHT_DEFAULT_MODE
 #    undef RGBLIGHT_DEFAULT_MODE
-#endif
+#endif // RGBLIGHT_DEFAULT_MODE

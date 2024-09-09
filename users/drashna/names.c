@@ -99,11 +99,11 @@ static const char *key_name_hid(uint16_t keycode, bool shifted) {
     if (keycode > KC_EQUAL) {
         return "Unknown";
     }
-#    else
+#    else  // QUANTUM_PAINTER_ENABLE
     if (keycode > KC_NUM_LOCK) {
         return "Unknown";
     }
-#    endif
+#    endif // QUANTUM_PAINTER_ENABLE
     return keycode_display_map[keycode][shifted ? 1 : 0];
 }
 #else  // __AVR__

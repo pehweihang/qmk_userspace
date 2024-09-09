@@ -14,4 +14,4 @@ void           pointing_device_mouse_jiggler_toggle(void);
 
 #ifdef POINTING_MODE_MAP_ENABLE
 extern const uint16_t PROGMEM pointing_mode_maps[POINTING_MODE_MAP_COUNT][POINTING_NUM_DIRECTIONS];
-#endif
+#endif // POINTING_MODE_MAP_ENABLE

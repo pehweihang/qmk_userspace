@@ -10,11 +10,11 @@
 
 #ifndef DYNAMIC_MACRO_COUNT
 #    define DYNAMIC_MACRO_COUNT 8
-#endif
+#endif // DYNAMIC_MACRO_COUNT
 
 #ifndef DYNAMIC_MACRO_SIZE
 #    define DYNAMIC_MACRO_SIZE 64
-#endif
+#endif // DYNAMIC_MACRO_SIZE
 
 enum dynamic_macro_recording_state {
     STATE_NOT_RECORDING,

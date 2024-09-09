@@ -12,25 +12,25 @@
 
 #if defined(RGBLIGHT_ENABLE)
 #    include "rgb/rgb_stuff.h"
-#endif
+#endif // defined(RGBLIGHT_ENABLE)
 #if defined(RGB_MATRIX_ENABLE)
 #    include "rgb/rgb_matrix_stuff.h"
-#endif
+#endif // defined(RGB_MATRIX_ENABLE)
 #if defined(OLED_ENABLE)
 #    include "display/oled/oled_stuff.h"
-#endif
+#endif // defined(OLED_ENABLE)
 #ifdef SPLIT_KEYBOARD
 #    include "split/transport_sync.h"
-#endif
+#endif // SPLIT_KEYBOARD
 #ifdef POINTING_DEVICE_ENABLE
 #    include "pointing/pointing.h"
-#endif
+#endif // POINTING_DEVICE_ENABLE
 #ifdef OS_DETECTION_ENABLE
 #    include "os_detection.h"
-#endif
+#endif // OS_DETECTION_ENABLE
 #ifdef ORBITAL_MOUSE_ENABLE
 #    include "orbital_mouse.h"
-#endif
+#endif // ORBITAL_MOUSE_ENABLE
 
 /* Define layer names */
 enum userspace_layers {
@@ -67,8 +67,8 @@ enum userspace_layers {
 #        define _DEFAULT_LAYER_3 (FIRST_DEFAULT_LAYER + 9)
 #        define _DEFAULT_LAYER_4 (FIRST_DEFAULT_LAYER + 10)
 #        define _DEFAULT_LAYER_4 (FIRST_DEFAULT_LAYER + 11)
-#    endif
-#endif
+#    endif // LAST_DEFAULT_LAYER > (FIRST_DEFAULT_LAYER + 7)
+#endif     // LAST_DEFAULT_LAYER > (FIRST_DEFAULT_LAYER + 3)
 
 #define DEFAULT_LAYER_1_HSV HSV_CYAN
 #define DEFAULT_LAYER_2_HSV HSV_CHARTREUSE

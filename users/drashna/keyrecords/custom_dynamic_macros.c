@@ -14,15 +14,15 @@
 static uint8_t macro_id        = 255;
 static uint8_t recording_state = STATE_NOT_RECORDING;
 
-#if EECONFIG_USER_DATA_SIZE < 4
+#if EECONFIG_USER_DATA_SIZE < 8
 #    error "EECONFIG_USER_DATA_SIZE not set. Don't step on others eeprom."
-#endif
+#endif // EECONFIG_USER_DATA_SIZE < 8
 #ifndef DYNAMIC_MACRO_EEPROM_BLOCK0_ADDR
-#    define DYNAMIC_MACRO_EEPROM_BLOCK0_ADDR (uint8_t*)(EECONFIG_USER_DATABLOCK + 4)
-#endif
+#    define DYNAMIC_MACRO_EEPROM_BLOCK0_ADDR (uint8_t*)(EECONFIG_USER_DATABLOCK + 8)
+#endif // DYNAMIC_MACRO_EEPROM_BLOCK0_ADDR
 
 dynamic_macro_t dynamic_macros[DYNAMIC_MACRO_COUNT];
-_Static_assert((sizeof(dynamic_macros)) <= (EECONFIG_USER_DATA_SIZE - 4),
+_Static_assert((sizeof(dynamic_macros)) <= (EECONFIG_USER_DATA_SIZE - 8),
                "User Data Size must be large enough to host all macros");
 
 __attribute__((weak)) void dynamic_macro_record_start_user(void) {}

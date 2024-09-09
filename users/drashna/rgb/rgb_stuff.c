@@ -60,14 +60,14 @@ uint32_t rgb_startup_animation(uint32_t triger_time, void *cb_arg) {
     }
     return is_rgblight_startup ? 10 : 0;
 }
-#endif
+#endif // RGBLIGHT_STARTUP_ANIMATION
 
 bool is_rgblight_startup_running(void) {
 #if defined(RGBLIGHT_STARTUP_ANIMATION)
     return is_rgblight_startup && is_keyboard_master();
-#else
+#else  // RGBLIGHT_STARTUP_ANIMATION
     return false;
-#endif
+#endif // RGBLIGHT_STARTUP_ANIMATION
 }
 
 void housekeeping_task_rgb_light(void) {
@@ -94,7 +94,7 @@ void keyboard_post_init_rgb_light(void) {
     rgblight_mode_noeeprom(RGBLIGHT_MODE_STATIC_LIGHT);
     is_rgblight_startup = true;
     rgb_startup_token   = defer_exec(300, rgb_startup_animation, NULL);
-#endif
+#endif // RGBLIGHT_STARTUP_ANIMATION
     if (userspace_config.rgb_layer_change) {
         layer_state_set_rgb_light(layer_state);
     }
@@ -127,9 +127,9 @@ layer_state_t layer_state_set_rgb_light(layer_state_t state) {
                 if (layer_state_cmp(state, _MOUSE)) {
 #    if defined(RGBLIGHT_EFFECT_TWINKLE)
                     rgblight_set_hsv_and_mode(HSV_CHARTREUSE, RGBLIGHT_MODE_TWINKLE + 5);
-#    else
+#    else  // RGBLIGHT_EFFECT_TWINKLE
                     rgblight_set_hsv_and_mode(HSV_CHARTREUSE, RGBLIGHT_MODE_BREATHING + 3);
-#    endif
+#    endif // RGBLIGHT_EFFECT_TWINKLE
                 } else {
                     default_layer_state_set_rgb_light(default_layer_state);
                 }

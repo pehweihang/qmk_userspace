@@ -20,4 +20,4 @@ void          housekeeping_task_keymap(void);
 
 #ifdef SPLIT_KEYBOARD
 void matrix_slave_scan_keymap(void);
-#endif
+#endif // SPLIT_KEYBOARD

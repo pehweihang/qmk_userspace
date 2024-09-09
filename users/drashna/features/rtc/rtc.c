@@ -14,16 +14,16 @@
 
 #ifdef DS3231_RTC_DRIVER_ENABLE
 #    include "ds3231.h"
-#endif
+#endif // DS3231_RTC_DRIVER_ENABLE
 #ifdef DS1307_RTC_DRIVER_ENABLE
 #    include "ds1307.h"
-#endif
+#endif // DS1307_RTC_DRIVER_ENABLE
 #ifdef PCF8523_RTC_DRIVER_ENABLE
 #    include "pcf8523.h"
-#endif
+#endif // PCF8523_RTC_DRIVER_ENABLE
 #ifdef VENDOR_RTC_DRIVER_ENABLE
 #    include "vendor.h"
-#endif
+#endif // VENDOR_RTC_DRIVER_ENABLE
 
 #define strncpy_nowarn(...)                                          \
     __extension__({                                                  \
@@ -199,16 +199,19 @@ void rtc_set_time_split(rtc_time_t time, bool is_connected) {
 void rtc_init(void) {
 #ifdef DS3231_RTC_DRIVER_ENABLE
     rtc_initialized = ds3231_init(&rtc_time);
-#endif
+#endif // DS3231_RTC_DRIVER_ENABLE
 #ifdef DS1307_RTC_DRIVER_ENABLE
     rtc_initialized = ds1307_init(&rtc_time);
-#endif
+#endif // DS1307_RTC_DRIVER_ENABLE
 #ifdef PCF8523_RTC_DRIVER_ENABLE
     rtc_initialized = pcf8523_init(&rtc_time);
-#endif
+#endif // PCF8523_RTC_DRIVER_ENABLE
 #ifdef VENDOR_RTC_DRIVER_ENABLE
     rtc_initialized = vendor_rtc_init(&rtc_time);
-#endif
+#endif // VENDOR_RTC_DRIVER_ENABLE
+    if (rtc_initialized) {
+        last_rtc_read = timer_read() + RTC_READ_INTERVAL;
+    }
 }
 
 /**
@@ -223,16 +226,16 @@ void rtc_task(void) {
         bool connected = false;
 #ifdef DS3231_RTC_DRIVER_ENABLE
         connected = ds3231_task(&rtc_time);
-#endif
+#endif // DS3231_RTC_DRIVER_ENABLE
 #ifdef DS1307_RTC_DRIVER_ENABLE
         connected = ds1307_task(&rtc_time);
-#endif
+#endif // DS1307_RTC_DRIVER_ENABLE
 #ifdef PCF8523_RTC_DRIVER_ENABLE
         connected = pcf8523_task(&rtc_time);
-#endif
+#endif // PCF8523_RTC_DRIVER_ENABLE
 #ifdef VENDOR_RTC_DRIVER_ENABLE
         connected = vendor_rtc_task(&rtc_time);
-#endif
+#endif // VENDOR_RTC_DRIVER_ENABLE
         if (connected) {
             last_rtc_read = timer_read() + RTC_READ_INTERVAL;
         } else {

@@ -15,7 +15,7 @@
 
 #ifndef DS1307_I2C_TIMEOUT
 #    define DS1307_I2C_TIMEOUT 10
-#endif
+#endif // !DS1307_I2C_TIMEOUT
 
 /**
  * @brief register definition

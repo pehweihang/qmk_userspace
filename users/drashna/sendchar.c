@@ -6,10 +6,10 @@
 
 #ifdef SEGGER_RTT_ENABLE
 #    include "SEGGER_RTT.h"
-#endif
+#endif // SEGGER_RTT_ENABLE
 #ifdef VIRTSER_ENABLE
 #    include "virtser.h"
-#endif
+#endif // VIRTSER_ENABLE
 
 uint32_t sendchar_timer = 0;
 
@@ -21,13 +21,13 @@ int8_t drashna_sendchar(uint8_t c) {
     ret = sendchar(c);
 #ifdef SEGGER_RTT_ENABLE
     ret = SEGGER_RTT_PutChar(0, (char)c);
-#endif
+#endif // SEGGER_RTT_ENABLE
 #ifdef VIRTSER_ENABLE
     virtser_send(c);
-#endif
+#endif // VIRTSER_ENABLE
 #if defined(DISPLAY_DRIVER_ENABLE)
     void display_sendchar_hook(uint8_t c);
     display_sendchar_hook(c);
-#endif
+#endif // DISPLAY_DRIVER_ENABLE
     return ret;
 }

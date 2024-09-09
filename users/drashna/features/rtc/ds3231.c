@@ -157,7 +157,7 @@ bool ds3231_init(rtc_time_t *time) {
     if (true)
 #else
     if (ds3231_has_lost_power())
-#endif
+#endif // RTC_FORCE_INIT
     {
         // If there is an issue with the RTC config, then manually set the RTC time to the compile time
         // It's not exact, but it's better than nothing. Can be adjusted manually, later.
@@ -199,11 +199,11 @@ char *ds3231_read_temp_str(void) {
     static char temp_str[8] = {0};
 #if PRINTF_SUPPORT_DECIMAL_SPECIFIERS
     snprintf(temp_str, sizeof(temp_str), "%2.2f", ds3231_temp);
-#else
+#else // PRINTF_SUPPORT_DECIMAL_SPECIFIERS
 #    pragma message "PRINTF_SUPPORT_DECIMAL_SPECIFIERS not enabled, RTC temperature will be rounded to nearest integer"
     uint16_t temp = (uint16_t)(ds3231_temp * 100);
     snprintf(temp_str, sizeof(temp_str), "%2d.%02d", temp / 100, temp % 100);
-#endif
+#endif // PRINTF_SUPPORT_DECIMAL_SPECIFIERS
     return temp_str;
 }
 
@@ -212,11 +212,11 @@ char *ds3231_read_temp_imperial_str(void) {
     float       temp_f      = (ds3231_temp * 9.0f / 5.0f) + 32.0f;
 #if PRINTF_SUPPORT_DECIMAL_SPECIFIERS
     snprintf(temp_str, sizeof(temp_str), "%2.2f", temp_f);
-#else
+#else // PRINTF_SUPPORT_DECIMAL_SPECIFIERS
 #    pragma message "PRINTF_SUPPORT_DECIMAL_SPECIFIERS not enabled, RTC temperature will be rounded to nearest integer"
     uint16_t temp = (uint16_t)(temp_f * 100);
     snprintf(temp_str, sizeof(temp_str), "%2d.%02d", temp / 100, temp % 100);
-#endif
+#endif // PRINTF_SUPPORT_DECIMAL_SPECIFIERS
     return temp_str;
 }
 

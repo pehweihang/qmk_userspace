@@ -68,7 +68,7 @@ bool process_select_word(uint16_t keycode, keyrecord_t* record, uint16_t sel_key
         if (!shifted) { // Select word.
 #ifdef MAC_HOTKEYS
             set_mods(MOD_BIT(KC_LALT)); // Hold Left Alt (Option).
-#else
+#else                                   // Windows/Linux.
             set_mods(MOD_BIT(KC_LCTL)); // Hold Left Ctrl.
 #endif // MAC_HOTKEYS
             if (state == STATE_NONE) {
@@ -90,8 +90,8 @@ bool process_select_word(uint16_t keycode, keyrecord_t* record, uint16_t sel_key
                 tap_code(KC_LEFT);
                 register_mods(MOD_BIT(KC_LSFT));
                 tap_code(KC_RGHT);
-#else
-                // Tap Home, then Shift + End.
+#else  // MAC_HOTKEYS
+       // Tap Home, then Shift + End.
                 clear_mods();
                 send_keyboard_report();
                 tap_code(KC_HOME);
@@ -114,7 +114,7 @@ bool process_select_word(uint16_t keycode, keyrecord_t* record, uint16_t sel_key
             unregister_code(KC_RGHT);
 #ifdef MAC_HOTKEYS
             unregister_mods(MOD_BIT(KC_LSFT) | MOD_BIT(KC_LALT));
-#else
+#else  // MAC_HOTKEYS
             unregister_mods(MOD_BIT(KC_LSFT) | MOD_BIT(KC_LCTL));
 #endif // MAC_HOTKEYS
             state = STATE_SELECTED;

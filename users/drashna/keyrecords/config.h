@@ -14,7 +14,7 @@
 
 #ifdef IS_COMMAND
 #    undef IS_COMMAND
-#endif
+#endif // IS_COMMAND
 #define IS_COMMAND() (((get_mods() | get_oneshot_mods()) & MOD_MASK_SHIFT) == MOD_MASK_SHIFT)
 
 #define UNICODE_SELECTED_MODES UNICODE_MODE_WINCOMPOSE, UNICODE_MODE_MACOS, UNICODE_MODE_LINUX
@@ -37,20 +37,20 @@
 #elif defined(ACHORDION_ENABLE)
 #    define PERMISSIVE_HOLD
 #    define QUICK_TAP_TERM_PER_KEY
-#endif
+#endif // PER_KEY_TAPPING
 
 #ifndef TAPPING_TOGGLE
 #    define TAPPING_TOGGLE 1
-#endif
+#endif // !TAPPING_TOGGLE
 #define TAP_CODE_DELAY 5
 
 /* Disable unused and unneeded features to reduce on firmware size */
 #ifdef LOCKING_SUPPORT_ENABLE
 #    undef LOCKING_SUPPORT_ENABLE
-#endif
+#endif // LOCKING_SUPPORT_ENABLE
 #ifdef LOCKING_RESYNC_ENABLE
 #    undef LOCKING_RESYNC_ENABLE
-#endif
+#endif // LOCKING_RESYNC_ENABLE
 
 #define ENABLE_COMPILE_KEYCODE
 

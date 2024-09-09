@@ -58,7 +58,7 @@
 #define ENABLE_RGB_MATRIX_CYCLE_OUT_IN_DUAL
 #if !defined(SPLIT_KEYBOARD) && !defined(KEYBOARD_ergodox_ez) && !defined(KEYBOARD_zsa)
 #    define ENABLE_RGB_MATRIX_CYCLE_OUT_IN
-#endif
+#endif // !SPLIT_KEYBOARD && !KEYBOARD_ergodox_ez && !KEYBOARD_zsa
 #if defined(__arm__) || defined(__AVR_AT90USB1286__) || defined(KEYBOARD_launchpad)
 // RGB Matrix Animation modes. Explicitly enabled
 // For full list of effects, see:

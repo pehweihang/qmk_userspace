@@ -17,7 +17,7 @@
 
 #ifndef DS3231_I2C_TIMEOUT
 #    define DS3231_I2C_TIMEOUT 10
-#endif
+#endif // !DS3231_I2C_TIMEOUT
 
 /**
  * @brief register definition

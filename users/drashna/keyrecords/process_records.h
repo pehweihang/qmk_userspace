@@ -5,22 +5,22 @@
 #include "drashna.h"
 #ifdef ACHORDION_ENABLE
 #    include "keyrecords/achordion.h"
-#endif
+#endif // ACHORDION_ENABLE
 #ifdef CUSTOM_TAP_DANCE_ENABLE
 #    include "keyrecords/custom_tap_dance.h"
 #endif // CUSTOM_TAP_DANCE_ENABLE
 #ifdef CUSTOM_SHIFT_KEYS_ENABLE
 #    include "keyrecords/custom_shift_keys.h"
-#endif
+#endif // CUSTOM_SHIFT_KEYS_ENABLE
 #ifdef SELECT_WORD_ENABLE
 #    include "keyrecords/select_word.h"
-#endif
+#endif // SELECT_WORD_ENABLE
 #ifdef SENTENCE_CASE_ENABLE
 #    include "keyrecords/sentence_case.h"
-#endif
+#endif // SENTENCE_CASE_ENABLE
 #ifdef UNICODE_COMMON_ENABLE
 #    include "keyrecords/unicode.h"
-#endif
+#endif // UNICODE_COMMON_ENABLE
 #ifdef CLAP_TRAP_ENABLE
 #    include "keyrecords/clap_trap.h"
 #endif // CLAP_TRAP_ENABLE
@@ -115,7 +115,7 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record);
 void post_process_record_keymap(uint16_t keycode, keyrecord_t *record);
 #ifdef CUSTOM_UNICODE_ENABLE
 bool process_record_unicode(uint16_t keycode, keyrecord_t *record);
-#endif
+#endif // CUSTOM_UNICODE_ENABLE
 void rgb_layer_indication_toggle(void);
 
 #define LOWER   MO(_LOWER)

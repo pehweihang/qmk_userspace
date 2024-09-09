@@ -6,33 +6,33 @@
 
 #ifdef LAYER_MAP_ENABLE
 #    include "layer_map.h"
-#endif
+#endif // LAYER_MAP_ENABLE
 #ifdef DISPLAY_DRIVER_ENABLE
 #    include "display/display.h"
 #endif // DISPLAY_DRIVER_ENABLE
 #ifdef QUANTUM_PAINTER_ENABLE
 #    include "display/painter/painter.h"
-#endif
+#endif // QUANTUM_PAINTER_ENABLE
 
 #ifdef CUSTOM_DYNAMIC_MACROS_ENABLE
 #    include "keyrecords/custom_dynamic_macros.h"
-#endif
+#endif // CUSTOM_DYNAMIC_MACROS_ENABLE
 #ifdef I2C_SCANNER_ENABLE
 void housekeeping_task_i2c_scanner(void);
 void keyboard_post_init_i2c(void);
-#endif
+#endif // I2C_SCANNER_ENABLE
 #ifdef RTC_ENABLE
 #    include "rtc.h"
-#endif
+#endif // RTC_ENABLE
 #ifdef CUSTOM_UNICODE_ENABLE
 void keyboard_post_init_unicode(void);
-#endif
+#endif // CUSTOM_UNICODE_ENABLE
 #ifdef WATCHDOG_ENABLE
 #    include "watchdog.h"
-#endif
+#endif // WATCHDOG_ENABLE
 #if defined(LAYER_LOCK_ENABLE) && defined(LAYER_LOCK_IDLE_TIMEOUT)
 #    include "layer_lock.h"
-#endif
+#endif // LAYER_LOCK_ENABLE && LAYER_LOCK_IDLE_TIMEOUT
 #ifdef SPLIT_KEYBOARD
 #    include "split_util.h"
 #endif // SPLIT_KEYBOARD
@@ -66,27 +66,27 @@ void                       keyboard_post_init_user(void) {
 #endif // DISPLAY_DRIVER_ENABLE
 #if defined(CUSTOM_RGBLIGHT)
     keyboard_post_init_rgb_light();
-#endif
+#endif // CUSTOM_RGBLIGHT
 #if defined(CUSTOM_RGB_MATRIX)
     keyboard_post_init_rgb_matrix();
-#endif
+#endif // CUSTOM_RGB_MATRIX
 #if defined(SPLIT_KEYBOARD) && defined(SPLIT_TRANSACTION_IDS_USER)
     keyboard_post_init_transport_sync();
-#endif
+#endif // SPLIT_KEYBOARD && SPLIT_TRANSACTION_IDS_USER
 #ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
     void keyboard_post_init_qp(void);
     keyboard_post_init_quantum_painter();
-#endif
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
 #ifdef I2C_SCANNER_ENABLE
     keyboard_post_init_i2c();
-#endif
+#endif // I2C_SCANNER_ENABLE
 #ifdef CUSTOM_UNICODE_ENABLE
     keyboard_post_init_unicode();
-#endif
+#endif // CUSTOM_UNICODE_ENABLE
 
 #ifdef DEBUG_MATRIX_SCAN_RATE_ENABLE
     userspace_config.matrix_scan_print = true;
-#endif
+#endif // DEBUG_MATRIX_SCAN_RATE_ENABLE
 
 #if defined(BOOTLOADER_CATERINA) && defined(__AVR__) && defined(__AVR_ATmega32U4__)
     DDRD &= ~(1 << 5);
@@ -94,16 +94,16 @@ void                       keyboard_post_init_user(void) {
 
     DDRB &= ~(1 << 0);
     PORTB &= ~(1 << 0);
-#endif
+#endif // BOOTLOADER_CATERINA && __AVR__ && __AVR_ATmega32U4__
 #ifdef CUSTOM_DYNAMIC_MACROS_ENABLE
     dynamic_macro_init();
-#endif
+#endif // CUSTOM_DYNAMIC_MACROS_ENABLE
 #ifdef RTC_ENABLE
     rtc_init();
-#endif
+#endif // RTC_ENABLE
 #ifdef WATCHDOG_ENABLE
     watchdog_init();
-#endif
+#endif // WATCHDOG_ENABLE
     keyboard_post_init_keymap();
 }
 
@@ -118,7 +118,7 @@ __attribute__((weak)) bool shutdown_keymap(bool jump_to_bootloader) {
 bool shutdown_user(bool jump_to_bootloader) {
 #ifdef WATCHDOG_ENABLE
     watchdog_shutdown();
-#endif
+#endif // WATCHDOG_ENABLE
     if (!shutdown_keymap(jump_to_bootloader)) {
         return false;
     }
@@ -130,10 +130,10 @@ bool shutdown_user(bool jump_to_bootloader) {
 #endif // RGB_MATRIX_ENABLE
 #if defined(OLED_ENABLE) && defined(CUSTOM_OLED_DRIVER)
     oled_shutdown(jump_to_bootloader);
-#endif
+#endif // OLED_ENABLE && CUSTOM_OLED_DRIVER
 #ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
     shutdown_quantum_painter();
-#endif
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
     return true;
 }
 
@@ -147,7 +147,7 @@ void suspend_power_down_user(void) {
     set_is_device_suspended(true);
 #ifdef WATCHDOG_ENABLE
     suspend_power_down_watchdog();
-#endif
+#endif // WATCHDOG_ENABLE
     if (layer_state_is(_GAMEPAD)) {
         layer_off(_GAMEPAD);
     }
@@ -159,11 +159,11 @@ void suspend_power_down_user(void) {
     }
 #ifdef OLED_ENABLE
     oled_off();
-#endif
+#endif // OLED_ENABLE
 
 #ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
     suspend_power_down_quantum_painter();
-#endif
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
 
     suspend_power_down_keymap();
 }
@@ -176,7 +176,7 @@ __attribute__((weak)) void suspend_wakeup_init_keymap(void) {}
 void                       suspend_wakeup_init_user(void) {
 #ifdef WATCHDOG_ENABLE
     suspend_wakeup_init_watchdog();
-#endif
+#endif // WATCHDOG_ENABLE
     // hack for re-enabling oleds/lights/etc when woken from usb
     void last_matrix_activity_trigger(void);
     last_matrix_activity_trigger();
@@ -184,13 +184,13 @@ void                       suspend_wakeup_init_user(void) {
     set_is_device_suspended(false);
 #ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
     suspend_wakeup_init_quantum_painter();
-#endif
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
     suspend_wakeup_init_keymap();
 }
 
 #ifdef AUDIO_ENABLE
 float doom_song[][2] = SONG(E1M1_DOOM);
-#endif
+#endif // AUDIO_ENABLE
 
 // on layer change, no matter where the change was initiated
 // Then runs keymap's layer change check
@@ -201,7 +201,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     state = update_tri_layer_state(state, _RAISE, _LOWER, _ADJUST);
 #if defined(CUSTOM_POINTING_DEVICE)
     state = layer_state_set_pointing(state);
-#endif
+#endif // CUSTOM_POINTING_DEVICE
 #if defined(CUSTOM_RGBLIGHT)
     state = layer_state_set_rgb_light(state);
 #endif // CUSTOM_RGBLIGHT
@@ -223,24 +223,24 @@ layer_state_t layer_state_set_user(layer_state_t state) {
             audio_stop_all();
         }
     }
-#endif
+#endif // AUDIO_ENABLE
     state = layer_state_set_keymap(state);
 
 #ifndef NO_PRINT
     char layer_buffer[16 + 5];
     format_layer_bitmap_string(layer_buffer, state, default_layer_state);
     dprintf("layer state: %s\n", layer_buffer);
-#endif
+#endif // NO_PRINT
 
 #ifdef LAYER_MAP_ENABLE
     set_layer_map();
-#endif
+#endif // LAYER_MAP_ENABLE
 
 #ifdef SWAP_HANDS_ENABLE
     if (is_gaming_layer_active(state) && is_swap_hands_on()) {
         swap_hands_off();
     }
-#endif
+#endif // SWAP_HANDS_ENABLE
     return state;
 }
 
@@ -251,7 +251,7 @@ __attribute__((weak)) layer_state_t default_layer_state_set_keymap(layer_state_t
 
 #if defined(AUDIO_ENABLE) && defined(DEFAULT_LAYER_SONGS)
 static float default_layer_songs[][16][2] = DEFAULT_LAYER_SONGS;
-#endif
+#endif // AUDIO_ENABLE && DEFAULT_LAYER_SONGS
 
 layer_state_t default_layer_state_set_user(layer_state_t state) {
     if (!is_keyboard_master()) {
@@ -261,7 +261,7 @@ layer_state_t default_layer_state_set_user(layer_state_t state) {
     state = default_layer_state_set_keymap(state);
 #if defined(CUSTOM_RGBLIGHT)
     state = default_layer_state_set_rgb_light(state);
-#endif
+#endif // CUSTOM_RGBLIGHT
 
     static bool has_init_been_ran = false;
     // We don't want to run this the first time it's called, since it's read from eeeprom and called
@@ -271,7 +271,7 @@ layer_state_t default_layer_state_set_user(layer_state_t state) {
         if (get_highest_layer(state) < MAX_LAYER) {
             PLAY_SONG(default_layer_songs[get_highest_layer(state)]);
         }
-#endif
+#endif // AUDIO_ENABLE && DEFAULT_LAYER_SONGS
         eeconfig_update_default_layer(state);
     } else {
         has_init_been_ran = true;
@@ -279,7 +279,7 @@ layer_state_t default_layer_state_set_user(layer_state_t state) {
 
 #ifdef LAYER_MAP_ENABLE
     set_layer_map();
-#endif
+#endif // LAYER_MAP_ENABLE
     return state;
 }
 
@@ -303,9 +303,9 @@ void                       eeconfig_init_user(void) {
     userspace_config.check            = true;
 #if defined(OLED_ENABLE)
     userspace_config.oled_brightness = OLED_BRIGHTNESS;
-#else
+#else  // OLED_ENABLE
     userspace_config.oled_brightness = 255;
-#endif
+#endif // OLED_ENABLE
     userspace_config.painter_hsv = (HSV){
         .h = 128,
         .s = 255,
@@ -329,7 +329,7 @@ void eeconfig_init_user_datablock(void) {
 #if (EECONFIG_USER_DATA_SIZE) > 8
     uint8_t eeconfig_empty_temp[(EECONFIG_USER_DATA_SIZE)-8] = {0};
     eeconfig_update_user_data(eeconfig_empty_temp);
-#endif
+#endif // (EECONFIG_USER_DATA_SIZE) > 8
 }
 
 /**
@@ -377,21 +377,21 @@ void                       housekeeping_task_user(void) {
 #ifdef AUDIO_ENABLE
         user_state.audio_enable        = is_audio_on();
         user_state.audio_clicky_enable = is_clicky_on();
-#endif
+#endif // AUDIO_ENABLE
 #if defined(POINTING_DEVICE_ENABLE) && defined(POINTING_DEVICE_AUTO_MOUSE_ENABLE)
         user_state.tap_toggling = get_auto_mouse_toggle();
-#endif
+#endif // POINTING_DEVICE_ENABLE && POINTING_DEVICE_AUTO_MOUSE_ENABLE
 #ifdef UNICODE_COMMON_ENABLE
         user_state.unicode_mode        = unicode_config.input_mode;
         user_state.unicode_typing_mode = unicode_typing_mode;
-#endif
+#endif // UNICODE_COMMON_ENABLE
 #ifdef SWAP_HANDS_ENABLE
         user_state.swap_hands = swap_hands;
-#endif
+#endif // SWAP_HANDS_ENABLE
         user_state.host_driver_disabled = get_keyboard_lock();
 #ifdef CAPS_WORD_ENABLE
         user_state.is_caps_word = is_caps_word_on();
-#endif
+#endif // CAPS_WORD_ENABLE
     }
 
 #ifdef WATCHDOG_ENABLE
@@ -399,7 +399,7 @@ void                       housekeeping_task_user(void) {
 #endif // WATCHDOG_ENABLE
 #if defined(LAYER_LOCK_ENABLE) && defined(LAYER_LOCK_IDLE_TIMEOUT)
     layer_lock_task();
-#endif
+#endif                               // LAYER_LOCK_ENABLE && LAYER_LOCK_IDLE_TIMEOUT
 #if defined(CUSTOM_TAP_DANCE_ENABLE) // Run Diablo 3 macro checking code.
     run_diablo_macro_check();
 #endif // CUSTOM_TAP_DANCE_ENABLE
@@ -411,33 +411,33 @@ void                       housekeeping_task_user(void) {
 #endif // CUSTOM_RGBLIGHT
 #ifdef I2C_SCANNER_ENABLE
     housekeeping_task_i2c_scanner();
-#endif
+#endif // I2C_SCANNER_ENABLE
 #ifdef CUSTOM_OLED_DRIVER
     housekeeping_task_oled();
-#endif
+#endif // CUSTOM_OLED_DRIVER
 #if defined(SPLIT_KEYBOARD) && defined(SPLIT_TRANSACTION_IDS_USER)
     housekeeping_task_transport_sync();
-#endif
+#endif // SPLIT_KEYBOARD && SPLIT_TRANSACTION_IDS_USER
 #ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
     housekeeping_task_quantum_painter();
-#endif
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
 #ifdef RTC_ENABLE
     rtc_task();
-#endif
+#endif // RTC_ENABLE
 #ifdef SENTENCE_CASE_ENABLE
     sentence_case_task();
-#endif
+#endif // SENTENCE_CASE_ENABLE
 #ifdef SELECT_WORD_ENABLE
     select_word_task();
-#endif
+#endif // SELECT_WORD_ENABLE
 #ifdef ACHORDION_ENABLE
     achordion_task();
-#endif
+#endif // ACHORDION_ENABLE
 #ifdef ORBITAL_MOUSE_ENABLE
     orbital_mouse_task();
-#endif
+#endif // ORBITAL_MOUSE_ENABLE
 #ifdef LAYER_MAP_ENABLE
     housekeeping_task_layer_map();
-#endif
+#endif // LAYER_MAP_ENABLE
     housekeeping_task_keymap();
 }

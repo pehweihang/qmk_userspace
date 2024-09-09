@@ -43,7 +43,7 @@
 
 #if !(0 <= ORBITAL_MOUSE_RADIUS && ORBITAL_MOUSE_RADIUS <= 63)
 #    error "Invalid ORBITAL_MOUSE_RADIUS. Value must be in [0, 63]."
-#endif
+#endif // ORBITAL_MOUSE_RADIUS
 
 #if !defined(IS_MOUSE_KEYCODE)
 // Attempt to detect out-of-date QMK installation, which would fail with
@@ -54,7 +54,7 @@
 // is enabled. Enable the mouse in your rules.mk by setting:
 //   MOUSE_ENABLE = yes
 #    error "orbital_mouse: Please set `MOUSE_ENABLE = yes` in rules.mk."
-#else
+#else // IS_MOUSE_KEYCODE && MOUSE_ENABLE
 
 enum {
     /** Number of distinct angles. */

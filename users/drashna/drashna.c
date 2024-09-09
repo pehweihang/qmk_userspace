@@ -83,7 +83,7 @@ void tap_code16_nomods(uint16_t kc) {
 
 #    ifndef I2C_SCANNER_TIMEOUT
 #        define I2C_SCANNER_TIMEOUT 50
-#    endif
+#    endif // I2C_SCANNER_TIMEOUT
 
 void do_scan(void) {
     uint8_t nDevices = 0;
@@ -121,15 +121,15 @@ void keyboard_post_init_i2c(void) {
     i2c_init();
     scan_timer = timer_read();
 }
-#endif
+#endif // I2C_SCANNER_ENABLE
 
 #if defined(AUTOCORRECT_ENABLE)
 #    if defined(AUDIO_ENABLE)
 #        ifdef USER_SONG_LIST
 float autocorrect_song[][2] = SONG(MARIO_GAMEOVER);
-#        else
+#        else // USER_SONG_LIST
 float autocorrect_song[][2] = SONG(PLOVER_GOODBYE_SOUND);
-#        endif
+#        endif // USER_SONG_LIST
 #    endif
 // 2 strings, 2q chars each + null terminator. max autocorrect length is 19 chars but 128px/6 supports 21 chars
 char autocorrected_str[2][21]     = {"    automatically\0", "      corrected\0"};
@@ -151,11 +151,11 @@ bool apply_autocorrect(uint8_t backspaces, const char *str, char *typo, char *co
     for (uint8_t i = 0; i < backspaces; i++) {
         update_wpm(KC_BSPC);
     }
-#    endif
+#    endif // WPM_ENABLE
 
 #    if defined(AUDIO_ENABLE)
     audio_play_melody(&autocorrect_song, NOTE_ARRAY_SIZE(autocorrect_song), false);
-#    endif
+#    endif // AUDIO_ENABLE
     return true;
 }
 #endif
@@ -192,8 +192,8 @@ void oneshot_locked_mods_changed_user(uint8_t mods) {
         caps_word_on();
     }
 }
-#    endif
-#endif
+#    endif // !NO_ACTION_ONESHOT
+#endif // CAPS_WORD_ENABLE
 
 /**
  * @brief Generates a string of the layer state bitmask
@@ -281,7 +281,7 @@ bool process_detected_host_os_user(os_variant_t detected_os) {
         keymap_config.swap_lctl_lgui = keymap_config.swap_rctl_rgui = os_detection_config.swap_ctl_gui;
 #    ifdef UNICODE_COMMON_ENABLE
         set_unicode_input_mode_soft(os_detection_config.unicode_input_mode);
-#    endif
+#    endif // UNICODE_COMMON_ENABLE
     }
 
     return true;
@@ -486,7 +486,7 @@ void matrix_scan_rate_task(void) {
         if (userspace_config.matrix_scan_print) {
             xprintf("matrix scan frequency: %lu\n", matrix_scan_count);
         }
-#endif
+#endif // NO_PRINT
         last_matrix_scan_count = matrix_scan_count;
         matrix_timer           = timer_read32();
         matrix_scan_count      = 0;

@@ -25,16 +25,16 @@
 
 #    if !defined(WATCHDOG_TIMEOUT)
 #        define WATCHDOG_TIMEOUT 2.0
-#    endif
+#    endif // !defined(WATCHDOG_TIMEOUT)
 
 static WDGConfig wdgcfg = {
 #    if STM32_HAS_IWDG == TRUE
     .pr = STM32_IWDG_PR_S(WATCHDOG_TIMEOUT),
-#    endif
+#    endif // STM32_HAS_IWDG
     .rlr = STM32_IWDG_RL_S(WATCHDOG_TIMEOUT),
 #    if STM32_IWDG_IS_WINDOWED == TRUE
     .winr = STM32_IWDG_WIN_DISABLED,
-#    endif
+#    endif // STM32_IWDG_IS_WINDOWED
 };
 
 void watchdog_init(void) {
@@ -84,4 +84,4 @@ void suspend_wakeup_init_watchdog(void) {
     clear_keyboard();
 }
 
-#endif
+#endif // __AVR__

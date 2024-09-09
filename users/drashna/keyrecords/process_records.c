@@ -8,16 +8,16 @@
 #include "names.h"
 #ifdef OS_DETECTION_ENABLE
 #    include "os_detection.h"
-#endif
+#endif // OS_DETECTION_ENABLE
 #ifdef CUSTOM_DYNAMIC_MACROS_ENABLE
 #    include "keyrecords/custom_dynamic_macros.h"
-#endif
+#endif // CUSTOM_DYNAMIC_MACROS_ENABLE
 #ifdef LAYER_LOCK_ENABLE
 #    include "layer_lock.h"
-#endif
+#endif // LAYER_LOCK_ENABLE
 #ifdef DISPLAY_DRIVER_ENABLE
 #    include "display/display.h"
-#endif
+#endif // DISPLAY_DRIVER_ENABLE
 
 uint16_t copy_paste_timer;
 
@@ -130,7 +130,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
         }
     }
-#endif
+#endif // ENCODER_ENABLE && SPLIT_KEYBOARD
 
     // If console is enabled, it will print the matrix position and status of each key pressed
 #ifdef KEYLOGGER_ENABLE
@@ -143,7 +143,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (!process_achordion(keycode, record)) {
         return false;
     }
-#endif
+#endif // ACHORDION_ENABLE
 
     if (!process_record_konami_code(keycode, record)) {
         return false;

@@ -55,7 +55,7 @@ bool process_select_word(uint16_t keycode, keyrecord_t* record, uint16_t sel_key
  */
 #if SELECT_WORD_TIMEOUT > 0
 void select_word_task(void);
-#else
+#else // SELECT_WORD_TIMEOUT > 0
 static inline void select_word_task(void) {}
 #endif // SELECT_WORD_TIMEOUT > 0
 

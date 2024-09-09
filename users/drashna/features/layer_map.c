@@ -23,14 +23,13 @@ void set_layer_map(void) {
 }
 
 void populate_layer_map(void) {
-    // xprintf("Layer map set\n\n");
     for (uint8_t i = 0; i < LAYER_MAP_ROWS; i++) {
         for (uint8_t j = 0; j < LAYER_MAP_COLS; j++) {
 #ifdef LAYER_MAP_REMAPPING
             keypos_t key = layer_remap[i][j];
-#else
+#else // LAYER_MAP_REMAPPING
             keypos_t key = {.row = i, .col = j};
-#endif
+#endif // LAYER_MAP_REMAPPING
 
 #ifdef SWAP_HANDS_ENABLE
             if (is_swap_hands_on()) {
@@ -38,19 +37,17 @@ void populate_layer_map(void) {
 #    ifdef LAYER_MAP_REMAPPING
                     key.row = pgm_read_byte(&hand_swap_config[layer_remap[i][j].row][layer_remap[i][j].col].row);
                     key.col = pgm_read_byte(&hand_swap_config[layer_remap[i][j].row][layer_remap[i][j].col].col);
-#    else
+#    else  // LAYER_MAP_REMAPPING
                     key.row = pgm_read_byte(&hand_swap_config[i][j].row);
                     key.col = pgm_read_byte(&hand_swap_config[i][j].col);
-#    endif
+#    endif // LAYER_MAP_REMAPPING
                 } else if (key.row == KEYLOC_ENCODER_CCW || key.row == KEYLOC_ENCODER_CW) {
                     key.col = pgm_read_byte(&encoder_hand_swap_config[key.col]);
                 }
             }
-#endif
+#endif // SWAP_HANDS_ENABLE
             layer_map[i][j] = keymap_key_to_keycode(layer_switch_get_layer(key), key);
-            // xprintf("0x%04x, ", layer_map[i][j]);
         }
-        // xprintf("\n");
     }
 #ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
     layer_map_has_updated = true;
@@ -63,12 +60,12 @@ bool peek_matrix_layer_map(uint8_t row, uint8_t col) {
         return false;
     }
     return peek_matrix(layer_remap[row][col].row, layer_remap[row][col].col, false);
-#else
+#else  // LAYER_MAP_REMAPPING
     if (row >= KEYLOC_DIP_SWITCH_OFF) {
         return false;
     }
     return peek_matrix(row, col, false);
-#endif
+#endif // LAYER_MAP_REMAPPING
 }
 
 void housekeeping_task_layer_map(void) {
@@ -78,7 +75,7 @@ void housekeeping_task_layer_map(void) {
         swap_hands    = is_swap_hands_on();
         layer_map_set = true;
     }
-#endif
+#endif // SWAP_HANDS_ENABLE
     if (layer_map_set) {
         populate_layer_map();
         layer_map_set = false;
@@ -98,4 +95,4 @@ bool via_command_kb(uint8_t *data, uint8_t length) {
     }
     return false;
 }
-#endif
+#endif // VIA_ENABLE

@@ -35,10 +35,10 @@ static bool pressed_another_key_before_release = false;
 #ifdef ACHORDION_STREAK
 // Timer for typing streak
 static uint16_t streak_timer = 0;
-#else
+#else // ACHORDION_STREAK
 // When disabled, is_streak is never true
 #    define is_streak false
-#endif
+#endif // ACHORDION_STREAK
 
 // Achordion's current state.
 enum {
@@ -62,11 +62,11 @@ static void recursively_process_record(keyrecord_t* record, uint8_t state) {
     achordion_state = STATE_RECURSING;
 #if defined(POINTING_DEVICE_ENABLE) && defined(POINTING_DEVICE_AUTO_MOUSE_ENABLE)
     int8_t mouse_key_tracker = get_auto_mouse_key_tracker();
-#endif
+#endif // POINTING_DEVICE_ENABLE && POINTING_DEVICE_AUTO_MOUSE_ENABLE
     process_record(record);
 #if defined(POINTING_DEVICE_ENABLE) && defined(POINTING_DEVICE_AUTO_MOUSE_ENABLE)
     set_auto_mouse_key_tracker(mouse_key_tracker);
-#endif
+#endif // POINTING_DEVICE_ENABLE && POINTING_DEVICE_AUTO_MOUSE_ENABLE
     achordion_state = state;
 }
 
@@ -91,7 +91,7 @@ static void update_streak_timer(uint16_t keycode, keyrecord_t* record) {
         streak_timer = 0;
     }
 }
-#endif
+#endif // ACHORDION_STREAK
 
 bool process_achordion(uint16_t keycode, keyrecord_t* record) {
     // Don't process events that Achordion generated.
@@ -140,7 +140,7 @@ bool process_achordion(uint16_t keycode, keyrecord_t* record) {
 
 #ifdef ACHORDION_STREAK
         update_streak_timer(keycode, record);
-#endif
+#endif // ACHORDION_STREAK
         return true; // Otherwise, continue with default handling.
     }
 
@@ -178,7 +178,7 @@ bool process_achordion(uint16_t keycode, keyrecord_t* record) {
         const uint16_t s_timeout = achordion_streak_chord_timeout(tap_hold_keycode, keycode);
         const bool     is_streak =
             streak_timer && s_timeout && !timer_expired(record->event.time, (streak_timer + s_timeout));
-#endif
+#endif // ACHORDION_STREAK
 
         // Press event occurred on a key other than the active tap-hold key.
 
@@ -245,7 +245,7 @@ bool process_achordion(uint16_t keycode, keyrecord_t* record) {
                 pressed_another_key_before_release = false;
                 return false;
             }
-#endif
+#endif // ACHORDION_STREAK
         }
 
         recursively_process_record(record, achordion_state); // Re-process event.
@@ -255,7 +255,7 @@ bool process_achordion(uint16_t keycode, keyrecord_t* record) {
 #ifdef ACHORDION_STREAK
     // update idle timer on regular keys event
     update_streak_timer(keycode, record);
-#endif
+#endif // ACHORDION_STREAK
     return true;
 }
 
@@ -270,16 +270,16 @@ void achordion_task(void) {
     if (streak_timer && timer_expired(timer_read(), (streak_timer + MAX_STREAK_TIMEOUT))) {
         streak_timer = 0; // Expired.
     }
-#endif
+#endif // ACHORDION_STREAK
 }
 
 // Returns true if `pos` on the left hand of the keyboard, false if right.
 static bool on_left_hand(keypos_t pos) {
 #ifdef SPLIT_KEYBOARD
     return pos.row < MATRIX_ROWS / 2;
-#else
+#else // SPLIT_KEYBOARD
     return (MATRIX_COLS > MATRIX_ROWS) ? pos.col < MATRIX_COLS / 2 : pos.row < MATRIX_ROWS / 2;
-#endif
+#endif // SPLIT_KEYBOARD
 }
 
 bool achordion_opposite_hands(const keyrecord_t* tap_hold_record, const keyrecord_t* other_record) {
@@ -331,4 +331,4 @@ __attribute__((weak)) uint16_t achordion_streak_chord_timeout(uint16_t tap_hold_
 __attribute__((weak)) uint16_t achordion_streak_timeout(uint16_t tap_hold_keycode) {
     return 200;
 }
-#endif
+#endif // ACHORDION_STREAK

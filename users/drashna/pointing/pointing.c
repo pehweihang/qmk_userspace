@@ -11,28 +11,28 @@ static uint16_t mouse_debounce_timer = 0;
 
 #ifdef TAPPING_TERM_PER_KEY
 #    define TAP_CHECK get_tapping_term(KC_BTN1, NULL)
-#else
+#else // TAPPING_TERM_PER_KEY
 #    ifndef TAPPING_TERM
 #        define TAPPING_TERM 200
 #    endif
 #    define TAP_CHECK TAPPING_TERM
-#endif
+#endif // TAPPING_TERM_PER_KEY
 
 #ifndef POINTING_DEVICE_ACCEL_CURVE_A
-#    define POINTING_DEVICE_ACCEL_CURVE_A 7 // steepness of accel curve
-#endif
+#    define POINTING_DEVICE_ACCEL_CURVE_A 7
+#endif // POINTING_DEVICE_ACCEL_CURVE_A
 #ifndef POINTING_DEVICE_ACCEL_CURVE_B
-#    define POINTING_DEVICE_ACCEL_CURVE_B 0.05 // X-offset of accel curve
-#endif
+#    define POINTING_DEVICE_ACCEL_CURVE_B 0.05
+#endif // POINTING_DEVICE_ACCEL_CURVE_B
 #ifndef POINTING_DEVICE_ACCEL_CURVE_C
-#    define POINTING_DEVICE_ACCEL_CURVE_C 0.3 // Y-offset of accel curve
-#endif
+#    define POINTING_DEVICE_ACCEL_CURVE_C 0.3
+#endif // POINTING_DEVICE_ACCEL_CURVE_C
 #ifndef POINTING_DEVICE_ACCEL_CURVE_D
-#    define POINTING_DEVICE_ACCEL_CURVE_D .1 // speed scaling factor
-#endif
+#    define POINTING_DEVICE_ACCEL_CURVE_D 0.1
+#endif // POINTING_DEVICE_ACCEL_CURVE_D
 #ifndef POINTING_DEVICE_ACCEL_HISTORY_TIME
-#    define POINTING_DEVICE_ACCEL_HISTORY_TIME 100 // milliseconds of history to keep
-#endif
+#    define POINTING_DEVICE_ACCEL_HISTORY_TIME 100
+#endif // POINTING_DEVICE_ACCEL_HISTORY_TIME
 #define POINTING_DEVICE_ACCEL_ACCUM
 
 #ifndef MOUSE_JIGGLER_THRESHOLD
@@ -142,7 +142,7 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
             maccel_accum_y += 1;
         }
         pd_dprintf("maccel accum: x: %3f, y: %3f\n", maccel_accum_x, maccel_accum_y);
-#endif // MACCEL_ACCUM
+#endif // POINTING_DEVICE_ACCEL_ACCUM
         mouse_report.x = x;
         mouse_report.y = y;
     }
@@ -234,4 +234,4 @@ enum keymap_pointing_mode_maps_index {
 const uint16_t PROGMEM pointing_mode_maps[POINTING_MODE_MAP_COUNT][POINTING_NUM_DIRECTIONS] = {
     [_PM_BROW] = POINTING_MODE_LAYOUT(C(S(KC_PGUP)), C(S(KC_TAB)), C(KC_TAB), C(S(KC_PGDN))),
     [_PM_APP]  = POINTING_MODE_LAYOUT(KC_NO, A(S(KC_TAB)), A(KC_TAB), KC_NO)};
-#endif
+#endif // POINTING_MODE_MAP_ENABLE

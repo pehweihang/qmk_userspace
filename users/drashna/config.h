@@ -24,7 +24,7 @@
 #    define C13 PAL_LINE(GPIOC, 13)
 #    define C14 PAL_LINE(GPIOC, 14)
 #    define C15 PAL_LINE(GPIOC, 15)
-#endif
+#endif // CONVERT_TO_PROTON_C
 
 /* --- PRINTF_BYTE_TO_BINARY macro's --- */
 #define PRINTF_BINARY_PATTERN_INT8 "%c%c%c%c%c%c%c%c"

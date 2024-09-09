@@ -180,22 +180,22 @@ void user_transport_update(void) {
 #ifdef UNICODE_COMMON_ENABLE
         unicode_config.input_mode = user_state.unicode_mode;
         unicode_typing_mode       = user_state.unicode_typing_mode;
-#endif
+#endif // UNICODE_COMMON_ENABLE
 #if defined(POINTING_DEVICE_ENABLE) && defined(POINTING_DEVICE_AUTO_MOUSE_ENABLE)
         if (get_auto_mouse_toggle() != user_state.tap_toggling) {
             auto_mouse_toggle();
         }
-#endif
+#endif // POINTING_DEVICE_ENABLE && POINTING_DEVICE_AUTO_MOUSE_ENABLE
 #ifdef SWAP_HANDS_ENABLE
         swap_hands = user_state.swap_hands;
-#endif
+#endif // SWAP_HANDS_ENABLE
 #ifdef CAPS_WORD_ENABLE
         if (user_state.is_caps_word) {
             caps_word_on();
         } else {
             caps_word_off();
         }
-#endif
+#endif // CAPS_WORD_ENABLE
         set_keyboard_lock(user_state.host_driver_disabled);
     }
 }
@@ -213,10 +213,10 @@ void user_transport_sync(void) {
         bool            needs_sync  = false;
 #if defined(DISPLAY_DRIVER_ENABLE) && defined(DISPLAY_KEYLOGGER_ENABLE)
         static char keylog_temp[DISPLAY_KEYLOGGER_LENGTH + 1] = {0};
-#endif
+#endif // DISPLAY_DRIVER_ENABLE && DISPLAY_KEYLOGGER_ENABLE
 #if defined(AUTOCORRECT_ENABLE)
         static char temp_autocorrected_str[2][22] = {0};
-#endif
+#endif // AUTOCORRECT_ENABLE
         if (timer_elapsed32(last_sync[5]) > FORCED_SYNC_THROTTLE_MS && !is_device_suspended()) {
             transaction_rpc_send(RPC_ID_USER_SUSPEND_STATE_SYNC, sizeof(bool), &needs_sync);
             last_sync[5] = timer_read32();
@@ -298,7 +298,7 @@ void user_transport_sync(void) {
             }
             needs_sync = false;
         }
-#endif
+#endif // DISPLAY_DRIVER_ENABLE && DISPLAY_KEYLOGGER_ENABLE
 #if defined(AUTOCORRECT_ENABLE)
         if (memcmp(&autocorrected_str, &temp_autocorrected_str, sizeof(autocorrected_str))) {
             needs_sync = true;
@@ -315,7 +315,7 @@ void user_transport_sync(void) {
             }
             needs_sync = false;
         }
-#endif
+#endif // AUTOCORRECT_ENABLE
     }
 }
 

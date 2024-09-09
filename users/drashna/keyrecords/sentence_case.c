@@ -29,7 +29,7 @@
 // by default, but are disabled by `#define NO_ACTION_ONESHOT` in config.h. If
 // your config.h includes such a line, please remove it.
 #    error "sentence_case: Please enable oneshot."
-#else
+#else // NO_ACTION_ONESHOT
 
 // Number of keys of state history to retain for backspacing.
 #    define STATE_HISTORY_SIZE 6
@@ -122,14 +122,14 @@ bool is_sentence_case_on(void) {
 // Constrain timeout to a sensible range. With the 16-bit timer, the longest
 // representable timeout is 32768 ms, rounded here to 30000 ms = half a minute.
 #            error "sentence_case: SENTENCE_CASE_TIMEOUT must be between 100 and 30000 ms"
-#        endif
+#        endif // SENTENCE_CASE_TIMEOUT < 100 || SENTENCE_CASE_TIMEOUT > 30000
 
 void sentence_case_task(void) {
     if (idle_timer && timer_expired(timer_read(), idle_timer)) {
         clear_state_history(); // Timed out; clear all state.
     }
 }
-#    endif // SENTENCE_CASE_TIMEOUT > 0
+#    endif     // SENTENCE_CASE_TIMEOUT > 0
 
 bool process_sentence_case(uint16_t keycode, keyrecord_t* record) {
     // Only process while enabled, and only process press events.
@@ -298,7 +298,7 @@ bool sentence_case_just_typed_P(const uint16_t* buffer, const uint16_t* pattern,
         }
     }
     return true;
-#    else
+#    else  // SENTENCE_CASE_BUFFER_SIZE > 1
     return false;
 #    endif // SENTENCE_CASE_BUFFER_SIZE > 1
 }

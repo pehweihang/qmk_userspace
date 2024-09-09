@@ -1613,6 +1613,7 @@ bool process_record_menu(uint16_t keycode, keyrecord_t *record) {
             // Exclude hold keycode
             if (!record->tap.count) {
                 keep_processing = true;
+                break;
             }
             keycode = QK_LAYER_TAP_GET_TAP_KEYCODE(keycode);
             break;

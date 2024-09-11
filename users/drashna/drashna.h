@@ -111,8 +111,7 @@ typedef union {
         uint32_t reserved             : 6;
         bool     check                : 1;
         HSV      painter_hsv;
-        uint8_t  reserved2 : 7;
-        bool     check1    : 1;
+        uint8_t  painter_offset : 8;
     };
 } userspace_config_t;
 

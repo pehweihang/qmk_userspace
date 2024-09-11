@@ -261,6 +261,10 @@ uint8_t painter_get_val(void) {
     return userspace_config.painter_hsv.v;
 }
 
+uint8_t painter_get_hue_offset(void) {
+    return userspace_config.painter_offset;
+}
+
 void painter_increase_hue_helper(bool write_to_eeprom) {
     painter_sethsv_eeprom_helper(qadd8(userspace_config.painter_hsv.h, PAINTER_HUE_STEP),
                                  userspace_config.painter_hsv.s, userspace_config.painter_hsv.v, write_to_eeprom);
@@ -327,4 +331,38 @@ void painter_decrease_val_noeeprom(void) {
 }
 void painter_decrease_val(void) {
     painter_decrease_val_helper(true);
+}
+
+void painter_increase_hue_offset_helper(bool write_to_eeprom) {
+    userspace_config.painter_offset = qadd8(userspace_config.painter_offset, PAINTER_HUE_STEP);
+    if (write_to_eeprom) {
+        eeconfig_update_user_config(&userspace_config.raw);
+    }
+    dprintf("painter set offset [%s]: %u\n", (write_to_eeprom) ? "EEPROM" : "NOEEPROM",
+            userspace_config.painter_offset);
+}
+
+void painter_increase_hue_offset_noeeprom(void) {
+    painter_increase_hue_offset_helper(false);
+}
+
+void painter_increase_hue_offset(void) {
+    painter_increase_hue_offset_helper(true);
+}
+
+void painter_decrease_hue_offset_helper(bool write_to_eeprom) {
+    userspace_config.painter_offset = qsub8(userspace_config.painter_offset, PAINTER_HUE_STEP);
+    if (write_to_eeprom) {
+        eeconfig_update_user_config(&userspace_config.raw);
+    }
+    dprintf("painter set offset [%s]: %u\n", (write_to_eeprom) ? "EEPROM" : "NOEEPROM",
+            userspace_config.painter_offset);
+}
+
+void painter_decrease_hue_offset_noeeprom(void) {
+    painter_decrease_hue_offset_helper(false);
+}
+
+void painter_decrease_hue_offset(void) {
+    painter_decrease_hue_offset_helper(true);
 }

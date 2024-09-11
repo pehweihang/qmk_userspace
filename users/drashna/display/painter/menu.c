@@ -181,8 +181,25 @@ static bool menu_handler_display_val(menu_input_t input) {
     }
 }
 
+void display_handler_display_hue_offset(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%d", painter_get_hue_offset());
+}
+
+static bool menu_handler_display_hue_offset(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            painter_decrease_hue_offset();
+            return false;
+        case menu_input_right:
+            painter_increase_hue_offset();
+            return false;
+        default:
+            return true;
+    }
+}
+
 void display_handler_display_val(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%d", painter_get_val());
+    snprintf(text_buffer, buffer_len - 1, "%d", painter_get_hue_offset());
 }
 
 menu_entry_t display_option_entries[] = {
@@ -215,6 +232,12 @@ menu_entry_t display_option_entries[] = {
         .text                  = "Display Value",
         .child.menu_handler    = menu_handler_display_val,
         .child.display_handler = display_handler_display_val,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Display Hue Offset",
+        .child.menu_handler    = menu_handler_display_hue_offset,
+        .child.display_handler = display_handler_display_hue_offset,
     },
 };
 
@@ -1692,24 +1715,24 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
         menu_entry_t *menu     = get_current_menu();
         menu_entry_t *selected = get_selected_menu_item();
         HSV           hsv      = painter_get_hsv();
+        uint8_t       hue      = hsv.h + userspace_config.painter_offset;
 
         uint16_t y = start_y;
-        qp_rect(display, start_x, y, render_width, y + 2, hsv.h, hsv.s, hsv.v, true);
-        y += 5;
+        qp_rect(display, start_x, y, render_width, y + 3, hsv.h, hsv.s, hsv.v, true);
+        y += 6;
         qp_drawtext_recolor(display, start_x + 4, y, font_oled, menu->text, hsv.h, hsv.s, hsv.v, 0, 0, 0);
         y += font_oled->line_height + 2;
         qp_rect(display, start_x, y, render_width, y + 3, hsv.h, hsv.s, hsv.v, true);
-        y += 7;
+        y += 6;
         for (int i = 0; i < menu->parent.child_count; ++i) {
             menu_entry_t *child = &menu->parent.children[i];
             uint16_t      x     = start_x + 2 + qp_textwidth(font_oled, ">");
             if (child == selected) {
-                qp_rect(display, start_x, y - 2, render_width, y + font_oled->line_height + 1, hsv.h, hsv.s, hsv.v,
-                        true);
-                qp_drawtext_recolor(display, start_x + 1, y, font_oled, ">", 0, 0, 0, hsv.h, hsv.s, hsv.v);
+                qp_rect(display, start_x, y - 2, render_width, y + font_oled->line_height + 1, hue, hsv.s, hsv.v, true);
+                qp_drawtext_recolor(display, start_x + 1, y, font_oled, ">", 0, 0, 0, hue, hsv.s, hsv.v);
                 x += qp_drawtext_recolor(display, x, y, font_oled,
-                                         truncate_text(child->text, render_width, font_oled, false, true), 0, 0, 0,
-                                         hsv.h, hsv.s, hsv.v);
+                                         truncate_text(child->text, render_width, font_oled, false, true), 0, 0, 0, hue,
+                                         hsv.s, hsv.v);
             } else {
                 x += qp_drawtext_recolor(display, x, y, font_oled,
                                          truncate_text(child->text, render_width, font_oled, false, true), hsv.h, hsv.s,
@@ -1718,7 +1741,7 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
             if (child->flags & menu_flag_is_parent) {
                 if (child == selected) {
                     qp_drawtext_recolor(display, render_width - (qp_textwidth(font_oled, ">") + 2), y, font_oled, ">",
-                                        0, 0, 0, hsv.h, hsv.s, hsv.v);
+                                        0, 0, 0, hue, hsv.s, hsv.v);
                 } else {
                     qp_drawtext_recolor(display, render_width - (qp_textwidth(font_oled, ">") + 2), y, font_oled, ">",
                                         hsv.h, hsv.s, hsv.v, 0, 0, 0);
@@ -1729,7 +1752,7 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
                 child->child.display_handler(val, sizeof(val));
                 snprintf(buf, sizeof(buf), ": %s", val);
                 if (child == selected) {
-                    qp_drawtext_recolor(display, x, y, font_oled, buf, 0, 0, 0, hsv.h, hsv.s, hsv.v);
+                    qp_drawtext_recolor(display, x, y, font_oled, buf, 0, 0, 0, hue, hsv.s, hsv.v);
                 } else {
                     qp_drawtext_recolor(display, x, y, font_oled, buf, hsv.h, hsv.s, hsv.v, 0, 0, 0);
                 }

@@ -426,7 +426,7 @@ static bool menu_handler_rm_hue(menu_input_t input) {
 }
 
 void display_handler_rm_hue(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_hue());
+    snprintf(text_buffer, buffer_len - 1, "%d", rgb_matrix_get_hue());
 }
 
 static bool menu_handler_rm_sat(menu_input_t input) {
@@ -443,7 +443,7 @@ static bool menu_handler_rm_sat(menu_input_t input) {
 }
 
 void display_handler_rm_sat(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_sat());
+    snprintf(text_buffer, buffer_len - 1, "%d", rgb_matrix_get_sat());
 }
 
 static bool menu_handler_rm_val(menu_input_t input) {
@@ -460,7 +460,7 @@ static bool menu_handler_rm_val(menu_input_t input) {
 }
 
 void display_handler_rm_val(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_val());
+    snprintf(text_buffer, buffer_len - 1, "%d", rgb_matrix_get_val());
 }
 
 static bool menu_handler_rm_speed(menu_input_t input) {
@@ -477,7 +477,7 @@ static bool menu_handler_rm_speed(menu_input_t input) {
 }
 
 void display_handler_rm_speed(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_speed());
+    snprintf(text_buffer, buffer_len - 1, "%d", rgb_matrix_get_speed());
 }
 
 static bool menu_handler_rgb_idle(menu_input_t input) {
@@ -597,7 +597,7 @@ static bool menu_handler_rgbhue(menu_input_t input) {
 }
 
 void display_handler_rgbhue(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%d", (int)rgblight_get_hue());
+    snprintf(text_buffer, buffer_len - 1, "%d", rgblight_get_hue());
 }
 
 static bool menu_handler_rgbsat(menu_input_t input) {
@@ -614,7 +614,7 @@ static bool menu_handler_rgbsat(menu_input_t input) {
 }
 
 void display_handler_rgbsat(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%d", (int)rgblight_get_sat());
+    snprintf(text_buffer, buffer_len - 1, "%d", rgblight_get_sat());
 }
 
 static bool menu_handler_rgbval(menu_input_t input) {
@@ -634,7 +634,7 @@ static bool menu_handler_rgbval(menu_input_t input) {
 }
 
 void display_handler_rgbval(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%d", (int)rgblight_get_val());
+    snprintf(text_buffer, buffer_len - 1, "%d", rgblight_get_val());
 }
 
 static bool menu_handler_rgbspeed(menu_input_t input) {
@@ -651,7 +651,7 @@ static bool menu_handler_rgbspeed(menu_input_t input) {
 }
 
 void display_handler_rgbspeed(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%d", (int)rgblight_get_speed());
+    snprintf(text_buffer, buffer_len - 1, "%d", rgblight_get_speed());
 }
 
 menu_entry_t rgb_light_entries[] = {
@@ -733,7 +733,7 @@ static bool menu_handler_bl_level(menu_input_t input) {
 }
 
 void display_handler_bl_level(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%d", (int)get_backlight_level());
+    snprintf(text_buffer, buffer_len - 1, "%d", get_backlight_level());
 }
 
 menu_entry_t backlight_entries[] = {
@@ -937,7 +937,7 @@ static bool menu_handler_dpi_config(menu_input_t input) {
 }
 
 void display_handler_dpi_config(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%d", (int)charybdis_get_pointer_default_dpi());
+    snprintf(text_buffer, buffer_len - 1, "%d", charybdis_get_pointer_default_dpi());
 }
 #    endif
 
@@ -1718,13 +1718,10 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
         uint8_t       hue      = hsv.h + userspace_config.painter_offset;
 
         uint16_t y = start_y;
-        qp_rect(display, start_x, y, render_width, y + 3, hsv.h, hsv.s, hsv.v, true);
-        y += 6;
-        qp_drawtext_recolor(display, start_x + 4, y, font_oled, menu->text, hsv.h, hsv.s, hsv.v, 0, 0, 0);
-        y += font_oled->line_height + 2;
-        qp_rect(display, start_x, y, render_width, y + 3, hsv.h, hsv.s, hsv.v, true);
-        y += 6;
-        for (int i = 0; i < menu->parent.child_count; ++i) {
+        qp_rect(display, start_x, y, render_width, y + 6 + font_oled->line_height + 1, hsv.h, hsv.s, hsv.v, true);
+        qp_drawtext_recolor(display, start_x + 4, y + 4, font_oled, menu->text, 0, 0, 0, hsv.h, hsv.s, hsv.v);
+        y += font_oled->line_height + 10;
+        for (uint8_t i = 0; i < menu->parent.child_count; ++i) {
             menu_entry_t *child = &menu->parent.children[i];
             uint16_t      x     = start_x + 2 + qp_textwidth(font_oled, ">");
             if (child == selected) {

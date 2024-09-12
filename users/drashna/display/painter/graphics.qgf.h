@@ -14,32 +14,11 @@ extern const uint8_t  gfx_windows_logo[404];
 extern const uint32_t gfx_linux_logo_length;
 extern const uint8_t  gfx_linux_logo[214];
 
-extern const uint32_t gfx_cg_off_length;
-extern const uint8_t  gfx_cg_off[940];
+extern const uint32_t gfx_gamepad_24x24_length;
+extern const uint8_t  gfx_gamepad_24x24[102];
 
-extern const uint32_t gfx_cg_on_length;
-extern const uint8_t  gfx_cg_on[243];
-
-extern const uint32_t gfx_lock_NUM_OFF_length;
-extern const uint8_t  gfx_lock_NUM_OFF[286];
-
-extern const uint32_t gfx_lock_NUM_ON_length;
-extern const uint8_t  gfx_lock_NUM_ON[302];
-
-extern const uint32_t gfx_lock_caps_OFF_length;
-extern const uint8_t  gfx_lock_caps_OFF[288];
-
-extern const uint32_t gfx_lock_caps_ON_length;
-extern const uint8_t  gfx_lock_caps_ON[291];
-
-extern const uint32_t gfx_lock_scrl_ON_length;
-extern const uint8_t  gfx_lock_scrl_ON[296];
-
-extern const uint32_t gfx_lock_scrl_OFF_length;
-extern const uint8_t  gfx_lock_scrl_OFF[292];
-
-extern const uint32_t gfx_mouse_icon_length;
-extern const uint8_t  gfx_mouse_icon[99];
+extern const uint32_t gfx_mouse_24x24_length;
+extern const uint8_t  gfx_mouse_24x24[96];
 
 extern const uint32_t gfx_nyan_cat_length;
 extern const uint8_t  gfx_nyan_cat[43015];

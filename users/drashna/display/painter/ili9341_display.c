@@ -86,20 +86,11 @@ void init_display_ili9341(void) {
     font_mono    = qp_load_font_mem(font_ProggyTiny15);
     font_oled    = qp_load_font_mem(font_oled_font);
 
-    // ters1 = qp_load_image_mem(gfx_ters1);
-    lock_caps_on  = qp_load_image_mem(gfx_lock_caps_ON);
-    lock_caps_off = qp_load_image_mem(gfx_lock_caps_OFF);
-    lock_num_on   = qp_load_image_mem(gfx_lock_NUM_ON);
-    lock_num_off  = qp_load_image_mem(gfx_lock_NUM_OFF);
-    lock_scrl_on  = qp_load_image_mem(gfx_lock_scrl_ON);
-    lock_scrl_off = qp_load_image_mem(gfx_lock_scrl_OFF);
-    // test_anim = qp_load_image_mem(gfx_test_anim);
-    // matrix = qp_load_image_mem(gfx_matrix);
     windows_logo = qp_load_image_mem(gfx_windows_logo);
     apple_logo   = qp_load_image_mem(gfx_apple_logo);
     linux_logo   = qp_load_image_mem(gfx_linux_logo);
 
-    mouse_icon = qp_load_image_mem(gfx_mouse_icon);
+    mouse_icon = qp_load_image_mem(gfx_mouse_24x24);
 
     ili9341_display =
         qp_ili9341_make_spi_device(240, 320, DISPLAY_CS_PIN, DISPLAY_DC_PIN, DISPLAY_RST_PIN, DISPLAY_SPI_DIVIDER, 0);
@@ -242,11 +233,11 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             }
             qp_rect(ili9341_display, xpos, ypos, max_cpi_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
-        // if (hue_redraw) {
-        //     xpos = 160;
-        //     qp_rect(ili9341_display, xpos, ypos, xpos + 10, ypos + 10, 0, 0, 200, true);
-        //     qp_drawimage(ili9341_display, xpos, ypos, mouse_icon);
-        // }
+        if (hue_redraw) {
+            qp_rect(ili9341_display, xpos, ypos, xpos + mouse_icon->width - 1, ypos + mouse_icon->height - 1, 0, 0, 200,
+                    true);
+            qp_drawimage_recolor(ili9341_display, xpos, ypos, mouse_icon, curr_hsv.h, curr_hsv.s, curr_hsv.v, 0, 0, 0);
+        }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Pointing Device Drag Scroll

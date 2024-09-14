@@ -315,54 +315,11 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
         ypos += font_oled->line_height + 4;
         static keymap_config_t last_keymap_config = {0};
-        bool                   keymap_redraw      = false;
-#if defined(OS_DETECTION_ENABLE)
-        static os_variant_t last_os_mode = OS_UNSURE;
-        if (last_os_mode != detected_host_os()) {
-            last_os_mode  = detected_host_os();
-            keymap_redraw = true;
-        }
-#elif defined(UNICODE_COMMON_ENABLE)
-        static uint8_t last_unicode_mode = 0xFF;
-        if (last_unicode_mode != get_unicode_input_mode()) {
-            last_unicode_mode = get_unicode_input_mode();
-            keymap_redraw     = true;
-        }
-#endif
-        if (hue_redraw || last_keymap_config.raw != keymap_config.raw || keymap_redraw) {
+        if (hue_redraw || last_keymap_config.raw != keymap_config.raw) {
             last_keymap_config.raw  = keymap_config.raw;
             static int max_bpm_xpos = 0;
             xpos                    = 5;
-#if defined(OS_DETECTION_ENABLE)
-            switch (last_os_mode) {
-                case OS_WINDOWS:
-                case OS_WINDOWS_UNSURE:
-                    qp_drawimage(ili9341_display, xpos, ypos, windows_logo);
-                    break;
-                case OS_MACOS:
-                case OS_IOS:
-                    qp_drawimage(ili9341_display, xpos, ypos, apple_logo);
-                    break;
-                default:
-                    qp_drawimage(ili9341_display, xpos, ypos, linux_logo);
-                    break;
-            }
-#elif defined(UNICODE_COMMON_ENABLE)
-            switch (last_unicode_mode) {
-                case UNICODE_MODE_WIN:
-                case UNICODE_MODE_WINC:
-                    qp_drawimage(ili9341_display, xpos, ypos, windows_logo);
-                    break;
-                case UNICODE_MODE_MAC:
-                    qp_drawimage(ili9341_display, xpos, ypos, apple_logo);
-                    break;
-                default:
-                    qp_drawimage(ili9341_display, xpos, ypos, linux_logo);
-                    break;
-            }
-#else  // OS_DETECTION_ENABLE
             qp_drawimage(ili9341_display, xpos, ypos, last_keymap_config.swap_lctl_lgui ? apple_logo : windows_logo);
-#endif // OS_DETECTION_ENABLE
             xpos += windows_logo->width + 5;
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char*)"NKRO",
                                         last_keymap_config.nkro ? 153 : 255, 255, 255, 0, 0, 0) +

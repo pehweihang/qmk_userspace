@@ -71,10 +71,8 @@ void render_frame(painter_device_t display) {
                         truncate_text(title, title_width, font_thintel, false, false), 0, 0, 0, hsv.h, hsv.s, hsv.v);
 }
 
-__attribute__((weak)) void init_display_ili9341_inversion(painter_device_t display) {
-    qp_comms_start(display);
-    qp_comms_command(display, ILI9XXX_CMD_INVERT_ON);
-    qp_comms_stop(display);
+__attribute__((weak)) bool init_display_ili9341_inversion(void) {
+    return false;
 }
 
 /**
@@ -108,7 +106,11 @@ void init_display_ili9341(void) {
     qp_rect(ili9341_display, 0, 0, width - 1, height - 1, 0, 0, 0, true);
 
     // if needs inversion, run it only afetr the clear and rect functions or otherwise it won't work
-    init_display_ili9341_inversion(ili9341_display);
+    if (init_display_ili9341_inversion()) {
+        qp_comms_start(ili9341_display);
+        qp_comms_command(ili9341_display, ILI9XXX_CMD_INVERT_ON);
+        qp_comms_stop(ili9341_display);
+    }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Initial render of frame/logo
 

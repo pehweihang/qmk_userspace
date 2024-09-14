@@ -1052,7 +1052,7 @@ static bool menu_handler_keycode_disable_gui(menu_input_t input) {
 }
 
 void display_handler_keycode_disable_gui(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%s", keymap_config.no_gui ? "disabled" : "enabled");
+    snprintf(text_buffer, buffer_len - 1, "%s", keymap_config.no_gui ? "enabled" : "disabled");
 }
 
 __attribute__((unused)) static bool menu_handler_keycode_grave_esc(menu_input_t input) {

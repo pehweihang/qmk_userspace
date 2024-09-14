@@ -132,7 +132,7 @@ bool shutdown_user(bool jump_to_bootloader) {
     oled_shutdown(jump_to_bootloader);
 #endif // OLED_ENABLE && CUSTOM_OLED_DRIVER
 #ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
-    shutdown_quantum_painter();
+    shutdown_quantum_painter(jump_to_bootloader);
 #endif // CUSTOM_QUANTUM_PAINTER_ENABLE
     return true;
 }

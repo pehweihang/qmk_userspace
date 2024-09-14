@@ -813,3 +813,11 @@ __attribute__((weak)) void ili9341_draw_user(void) {
     }
     qp_flush(ili9341_display);
 }
+
+bool ili9341_display_shutdown(bool jump_to_bootloader) {
+    painter_image_handle_t frame = NULL;
+    frame                        = qp_load_image_mem(gfx_samurai_cyberpunk_minimal_dark_8k_b3_240x320);
+    qp_drawimage_recolor(ili9341_display, 0, 0, frame, 0, 0, 255, 0, 0, 0);
+    qp_flush(ili9341_display);
+    return false;
+}

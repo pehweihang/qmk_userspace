@@ -13,7 +13,7 @@ void housekeeping_task_quantum_painter(void);
 void keyboard_post_init_quantum_painter(void);
 void suspend_power_down_quantum_painter(void);
 void suspend_wakeup_init_quantum_painter(void);
-void shutdown_quantum_painter(void);
+void shutdown_quantum_painter(bool jump_to_bootloader);
 
 char* truncate_text(const char* text, uint16_t max_width, painter_font_handle_t font, bool from_start,
                     bool add_ellipses);

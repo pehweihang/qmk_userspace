@@ -203,7 +203,12 @@ void suspend_wakeup_init_quantum_painter(void) {
     qp_backlight_enable();
 }
 
-void shutdown_quantum_painter(void) {
+void shutdown_quantum_painter(bool jump_to_bootloader) {
+#ifdef QUANTUM_PAINTER_ILI9341_ENABLE
+    if (!ili9341_display_shutdown(jump_to_bootloader)) {
+        return;
+    }
+#endif // QUANTUM_PAINTER_ILI9341_ENABLE
 #ifdef BACKLIGHT_ENABLE
     qp_backlight_disable();
 #elif defined(BACKLIGHT_PIN)

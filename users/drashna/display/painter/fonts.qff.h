@@ -11,3 +11,6 @@ extern const uint32_t font_ProggyTiny15_length;
 extern const uint8_t  font_ProggyTiny15[1080];
 extern const uint32_t font_oled_font_length;
 extern const uint8_t  font_oled_font[890];
+
+extern const uint32_t font_proggy_clean_15_length;
+extern const uint8_t  font_proggy_clean_15[1427];

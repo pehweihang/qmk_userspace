@@ -815,9 +815,35 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 }
 
 bool ili9341_display_shutdown(bool jump_to_bootloader) {
+    painter_font_handle_t font_proggy = qp_load_font_mem(font_proggy_clean_15);
+    uint16_t              width, height, ypos = 240;
+    qp_get_geometry(ili9341_display, &width, &height, NULL, NULL, NULL);
     painter_image_handle_t frame = NULL;
-    frame                        = qp_load_image_mem(gfx_samurai_cyberpunk_minimal_dark_8k_b3_240x320);
-    qp_drawimage_recolor(ili9341_display, 0, 0, frame, 0, 0, 255, 0, 0, 0);
+    qp_rect(ili9341_display, 0, 0, width - 1, height - 1, 0, 0, 0, true);
+    frame = qp_load_image_mem(gfx_qmk_logo_220x220);
+    qp_drawimage_recolor(ili9341_display, 10, 10, frame, 0, 0, 255, 0, 0, 0);
+
+    char title[50] = {0};
+    snprintf(title, sizeof(title), "%s", "Please Stand By...");
+    uint8_t title_width = qp_textwidth(font_proggy, title);
+    uint8_t title_xpos  = (width - title_width) / 2;
+    qp_drawtext_recolor(ili9341_display, title_xpos, ypos, font_proggy,
+                        truncate_text(title, title_width, font_proggy, false, false), 0, 0, 255, 0, 0, 0);
+    ypos += font_proggy->line_height + 4;
+    snprintf(title, sizeof(title), "%s", jump_to_bootloader ? "Jumping to Bootloader..." : "Shutting Down...");
+    title_width = qp_textwidth(font_proggy, title);
+    title_xpos  = (width - title_width) / 2;
+    qp_drawtext_recolor(ili9341_display, title_xpos, ypos, font_proggy,
+                        truncate_text(title, title_width, font_proggy, false, false), 0, 0, 255, 0, 0, 0);
+    ypos += font_proggy->line_height + 4;
+    if (!eeconfig_is_enabled()) {
+        snprintf(title, sizeof(title), "%s", "Reinitialiing EEPROM...");
+        title_width = qp_textwidth(font_proggy, title);
+        title_xpos  = (width - title_width) / 2;
+        qp_drawtext_recolor(ili9341_display, title_xpos, ypos, font_proggy,
+                            truncate_text(title, title_width, font_proggy, false, false), 0, 0, 255, 0, 0, 0);
+        ypos += font_proggy->line_height + 4;
+    }
     qp_flush(ili9341_display);
     return false;
 }

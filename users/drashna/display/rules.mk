@@ -26,6 +26,7 @@ endif
 ifeq ($(strip $(QUANTUM_PAINTER_ENABLE)), yes)
     SRC += \
         $(USER_PATH)/display/painter/fonts.qff.c \
+        $(USER_PATH)/display/painter/graphics/qmk_logo_220x220.qgf.c \
         $(USER_PATH)/display/painter/graphics/asuka-240x320.qgf.c \
         $(USER_PATH)/display/painter/graphics/anime-girl-jacket-240x320.qgf.c \
         $(USER_PATH)/display/painter/graphics/neon-genesis-evangelion-initial-machine-240x320.qgf.c \

@@ -237,7 +237,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             qp_rect(ili9341_display, xpos, ypos, max_cpi_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
         if (hue_redraw) {
-            qp_rect(ili9341_display, xpos, ypos, xpos + mouse_icon->width - 1, ypos + mouse_icon->height - 1, 0, 0, 200,
+            xpos = max_cpi_xpos + 5;
+            qp_rect(ili9341_display, xpos, ypos, xpos + mouse_icon->width - 1, ypos + mouse_icon->height - 1, 0, 0, 0,
                     true);
             qp_drawimage_recolor(ili9341_display, xpos, ypos, mouse_icon, curr_hsv.h, curr_hsv.s, curr_hsv.v, 0, 0, 0);
         }

@@ -215,7 +215,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Pointing Device CPI
 
-#ifdef POINTING_DEVICE_ENABLE
+#if defined(POINTING_DEVICE_ENABLE) && \
+    (defined(KEYBOARD_bastardkb_charybdis) || defined(KEYBOARD_handwired_tractyl_manuform))
         static uint16_t last_cpi   = {0xFFFF};
         uint16_t        curr_cpi   = charybdis_get_pointer_sniping_enabled() ? charybdis_get_pointer_sniping_dpi()
                                                                              : charybdis_get_pointer_default_dpi();
@@ -585,8 +586,71 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 #endif // AUTOCORRECT_ENABLE
 
         ypos += font_oled->line_height + 1;
-        static bool force_full_block_redraw = false;
 
+        // Keylogger
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#ifdef DISPLAY_KEYLOGGER_ENABLE // keep at very end
+        static uint32_t last_klog_update = 0;
+        if (timer_elapsed32(last_klog_update) > 125 || keylogger_has_changed) {
+            last_klog_update      = timer_read32();
+            keylogger_has_changed = true;
+        }
+
+        ypos = height - (font_mono->line_height + 2);
+        if (keylogger_has_changed) {
+            static int max_klog_xpos = 0;
+            xpos                     = 27;
+            snprintf(buf, sizeof(buf), "Keylogger: %s", display_keylogger_string);
+
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_mono, buf, 0, 255, 0, curr_hsv.h, curr_hsv.s,
+                                        curr_hsv.v);
+
+            if (max_klog_xpos < xpos) {
+                max_klog_xpos = xpos;
+            }
+            // qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 255, true);
+            keylogger_has_changed = false;
+        }
+#endif // DISPLAY_KEYLOGGER_ENABLE
+
+        // RTC
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#ifdef RTC_ENABLE
+        ypos -= (font_oled->line_height + 3);
+        static uint16_t rtc_timer  = 0;
+        bool            rtc_redraw = false;
+        if (timer_elapsed(rtc_timer) > 125 && rtc_is_connected()) {
+            rtc_timer  = timer_read();
+            rtc_redraw = true;
+        }
+        if (hue_redraw || rtc_redraw) {
+            static uint16_t max_rtc_xpos = 0;
+            xpos                         = 5;
+            if (rtc_is_connected()) {
+                snprintf(buf, sizeof(buf), "RTC Date/Time: %s", rtc_read_date_time_str());
+            } else {
+                snprintf(buf, sizeof(buf), "RTC Device Not Connected");
+            }
+
+            uint8_t title_width = qp_textwidth(font_oled, buf);
+            if (title_width > (width - 6)) {
+                title_width = width - 6;
+            }
+            uint8_t title_xpos = (width - title_width) / 2;
+
+            xpos += qp_drawtext_recolor(ili9341_display, title_xpos, ypos, font_oled, buf, curr_hsv.h, curr_hsv.s,
+                                        curr_hsv.v, 0, 0, 0);
+            if (max_rtc_xpos < xpos) {
+                max_rtc_xpos = xpos;
+            }
+            qp_rect(ili9341_display, xpos, ypos, max_rtc_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
+        }
+#endif // RTC_ENABLE
+
+        static bool force_full_block_redraw = false;
+        ypos -= SURFACE_MENU_HEIGHT + 1;
         //        if (render_menu(ili9341_display, 2, ypos, width - 1, height - (font_oled->line_height * 2 + 6))) {
         if (render_menu(menu_surface, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT)) {
             force_full_block_redraw = true;
@@ -611,6 +675,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 block_redraw            = true;
             }
 
+            qp_rect(menu_surface, 0, 0, SURFACE_MENU_WIDTH - 1, 0, curr_hsv.h, curr_hsv.s, curr_hsv.v, true);
             surface_ypos += 3;
             xpos = 3;
             switch (userspace_config.display_mode) {
@@ -682,66 +747,11 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 default:
                     break;
             }
+            qp_rect(menu_surface, 0, SURFACE_MENU_HEIGHT - 1, SURFACE_MENU_WIDTH - 1, SURFACE_MENU_HEIGHT - 1,
+                    curr_hsv.h, curr_hsv.s, curr_hsv.v, true);
         }
         qp_surface_draw(menu_surface, ili9341_display, 2, ypos, false);
 
-        // Keylogger
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifdef DISPLAY_KEYLOGGER_ENABLE // keep at very end
-        static uint32_t last_klog_update = 0;
-        if (timer_elapsed32(last_klog_update) > 125 || keylogger_has_changed) {
-            last_klog_update      = timer_read32();
-            keylogger_has_changed = true;
-        }
-
-        ypos = height - (font_mono->line_height + 2);
-        if (keylogger_has_changed) {
-            static int max_klog_xpos = 0;
-            xpos                     = 27;
-            snprintf(buf, sizeof(buf), "Keylogger: %s", display_keylogger_string);
-
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_mono, buf, 0, 255, 0, curr_hsv.h, curr_hsv.s,
-                                        curr_hsv.v);
-
-            if (max_klog_xpos < xpos) {
-                max_klog_xpos = xpos;
-            }
-            // qp_rect(ili9341_display, xpos, ypos, max_klog_xpos, ypos + font->line_height, 0, 0, 255, true);
-            keylogger_has_changed = false;
-        }
-#endif // DISPLAY_KEYLOGGER_ENABLE
-
-        // RTC
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifdef RTC_ENABLE
-        ypos -= (font_oled->line_height + 3);
-        static uint16_t rtc_timer  = 0;
-        bool            rtc_redraw = false;
-        if (timer_elapsed(rtc_timer) > 125 && rtc_is_connected()) {
-            rtc_timer  = timer_read();
-            rtc_redraw = true;
-        }
-        if (hue_redraw || rtc_redraw) {
-            static uint16_t max_rtc_xpos = 0;
-            xpos                         = 5;
-            snprintf(buf, sizeof(buf), "RTC Date/Time: %s", rtc_read_date_time_str());
-
-            uint8_t title_width = qp_textwidth(font_oled, buf);
-            if (title_width > (width - 6)) {
-                title_width = width - 6;
-            }
-            uint8_t title_xpos = (width - title_width) / 2;
-
-            xpos += qp_drawtext_recolor(ili9341_display, title_xpos, ypos, font_oled, buf, curr_hsv.h, curr_hsv.s,
-                                        curr_hsv.v, 0, 0, 0);
-            if (max_rtc_xpos < xpos) {
-                max_rtc_xpos = xpos;
-            }
-            qp_rect(ili9341_display, xpos, ypos, max_rtc_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
-        }
-#endif // RTC_ENABLE
     } else {
 #ifdef SPLIT_KEYBOARD
         if (!is_transport_connected()) {

@@ -39,7 +39,7 @@ painter_image_handle_t windows_logo, apple_logo, linux_logo;
 painter_image_handle_t mouse_icon;
 
 #define SURFACE_MENU_WIDTH  236
-#define SURFACE_MENU_HEIGHT 124
+#define SURFACE_MENU_HEIGHT 120
 
 uint8_t menu_buffer[SURFACE_REQUIRED_BUFFER_BYTE_SIZE(SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT, 16)];
 
@@ -650,8 +650,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 #endif // RTC_ENABLE
 
         static bool force_full_block_redraw = false;
-        ypos -= SURFACE_MENU_HEIGHT + 1;
-        //        if (render_menu(ili9341_display, 2, ypos, width - 1, height - (font_oled->line_height * 2 + 6))) {
+        ypos -= SURFACE_MENU_HEIGHT + 4;
         if (render_menu(menu_surface, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT)) {
             force_full_block_redraw = true;
         } else {
@@ -670,12 +669,14 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             }
 
             if (force_full_block_redraw) {
-                qp_rect(menu_surface, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT, 0, 0, 0, true);
+                qp_rect(menu_surface, 0, 0, SURFACE_MENU_WIDTH - 1, SURFACE_MENU_HEIGHT - 1, 0, 0, 0, true);
+                qp_rect(menu_surface, 0, 0, SURFACE_MENU_WIDTH - 1, 0, curr_hsv.h, curr_hsv.s, curr_hsv.v, true);
+                qp_rect(menu_surface, 0, SURFACE_MENU_HEIGHT - 1, SURFACE_MENU_WIDTH - 1, SURFACE_MENU_HEIGHT - 1,
+                        curr_hsv.h, curr_hsv.s, curr_hsv.v, true);
                 force_full_block_redraw = false;
                 block_redraw            = true;
             }
 
-            qp_rect(menu_surface, 0, 0, SURFACE_MENU_WIDTH - 1, 0, curr_hsv.h, curr_hsv.s, curr_hsv.v, true);
             surface_ypos += 3;
             xpos = 3;
             switch (userspace_config.display_mode) {
@@ -747,8 +748,6 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 default:
                     break;
             }
-            qp_rect(menu_surface, 0, SURFACE_MENU_HEIGHT - 1, SURFACE_MENU_WIDTH - 1, SURFACE_MENU_HEIGHT - 1,
-                    curr_hsv.h, curr_hsv.s, curr_hsv.v, true);
         }
         qp_surface_draw(menu_surface, ili9341_display, 2, ypos, false);
 

@@ -88,7 +88,7 @@ void init_display_ili9341(void) {
     apple_logo   = qp_load_image_mem(gfx_apple_logo);
     linux_logo   = qp_load_image_mem(gfx_linux_logo);
 
-    mouse_icon = qp_load_image_mem(gfx_mouse_24x24);
+    mouse_icon = qp_load_image_mem(gfx_mouse_icon);
 
     ili9341_display =
         qp_ili9341_make_spi_device(240, 320, DISPLAY_CS_PIN, DISPLAY_DC_PIN, DISPLAY_RST_PIN, DISPLAY_SPI_DIVIDER, 0);
@@ -164,6 +164,10 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
         if (hue_redraw) {
             render_frame(ili9341_display);
+            qp_rect(ili9341_display, width - mouse_icon->width - 6, 5, width - 6, 5 + mouse_icon->height - 1, 0, 0, 0,
+                    true);
+            qp_drawimage_recolor(ili9341_display, width - mouse_icon->width - 6, 5, mouse_icon, curr_hsv.h, curr_hsv.s,
+                                 curr_hsv.v, 0, 0, 0);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -235,12 +239,6 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 max_cpi_xpos = xpos;
             }
             qp_rect(ili9341_display, xpos, ypos, max_cpi_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
-        }
-        if (hue_redraw) {
-            xpos = max_cpi_xpos + 5;
-            qp_rect(ili9341_display, xpos, ypos, xpos + mouse_icon->width - 1, ypos + mouse_icon->height - 1, 0, 0, 0,
-                    true);
-            qp_drawimage_recolor(ili9341_display, xpos, ypos, mouse_icon, curr_hsv.h, curr_hsv.s, curr_hsv.v, 0, 0, 0);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

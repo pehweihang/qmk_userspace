@@ -180,7 +180,15 @@ void housekeeping_task_quantum_painter(void) {
 #endif
 }
 void keyboard_post_init_quantum_painter(void) {
-#if !defined(BACKLIGHT_ENABLE) && defined(BACKLIGHT_PIN)
+#if defined(BACKLIGHT_ENABLE)
+    if (!is_backlight_enabled()) {
+        backlight_enable();
+        backlight_level_noeeprom(get_backlight_level());
+    }
+    if (get_backlight_level() == 0) {
+        backlight_level(BACKLIGHT_LEVELS);
+    }
+#elif !defined(BACKLIGHT_ENABLE) && defined(BACKLIGHT_PIN)
     gpio_set_pin_output_push_pull(BACKLIGHT_PIN);
     gpio_write_pin_high(BACKLIGHT_PIN);
 #endif

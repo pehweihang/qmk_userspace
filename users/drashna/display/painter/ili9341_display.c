@@ -39,7 +39,7 @@ painter_image_handle_t windows_logo, apple_logo, linux_logo;
 painter_image_handle_t mouse_icon;
 
 #define SURFACE_MENU_WIDTH  236
-#define SURFACE_MENU_HEIGHT 120
+#define SURFACE_MENU_HEIGHT 121
 
 uint8_t menu_buffer[SURFACE_REQUIRED_BUFFER_BYTE_SIZE(SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT, 16)];
 

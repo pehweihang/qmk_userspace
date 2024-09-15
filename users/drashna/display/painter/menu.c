@@ -1426,7 +1426,24 @@ menu_entry_t buy_more_entries[] = {
         .parent.children    = keymap_config_entries,
         .parent.child_count = ARRAY_SIZE(keymap_config_entries),
     },
-#ifdef RTC_ENABLE
+#if defined(RTC_ENABLE) && !defined(DISPLAY_MENU_NO_RTC)
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "RTC Config",
+        .parent.children    = rtc_config_entries,
+        .parent.child_count = ARRAY_SIZE(rtc_config_entries),
+    },
+#endif // RTC_ENABLE
+};
+
+menu_entry_t buy_more_entries_less[] = {
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "Keymap Config",
+        .parent.children    = keymap_config_entries,
+        .parent.child_count = ARRAY_SIZE(keymap_config_entries),
+    },
+#if defined(RTC_ENABLE) && !defined(DISPLAY_MENU_NO_RTC)
     {
         .flags              = menu_flag_is_parent,
         .text               = "RTC Config",
@@ -1439,67 +1456,64 @@ menu_entry_t buy_more_entries[] = {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Root menu
 
+#define MENU_ENTRY_PARENT(display_text, child)                  \
+    [__COUNTER__] = {.flags              = menu_flag_is_parent, \
+                     .text               = display_text,        \
+                     .parent.children    = child,               \
+                     .parent.child_count = ARRAY_SIZE(child)}
+
 menu_entry_t root_entries[] = {
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "Display Option",
-        .parent.children    = display_option_entries,
-        .parent.child_count = ARRAY_SIZE(display_option_entries),
-    },
+    MENU_ENTRY_PARENT("Display Option", display_option_entries),
 #ifdef UNICODE_COMMON_ENABLE
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "Unicode Settings",
-        .parent.children    = unicode_entries,
-        .parent.child_count = ARRAY_SIZE(unicode_entries),
-    },
+    MENU_ENTRY_PARENT("Unicode Settings", unicode_entries),
 #endif // UNICODE_COMMON_ENABLE
 #ifdef RGB_MATRIX_ENABLE
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "RGB Matrix Settings",
-        .parent.children    = rgb_matrix_entries,
-        .parent.child_count = ARRAY_SIZE(rgb_matrix_entries),
-    },
+    MENU_ENTRY_PARENT("RGB Matrix Settings", rgb_matrix_entries),
 #endif // RGB_MATRIX_ENABLE
 #ifdef RGBLIGHT_ENABLE
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "RGB Light Settings",
-        .parent.children    = rgb_light_entries,
-        .parent.child_count = ARRAY_SIZE(rgb_light_entries),
-    },
+    MENU_ENTRY_PARENT("RGB Light Settings", rgb_light_entries),
 #endif // RGBLIGHT_ENABLE
 #ifdef BACKLIGHT_ENABLE
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "Backlight Settings",
-        .parent.children    = backlight_entries,
-        .parent.child_count = ARRAY_SIZE(backlight_entries),
-    },
+    MENU_ENTRY_PARENT("Backlight Settings", backlight_entries),
 #endif // BACKLIGHT_ENABLE
 #ifdef AUDIO_ENABLE
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "Audio Settings",
-        .parent.children    = audio_entries,
-        .parent.child_count = ARRAY_SIZE(audio_entries),
-    },
+    MENU_ENTRY_PARENT("Audio Settings", audio_entries),
 #endif // AUDIO_ENABLE
 #ifdef POINTING_DEVICE_ENABLE
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "Pointing Device Settings",
-        .parent.children    = pointing_entries,
-        .parent.child_count = ARRAY_SIZE(pointing_entries),
-    },
+    MENU_ENTRY_PARENT("Pointing Device Settings", pointing_entries),
 #endif // POINTING_DEVICE_ENABLE
+#if __COUNTER__ < 7
+#    define DISPLAY_MENU_NO_KEYMAP
     {
         .flags              = menu_flag_is_parent,
-        .text               = "More...",
+        .text               = "Keymap Config",
+        .parent.children    = keymap_config_entries,
+        .parent.child_count = ARRAY_SIZE(keymap_config_entries),
+    },
+#endif
+#if __COUNTER__ < 7 && defined(RTC_ENABLE)
+#    define DISPLAY_MENU_NO_RTC
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "RTC Config",
+        .parent.children    = rtc_config_entries,
+        .parent.child_count = ARRAY_SIZE(rtc_config_entries),
+    },
+#endif
+#if __COUNTER__ >= 8 && !defined(DISPLAY_MENU_NO_KEYMAP) && !defined(DISPLAY_MENU_NO_RTC)
+
+    {
+        .flags = menu_flag_is_parent,
+        .text  = "More...",
+#    if defined(DISPLAY_MENU_NO_KEYMAP)
+        .parent.children    = buy_more_entries_less,
+        .parent.child_count = ARRAY_SIZE(buy_more_entries),
+#    else
         .parent.children    = buy_more_entries,
         .parent.child_count = ARRAY_SIZE(buy_more_entries),
+#    endif
     },
+#endif
 };
 
 _Static_assert(ARRAY_SIZE(root_entries) <= 8, "Too many root menu entries");

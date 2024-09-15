@@ -1718,9 +1718,9 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
         uint8_t       hue      = hsv.h + userspace_config.painter_offset;
 
         uint16_t y = start_y;
-        qp_rect(display, start_x, y, render_width, y + 6 + font_oled->line_height + 1, hsv.h, hsv.s, hsv.v, true);
+        qp_rect(display, start_x, y, render_width, y + 6 + font_oled->line_height + 2, hsv.h, hsv.s, hsv.v, true);
         qp_drawtext_recolor(display, start_x + 4, y + 4, font_oled, menu->text, 0, 0, 0, hsv.h, hsv.s, hsv.v);
-        y += font_oled->line_height + 10;
+        y += font_oled->line_height + 11;
         for (uint8_t i = 0; i < menu->parent.child_count; ++i) {
             menu_entry_t *child = &menu->parent.children[i];
             uint16_t      x     = start_x + 2 + qp_textwidth(font_oled, ">");

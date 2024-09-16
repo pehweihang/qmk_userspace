@@ -23,5 +23,3 @@ extern const uint8_t  gfx_mouse_24x24[96];
 extern const uint32_t gfx_mouse_icon_length;
 extern const uint8_t  gfx_mouse_icon[68];
 
-extern const uint32_t gfx_nyan_cat_length;
-extern const uint8_t  gfx_nyan_cat[43015];

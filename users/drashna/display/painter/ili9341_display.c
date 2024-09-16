@@ -36,6 +36,7 @@ painter_image_handle_t lock_caps_on, lock_caps_off;
 painter_image_handle_t lock_num_on, lock_num_off;
 painter_image_handle_t lock_scrl_on, lock_scrl_off;
 painter_image_handle_t windows_logo, apple_logo, linux_logo;
+painter_image_handle_t shift_icon, control_icon, alt_icon, command_icon, windows_icon;
 painter_image_handle_t mouse_icon;
 
 #define SURFACE_MENU_WIDTH  236
@@ -88,6 +89,12 @@ void init_display_ili9341(void) {
     apple_logo   = qp_load_image_mem(gfx_apple_logo);
     linux_logo   = qp_load_image_mem(gfx_linux_logo);
 
+    shift_icon   = qp_load_image_mem(gfx_shift_icon);
+    control_icon = qp_load_image_mem(gfx_control_icon);
+    alt_icon     = qp_load_image_mem(gfx_alt_icon);
+    command_icon = qp_load_image_mem(gfx_command_icon);
+    windows_icon = qp_load_image_mem(gfx_windows_icon);
+
     mouse_icon = qp_load_image_mem(gfx_mouse_icon);
 
     ili9341_display =
@@ -131,10 +138,15 @@ __attribute__((weak)) void ili9341_draw_user(void) {
     bool hue_redraw = false;
 
     static HSV last_hsv = {0};
+    static uint8_t last_hue_offset = 0;
     HSV        curr_hsv = painter_get_hsv();
     if (memcmp(&last_hsv, &curr_hsv, sizeof(HSV)) != 0) {
         memcpy(&last_hsv, &curr_hsv, sizeof(HSV));
         hue_redraw = true;
+    }
+    if (last_hue_offset != painter_get_hue_offset()) {
+        last_hue_offset = painter_get_hue_offset();
+        hue_redraw      = true;
     }
 
     uint16_t width;
@@ -142,16 +154,13 @@ __attribute__((weak)) void ili9341_draw_user(void) {
     qp_get_geometry(ili9341_display, &width, &height, NULL, NULL, NULL);
 
 #if defined(RGB_MATRIX_ENABLE) || defined(RGBLIGHT_ENABLE)
-    bool rgb_redraw = false;
 #    if defined(RGB_MATRIX_ENABLE)
     if (has_rgb_matrix_config_changed()) {
-        rgb_redraw = true;
         display_menu_set_dirty();
     }
 #    endif
 #    if defined(RGBLIGHT_ENABLE)
     if (has_rgblight_config_changed()) {
-        rgb_redraw = true;
         display_menu_set_dirty();
     }
 #    endif
@@ -317,8 +326,12 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
         ypos += font_oled->line_height + 4;
         static keymap_config_t last_keymap_config = {0};
-        if (hue_redraw || last_keymap_config.raw != keymap_config.raw) {
+        bool                   keymap_config_redraw = false;
+        if (last_keymap_config.raw != keymap_config.raw) {
             last_keymap_config.raw  = keymap_config.raw;
+            keymap_config_redraw    = true;
+        }
+        if (hue_redraw || keymap_config_redraw) {
             static int max_bpm_xpos = 0;
             xpos                    = 5;
             qp_drawimage(ili9341_display, xpos, ypos, last_keymap_config.swap_lctl_lgui ? apple_logo : windows_logo);
@@ -395,25 +408,57 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         ypos += font_oled->line_height + 4;
         static uint8_t last_mods    = {0};
         uint8_t        current_mods = get_mods() | get_weak_mods() | get_oneshot_mods();
-        if (hue_redraw || last_mods != current_mods) {
+        if (hue_redraw || last_mods != current_mods || keymap_config_redraw) {
             last_mods                    = current_mods;
             static uint16_t max_mod_xpos = 0;
             xpos                         = 5;
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char*)"Modifiers:", 153, 255,
-                                        255, 255, 255, 0) +
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char*)"Modifiers:", curr_hsv.h,
+                                        curr_hsv.s, curr_hsv.v, 0, 0, 0) +
                     5;
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char*)"Shift",
-                                        last_mods & MOD_MASK_SHIFT ? 153 : 255, 255, 255, 255, 255, 0) +
-                    5;
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char*)"Control",
-                                        last_mods & MOD_MASK_CTRL ? 153 : 255, 255, 255, 255, 255, 0) +
-                    5;
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char*)"Alt",
-                                        last_mods & MOD_MASK_ALT ? 153 : 255, 255, 255, 255, 255, 0) +
-                    5;
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char*)"GUI",
-                                        last_mods & MOD_MASK_GUI ? 153 : 255, 255, 255, 255, 255, 0) +
-                    5;
+
+            if (qp_drawimage_recolor(ili9341_display, xpos, ypos, shift_icon,
+                                     curr_hsv.h + (last_mods & MOD_BIT_LSHIFT ? painter_get_hue_offset() : 0),
+                                     curr_hsv.s, last_mods & MOD_BIT_LSHIFT ? curr_hsv.v : (curr_hsv.v / 3), 0, 0, 0)) {
+                xpos += shift_icon->width + 5;
+            }
+            if (qp_drawimage_recolor(ili9341_display, xpos, ypos,
+                                     keymap_config.swap_lctl_lgui ? command_icon : windows_icon,
+                                     curr_hsv.h + (last_mods & MOD_BIT_LGUI ? painter_get_hue_offset() : 0), curr_hsv.s,
+                                     last_mods & MOD_BIT_LGUI ? curr_hsv.v : (curr_hsv.v / 3), 0, 0, 0)) {
+                xpos += windows_icon->width + 5;
+            }
+            if (qp_drawimage_recolor(ili9341_display, xpos, ypos, alt_icon,
+                                     curr_hsv.h + (last_mods & MOD_BIT_LALT ? painter_get_hue_offset() : 0), curr_hsv.s,
+                                     last_mods & MOD_BIT_LALT ? curr_hsv.v : (curr_hsv.v / 3), 0, 0, 0)) {
+                xpos += alt_icon->width + 5;
+            }
+            if (qp_drawimage_recolor(ili9341_display, xpos, ypos, control_icon,
+                                     curr_hsv.h + (last_mods & MOD_BIT_LCTRL ? painter_get_hue_offset() : 0),
+                                     curr_hsv.s, last_mods & MOD_BIT_LCTRL ? curr_hsv.v : (curr_hsv.v / 3), 0, 0, 0)) {
+                xpos += control_icon->width + 5;
+            }
+            if (qp_drawimage_recolor(ili9341_display, xpos, ypos, control_icon,
+                                     curr_hsv.h + (last_mods & MOD_BIT_RCTRL ? painter_get_hue_offset() : 0),
+                                     curr_hsv.s, last_mods & MOD_BIT_RCTRL ? curr_hsv.v : (curr_hsv.v / 3), 0, 0, 0)) {
+                xpos += control_icon->width + 5;
+            }
+            if (qp_drawimage_recolor(ili9341_display, xpos, ypos, alt_icon,
+                                     curr_hsv.h + (last_mods & MOD_BIT_RALT ? painter_get_hue_offset() : 0), curr_hsv.s,
+                                     last_mods & MOD_BIT_RALT ? curr_hsv.v : (curr_hsv.v / 3), 0, 0, 0)) {
+                xpos += alt_icon->width + 5;
+            }
+            if (qp_drawimage_recolor(ili9341_display, xpos, ypos,
+                                     keymap_config.swap_rctl_rgui ? command_icon : windows_icon,
+                                     curr_hsv.h + (last_mods & MOD_BIT_RGUI ? painter_get_hue_offset() : 0), curr_hsv.s,
+                                     last_mods & MOD_BIT_RGUI ? curr_hsv.v : (curr_hsv.v / 3), 0, 0, 0)) {
+                xpos += windows_icon->width + 5;
+            }
+            if (qp_drawimage_recolor(ili9341_display, xpos, ypos, shift_icon,
+                                     curr_hsv.h + (last_mods & MOD_BIT_RSHIFT ? painter_get_hue_offset() : 0),
+                                     curr_hsv.s, last_mods & MOD_BIT_RSHIFT ? curr_hsv.v : (curr_hsv.v / 3), 0, 0, 0)) {
+                xpos += shift_icon->width + 5;
+            }
+
             if (max_mod_xpos < xpos) {
                 max_mod_xpos = xpos;
             }
@@ -423,7 +468,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //  RGB Light Settings
 
-#if defined(RGBLIGHT_ENABLE)
+#if 0
+#    if defined(RGBLIGHT_ENABLE)
         ypos += font_oled->line_height + 4;
         if (hue_redraw || rgb_redraw) {
             static uint16_t max_rgb_xpos = 0;
@@ -456,12 +502,12 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             // we called ypos inside the function ... to make sure we don't skip a line on future passes ....
             ypos += font_oled->line_height + 4;
         }
-#endif // RGBLIGHT_ENABLE
+#    endif // RGBLIGHT_ENABLE
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // RGB Matrix Settings
 
-#if defined(RGB_MATRIX_ENABLE)
+#    if defined(RGB_MATRIX_ENABLE)
         ypos += font_oled->line_height + 4;
         if (hue_redraw || rgb_redraw) {
             static uint16_t max_rgb_xpos = 0;
@@ -494,8 +540,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             // we called ypos inside the function ... to make sure we don't skip a line on future passes ....
             ypos += font_oled->line_height + 4;
         }
-#endif // RGB_MATRIX_ENABLE
-
+#    endif // RGB_MATRIX_ENABLE
+#endif
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //  Default layer state
 

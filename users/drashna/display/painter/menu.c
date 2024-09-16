@@ -1729,7 +1729,7 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
         menu_entry_t *menu     = get_current_menu();
         menu_entry_t *selected = get_selected_menu_item();
         HSV           hsv      = painter_get_hsv();
-        uint8_t       hue      = hsv.h + userspace_config.painter_offset;
+        uint8_t       hue      = hsv.h + painter_get_hue_offset();
 
         uint16_t y = start_y;
         qp_rect(display, start_x, y, render_width, y + 6 + font_oled->line_height + 2, hsv.h, hsv.s, hsv.v, true);

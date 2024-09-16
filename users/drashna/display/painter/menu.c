@@ -181,8 +181,8 @@ static bool menu_handler_display_val(menu_input_t input) {
     }
 }
 
-void display_handler_display_hue_offset(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%d", painter_get_hue_offset());
+void display_handler_display_val(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%d", painter_get_val());
 }
 
 static bool menu_handler_display_hue_offset(menu_input_t input) {
@@ -198,7 +198,7 @@ static bool menu_handler_display_hue_offset(menu_input_t input) {
     }
 }
 
-void display_handler_display_val(char *text_buffer, size_t buffer_len) {
+void display_handler_display_hue_offset(char *text_buffer, size_t buffer_len) {
     snprintf(text_buffer, buffer_len - 1, "%d", painter_get_hue_offset());
 }
 

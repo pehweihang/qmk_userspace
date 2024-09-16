@@ -418,44 +418,44 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
             if (qp_drawimage_recolor(ili9341_display, xpos, ypos, shift_icon,
                                      curr_hsv.h + (last_mods & MOD_BIT_LSHIFT ? painter_get_hue_offset() : 0),
-                                     curr_hsv.s, last_mods & MOD_BIT_LSHIFT ? curr_hsv.v : (curr_hsv.v / 3), 0, 0, 0)) {
+                                     curr_hsv.s, last_mods & MOD_BIT_LSHIFT ? curr_hsv.v : (curr_hsv.v / 2), 0, 0, 0)) {
                 xpos += shift_icon->width + 5;
             }
             if (qp_drawimage_recolor(ili9341_display, xpos, ypos,
                                      keymap_config.swap_lctl_lgui ? command_icon : windows_icon,
                                      curr_hsv.h + (last_mods & MOD_BIT_LGUI ? painter_get_hue_offset() : 0), curr_hsv.s,
-                                     last_mods & MOD_BIT_LGUI ? curr_hsv.v : (curr_hsv.v / 3), 0, 0, 0)) {
+                                     last_mods & MOD_BIT_LGUI ? curr_hsv.v : (curr_hsv.v / 2), 0, 0, 0)) {
                 xpos += windows_icon->width + 5;
             }
             if (qp_drawimage_recolor(ili9341_display, xpos, ypos, alt_icon,
                                      curr_hsv.h + (last_mods & MOD_BIT_LALT ? painter_get_hue_offset() : 0), curr_hsv.s,
-                                     last_mods & MOD_BIT_LALT ? curr_hsv.v : (curr_hsv.v / 3), 0, 0, 0)) {
+                                     last_mods & MOD_BIT_LALT ? curr_hsv.v : (curr_hsv.v / 2), 0, 0, 0)) {
                 xpos += alt_icon->width + 5;
             }
             if (qp_drawimage_recolor(ili9341_display, xpos, ypos, control_icon,
                                      curr_hsv.h + (last_mods & MOD_BIT_LCTRL ? painter_get_hue_offset() : 0),
-                                     curr_hsv.s, last_mods & MOD_BIT_LCTRL ? curr_hsv.v : (curr_hsv.v / 3), 0, 0, 0)) {
+                                     curr_hsv.s, last_mods & MOD_BIT_LCTRL ? curr_hsv.v : (curr_hsv.v / 2), 0, 0, 0)) {
                 xpos += control_icon->width + 5;
             }
             if (qp_drawimage_recolor(ili9341_display, xpos, ypos, control_icon,
                                      curr_hsv.h + (last_mods & MOD_BIT_RCTRL ? painter_get_hue_offset() : 0),
-                                     curr_hsv.s, last_mods & MOD_BIT_RCTRL ? curr_hsv.v : (curr_hsv.v / 3), 0, 0, 0)) {
+                                     curr_hsv.s, last_mods & MOD_BIT_RCTRL ? curr_hsv.v : (curr_hsv.v / 2), 0, 0, 0)) {
                 xpos += control_icon->width + 5;
             }
             if (qp_drawimage_recolor(ili9341_display, xpos, ypos, alt_icon,
                                      curr_hsv.h + (last_mods & MOD_BIT_RALT ? painter_get_hue_offset() : 0), curr_hsv.s,
-                                     last_mods & MOD_BIT_RALT ? curr_hsv.v : (curr_hsv.v / 3), 0, 0, 0)) {
+                                     last_mods & MOD_BIT_RALT ? curr_hsv.v : (curr_hsv.v / 2), 0, 0, 0)) {
                 xpos += alt_icon->width + 5;
             }
             if (qp_drawimage_recolor(ili9341_display, xpos, ypos,
                                      keymap_config.swap_rctl_rgui ? command_icon : windows_icon,
                                      curr_hsv.h + (last_mods & MOD_BIT_RGUI ? painter_get_hue_offset() : 0), curr_hsv.s,
-                                     last_mods & MOD_BIT_RGUI ? curr_hsv.v : (curr_hsv.v / 3), 0, 0, 0)) {
+                                     last_mods & MOD_BIT_RGUI ? curr_hsv.v : (curr_hsv.v / 2), 0, 0, 0)) {
                 xpos += windows_icon->width + 5;
             }
             if (qp_drawimage_recolor(ili9341_display, xpos, ypos, shift_icon,
                                      curr_hsv.h + (last_mods & MOD_BIT_RSHIFT ? painter_get_hue_offset() : 0),
-                                     curr_hsv.s, last_mods & MOD_BIT_RSHIFT ? curr_hsv.v : (curr_hsv.v / 3), 0, 0, 0)) {
+                                     curr_hsv.s, last_mods & MOD_BIT_RSHIFT ? curr_hsv.v : (curr_hsv.v / 2), 0, 0, 0)) {
                 xpos += shift_icon->width + 5;
             }
 

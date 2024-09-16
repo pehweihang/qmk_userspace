@@ -559,7 +559,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         //  Default layer state
 
         ypos                                    = 122 + 4;
-        xpos                                    = 122 + 4;
+        xpos                                    = 125;
         bool                 layer_state_redraw = false, dl_state_redraw = false;
         static layer_state_t last_layer_state = 0, last_dl_state = 0;
         if (last_layer_state != layer_state) {

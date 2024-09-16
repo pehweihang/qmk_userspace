@@ -59,6 +59,8 @@ void render_frame(painter_device_t display) {
     qp_line(ili9341_display, 1, frame_top->height, 1, height - frame_bottom->height, hsv.h, hsv.s, hsv.v);
     qp_line(ili9341_display, width - 2, frame_top->height, width - 2, height - frame_bottom->height, hsv.h, hsv.s,
             hsv.v);
+    qp_line(ili9341_display, 2, 122, width - 3, 122, hsv.h, hsv.s, hsv.v);
+    qp_line(ili9341_display, 121, 122, 121, 171, hsv.h, hsv.s, hsv.v);
     qp_drawimage_recolor(ili9341_display, 1, height - frame_bottom->height, frame_bottom, hsv.h, hsv.s, hsv.v, 0, 0, 0);
 
     char title[50] = {0};
@@ -599,7 +601,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         // Autocorrection values
 
 #ifdef AUTOCORRECT_ENABLE
-        ypos += font_oled->line_height + 4;
+        ypos = 122 + 4;
         extern bool     autocorrect_str_has_changed;
         extern char     autocorrected_str_raw[2][21];
         static uint32_t autocorrect_timer = 0;
@@ -609,35 +611,26 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         }
 
         if (hue_redraw || autocorrect_str_has_changed) {
-            static uint16_t max_klog_xpos[2] = {0};
             xpos                             = 5;
-            snprintf(buf, sizeof(buf), "Autocorrected: %s", autocorrected_str_raw[0]);
-            snprintf(buf, sizeof(buf), "%s", truncate_text(buf, width - 7, font_oled, false, false));
-
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv.h, curr_hsv.s, curr_hsv.v,
-                                        0, 0, 0);
-
-            if (max_klog_xpos[0] < xpos) {
-                max_klog_xpos[0] = xpos;
-            }
-            qp_rect(ili9341_display, xpos, ypos, max_klog_xpos[0], ypos + font_oled->line_height, 0, 0, 0, true);
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Autocorrected: ", curr_hsv.h, curr_hsv.s,
+                                curr_hsv.v, 0, 0, 0);
+            ypos += font_oled->line_height + 4;
+            snprintf(buf, sizeof(buf), "%19s", autocorrected_str_raw[0]);
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, offset_hue, curr_hsv.s, curr_hsv.v, 0, 0,
+                                0);
 
             ypos += font_oled->line_height + 4;
-            xpos = 5;
-            snprintf(buf, sizeof(buf), "Original Text: %s", autocorrected_str_raw[1]);
-            snprintf(buf, sizeof(buf), "%s", truncate_text(buf, width - 7, font_oled, false, false));
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Original Text: ", curr_hsv.h, curr_hsv.s,
+                                curr_hsv.v, 0, 0, 0);
+            ypos += font_oled->line_height + 4;
+            snprintf(buf, sizeof(buf), "%19s", autocorrected_str_raw[1]);
 
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv.h, curr_hsv.s, curr_hsv.v,
-                                        0, 0, 0);
-            if (max_klog_xpos[1] < xpos) {
-                max_klog_xpos[1] = xpos;
-            }
-            qp_rect(ili9341_display, xpos, ypos, max_klog_xpos[1], ypos + font_oled->line_height, 0, 0, 0, true);
-
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, offset_hue, curr_hsv.s, curr_hsv.v, 0, 0,
+                                0);
             autocorrect_str_has_changed = false;
         } else {
             // we called ypos inside the function ... to make sure we don't skip a line on future passes ....
-            ypos += font_oled->line_height + 4;
+            ypos += (font_oled->line_height + 4) * 3;
         }
 #endif // AUTOCORRECT_ENABLE
 
@@ -726,9 +719,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
             if (force_full_block_redraw) {
                 qp_rect(menu_surface, 0, 0, SURFACE_MENU_WIDTH - 1, SURFACE_MENU_HEIGHT - 1, 0, 0, 0, true);
-                qp_rect(menu_surface, 0, 0, SURFACE_MENU_WIDTH - 1, 0, curr_hsv.h, curr_hsv.s, curr_hsv.v, true);
-                qp_rect(menu_surface, 0, SURFACE_MENU_HEIGHT - 1, SURFACE_MENU_WIDTH - 1, SURFACE_MENU_HEIGHT - 1,
-                        curr_hsv.h, curr_hsv.s, curr_hsv.v, true);
+                qp_line(menu_surface, 0, 0, SURFACE_MENU_WIDTH - 1, 0, curr_hsv.h, curr_hsv.s, curr_hsv.v);
+                qp_line(menu_surface, 0, SURFACE_MENU_HEIGHT - 1, SURFACE_MENU_WIDTH - 1, SURFACE_MENU_HEIGHT - 1,
+                        curr_hsv.h, curr_hsv.s, curr_hsv.v);
                 force_full_block_redraw = false;
                 block_redraw            = true;
             }

@@ -558,6 +558,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //  Default layer state
 
+        ypos                                    = 122 + 4;
+        xpos                                    = 122 + 4;
         bool                 layer_state_redraw = false, dl_state_redraw = false;
         static layer_state_t last_layer_state = 0, last_dl_state = 0;
         if (last_layer_state != layer_state) {
@@ -569,32 +571,31 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             dl_state_redraw = true;
         }
 
-        ypos += font_oled->line_height + 4;
         if (hue_redraw || dl_state_redraw || layer_state_redraw) {
-            static int max_layer_xpos = 0;
-            xpos                      = 5;
-            snprintf(buf, sizeof(buf), "LAYOUT: %s", get_layer_name_string(default_layer_state, false, true));
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv.h, curr_hsv.s, curr_hsv.v,
-                                        0, 0, 0);
-            if (max_layer_xpos < xpos) {
-                max_layer_xpos = xpos;
-            }
-            qp_rect(ili9341_display, xpos, ypos, max_layer_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Layout: ", curr_hsv.h, curr_hsv.s, curr_hsv.v,
+                                0, 0, 0);
+            ypos += font_oled->line_height + 4;
+            snprintf(buf, sizeof(buf), "%10s", get_layer_name_string(default_layer_state, false, true));
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, offset_hue, curr_hsv.s, curr_hsv.v, 0, 0,
+                                0);
+        } else {
+            ypos += font_oled->line_height + 4;
         }
+        ypos += font_oled->line_height + 4;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Layer State
 
         if (hue_redraw || layer_state_redraw) {
-            static int max_layer_xpos = 0;
-            xpos                      = 5 + (qp_textwidth(font_oled, "LAYOUT: COLEMAK_DH"));
-            snprintf(buf, sizeof(buf), "LAYER: %s", get_layer_name_string(layer_state, false, false));
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv.h, curr_hsv.s, curr_hsv.v,
-                                        0, 0, 0);
-            if (max_layer_xpos < xpos) {
-                max_layer_xpos = xpos;
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Layer: ", curr_hsv.h, curr_hsv.s, curr_hsv.v,
+                                0, 0, 0);
+            ypos += font_oled->line_height + 4;
+            if (is_gaming_layer_active(last_layer_state)) {
+                last_layer_state &= ~((layer_state_t)1 << _MOUSE);
             }
-            qp_rect(ili9341_display, xpos, ypos, max_layer_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
+            snprintf(buf, sizeof(buf), "%10s", get_layer_name_string(last_layer_state, false, false));
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, offset_hue, curr_hsv.s, curr_hsv.v, 0, 0,
+                                0);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

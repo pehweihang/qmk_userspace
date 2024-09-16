@@ -264,7 +264,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
         ypos += font_oled->line_height + 4;
         static uint16_t max_dss_xpos = 0;
-        if (ds_state_redraw) {
+        if (hue_redraw || ds_state_redraw) {
             xpos = 5;
             xpos +=
                 qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Drag-Scroll",
@@ -288,7 +288,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         }
 
         static uint16_t max_ams_xpos = 0;
-        if (am_state_redraw) {
+        if (hue_redraw || am_state_redraw) {
             xpos = 10 + max_dss_xpos;
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Auto Layer",
                                         get_auto_mouse_enable() ? offset_hue : curr_hsv.h, curr_hsv.s,
@@ -310,7 +310,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             sp_state_redraw = true;
         }
         static uint16_t max_sps_xpos = 0;
-        if (sp_state_redraw) {
+        if (hue_redraw || sp_state_redraw) {
             xpos = 10 + max_ams_xpos;
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Sniping",
                                         charybdis_get_pointer_sniping_enabled() ? offset_hue : curr_hsv.h, curr_hsv.s,

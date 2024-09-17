@@ -525,23 +525,16 @@ const char *os_variant_to_string(os_variant_t os_detected) {
 
 #ifdef AUDIO_ENABLE
 float doom_song[][2] = SONG(E1M1_DOOM);
+extern audio_config_t audio_config;
 
 void set_doom_song(layer_state_t state) {
-    static bool is_gamepad_on = false, is_click_on = false;
-    if (layer_state_cmp(state, _GAMEPAD) != is_gamepad_on && userspace_config.gaming_song_enable) {
-        is_gamepad_on = layer_state_cmp(state, _GAMEPAD);
-
-        if (is_gamepad_on) {
-            is_click_on = is_clicky_on();
-            if (is_click_on) {
-                clicky_off();
-            }
+    if (userspace_config.gaming_song_enable) {
+        if (layer_state_cmp(state, _GAMEPAD)) {
             PLAY_LOOP(doom_song);
+            audio_config.clicky_enable = false;
         } else {
-            if (is_click_on) {
-                clicky_on();
-            }
             audio_stop_all();
+            audio_config.raw = eeconfig_read_audio();
         }
     }
 }

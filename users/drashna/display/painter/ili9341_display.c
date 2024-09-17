@@ -630,10 +630,11 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Layer: ", curr_hsv.h, curr_hsv.s, curr_hsv.v,
                                 0, 0, 0);
             ypos += font_oled->line_height + 4;
+            layer_state_t temp = last_layer_state;
             if (is_gaming_layer_active(last_layer_state)) {
-                last_layer_state &= ~((layer_state_t)1 << _MOUSE);
+                temp = last_layer_state & ~((layer_state_t)1 << _MOUSE);
             }
-            snprintf(buf, sizeof(buf), "%10s", get_layer_name_string(last_layer_state, false, false));
+            snprintf(buf, sizeof(buf), "%10s", get_layer_name_string(temp, false, false));
             qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, offset_hue, curr_hsv.s, curr_hsv.v, 0, 0,
                                 0);
             ypos = 122 + 4;

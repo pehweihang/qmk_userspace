@@ -22,6 +22,9 @@
 #ifdef LAYER_MAP_ENABLE
 #    include "features/layer_map.h"
 #endif
+#ifdef CUSTOM_UNICODE_ENABLE
+#    include "keyrecords/unicode.h"
+#endif // CUSTOM_UNICODE_ENABLE
 
 #include <math.h>
 #include <stdio.h>
@@ -56,15 +59,24 @@ void render_frame(painter_device_t display) {
     qp_get_geometry(ili9341_display, &width, &height, NULL, NULL, NULL);
 
     HSV hsv = painter_get_hsv();
+    // frame top
     qp_drawimage_recolor(ili9341_display, 1, 2, frame_top, hsv.h, hsv.s, hsv.v, 0, 0, 0);
+    // lines for frame sides
     qp_line(ili9341_display, 1, frame_top->height, 1, height - frame_bottom->height, hsv.h, hsv.s, hsv.v);
     qp_line(ili9341_display, width - 2, frame_top->height, width - 2, height - frame_bottom->height, hsv.h, hsv.s,
             hsv.v);
+    // lines for
+    qp_line(ili9341_display, 2, 80, width - 3, 80, hsv.h, hsv.s, hsv.v);
+    qp_line(ili9341_display, 91, 80, 91, 106, hsv.h, hsv.s, hsv.v);
+
+    // lines for mods and OS detection
     qp_line(ili9341_display, 2, 107, width - 3, 107, hsv.h, hsv.s, hsv.v);
     qp_line(ili9341_display, 155, 107, 155, 122, hsv.h, hsv.s, hsv.v);
+    // lines for autocorrect and layers
     qp_line(ili9341_display, 2, 122, width - 3, 122, hsv.h, hsv.s, hsv.v);
     qp_line(ili9341_display, 121, 122, 121, 171, hsv.h, hsv.s, hsv.v);
     qp_line(ili9341_display, 186, 122, 186, 171, hsv.h, hsv.s, hsv.v);
+    // frame bottom
     qp_drawimage_recolor(ili9341_display, 1, height - frame_bottom->height, frame_bottom, hsv.h, hsv.s, hsv.v, 0, 0, 0);
 
     char title[50] = {0};
@@ -421,6 +433,21 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             qp_rect(ili9341_display, xpos, ypos, max_led_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
 
+#ifdef CUSTOM_UNICODE_ENABLE
+        ypos                                    = 80 + 4;
+        static uint8_t last_unicode_typing_mode = 0;
+        if (hue_redraw || last_unicode_typing_mode != unicode_typing_mode) {
+            last_unicode_typing_mode = unicode_typing_mode;
+            xpos                     = 5;
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Typing Mode:", curr_hsv.h, curr_hsv.s,
+                                curr_hsv.v, 0, 0, 0);
+            ypos += font_oled->line_height + 4;
+            snprintf(buf, sizeof(buf), "%14s", unicode_mode_str[last_unicode_typing_mode]);
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, offset_hue, curr_hsv.s, curr_hsv.v, 0, 0,
+                                0);
+        }
+#endif // CUSTOM_UNICODE_ENABLE
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Mods
 
@@ -613,7 +640,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             xpos = 190;
             qp_drawimage_recolor(ili9341_display, xpos, ypos, gamepad_icon, curr_hsv.h, curr_hsv.s,
                                  layer_state_cmp(last_layer_state, _GAMEPAD) ? curr_hsv.v : disabled_val, 0, 0, 0);
-            qp_drawimage_recolor(ili9341_display, xpos + gamepad_icon->width + 5, ypos + 4, mouse_icon, curr_hsv.h,
+            qp_drawimage_recolor(ili9341_display, xpos + gamepad_icon->width + 6, ypos + 4, mouse_icon, curr_hsv.h,
                                  curr_hsv.s, layer_state_cmp(layer_state, _MOUSE) ? curr_hsv.v : disabled_val, 0, 0, 0);
             ypos += gamepad_icon->height + 2;
             qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Diablo",

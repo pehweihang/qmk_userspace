@@ -99,7 +99,7 @@ typedef union {
         bool     nuke_switch          : 1;
         bool     swapped_numbers      : 1;
         bool     rgb_matrix_idle_anim : 1;
-        bool     reserved1            : 1;
+        bool     i2c_scanner_enable   : 1;
         bool     matrix_scan_print    : 1;
         bool     align_reserved       : 1;
         uint8_t  oled_brightness      : 8;

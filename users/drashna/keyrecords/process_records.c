@@ -292,6 +292,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 eeconfig_update_user_config(&userspace_config.raw);
             }
             break;
+        case US_I2C_SCAN_ENABLE:
+#if HAL_USE_I2C == TRUE
+            if (record->event.pressed) {
+                userspace_config.i2c_scanner_enable = !userspace_config.i2c_scanner_enable;
+                eeconfig_update_user_config(&userspace_config.raw);
+            }
+#endif // HAL_USE_I2C == TRUE
+            break;
     }
     return true;
 }

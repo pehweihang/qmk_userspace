@@ -77,7 +77,7 @@ void tap_code16_nomods(uint16_t kc) {
     set_mods(temp_mod);
 }
 
-#ifdef I2C_SCANNER_ENABLE
+#if HAL_USE_I2C == TRUE
 #    include "i2c_master.h"
 #    include "debug.h"
 
@@ -86,6 +86,9 @@ void tap_code16_nomods(uint16_t kc) {
 #    endif // I2C_SCANNER_TIMEOUT
 
 void do_scan(void) {
+    if (!userspace_config.i2c_scanner_enable) {
+        return;
+    }
     uint8_t nDevices = 0;
 
     xprintf("Scanning for I2C Devices...\n");
@@ -121,7 +124,7 @@ void keyboard_post_init_i2c(void) {
     i2c_init();
     scan_timer = timer_read();
 }
-#endif // I2C_SCANNER_ENABLE
+#endif // HAL_USE_I2C == TRUE
 
 #if defined(AUTOCORRECT_ENABLE)
 #    if defined(AUDIO_ENABLE)

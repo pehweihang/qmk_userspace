@@ -150,3 +150,7 @@ uint16_t extract_basic_keycode(uint16_t keycode, keyrecord_t *record, bool check
 
 void     matrix_scan_rate_task(void);
 uint32_t get_matrix_scan_rate(void);
+
+#ifdef OS_DETECTION_ENABLE
+const char *os_variant_to_string(os_variant_t os);
+#endif

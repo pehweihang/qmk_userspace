@@ -785,6 +785,22 @@ void display_handler_audio_clicky_freq(char *text_buffer, size_t buffer_len) {
     snprintf(text_buffer, buffer_len - 1, "%.2f", (float)clicky_freq);
 }
 
+static bool menu_handler_gaming_song_enabled(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            userspace_config.gaming_song_enable = !userspace_config.gaming_song_enable;
+            set_doom_song(layer_state);
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_gaming_song_enabled(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.gaming_song_enable ? "on" : "off");
+}
+
 menu_entry_t audio_entries[] = {
     {
         .flags                 = menu_flag_is_value,
@@ -809,6 +825,12 @@ menu_entry_t audio_entries[] = {
         .text                  = "Audio Clicky Frequency",
         .child.menu_handler    = menu_handler_audio_clicky_freq,
         .child.display_handler = display_handler_audio_clicky_freq,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Gaming Song Enabled",
+        .child.menu_handler    = menu_handler_gaming_song_enabled,
+        .child.display_handler = display_handler_gaming_song_enabled,
     },
 };
 #endif // AUDIO_ENABLE

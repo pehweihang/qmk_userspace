@@ -523,6 +523,30 @@ const char *os_variant_to_string(os_variant_t os_detected) {
 }
 #endif // OS_DETECTION_ENABLE
 
+#ifdef AUDIO_ENABLE
+float doom_song[][2] = SONG(E1M1_DOOM);
+
+void set_doom_song(layer_state_t state) {
+    static bool is_gamepad_on = false, is_click_on = false;
+    if (layer_state_cmp(state, _GAMEPAD) != is_gamepad_on && userspace_config.gaming_song_enable) {
+        is_gamepad_on = layer_state_cmp(state, _GAMEPAD);
+
+        if (is_gamepad_on) {
+            is_click_on = is_clicky_on();
+            if (is_click_on) {
+                clicky_off();
+            }
+            PLAY_LOOP(doom_song);
+        } else {
+            if (is_click_on) {
+                clicky_on();
+            }
+            audio_stop_all();
+        }
+    }
+}
+#endif // AUDIO_ENABLE
+
 #if 0
 #    include "hardware_id.h"
 void get_serial_number(void) {

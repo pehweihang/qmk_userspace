@@ -107,6 +107,7 @@ enum userspace_custom_keycodes {
     CLAP_TRAP_TOGGLE,
 
     US_I2C_SCAN_ENABLE,
+    US_GAMING_SCAN_TOGGLE,
     USER_SAFE_RANGE,
 };
 

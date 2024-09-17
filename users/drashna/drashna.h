@@ -108,7 +108,8 @@ typedef union {
         uint8_t  display_mode         : 2;
         uint8_t  display_logo         : 4;
         bool     clap_trap_enable     : 1;
-        uint32_t reserved             : 6;
+        bool     gaming_song_enable   : 1;
+        uint32_t reserved             : 5;
         bool     check                : 1;
         HSV      painter_hsv;
         uint8_t  painter_offset : 8;
@@ -154,3 +155,7 @@ uint32_t get_matrix_scan_rate(void);
 #ifdef OS_DETECTION_ENABLE
 const char *os_variant_to_string(os_variant_t os);
 #endif
+
+#ifdef AUDIO_ENABLE
+void set_doom_song(layer_state_t state);
+#endif // AUDIO_ENABLE

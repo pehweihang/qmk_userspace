@@ -300,6 +300,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
 #endif // HAL_USE_I2C == TRUE
             break;
+        case US_GAMING_SCAN_TOGGLE:
+#ifdef AUDIO_ENABLE
+            if (record->event.pressed) {
+                userspace_config.gaming_song_enable = !userspace_config.gaming_song_enable;
+                eeconfig_update_user_config(&userspace_config.raw);
+                set_doom_song(layer_state);
+            }
+#endif // AUDIO_ENABLE
+            break;
     }
     return true;
 }

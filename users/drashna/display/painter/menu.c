@@ -286,14 +286,14 @@ void display_handler_unicode(char *text_buffer, size_t buffer_len) {
 static bool menu_handler_unicode_typing(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            unicode_typing_mode = (unicode_typing_mode - 1) % UNICODE_MODE_COUNT;
-            if (unicode_typing_mode >= UNICODE_MODE_COUNT) {
-                unicode_typing_mode = UNICODE_MODE_COUNT - 1;
+            unicode_typing_mode = (unicode_typing_mode - 1) % UNCODES_MODE_END;
+            if (unicode_typing_mode >= UNCODES_MODE_END) {
+                unicode_typing_mode = UNCODES_MODE_END - 1;
             }
             return false;
         case menu_input_right:
-            unicode_typing_mode = (unicode_typing_mode + 1) % UNICODE_MODE_COUNT;
-            if (unicode_typing_mode >= UNICODE_MODE_COUNT) {
+            unicode_typing_mode = (unicode_typing_mode + 1) % UNCODES_MODE_END;
+            if (unicode_typing_mode >= UNCODES_MODE_END) {
                 unicode_typing_mode = 0;
             }
             return false;
@@ -302,44 +302,7 @@ static bool menu_handler_unicode_typing(menu_input_t input) {
     }
 }
 void display_handler_unicode_typing(char *text_buffer, size_t buffer_len) {
-    switch (unicode_typing_mode) {
-        case UCTM_NO_MODE:
-            strncpy(text_buffer, "Normal", buffer_len - 1); // Normal
-            return;
-        case UCTM_WIDE:
-            strncpy(text_buffer, "Wide", buffer_len - 1); // ｗｉｄｅ
-            return;
-        case UCTM_SCRIPT:
-            strncpy(text_buffer, "Script", buffer_len - 1); // 𝓢𝓬𝓻𝓲𝓹𝓽
-            return;
-        case UCTM_BLOCKS:
-            strncpy(text_buffer, "Blocks", buffer_len - 1); // 🅱🅻🅾🅲🅺🆂
-            return;
-        case UCTM_REGIONAL:
-            strncpy(text_buffer, "Regional",
-                    buffer_len - 1); // 🇷‌‌🇪‌‌🇬‌‌🇮‌‌🇴‌‌🇳‌‌🇦‌‌🇱‌‌
-            return;
-        case UCTM_AUSSIE:
-            strncpy(text_buffer, "Aussie", buffer_len - 1); // ǝᴉssnɐ
-            return;
-        case UCTM_ZALGO:
-            strncpy(text_buffer, "Zalgo", buffer_len - 1); // z̴̬̙̐̋͢ā̸̧̺͂ͥ͐͟l̵̪̻͎̈ͭ̋͠g̦ͥo͚ͫͣ
-            return;
-        case UCTM_SUPER:
-            strncpy(text_buffer, "SuperScript", buffer_len - 1); // ˢᵘᵖᵉʳˢᶜʳᶦᵖᵗ
-            return;
-        case UCTM_COMIC:
-            strncpy(text_buffer, "Comic", buffer_len - 1); // ƈơɱıƈ
-            return;
-        case UCTM_FRAKTUR:
-            strncpy(text_buffer, "Fraktur", buffer_len - 1); // 𝔉𝔯𝔞𝔨𝔱𝔲𝔯
-            return;
-        case UCTM_DOUBLE_STRUCK:
-            strncpy(text_buffer, "Double Struck", buffer_len - 1); // 𝕯𝖔𝖚𝖇𝖑𝖊 𝕾𝖙𝖗𝖚𝖈𝖐
-            return;
-    }
-
-    strncpy(text_buffer, "Unknown", buffer_len);
+    strncpy(text_buffer, unicode_mode_str[unicode_typing_mode], buffer_len);
 }
 
 menu_entry_t unicode_entries[] = {

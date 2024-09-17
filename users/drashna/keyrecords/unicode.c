@@ -8,9 +8,18 @@
 #include "process_unicode_common.h"
 
 uint8_t    unicode_typing_mode                            = UCTM_NO_MODE;
-const char unicode_mode_str[UNCODES_MODE_END][13] PROGMEM = {
-    "      Normal\0", "        Wide\0", "      Script\0", "      Blocks\0", "    Regional\0", "      Aussie\0",
-    "       Zalgo\0", "Super Script\0", "       Comic\0", "     Fraktur\0", "DoubleStruck\0",
+const char unicode_mode_str[UNCODES_MODE_END][13]         = {
+    "Normal",       // Normal
+    "Wide",         // ｗｉｄｅ
+    "Script",       // 𝒮𝒸𝓇𝒾𝓅𝓉
+    "Blocks",       //  🅱🅻🅾🅲🅺🆂
+    "Regional",     //  ‌‌🇷‌‌🇪‌‌🇬‌‌🇮‌‌🇴‌‌🇳‌‌🇦‌‌🇱‌‌
+    "Aussie",       // ǝᴉssnɐ
+    "Zalgo",        // z͚ͭ̐a̪̒͋ͤl͇̼̥̖̃͟͡g̸ͥỡ̳ͬ
+    "Super Script", // ˢᵘᵖᵉʳˢᶜʳᶦᵖᵗ
+    "Comic",        // ƈơɱıƈ
+    "Fraktur",      // 𝔉𝔯𝔞𝔨𝔱𝔲𝔯
+    "DoubleStruck", // 𝕯𝖔𝖚𝖇𝖑𝖊 𝕾𝖙𝖗𝖚𝖈𝖐
 };
 
 /**

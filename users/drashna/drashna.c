@@ -528,14 +528,22 @@ float doom_song[][2] = SONG(E1M1_DOOM);
 extern audio_config_t audio_config;
 
 void set_doom_song(layer_state_t state) {
-    if (layer_state_cmp(state, _GAMEPAD) && userspace_config.gaming_song_enable) {
-        PLAY_LOOP(doom_song);
-        audio_config.clicky_enable = false;
-    } else {
-        audio_stop_all();
-        audio_config.raw = eeconfig_read_audio();
+    static bool is_gaming_layer_active = false, is_doom_song_active = false;
+
+    if (userspace_config.gaming_song_enable != is_doom_song_active ||
+        is_gaming_layer_active != layer_state_cmp(state, _GAMEPAD)) {
+        is_doom_song_active    = userspace_config.gaming_song_enable;
+        is_gaming_layer_active = layer_state_cmp(state, _GAMEPAD);
+        if (is_gaming_layer_active && is_doom_song_active) {
+            PLAY_LOOP(doom_song);
+            audio_config.clicky_enable = false;
+        } else {
+            audio_stop_all();
+            audio_config.raw = eeconfig_read_audio();
+        }
     }
 }
+
 #endif // AUDIO_ENABLE
 
 #if 0

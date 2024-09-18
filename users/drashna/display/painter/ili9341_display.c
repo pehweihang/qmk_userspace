@@ -233,6 +233,35 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         }
 #endif // WPM_ENABLE
 
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // LED Lock indicator(text)
+
+        ypos += font_oled->line_height + 4;
+        static led_t last_led_state = {0};
+        if (hue_redraw || last_led_state.raw != host_keyboard_led_state().raw) {
+            last_led_state.raw           = host_keyboard_led_state().raw;
+            static uint16_t max_led_xpos = 0;
+            xpos                         = 5;
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"Locks:", curr_hsv.h,
+                                        curr_hsv.s, curr_hsv.v, 0, 0, 0) +
+                    5;
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"CAPS",
+                                        last_led_state.caps_lock ? offset_hue : curr_hsv.h, curr_hsv.s,
+                                        last_led_state.caps_lock ? curr_hsv.v : disabled_val, 0, 0, 0) +
+                    5;
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"SCRL",
+                                        last_led_state.scroll_lock ? offset_hue : curr_hsv.h, curr_hsv.s,
+                                        last_led_state.scroll_lock ? curr_hsv.v : disabled_val, 0, 0, 0) +
+                    5;
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"NUM",
+                                        last_led_state.num_lock ? offset_hue : curr_hsv.h, curr_hsv.s,
+                                        last_led_state.num_lock ? curr_hsv.v : disabled_val, 0, 0, 0);
+            if (max_led_xpos < xpos) {
+                max_led_xpos = xpos;
+            }
+            qp_rect(ili9341_display, xpos, ypos, max_led_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
+        }
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Keymap config (nkro, autocorrect, oneshots)
 
@@ -285,132 +314,69 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                                         last_user_state.swap_hands ? offset_hue : curr_hsv.h, curr_hsv.s,
                                         last_user_state.swap_hands ? curr_hsv.v : disabled_val, 0, 0, 0);
         }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // LED Lock indicator (text)
-
-        // ypos = 54+4
-        // static led_t last_led_state = {0};
-        // if (hue_redraw || last_led_state.raw != host_keyboard_led_state().raw) {
-        //     last_led_state.raw           = host_keyboard_led_state().raw;
-        //     static uint16_t max_led_xpos = 0;
-        //     xpos                         = 5;
-        //     xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"Locks:", curr_hsv.h,
-        //                                 curr_hsv.s, curr_hsv.v, 0, 0, 0) +
-        //             5;
-        //     xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"CAPS",
-        //                                 last_led_state.caps_lock ? offset_hue : curr_hsv.h, curr_hsv.s,
-        //                                 last_led_state.caps_lock ? curr_hsv.v : disabled_val, 0, 0, 0) +
-        //             5;
-        //     xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"SCRL",
-        //                                 last_led_state.scroll_lock ? offset_hue : curr_hsv.h, curr_hsv.s,
-        //                                 last_led_state.scroll_lock ? curr_hsv.v : disabled_val, 0, 0, 0) +
-        //             5;
-        //     xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"NUM",
-        //                                 last_led_state.num_lock ? offset_hue : curr_hsv.h, curr_hsv.s,
-        //                                 last_led_state.num_lock ? curr_hsv.v : disabled_val, 0, 0, 0);
-        //     if (max_led_xpos < xpos) {
-        //         max_led_xpos = xpos;
-        //     }
-        //     qp_rect(ili9341_display, xpos, ypos, max_led_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
-        // }
-
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Pointing Device CPI
 
         ypos = 54 + 4;
-#if defined(POINTING_DEVICE_ENABLE) && \
-    (defined(KEYBOARD_bastardkb_charybdis) || defined(KEYBOARD_handwired_tractyl_manuform))
+#if defined(POINTING_DEVICE_ENABLE)
+#    if (defined(KEYBOARD_bastardkb_charybdis) || defined(KEYBOARD_handwired_tractyl_manuform))
         static uint16_t last_cpi   = {0xFFFF};
         uint16_t        curr_cpi   = charybdis_get_pointer_sniping_enabled() ? charybdis_get_pointer_sniping_dpi()
                                                                              : charybdis_get_pointer_default_dpi();
-        bool            cpi_redraw = false;
-        if (last_cpi != curr_cpi) {
-            last_cpi   = curr_cpi;
-            cpi_redraw = true;
-        }
-        static uint16_t max_cpi_xpos = 0;
-        if (hue_redraw || cpi_redraw) {
+        if (hue_redraw || last_cpi != curr_cpi) {
+            last_cpi = curr_cpi;
             xpos = 5;
-            snprintf(buf, sizeof(buf), "CPI: %5u", curr_cpi);
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv.h, curr_hsv.s, curr_hsv.v,
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "CPI: ", curr_hsv.h, curr_hsv.s,
+                                        curr_hsv.v, 0, 0, 0);
+            snprintf(buf, sizeof(buf), "%5u", curr_cpi);
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, offset_hue, curr_hsv.s, curr_hsv.v,
                                         0, 0, 0);
-            if (max_cpi_xpos < xpos) {
-                max_cpi_xpos = xpos;
-            }
-            qp_rect(ili9341_display, xpos, ypos, max_cpi_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // Pointing Device Drag Scroll
-
-        bool            ds_state_redraw = false;
-        static uint32_t last_ds_state   = 0xFFFFFFFF;
-        if (last_ds_state != charybdis_get_pointer_dragscroll_enabled()) {
-            last_ds_state   = charybdis_get_pointer_dragscroll_enabled();
-            ds_state_redraw = true;
-        }
-
-        ypos += font_oled->line_height + 4;
-        static uint16_t max_dss_xpos = 0;
-        if (hue_redraw || ds_state_redraw) {
-            xpos = 5;
-            xpos +=
-                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Drag-Scroll",
-                                    charybdis_get_pointer_dragscroll_enabled() ? offset_hue : curr_hsv.h, curr_hsv.s,
-                                    charybdis_get_pointer_dragscroll_enabled() ? curr_hsv.v : disabled_val, 0, 0, 0);
-            if (max_dss_xpos < xpos) {
-                max_dss_xpos = xpos;
-            }
-            qp_rect(ili9341_display, xpos, ypos, max_dss_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
         ypos += font_oled->line_height + 4;
-
+#    endif
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Pointing Device Auto Mouse Layer
 
 #    ifdef POINTING_DEVICE_AUTO_MOUSE_ENABLE
-        bool           am_state_redraw = false;
-        static uint8_t last_am_state   = 0xFF;
-        if (last_am_state != get_auto_mouse_enable()) {
-            last_am_state   = get_auto_mouse_enable();
-            am_state_redraw = true;
-        }
-
-        static uint16_t max_ams_xpos = 0;
-        if (hue_redraw || am_state_redraw) {
-            xpos = 5;
+        static uint8_t last_am_state = 0xFF;
+        if (hue_redraw || last_am_state != get_auto_mouse_enable()) {
+            last_am_state = get_auto_mouse_enable();
+            xpos          = 5;
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Auto Layer",
                                         get_auto_mouse_enable() ? offset_hue : curr_hsv.h, curr_hsv.s,
                                         get_auto_mouse_enable() ? curr_hsv.v : disabled_val, 0, 0, 0);
-            if (max_ams_xpos < xpos) {
-                max_ams_xpos = xpos;
-            }
-            qp_rect(ili9341_display, xpos, ypos, max_ams_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
         ypos += font_oled->line_height + 4;
 #    endif
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Pointing Device Drag Scroll
+
+#    if (defined(KEYBOARD_bastardkb_charybdis) || defined(KEYBOARD_handwired_tractyl_manuform))
+        static uint32_t last_ds_state   = 0xFFFFFFFF;
+        if (hue_redraw || last_ds_state != charybdis_get_pointer_dragscroll_enabled()) {
+            last_ds_state = charybdis_get_pointer_dragscroll_enabled();
+            xpos = 5;
+            xpos +=
+                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Drag-Scroll",
+                                    charybdis_get_pointer_dragscroll_enabled() ? offset_hue : curr_hsv.h, curr_hsv.s,
+                                    charybdis_get_pointer_dragscroll_enabled() ? curr_hsv.v : disabled_val, 0, 0, 0);
+        }
+        ypos += font_oled->line_height + 4;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Pointing Device Sniping mode
 
-        bool           sp_state_redraw = false;
         static uint8_t last_sp_state   = 0xFF;
-        if (last_sp_state != charybdis_get_pointer_sniping_enabled()) {
-            last_sp_state   = charybdis_get_pointer_sniping_enabled();
-            sp_state_redraw = true;
-        }
-        static uint16_t max_sps_xpos = 0;
-        if (hue_redraw || sp_state_redraw) {
-            xpos = 5;
+
+        if (hue_redraw || last_sp_state != charybdis_get_pointer_sniping_enabled()) {
+            last_sp_state = charybdis_get_pointer_sniping_enabled();
+            xpos          = 5;
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Sniping",
                                         charybdis_get_pointer_sniping_enabled() ? offset_hue : curr_hsv.h, curr_hsv.s,
                                         charybdis_get_pointer_sniping_enabled() ? curr_hsv.v : disabled_val, 0, 0, 0);
-            if (max_sps_xpos < xpos) {
-                max_sps_xpos = xpos;
-            }
-            qp_rect(ili9341_display, xpos, ypos, max_sps_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
+#    endif
 #endif // POINTING_DEVICE_ENABLE
 
 #ifdef CUSTOM_UNICODE_ENABLE

@@ -210,8 +210,10 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         static uint32_t last_scan_update = 0;
         if (hue_redraw || last_scan_update != get_matrix_scan_rate()) {
             last_scan_update = get_matrix_scan_rate();
-            snprintf(buf, sizeof(buf), "SCANS: %-5lu", last_scan_update);
-            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv.h, curr_hsv.s, curr_hsv.v, 0, 0,
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "SCANS: ", curr_hsv.h, curr_hsv.s,
+                                        curr_hsv.v, 0, 0, 0);
+            snprintf(buf, sizeof(buf), "%-5lu", last_scan_update);
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, offset_hue, curr_hsv.s, curr_hsv.v, 0, 0,
                                 0);
         }
         ypos += font_oled->line_height + 4;
@@ -227,9 +229,12 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             wpm_redraw      = true;
         }
         if (hue_redraw || wpm_redraw) {
-            snprintf(buf, sizeof(buf), "WPM: %3u", get_current_wpm());
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv.h, curr_hsv.s, curr_hsv.v,
-                                        0, 0, 0);
+            uint16_t xpos = 5;
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "WPM: ", curr_hsv.h, curr_hsv.s,
+                                        curr_hsv.v, 0, 0, 0);
+            snprintf(buf, sizeof(buf), "   %3u", get_current_wpm());
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, offset_hue, curr_hsv.s, curr_hsv.v, 0, 0,
+                                0);
         }
 #endif // WPM_ENABLE
 
@@ -326,7 +331,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         if (hue_redraw || last_cpi != curr_cpi) {
             last_cpi = curr_cpi;
             xpos = 5;
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "CPI: ", curr_hsv.h, curr_hsv.s,
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "CPI:   ", curr_hsv.h, curr_hsv.s,
                                         curr_hsv.v, 0, 0, 0);
             snprintf(buf, sizeof(buf), "%5u", curr_cpi);
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, offset_hue, curr_hsv.s, curr_hsv.v,
@@ -487,8 +492,11 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         if (hue_redraw || last_detected_os != current_detected_os) {
             last_detected_os = current_detected_os;
 
-            snprintf(buf, sizeof(buf), "OS: %9s", os_variant_to_string(current_detected_os));
-            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv.h, curr_hsv.s, curr_hsv.v, 0, 0,
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "OS: ", curr_hsv.h, curr_hsv.s,
+                                        curr_hsv.v, 0, 0, 0);
+
+            snprintf(buf, sizeof(buf), "%9s", os_variant_to_string(current_detected_os));
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, offset_hue, curr_hsv.s, curr_hsv.v, 0, 0,
                                 0);
         }
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

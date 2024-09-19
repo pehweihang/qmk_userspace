@@ -896,14 +896,13 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             if (hue_redraw || force_redraw || console_log_needs_redraw) {
                 for (uint8_t i = 0; i < DISPLAY_CONSOLE_LOG_LINE_NUM; i++) {
                     static uint16_t max_line_width = 5;
-                    uint16_t        xpos = 5, ypos = 3;
+                    uint16_t        xpos = 5, ypos = 3 + (font_oled->line_height + 4) * i;
                     xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, logline_ptrs[i], curr_hsv.h,
                                                 curr_hsv.s, curr_hsv.v, 0, 0, 0);
                     if (max_line_width < xpos) {
                         max_line_width = xpos;
                     }
                     qp_rect(ili9341_display, xpos, ypos, max_line_width, ypos + font_oled->line_height, 0, 0, 0, true);
-                    ypos += font_oled->line_height + 4;
                 }
                 console_log_needs_redraw = force_redraw = false;
             }

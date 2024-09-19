@@ -1402,6 +1402,122 @@ menu_entry_t rtc_config_entries[] = {
 #endif // RTC_ENABLE
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// User Settings
+
+static bool menu_handler_overwatch_mode(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            userspace_config.is_overwatch = !userspace_config.is_overwatch;
+            eeconfig_update_user_config(&userspace_config.raw);
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_overwatch_mode(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.is_overwatch ? "on" : "off");
+}
+
+static bool menu_handler_gamepad_swap(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            userspace_config.swapped_numbers = !userspace_config.swapped_numbers;
+            eeconfig_update_user_config(&userspace_config.raw);
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_gamepad_swap(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.swapped_numbers ? "swapped" : "normal");
+}
+
+static bool menu_handler_clap_trap(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            userspace_config.clap_trap_enable = !userspace_config.clap_trap_enable;
+            eeconfig_update_user_config(&userspace_config.raw);
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_clap_trap(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.clap_trap_enable ? "on" : "off");
+}
+
+static bool menu_handler_i2c_scanner(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            userspace_config.i2c_scanner_enable = !userspace_config.i2c_scanner_enable;
+            eeconfig_update_user_config(&userspace_config.raw);
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_i2c_scanner(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.i2c_scanner_enable ? "on" : "off");
+}
+
+static bool menu_handler_scan_rate(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            userspace_config.matrix_scan_print = !userspace_config.matrix_scan_print;
+            eeconfig_update_user_config(&userspace_config.raw);
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_scan_rate(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.matrix_scan_print ? "on" : "off");
+}
+
+menu_entry_t user_settings_option_entries[] = {
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Overwatch Mode",
+        .child.menu_handler    = menu_handler_overwatch_mode,
+        .child.display_handler = display_handler_overwatch_mode,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Gamepad 1<->2 Swap",
+        .child.menu_handler    = menu_handler_gamepad_swap,
+        .child.display_handler = display_handler_gamepad_swap,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "SOCD Cleaner",
+        .child.menu_handler    = menu_handler_clap_trap,
+        .child.display_handler = display_handler_clap_trap,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "I2C Scanner",
+        .child.menu_handler    = menu_handler_i2c_scanner,
+        .child.display_handler = display_handler_i2c_scanner,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Matrix Scan Rate Print",
+        .child.menu_handler    = menu_handler_scan_rate,
+        .child.display_handler = display_handler_scan_rate,
+    },
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Buy More
 
 menu_entry_t buy_more_entries[] = {
@@ -1419,6 +1535,12 @@ menu_entry_t buy_more_entries[] = {
         .parent.child_count = ARRAY_SIZE(rtc_config_entries),
     },
 #endif // RTC_ENABLE
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "User Settings",
+        .parent.children    = user_settings_option_entries,
+        .parent.child_count = ARRAY_SIZE(user_settings_option_entries),
+    },
 };
 
 menu_entry_t buy_more_entries_less[] = {
@@ -1436,6 +1558,12 @@ menu_entry_t buy_more_entries_less[] = {
         .parent.child_count = ARRAY_SIZE(rtc_config_entries),
     },
 #endif // RTC_ENABLE
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "User Settings",
+        .parent.children    = user_settings_option_entries,
+        .parent.child_count = ARRAY_SIZE(user_settings_option_entries),
+    },
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1560,7 +1688,7 @@ bool menu_handle_input(menu_input_t input) {
             if (cancel_deferred_exec(menu_deferred_token)) {
                 menu_deferred_token = INVALID_DEFERRED_TOKEN;
             }
-            return false;
+             return false;
         case menu_input_back:
             // Iterate backwards through the stack and remove the last entry
             for (uint8_t i = 0; i < sizeof(display_menu_state.menu_stack); ++i) {

@@ -770,7 +770,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 case 0:
                     if (hue_redraw || block_redraw || console_log_needs_redraw) {
                         static uint16_t max_line_width = 0;
-                        for (uint8_t i = 0; i < DISPLAY_CONSOLE_LOG_LINE_NUM; i++) {
+                        for (uint8_t i = DISPLAY_CONSOLE_LOG_LINE_START; i < DISPLAY_CONSOLE_LOG_LINE_NUM; i++) {
                             xpos = 5;
                             xpos += qp_drawtext_recolor(menu_surface, xpos, surface_ypos, font_oled, logline_ptrs[i],
                                                         curr_hsv.h, curr_hsv.s, curr_hsv.v, 0, 0, 0);

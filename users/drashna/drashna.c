@@ -101,14 +101,13 @@ void do_scan(void) {
             xprintf("  I2C device found at address 0x%02X\n", address);
             nDevices++;
         } else {
-            // dprintf("  Unknown error (%u) at address 0x%02X\n", error, address);
+            xprintf("  Unknown error (%u) at address 0x%02X\n", error, address);
         }
     }
 
-    if (nDevices == 0)
+    if (nDevices == 0) {
         xprintf("No I2C devices found\n");
-    else
-        xprintf("done\n");
+    }
 }
 
 uint16_t scan_timer = 0;

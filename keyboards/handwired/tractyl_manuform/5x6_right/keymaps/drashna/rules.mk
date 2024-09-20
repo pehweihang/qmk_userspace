@@ -60,6 +60,7 @@ ifeq ($(strip $(KEYBOARD)), handwired/tractyl_manuform/5x6_right/f405)
     QUANTUM_PAINTER_DRIVERS          += ili9341_spi
     CUSTOM_QUANTUM_PAINTER_ENABLE    = yes
     DISPLAY_KEYLOGGER_ENABLE         = yes
+    I2C_DRIVER_REQUIRED              = yes
 endif
 ifeq ($(strip $(OVERLOAD_FEATURES)), yes)
     AUDIO_ENABLE                     = yes

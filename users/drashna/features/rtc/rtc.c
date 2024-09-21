@@ -255,6 +255,10 @@ void rtc_task(void) {
             last_rtc_read = timer_read() + (RTC_READ_INTERVAL * 100);
         }
         rtc_connected = connected;
+#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+        void display_menu_set_dirty(void);
+        display_menu_set_dirty();
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
     }
 }
 

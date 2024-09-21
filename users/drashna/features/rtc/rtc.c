@@ -276,8 +276,8 @@ char *rtc_read_date_str(void) {
  */
 char *rtc_read_time_str(void) {
     static char time_str[11] = {0};
-    snprintf_nowarn(time_str, sizeof(time_str), "%02d:%02d:%02d%2s", rtc_time.hour, rtc_time.minute, rtc_time.second,
-                    rtc_time.format == RTC_FORMAT_24H ? " Z" : (rtc_time.am_pm == RTC_AM ? "AM" : "PM"));
+    snprintf_nowarn(time_str, sizeof(time_str), "%02d:%02d:%02d%s", rtc_time.hour, rtc_time.minute, rtc_time.second,
+                    rtc_time.format == RTC_FORMAT_24H ? "" : (rtc_time.am_pm == RTC_AM ? "AM" : "PM"));
     return time_str;
 }
 
@@ -299,9 +299,9 @@ char *rtc_read_date_time_str(void) {
  */
 char *rtc_read_date_time_iso8601_str(void) {
     static char date_time_str[22] = {0};
-    snprintf_nowarn(date_time_str, sizeof(date_time_str), "%04d-%02d-%02dT%02d:%02d:%02d%2s", rtc_time.year,
+    snprintf_nowarn(date_time_str, sizeof(date_time_str), "%04d-%02d-%02dT%02d:%02d:%02d%s", rtc_time.year,
                     rtc_time.month, rtc_time.date, rtc_time.hour, rtc_time.minute, rtc_time.second,
-                    rtc_time.format == RTC_FORMAT_24H ? " Z" : (rtc_time.am_pm == RTC_AM ? "AM" : "PM"));
+                    rtc_time.format == RTC_FORMAT_24H ? "" : (rtc_time.am_pm == RTC_AM ? "AM" : "PM"));
     return date_time_str;
 }
 

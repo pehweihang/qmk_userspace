@@ -18,7 +18,7 @@ void convert_halrtc_to_local_rtc_struct(RTCDateTime *halrtc, rtc_time_t *local) 
     local->date            = halrtc->day;
     local->second          = (halrtc->millisecond / 1000) % 60;
     local->minute          = (halrtc->millisecond / (1000 * 60)) % 60;
-    local->format          = RTC_FORMAT_12H;
+    local->format          = RTC_FORMAT_24H;
     if (local->format == RTC_FORMAT_12H) {
         local->hour = (halrtc->millisecond / (1000 * 60 * 60)) % 12;
     } else {

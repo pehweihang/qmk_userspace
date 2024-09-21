@@ -34,6 +34,19 @@
         _strncpy_nowarn;                                             \
     })
 
+/**
+ * @brief hack for snprintf warning
+ *
+ */
+#define snprintf_nowarn(...)                                       \
+    __extension__({                                                \
+        _Pragma("GCC diagnostic push");                            \
+        _Pragma("GCC diagnostic ignored \"-Wformat-truncation\""); \
+        const int _snprintf_nowarn = snprintf(__VA_ARGS__);        \
+        _Pragma("GCC diagnostic pop");                             \
+        _snprintf_nowarn;                                          \
+    })
+
 #ifndef RTC_READ_INTERVAL
 #    define RTC_READ_INTERVAL 250
 #endif
@@ -251,10 +264,8 @@ void rtc_task(void) {
  * @return char* MM/DD/YYYY
  */
 char *rtc_read_date_str(void) {
-    char date_str_temp[14] = {0};
-    snprintf(date_str_temp, sizeof(date_str_temp), "%02d/%02d/%04d", rtc_time.month, rtc_time.date, rtc_time.year);
-    static char date_str[12] = {0};
-    strncpy_nowarn(date_str, date_str_temp, sizeof(date_str));
+    static char date_str[11] = {0};
+    snprintf_nowarn(date_str, sizeof(date_str), "%02d/%02d/%04d", rtc_time.month, rtc_time.date, rtc_time.year);
     return date_str;
 }
 
@@ -264,10 +275,9 @@ char *rtc_read_date_str(void) {
  * @return char* HH:MM:SS
  */
 char *rtc_read_time_str(void) {
-    char time_str_temp[12];
-    snprintf(time_str_temp, sizeof(time_str_temp), "%02d:%02d:%02d", rtc_time.hour, rtc_time.minute, rtc_time.second);
-    static char time_str[9] = {0};
-    strncpy_nowarn(time_str, time_str_temp, sizeof(time_str));
+    static char time_str[11] = {0};
+    snprintf_nowarn(time_str, sizeof(time_str), "%02d:%02d:%02d%2s", rtc_time.hour, rtc_time.minute, rtc_time.second,
+                    rtc_time.format == RTC_FORMAT_24H ? " Z" : (rtc_time.am_pm == RTC_AM ? "AM" : "PM"));
     return time_str;
 }
 
@@ -277,8 +287,8 @@ char *rtc_read_time_str(void) {
  * @return char* MM/DD/YYYY HH:MM:SS
  */
 char *rtc_read_date_time_str(void) {
-    static char date_time_str[21] = {0};
-    snprintf(date_time_str, sizeof(date_time_str), "%s %s", rtc_read_date_str(), rtc_read_time_str());
+    static char date_time_str[22] = {0};
+    snprintf_nowarn(date_time_str, sizeof(date_time_str), "%s %s", rtc_read_date_str(), rtc_read_time_str());
     return date_time_str;
 }
 
@@ -288,9 +298,10 @@ char *rtc_read_date_time_str(void) {
  * @return char* YYYY-MM-DDTHH:MM:SS
  */
 char *rtc_read_date_time_iso8601_str(void) {
-    static char date_time_str[26] = {0};
-    snprintf(date_time_str, sizeof(date_time_str), "%04d-%02d-%02dT%02d:%02d:%02d", rtc_time.year, rtc_time.month,
-             rtc_time.date, rtc_time.hour, rtc_time.minute, rtc_time.second);
+    static char date_time_str[22] = {0};
+    snprintf_nowarn(date_time_str, sizeof(date_time_str), "%04d-%02d-%02dT%02d:%02d:%02d%2s", rtc_time.year,
+                    rtc_time.month, rtc_time.date, rtc_time.hour, rtc_time.minute, rtc_time.second,
+                    rtc_time.format == RTC_FORMAT_24H ? " Z" : (rtc_time.am_pm == RTC_AM ? "AM" : "PM"));
     return date_time_str;
 }
 

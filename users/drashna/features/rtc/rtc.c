@@ -251,14 +251,14 @@ void rtc_task(void) {
 #endif // VENDOR_RTC_DRIVER_ENABLE
         if (connected) {
             last_rtc_read = timer_read() + RTC_READ_INTERVAL;
+#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+            void display_menu_set_dirty(void);
+            display_menu_set_dirty();
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
         } else {
             last_rtc_read = timer_read() + (RTC_READ_INTERVAL * 100);
         }
         rtc_connected = connected;
-#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
-        void display_menu_set_dirty(void);
-        display_menu_set_dirty();
-#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
     }
 }
 

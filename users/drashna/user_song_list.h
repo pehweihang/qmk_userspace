@@ -543,6 +543,7 @@
 #define WINXP_SOUND \
     W__NOTE(_DS6), Q__NOTE(_DS5), H__NOTE(_AS5), H__NOTE(_GS5), H__NOTE(_DS5), H__NOTE(_DS6), H__NOTE(_AS5)
 
+#define FP_STARTUP_LIGHT H__NOTE(_E6), H__NOTE(_F6), H__NOTE(_C6), W__NOTE(_A5), WD_NOTE(_F5)
 #define FP_STARTUP_LIGHT_EXT \
     H__NOTE(_E6), H__NOTE(_F6), H__NOTE(_C6), W__NOTE(_A5), WD_NOTE(_F5), WD_NOTE(_D5), WD_NOTE(_G5), WD_NOTE(_C5)
 #define FP_STARTUP_DARK                                                                                   \
@@ -550,6 +551,9 @@
         Q__NOTE(_E5), Q__NOTE(_F5), Q__NOTE(_GS5), Q__NOTE(_G5), Q__NOTE(_F5), W__NOTE(_G5)
 #define FP_STARTUP_FLOW_DOWN \
     W__NOTE(_E6), H__NOTE(_REST), H__NOTE(_C6), W__NOTE(_G5), H__NOTE(_A5), W__NOTE(_D5), W__NOTE(_E5), W__NOTE(_C5)
+#define FP_STARTUP_XIMEGA                                                                                 \
+    W__NOTE(_FS5), Q__NOTE(_A5), HD_NOTE(_B5), W__NOTE(_D6), Q__NOTE(_REST), HD_NOTE(_B5), HD_NOTE(_FS5), \
+        HD_NOTE(_D5), HD_NOTE(_E5), H__NOTE(_REST), HD_NOTE(_D5), HD_NOTE(_B4),
 
 #define FP_MOUSE_SOUND_1 E__NOTE(_B2)
 #define FP_MOUSE_SOUND_2 E__NOTE(_B3)

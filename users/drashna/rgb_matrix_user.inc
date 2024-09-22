@@ -8,3 +8,7 @@
 // #include "rgb/anim/custom_gradient.h" // too custom
 #include "rgb/anim/raindrops.h"
 #include "rgb/anim/candy.h"
+// #include "rgb/anim/alpha_mod_homerow.h"
+// #include "rgb/anim/alpha_mod_homerow_cycle.h"
+// #include "rgb/anim/tetris_falling.h"
+// #include "rgb/anim/tetris_falling_horizontal.h"

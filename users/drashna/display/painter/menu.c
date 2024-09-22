@@ -1613,14 +1613,21 @@ menu_entry_t root_entries[] = {
         .parent.child_count = ARRAY_SIZE(rtc_config_entries),
     },
 #endif
-#if __COUNTER__ >= 8 && !defined(DISPLAY_MENU_NO_KEYMAP) && !defined(DISPLAY_MENU_NO_RTC)
-
+#if __COUNTER__ < 8
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "User Settings",
+        .parent.children    = user_settings_option_entries,
+        .parent.child_count = ARRAY_SIZE(user_settings_option_entries),
+    },
+#endif
+#if __COUNTER__ >= 8 && (!defined(DISPLAY_MENU_NO_KEYMAP) || !defined(DISPLAY_MENU_NO_RTC))
     {
         .flags = menu_flag_is_parent,
         .text  = "More...",
 #    if defined(DISPLAY_MENU_NO_KEYMAP)
         .parent.children    = buy_more_entries_less,
-        .parent.child_count = ARRAY_SIZE(buy_more_entries),
+        .parent.child_count = ARRAY_SIZE(buy_more_entries_less),
 #    else
         .parent.children    = buy_more_entries,
         .parent.child_count = ARRAY_SIZE(buy_more_entries),

@@ -704,8 +704,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         // RTC
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifdef RTC_ENABLE
         ypos -= (font_oled->line_height + 3);
+#ifdef RTC_ENABLE
         static uint16_t rtc_timer  = 0;
         bool            rtc_redraw = false;
         if (timer_elapsed(rtc_timer) > 125 && rtc_is_connected()) {
@@ -734,6 +734,21 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             }
             qp_rect(ili9341_display, xpos, ypos, max_rtc_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
+#else
+#    include "version.h"
+        if (hue_redraw) {
+            snprintf(buf, sizeof(buf), "Built on: %s %s", QMK_BUILDDATE);
+
+            uint8_t title_width = qp_textwidth(font_oled, buf);
+            if (title_width > (width - 6)) {
+                title_width = width - 6;
+            }
+            uint8_t title_xpos = (width - title_width) / 2;
+
+            xpos += qp_drawtext_recolor(ili9341_display, title_xpos, ypos, font_oled, buf, curr_hsv.h, curr_hsv.s,
+                                        curr_hsv.v, 0, 0, 0);
+        }
+
 #endif // RTC_ENABLE
 
         static bool force_full_block_redraw = false;

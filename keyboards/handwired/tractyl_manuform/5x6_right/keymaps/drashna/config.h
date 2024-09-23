@@ -38,3 +38,5 @@
 #elif defined(KEYBOARD_handwired_tractyl_manuform_5x6_right_f411)
 #    define EECONFIG_USER_DATA_SIZE 4096
 #endif
+
+#define QUANTUM_PAINTER_DISPLAY_TIMEOUT 600000

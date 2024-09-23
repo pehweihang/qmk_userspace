@@ -6,10 +6,10 @@
 // USB Port Pin Definitions
 // black - GND
 // red - VCC
-// white - D+
-// blue - D-
+// white - D- - A11
+// blue - D+ - A12
 // green - CC1
-// yellow - SBU1
+// yellow - CC2
 
 #if defined(KEYBOARD_handwired_tractyl_manuform_5x6_right_f405)
 #    include "keymap_full.h"

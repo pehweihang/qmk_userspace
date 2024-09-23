@@ -93,6 +93,10 @@ void bootmagic_scan(void) {
 #ifdef OLED_ENABLE
         oled_init(OLED_ROTATION_0);
 #endif // OLED_ENABLE
+#ifdef QUANTUM_PAINTER_ENABLE
+        void keyboard_post_init_quantum_painter(void);
+        keyboard_post_init_quantum_painter();
+#endif
         reset_keyboard();
     }
 }

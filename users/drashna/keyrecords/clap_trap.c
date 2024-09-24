@@ -52,7 +52,7 @@ bool clap_trap_is_enabled(void) {
  */
 void clap_trap_enable(void) {
     userspace_config.clap_trap_enable = true;
-    eeconfig_update_user_config(&userspace_config.raw);
+    eeconfig_update_user_datablock(&userspace_config);
 }
 
 /**
@@ -61,7 +61,7 @@ void clap_trap_enable(void) {
  */
 void clap_trap_disable(void) {
     userspace_config.clap_trap_enable = false;
-    eeconfig_update_user_config(&userspace_config.raw);
+    eeconfig_update_user_datablock(&userspace_config);
 }
 
 /**
@@ -70,7 +70,7 @@ void clap_trap_disable(void) {
  */
 void clap_trap_toggle(void) {
     userspace_config.clap_trap_enable = !userspace_config.clap_trap_enable;
-    eeconfig_update_user_config(&userspace_config.raw);
+    eeconfig_update_user_datablock(&userspace_config);
 }
 
 /**

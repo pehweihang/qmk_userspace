@@ -34,10 +34,6 @@ _Static_assert(sizeof(userspace_config_t) <= RPC_M2S_BUFFER_SIZE,
 _Static_assert(sizeof(user_runtime_config_t) <= RPC_M2S_BUFFER_SIZE,
                "user_runtime_config_t is larger than split buffer size!");
 
-uint32_t transport_user_runtime_state = 0;
-uint16_t transport_keymap_config      = 0;
-uint64_t transport_userspace_config   = 0;
-
 /**
  * @brief Syncs user state between halves of split keyboard
  *
@@ -48,8 +44,8 @@ uint64_t transport_userspace_config   = 0;
  */
 void user_runtime_state_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
                              uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
-    if (initiator2target_buffer_size == sizeof(transport_user_runtime_state)) {
-        memcpy(&transport_user_runtime_state, initiator2target_buffer, initiator2target_buffer_size);
+    if (initiator2target_buffer_size == sizeof(user_runtime_state)) {
+        memcpy(&user_runtime_state, initiator2target_buffer, initiator2target_buffer_size);
     }
 }
 
@@ -63,8 +59,8 @@ void user_runtime_state_sync(uint8_t initiator2target_buffer_size, const void* i
  */
 void user_keymap_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
                       uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
-    if (initiator2target_buffer_size == sizeof(transport_keymap_config)) {
-        memcpy(&transport_keymap_config, initiator2target_buffer, initiator2target_buffer_size);
+    if (initiator2target_buffer_size == sizeof(keymap_config)) {
+        memcpy(&keymap_config, initiator2target_buffer, initiator2target_buffer_size);
     }
 }
 
@@ -78,8 +74,8 @@ void user_keymap_sync(uint8_t initiator2target_buffer_size, const void* initiato
  */
 void user_config_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
                       uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
-    if (initiator2target_buffer_size == sizeof(transport_userspace_config)) {
-        memcpy(&transport_userspace_config, initiator2target_buffer, initiator2target_buffer_size);
+    if (initiator2target_buffer_size == sizeof(userspace_config)) {
+        memcpy(&userspace_config, initiator2target_buffer, initiator2target_buffer_size);
     }
 }
 
@@ -170,33 +166,27 @@ void keyboard_post_init_transport_sync(void) {
  */
 void user_transport_update(void) {
     if (is_keyboard_master()) {
-        transport_user_runtime_state = user_state.raw;
-        transport_keymap_config      = keymap_config.raw;
-        transport_userspace_config   = userspace_config.raw;
     } else {
-        user_state.raw       = transport_user_runtime_state;
-        keymap_config.raw    = transport_keymap_config;
-        userspace_config.raw = transport_userspace_config;
 #ifdef UNICODE_COMMON_ENABLE
-        unicode_config.input_mode = user_state.unicode_mode;
-        unicode_typing_mode       = user_state.unicode_typing_mode;
+        unicode_config.input_mode = user_runtime_state.unicode_mode;
+        unicode_typing_mode       = user_runtime_state.unicode_typing_mode;
 #endif // UNICODE_COMMON_ENABLE
 #if defined(POINTING_DEVICE_ENABLE) && defined(POINTING_DEVICE_AUTO_MOUSE_ENABLE)
-        if (get_auto_mouse_toggle() != user_state.tap_toggling) {
+        if (get_auto_mouse_toggle() != user_runtime_state.tap_toggling) {
             auto_mouse_toggle();
         }
 #endif // POINTING_DEVICE_ENABLE && POINTING_DEVICE_AUTO_MOUSE_ENABLE
 #ifdef SWAP_HANDS_ENABLE
-        swap_hands = user_state.swap_hands;
+        swap_hands = user_runtime_state.swap_hands;
 #endif // SWAP_HANDS_ENABLE
 #ifdef CAPS_WORD_ENABLE
-        if (user_state.is_caps_word) {
+        if (user_runtime_state.is_caps_word) {
             caps_word_on();
         } else {
             caps_word_off();
         }
 #endif // CAPS_WORD_ENABLE
-        set_keyboard_lock(user_state.host_driver_disabled);
+        set_keyboard_lock(user_runtime_state.host_driver_disabled);
     }
 }
 
@@ -209,7 +199,7 @@ void user_transport_sync(void) {
         // Keep track of the last state, so that we can tell if we need to propagate to slave
         static uint32_t last_sync[6], last_user_state = 0;
         static uint16_t last_keymap = 0;
-        static uint64_t last_config = 0;
+        static userspace_config_t last_config = {0};
         bool            needs_sync  = false;
 #if defined(DISPLAY_DRIVER_ENABLE) && defined(DISPLAY_KEYLOGGER_ENABLE)
         static char keylog_temp[DISPLAY_KEYLOGGER_LENGTH + 1] = {0};
@@ -222,9 +212,9 @@ void user_transport_sync(void) {
             last_sync[5] = timer_read32();
         }
         // Check if the state values are different
-        if (memcmp(&transport_user_runtime_state, &last_user_state, sizeof(transport_user_runtime_state))) {
+        if (memcmp(&user_runtime_state, &last_user_state, sizeof(user_runtime_state))) {
             needs_sync = true;
-            memcpy(&last_user_state, &transport_user_runtime_state, sizeof(transport_user_runtime_state));
+            memcpy(&last_user_state, &user_runtime_state, sizeof(user_runtime_state));
         }
         // Send to slave every FORCED_SYNC_THROTTLE_MS regardless of state change
         if (timer_elapsed32(last_sync[0]) > FORCED_SYNC_THROTTLE_MS) {
@@ -233,17 +223,16 @@ void user_transport_sync(void) {
 
         // Perform the sync if requested
         if (needs_sync) {
-            if (transaction_rpc_send(RPC_ID_USER_RUNTIME_STATE_SYNC, sizeof(transport_user_runtime_state),
-                                     &transport_user_runtime_state)) {
+            if (transaction_rpc_send(RPC_ID_USER_RUNTIME_STATE_SYNC, sizeof(user_runtime_state), &user_runtime_state)) {
                 last_sync[0] = timer_read32();
             }
             needs_sync = false;
         }
 
         // Check if the state values are different
-        if (memcmp(&transport_keymap_config, &last_keymap, sizeof(transport_keymap_config))) {
+        if (memcmp(&keymap_config, &last_keymap, sizeof(keymap_config))) {
             needs_sync = true;
-            memcpy(&last_keymap, &transport_keymap_config, sizeof(transport_keymap_config));
+            memcpy(&last_keymap, &keymap_config, sizeof(keymap_config));
         }
 
         // Send to slave every FORCED_SYNC_THROTTLE_MS regardless of state change
@@ -253,17 +242,16 @@ void user_transport_sync(void) {
 
         // Perform the sync if requested
         if (needs_sync) {
-            if (transaction_rpc_send(RPC_ID_USER_KEYMAP_SYNC, sizeof(transport_keymap_config),
-                                     &transport_keymap_config)) {
+            if (transaction_rpc_send(RPC_ID_USER_KEYMAP_SYNC, sizeof(keymap_config), &keymap_config)) {
                 last_sync[1] = timer_read32();
             }
             needs_sync = false;
         }
 
         // Check if the state values are different
-        if (memcmp(&transport_userspace_config, &last_config, sizeof(transport_userspace_config))) {
+        if (memcmp(&userspace_config, &last_config, sizeof(userspace_config))) {
             needs_sync = true;
-            memcpy(&last_config, &transport_userspace_config, sizeof(transport_userspace_config));
+            memcpy(&last_config, &userspace_config, sizeof(userspace_config));
         }
 
         // Send to slave every FORCED_SYNC_THROTTLE_MS regardless of state change
@@ -273,8 +261,7 @@ void user_transport_sync(void) {
 
         // Perform the sync if requested
         if (needs_sync) {
-            if (transaction_rpc_send(RPC_ID_USER_CONFIG_SYNC, sizeof(transport_userspace_config),
-                                     &transport_userspace_config)) {
+            if (transaction_rpc_send(RPC_ID_USER_CONFIG_SYNC, sizeof(userspace_config), &userspace_config)) {
                 last_sync[2] = timer_read32();
             }
             needs_sync = false;

@@ -109,16 +109,16 @@ bool process_record_user_oled(uint16_t keycode, keyrecord_t *record) {
             case OLED_BRIGHTNESS_INC:
                 userspace_config.oled_brightness = qadd8(userspace_config.oled_brightness, OLED_BRIGHTNESS_STEP);
                 oled_set_brightness(userspace_config.oled_brightness);
-                eeconfig_update_user_config(&userspace_config.raw);
+                eeconfig_update_user_datablock(&userspace_config);
                 break;
             case OLED_BRIGHTNESS_DEC:
                 userspace_config.oled_brightness = qsub8(userspace_config.oled_brightness, OLED_BRIGHTNESS_STEP);
                 oled_set_brightness(userspace_config.oled_brightness);
-                eeconfig_update_user_config(&userspace_config.raw);
+                eeconfig_update_user_datablock(&userspace_config);
                 break;
             case OLED_LOCK:
                 userspace_config.oled_lock = !userspace_config.oled_lock;
-                eeconfig_update_user_config(&userspace_config.raw);
+                eeconfig_update_user_datablock(&userspace_config);
                 if (userspace_config.oled_lock) {
                     oled_on();
                 }
@@ -421,9 +421,9 @@ void render_user_status(uint8_t col, uint8_t line) {
     bool is_audio_on = false, l_is_clicky_on = false;
 #    ifdef SPLIT_KEYBOARD
 
-    is_audio_on = user_state.audio_enable;
+    is_audio_on = user_runtime_state.audio_enable;
 #        ifdef AUDIO_CLICKY
-    l_is_clicky_on = user_state.audio_clicky_enable;
+    l_is_clicky_on = user_runtime_state.audio_clicky_enable;
 #        endif
 #    else
     is_audio_on = is_audio_on();

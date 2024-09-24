@@ -282,7 +282,7 @@ void rgb_matrix_idle_anim_toggle(void) {
 #if defined(RGB_MATRIX_ENABLE) && defined(RGB_MATRIX_FRAMEBUFFER_EFFECTS)
     userspace_config.rgb_matrix_idle_anim ^= 1;
     dprintf("RGB Matrix Idle Animation [EEPROM]: %u\n", userspace_config.rgb_matrix_idle_anim);
-    eeconfig_update_user_config(&userspace_config.raw);
+    eeconfig_update_user_datablock(&userspace_config);
     if (userspace_config.rgb_matrix_idle_anim) {
         rgb_matrix_mode_noeeprom(RGB_MATRIX_TYPING_HEATMAP);
     }

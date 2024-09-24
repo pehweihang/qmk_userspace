@@ -257,7 +257,7 @@ void painter_sethsv_eeprom_helper(uint8_t hue, uint8_t sat, uint8_t val, bool wr
     userspace_config.painter_hsv.s = sat;
     userspace_config.painter_hsv.v = val;
     if (write_to_eeprom) {
-        eeconfig_update_user_config(&userspace_config.raw);
+        eeconfig_update_user_datablock(&userspace_config);
     }
     dprintf("painter set hsv [%s]: %u,%u,%u\n", (write_to_eeprom) ? "EEPROM" : "NOEEPROM",
             userspace_config.painter_hsv.h, userspace_config.painter_hsv.s, userspace_config.painter_hsv.v);
@@ -482,7 +482,7 @@ void painter_decrease_val(void) {
 void painter_increase_hue_offset_helper(bool write_to_eeprom) {
     userspace_config.painter_offset = qadd8(userspace_config.painter_offset, PAINTER_HUE_STEP);
     if (write_to_eeprom) {
-        eeconfig_update_user_config(&userspace_config.raw);
+        eeconfig_update_user_datablock(&userspace_config);
     }
     dprintf("painter set offset [%s]: %u\n", (write_to_eeprom) ? "EEPROM" : "NOEEPROM",
             userspace_config.painter_offset);
@@ -510,7 +510,7 @@ void painter_increase_hue_offset(void) {
 void painter_decrease_hue_offset_helper(bool write_to_eeprom) {
     userspace_config.painter_offset = qsub8(userspace_config.painter_offset, PAINTER_HUE_STEP);
     if (write_to_eeprom) {
-        eeconfig_update_user_config(&userspace_config.raw);
+        eeconfig_update_user_datablock(&userspace_config);
     }
     dprintf("painter set offset [%s]: %u\n", (write_to_eeprom) ? "EEPROM" : "NOEEPROM",
             userspace_config.painter_offset);

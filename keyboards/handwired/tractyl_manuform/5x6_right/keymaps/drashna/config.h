@@ -34,9 +34,9 @@
 #    undef RGB_MATRIX_MAXIMUM_BRIGHTNESS
 #    define RGB_MATRIX_MAXIMUM_BRIGHTNESS 255
 #    define WEAR_LEVELING_BACKING_SIZE    (0x4000)
-#    define EECONFIG_USER_DATA_SIZE       (0x1C00)
+#    define EECONFIG_USER_DATA_SIZE       64
 #elif defined(KEYBOARD_handwired_tractyl_manuform_5x6_right_f411)
-#    define EECONFIG_USER_DATA_SIZE 4096
+#    define EECONFIG_USER_DATA_SIZE 64
 #endif
 
 #define QUANTUM_PAINTER_DISPLAY_TIMEOUT 600000

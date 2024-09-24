@@ -4,7 +4,6 @@
 #pragma once
 #include QMK_KEYBOARD_H
 
-#include "eeconfig_users.h"
 #include "keyrecords/wrappers.h"
 #include "keyrecords/process_records.h"
 #include "callbacks.h"
@@ -91,32 +90,29 @@ void center_text(const char *text, char *output, uint8_t width);
 #    include <quantum/color.h>
 #endif // !defined(RGB_MATRIX_ENABLE) && !defined(RGBLIGHT_ENABLE)
 
-typedef union {
-    uint64_t raw;
-    struct {
-        bool     rgb_layer_change     : 1;
-        bool     is_overwatch         : 1;
-        bool     nuke_switch          : 1;
-        bool     swapped_numbers      : 1;
-        bool     rgb_matrix_idle_anim : 1;
-        bool     i2c_scanner_enable   : 1;
-        bool     matrix_scan_print    : 1;
-        bool     align_reserved       : 1;
-        uint8_t  oled_brightness      : 8;
-        bool     oled_lock            : 1;
-        bool     enable_acceleration  : 1;
-        uint8_t  display_mode         : 2;
-        uint8_t  display_logo         : 4;
-        bool     clap_trap_enable     : 1;
-        bool     gaming_song_enable   : 1;
-        uint32_t reserved             : 5;
-        bool     check                : 1;
-        HSV      painter_hsv;
-        uint8_t  painter_offset : 8;
-    };
+typedef struct PACKED {
+    bool     rgb_layer_change     : 1;
+    bool     is_overwatch         : 1;
+    bool     nuke_switch          : 1;
+    bool     swapped_numbers      : 1;
+    bool     rgb_matrix_idle_anim : 1;
+    bool     i2c_scanner_enable   : 1;
+    bool     matrix_scan_print    : 1;
+    bool     align_reserved       : 1;
+    uint8_t  oled_brightness      : 8;
+    bool     oled_lock            : 1;
+    bool     enable_acceleration  : 1;
+    uint8_t  display_mode         : 2;
+    uint8_t  display_logo         : 4;
+    bool     clap_trap_enable     : 1;
+    bool     gaming_song_enable   : 1;
+    uint32_t reserved             : 5;
+    bool     check                : 1;
+    HSV      painter_hsv;
+    uint8_t  painter_offset : 8;
 } userspace_config_t;
 
-_Static_assert(sizeof(userspace_config_t) == sizeof(uint64_t), "Userspace EECONFIG out of spec.");
+_Static_assert(sizeof(userspace_config_t) <= EECONFIG_USER_DATA_SIZE, "User EECONFIG block is not large enough.");
 
 extern userspace_config_t userspace_config;
 
@@ -137,7 +133,7 @@ typedef union {
 
 _Static_assert(sizeof(user_runtime_config_t) == sizeof(uint32_t), "Userspace Runtime config out of spec.");
 
-extern user_runtime_config_t user_state;
+extern user_runtime_config_t user_runtime_state;
 
 void        set_keyboard_lock(bool enable);
 bool        get_keyboard_lock(void);

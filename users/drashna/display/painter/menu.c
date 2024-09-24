@@ -44,14 +44,14 @@ static bool menu_handler_display(menu_input_t input) {
             if (userspace_config.display_mode > 2) {
                 userspace_config.display_mode = 2;
             }
-            eeconfig_update_user_config(&userspace_config.raw);
+            eeconfig_update_user_datablock(&userspace_config);
             return false;
         case menu_input_right:
             userspace_config.display_mode = (userspace_config.display_mode + 1) % 3;
             if (userspace_config.display_mode > 2) {
                 userspace_config.display_mode = 0;
             }
-            eeconfig_update_user_config(&userspace_config.raw);
+            eeconfig_update_user_datablock(&userspace_config);
             return false;
         default:
             return true;
@@ -81,14 +81,14 @@ static bool menu_handler_slave_image(menu_input_t input) {
             if (userspace_config.display_logo > 10) {
                 userspace_config.display_logo = 10;
             }
-            eeconfig_update_user_config(&userspace_config.raw);
+            eeconfig_update_user_datablock(&userspace_config);
             return false;
         case menu_input_right:
             userspace_config.display_logo = (userspace_config.display_logo + 1) % 11;
             if (userspace_config.display_logo > 10) {
                 userspace_config.display_logo = 0;
             }
-            eeconfig_update_user_config(&userspace_config.raw);
+            eeconfig_update_user_datablock(&userspace_config);
             return false;
         default:
             return true;
@@ -877,7 +877,8 @@ static bool menu_handler_auto_mouse_accel(menu_input_t input) {
         case menu_input_left:
         case menu_input_right:
             userspace_config.enable_acceleration ^= 1;
-            eeconfig_update_user_config(&userspace_config.raw);
+            eeconfig_update_user_datablock(&userspace_config);
+
             return false;
         default:
             return true;
@@ -1409,7 +1410,7 @@ static bool menu_handler_overwatch_mode(menu_input_t input) {
         case menu_input_left:
         case menu_input_right:
             userspace_config.is_overwatch = !userspace_config.is_overwatch;
-            eeconfig_update_user_config(&userspace_config.raw);
+            eeconfig_update_user_datablock(&userspace_config);
             return false;
         default:
             return true;
@@ -1425,7 +1426,7 @@ static bool menu_handler_gamepad_swap(menu_input_t input) {
         case menu_input_left:
         case menu_input_right:
             userspace_config.swapped_numbers = !userspace_config.swapped_numbers;
-            eeconfig_update_user_config(&userspace_config.raw);
+            eeconfig_update_user_datablock(&userspace_config);
             return false;
         default:
             return true;
@@ -1441,7 +1442,7 @@ static bool menu_handler_clap_trap(menu_input_t input) {
         case menu_input_left:
         case menu_input_right:
             userspace_config.clap_trap_enable = !userspace_config.clap_trap_enable;
-            eeconfig_update_user_config(&userspace_config.raw);
+            eeconfig_update_user_datablock(&userspace_config);
             return false;
         default:
             return true;
@@ -1457,7 +1458,7 @@ static bool menu_handler_i2c_scanner(menu_input_t input) {
         case menu_input_left:
         case menu_input_right:
             userspace_config.i2c_scanner_enable = !userspace_config.i2c_scanner_enable;
-            eeconfig_update_user_config(&userspace_config.raw);
+            eeconfig_update_user_datablock(&userspace_config);
             return false;
         default:
             return true;
@@ -1473,7 +1474,7 @@ static bool menu_handler_scan_rate(menu_input_t input) {
         case menu_input_left:
         case menu_input_right:
             userspace_config.matrix_scan_print = !userspace_config.matrix_scan_print;
-            eeconfig_update_user_config(&userspace_config.raw);
+            eeconfig_update_user_datablock(&userspace_config);
             return false;
         default:
             return true;

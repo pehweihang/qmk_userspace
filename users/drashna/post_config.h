@@ -33,7 +33,7 @@
 #        endif
 #        define RGBLIGHT_EFFECT_TWINKLE
 #    endif // defined(__AVR__) && (!defined(__AVR_AT90USB1286__) && !defined(RGBLIGHT_ALL_ANIMATIONS))
-#endif // RGBLIGHT_ENABLE
+#endif     // RGBLIGHT_ENABLE
 
 #ifdef MOUSEKEY_ENABLE
 // mouse movement config
@@ -51,7 +51,7 @@
 #        ifndef MOUSEKEY_MOVE_DELTA
 #            define MOUSEKEY_MOVE_DELTA 25
 #        endif // MOUSEKEY_MOVE_DELTA
-#    else // MK_KINETIC_SPEED
+#    else      // MK_KINETIC_SPEED
 #        ifndef MOUSEKEY_DELAY
 #            define MOUSEKEY_DELAY 300
 #        endif // MOUSEKEY_DELAY
@@ -61,7 +61,7 @@
 #        ifndef MOUSEKEY_MOVE_DELTA
 #            define MOUSEKEY_MOVE_DELTA 5
 #        endif // MOUSEKEY_MOVE_DELTA
-#    endif // MK_KINETIC_SPEED
+#    endif     // MK_KINETIC_SPEED
 #    ifndef MOUSEKEY_MAX_SPEED
 #        define MOUSEKEY_MAX_SPEED 7
 #    endif // MOUSEKEY_MAX_SPEED
@@ -109,7 +109,7 @@
 #    ifndef MOUSEKEY_WHEEL_DECELERATED_MOVEMENTS
 #        define MOUSEKEY_WHEEL_DECELERATED_MOVEMENTS 8
 #    endif // MOUSEKEY_WHEEL_DECELERATED_MOVEMENTS
-#endif // MOUSEKEY_ENABLE
+#endif     // MOUSEKEY_ENABLE
 
 #ifndef TAPPING_TERM
 #    define TAPPING_TERM 175
@@ -131,3 +131,15 @@
 #ifndef EECONFIG_USER_DATA_SIZE
 #    define EECONFIG_USER_DATA_SIZE 8
 #endif // EECONFIG_USER_DATA_SIZE
+#ifdef SPLIT_KEYBOARD
+#    if EECONFIG_USER_DATA_SIZE > RPC_M2S_BUFFER_SIZE
+#        error "EECONFIG_USER_DATA_SIZE is too large!"
+#    endif // EECONFIG_USER_DATA_SIZE > 1000
+#else      // SPLIT_KEYBOARD
+#    if EECONFIG_USER_DATA_SIZE > 1000
+#        error "EECONFIG_USER_DATA_SIZE is too large!"
+#    endif // EECONFIG_USER_DATA_SIZE > 1000
+#endif     // SPLIT_KEYBOARD
+#ifndef EECONFIG_USER_DATA_VERSION
+#    define EECONFIG_USER_DATA_VERSION (0x13373A7A | EECONFIG_USER_DATA_SIZE)
+#endif // EECONFIG_USER_DATA_VERSION

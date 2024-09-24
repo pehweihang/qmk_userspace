@@ -37,7 +37,7 @@ void keyboard_post_init_unicode(void);
 #    include "split_util.h"
 #endif // SPLIT_KEYBOARD
 
-user_runtime_config_t user_state;
+user_runtime_config_t user_runtime_state;
 
 /**
  * @brief Keyboard Pre-Initialization
@@ -46,7 +46,8 @@ user_runtime_config_t user_state;
 __attribute__((weak)) void keyboard_pre_init_keymap(void) {}
 void                       keyboard_pre_init_user(void) {
     print_set_sendchar(drashna_sendchar);
-    eeconfig_read_user_config(&userspace_config.raw);
+    eeconfig_read_user_datablock(&userspace_config);
+
     if (!userspace_config.check) {
         eeconfig_init_user();
     }
@@ -278,7 +279,7 @@ void                       led_set_user(uint8_t usb_led) {
  */
 __attribute__((weak)) void eeconfig_init_keymap(void) {}
 void                       eeconfig_init_user(void) {
-    userspace_config.raw              = 0;
+    memset(&userspace_config, 0, sizeof(userspace_config_t));
     userspace_config.rgb_layer_change = true;
     userspace_config.check            = true;
 #if defined(OLED_ENABLE)
@@ -297,19 +298,8 @@ void                       eeconfig_init_user(void) {
     keymap_config.nkro = true;
     eeconfig_update_keymap(keymap_config.raw);
 
-    eeconfig_update_user_config(&userspace_config.raw);
+    eeconfig_update_user_datablock(&userspace_config);
     eeconfig_init_keymap();
-}
-
-/**
- * @brief When EEPROM size is larger, init everything but first 4 bytes
- *
- */
-void eeconfig_init_user_datablock(void) {
-#if (EECONFIG_USER_DATA_SIZE) > 8
-    uint8_t eeconfig_empty_temp[(EECONFIG_USER_DATA_SIZE)-8] = {0};
-    eeconfig_update_user_data(eeconfig_empty_temp);
-#endif // (EECONFIG_USER_DATA_SIZE) > 8
 }
 
 /**
@@ -349,28 +339,28 @@ void                       matrix_slave_scan_user(void) {
 /**
  * @brief Housekeyping task
  *
- * sets user_state config to be synced later or just used. Also runs other "every tick" tasks
+ * sets user_runtime_state config to be synced later or just used. Also runs other "every tick" tasks
  */
 __attribute__((weak)) void housekeeping_task_keymap(void) {}
 void                       housekeeping_task_user(void) {
     if (is_keyboard_master()) {
 #ifdef AUDIO_ENABLE
-        user_state.audio_enable        = is_audio_on();
-        user_state.audio_clicky_enable = is_clicky_on();
+        user_runtime_state.audio_enable        = is_audio_on();
+        user_runtime_state.audio_clicky_enable = is_clicky_on();
 #endif // AUDIO_ENABLE
 #if defined(POINTING_DEVICE_ENABLE) && defined(POINTING_DEVICE_AUTO_MOUSE_ENABLE)
-        user_state.tap_toggling = get_auto_mouse_toggle();
+        user_runtime_state.tap_toggling = get_auto_mouse_toggle();
 #endif // POINTING_DEVICE_ENABLE && POINTING_DEVICE_AUTO_MOUSE_ENABLE
 #ifdef UNICODE_COMMON_ENABLE
-        user_state.unicode_mode        = unicode_config.input_mode;
-        user_state.unicode_typing_mode = unicode_typing_mode;
+        user_runtime_state.unicode_mode        = unicode_config.input_mode;
+        user_runtime_state.unicode_typing_mode = unicode_typing_mode;
 #endif // UNICODE_COMMON_ENABLE
 #ifdef SWAP_HANDS_ENABLE
-        user_state.swap_hands = swap_hands;
+        user_runtime_state.swap_hands = swap_hands;
 #endif // SWAP_HANDS_ENABLE
-        user_state.host_driver_disabled = get_keyboard_lock();
+        user_runtime_state.host_driver_disabled = get_keyboard_lock();
 #ifdef CAPS_WORD_ENABLE
-        user_state.is_caps_word = is_caps_word_on();
+        user_runtime_state.is_caps_word = is_caps_word_on();
 #endif // CAPS_WORD_ENABLE
     }
 

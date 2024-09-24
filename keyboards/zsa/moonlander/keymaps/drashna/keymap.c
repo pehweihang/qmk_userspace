@@ -143,7 +143,7 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
         case KC_SWAP_NUM:
             if (record->event.pressed) {
                 userspace_config.swapped_numbers ^= 1;
-                eeconfig_update_user_config(&userspace_config.raw);
+                eeconfig_update_user_datablock(&userspace_config);
                 unregister_code(KC_1);
                 unregister_code(KC_2);
             }

@@ -264,7 +264,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 }
 #    endif // CUSTOM_RGB_MATRIX && RGB_MATRIX_FRAMEBUFFER_EFFECTS
                 if (is_eeprom_updated) {
-                    eeconfig_update_user_config(&userspace_config.raw);
+                    eeconfig_update_user_datablock(&userspace_config);
                 }
             }
             break;
@@ -289,14 +289,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case US_MATRIX_SCAN_RATE_PRINT:
             if (record->event.pressed) {
                 userspace_config.matrix_scan_print ^= 1;
-                eeconfig_update_user_config(&userspace_config.raw);
+                eeconfig_update_user_datablock(&userspace_config);
             }
             break;
         case US_I2C_SCAN_ENABLE:
 #if HAL_USE_I2C == TRUE
             if (record->event.pressed) {
                 userspace_config.i2c_scanner_enable = !userspace_config.i2c_scanner_enable;
-                eeconfig_update_user_config(&userspace_config.raw);
+                eeconfig_update_user_datablock(&userspace_config);
             }
 #endif // HAL_USE_I2C == TRUE
             break;
@@ -304,7 +304,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #ifdef AUDIO_ENABLE
             if (record->event.pressed) {
                 userspace_config.gaming_song_enable = !userspace_config.gaming_song_enable;
-                eeconfig_update_user_config(&userspace_config.raw);
+                eeconfig_update_user_datablock(&userspace_config);
                 set_doom_song(layer_state);
             }
 #endif // AUDIO_ENABLE
@@ -334,7 +334,7 @@ void                       post_process_record_user(uint16_t keycode, keyrecord_
 void rgb_layer_indication_toggle(void) {
     userspace_config.rgb_layer_change ^= 1;
     dprintf("rgblight layer change [EEPROM]: %u\n", userspace_config.rgb_layer_change);
-    eeconfig_update_user_config(&userspace_config.raw);
+    eeconfig_update_user_datablock(&userspace_config);
     if (userspace_config.rgb_layer_change) {
 #if defined(CUSTOM_RGB_MATRIX)
         rgb_matrix_set_flags(LED_FLAG_UNDERGLOW | LED_FLAG_KEYLIGHT | LED_FLAG_INDICATOR);

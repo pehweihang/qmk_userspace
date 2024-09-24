@@ -300,8 +300,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
         ypos += font_oled->line_height + 4;
         static user_runtime_config_t last_user_state = {0};
-        if (hue_redraw || last_user_state.raw != user_state.raw) {
-            last_user_state.raw = user_state.raw;
+        if (hue_redraw || memcmp(&user_runtime_state, &last_user_state, sizeof(user_runtime_state))) {
+            memcpy(&last_user_state, &user_runtime_state, sizeof(user_runtime_state));
             xpos                = 80 + 4 + windows_logo->width + 5;
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"AUDIO",
                                         last_user_state.audio_enable ? offset_hue : curr_hsv.h, curr_hsv.s,

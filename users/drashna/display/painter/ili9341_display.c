@@ -737,7 +737,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 #else
 #    include "version.h"
         if (hue_redraw) {
-            snprintf(buf, sizeof(buf), "Built on: %s %s", QMK_BUILDDATE);
+            snprintf(buf, sizeof(buf), "Built on: %s", QMK_BUILDDATE);
 
             uint8_t title_width = qp_textwidth(font_oled, buf);
             if (title_width > (width - 6)) {

@@ -250,16 +250,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #    if defined(CUSTOM_RGBLIGHT) && !defined(RGBLIGHT_DISABLE_KEYCODES)
                 // This disables layer indication, as it's assumed that if you're changing this ... you want that
                 // disabled
-                if (userspace_config.rgb_layer_change) {
-                    userspace_config.rgb_layer_change = false;
-                    dprintf("rgblight layer change [EEPROM]: %u\n", userspace_config.rgb_layer_change);
+                if (userspace_config.rgb.layer_change) {
+                    userspace_config.rgb.layer_change = false;
+                    dprintf("rgblight layer change [EEPROM]: %u\n", userspace_config.rgb.layer_change);
                     is_eeprom_updated = true;
                 }
 #    endif // CUSTOM_RGBLIGHT
 #    if defined(CUSTOM_RGB_MATRIX) && defined(RGB_MATRIX_FRAMEBUFFER_EFFECTS)
-                if (userspace_config.rgb_matrix_idle_anim) {
-                    userspace_config.rgb_matrix_idle_anim = false;
-                    dprintf("RGB Matrix Idle Animation [EEPROM]: %u\n", userspace_config.rgb_matrix_idle_anim);
+                if (userspace_config.rgb.idle_anim) {
+                    userspace_config.rgb.idle_anim = false;
+                    dprintf("RGB Matrix Idle Animation [EEPROM]: %u\n", userspace_config.rgb.idle_anim);
                     is_eeprom_updated = true;
                 }
 #    endif // CUSTOM_RGB_MATRIX && RGB_MATRIX_FRAMEBUFFER_EFFECTS
@@ -288,14 +288,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #endif // OS_DETECTION_ENABLE && OS_DETECTION_DEBUG_ENABLE
         case US_MATRIX_SCAN_RATE_PRINT:
             if (record->event.pressed) {
-                userspace_config.matrix_scan_print ^= 1;
+                userspace_config.debug.matrix_scan_print ^= 1;
                 eeconfig_update_user_datablock(&userspace_config);
             }
             break;
         case US_I2C_SCAN_ENABLE:
 #if HAL_USE_I2C == TRUE
             if (record->event.pressed) {
-                userspace_config.i2c_scanner_enable = !userspace_config.i2c_scanner_enable;
+                userspace_config.debug.i2c_scanner_enable = !userspace_config.debug.i2c_scanner_enable;
                 eeconfig_update_user_datablock(&userspace_config);
             }
 #endif // HAL_USE_I2C == TRUE
@@ -303,7 +303,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case US_GAMING_SCAN_TOGGLE:
 #ifdef AUDIO_ENABLE
             if (record->event.pressed) {
-                userspace_config.gaming_song_enable = !userspace_config.gaming_song_enable;
+                userspace_config.gaming.song_enable = !userspace_config.gaming.song_enable;
                 eeconfig_update_user_datablock(&userspace_config);
                 set_doom_song(layer_state);
             }
@@ -332,10 +332,10 @@ void                       post_process_record_user(uint16_t keycode, keyrecord_
 }
 
 void rgb_layer_indication_toggle(void) {
-    userspace_config.rgb_layer_change ^= 1;
-    dprintf("rgblight layer change [EEPROM]: %u\n", userspace_config.rgb_layer_change);
+    userspace_config.rgb.layer_change ^= 1;
+    dprintf("rgblight layer change [EEPROM]: %u\n", userspace_config.rgb.layer_change);
     eeconfig_update_user_datablock(&userspace_config);
-    if (userspace_config.rgb_layer_change) {
+    if (userspace_config.rgb.layer_change) {
 #if defined(CUSTOM_RGB_MATRIX)
         rgb_matrix_set_flags(LED_FLAG_UNDERGLOW | LED_FLAG_KEYLIGHT | LED_FLAG_INDICATOR);
 #    if defined(CUSTOM_RGBLIGHT)

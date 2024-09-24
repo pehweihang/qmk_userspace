@@ -48,9 +48,6 @@ void                       keyboard_pre_init_user(void) {
     print_set_sendchar(drashna_sendchar);
     eeconfig_read_user_datablock(&userspace_config);
 
-    if (!userspace_config.check) {
-        eeconfig_init_user();
-    }
     keyboard_pre_init_keymap();
 }
 // Add reconfigurable functions here, for keymap customization
@@ -86,7 +83,7 @@ void                       keyboard_post_init_user(void) {
 #endif // CUSTOM_UNICODE_ENABLE
 
 #ifdef DEBUG_MATRIX_SCAN_RATE_ENABLE
-    userspace_config.matrix_scan_print = true;
+    userspace_config.debug.matrix_scan_print = true;
 #endif // DEBUG_MATRIX_SCAN_RATE_ENABLE
 
 #if defined(BOOTLOADER_CATERINA) && defined(__AVR__) && defined(__AVR_ATmega32U4__)
@@ -280,15 +277,19 @@ void                       led_set_user(uint8_t usb_led) {
 __attribute__((weak)) void eeconfig_init_keymap(void) {}
 void                       eeconfig_init_user(void) {
     memset(&userspace_config, 0, sizeof(userspace_config_t));
-    userspace_config.rgb_layer_change = true;
-    userspace_config.check            = true;
+    userspace_config.rgb.layer_change = true;
 #if defined(OLED_ENABLE)
-    userspace_config.oled_brightness = OLED_BRIGHTNESS;
+    userspace_config.oled.brightness = OLED_BRIGHTNESS;
 #else  // OLED_ENABLE
-    userspace_config.oled_brightness = 255;
+    userspace_config.oled.brightness = 255;
 #endif // OLED_ENABLE
-    userspace_config.painter_hsv = (HSV){
+    userspace_config.painter.primary_hsv = (HSV){
         .h = 128,
+        .s = 255,
+        .v = 255,
+    };
+    userspace_config.painter.secondary_hsv = (HSV){
+        .h = 49,
         .s = 255,
         .v = 255,
     };

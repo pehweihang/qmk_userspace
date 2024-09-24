@@ -91,25 +91,35 @@ void center_text(const char *text, char *output, uint8_t width);
 #endif // !defined(RGB_MATRIX_ENABLE) && !defined(RGBLIGHT_ENABLE)
 
 typedef struct PACKED {
-    bool     rgb_layer_change     : 1;
-    bool     is_overwatch         : 1;
-    bool     nuke_switch          : 1;
-    bool     swapped_numbers      : 1;
-    bool     rgb_matrix_idle_anim : 1;
-    bool     i2c_scanner_enable   : 1;
-    bool     matrix_scan_print    : 1;
-    bool     align_reserved       : 1;
-    uint8_t  oled_brightness      : 8;
-    bool     oled_lock            : 1;
-    bool     enable_acceleration  : 1;
-    uint8_t  display_mode         : 2;
-    uint8_t  display_logo         : 4;
-    bool     clap_trap_enable     : 1;
-    bool     gaming_song_enable   : 1;
-    uint32_t reserved             : 5;
-    bool     check                : 1;
-    HSV      painter_hsv;
-    uint8_t  painter_offset : 8;
+    struct {
+        bool layer_change : 1;
+        bool idle_anim    : 1;
+    } rgb;
+    struct {
+        bool is_overwatch     : 1;
+        bool swapped_numbers  : 1;
+        bool clap_trap_enable : 1;
+        bool song_enable      : 1;
+    } gaming;
+    struct {
+        uint8_t brightness  : 8;
+        bool    screen_lock : 1;
+    } oled;
+    struct {
+        bool i2c_scanner_enable : 1;
+        bool matrix_scan_print  : 1;
+    } debug;
+    struct {
+        bool enable_acceleration : 1;
+    } pointing;
+    struct {
+        uint8_t display_mode : 2;
+        uint8_t display_logo : 4;
+        HSV     primary_hsv;
+        HSV     secondary_hsv;
+    } painter;
+    bool nuke_switch : 1;
+    bool check       : 1;
 } userspace_config_t;
 
 _Static_assert(sizeof(userspace_config_t) <= EECONFIG_USER_DATA_SIZE, "User EECONFIG block is not large enough.");

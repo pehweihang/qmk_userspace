@@ -43,7 +43,7 @@ clap_trap_t clap_trap_get(uint16_t idx) {
  * @return false if disabled
  */
 bool clap_trap_is_enabled(void) {
-    return userspace_config.clap_trap_enable;
+    return userspace_config.gaming.clap_trap_enable;
 }
 
 /**
@@ -51,7 +51,7 @@ bool clap_trap_is_enabled(void) {
  *
  */
 void clap_trap_enable(void) {
-    userspace_config.clap_trap_enable = true;
+    userspace_config.gaming.clap_trap_enable = true;
     eeconfig_update_user_datablock(&userspace_config);
 }
 
@@ -60,7 +60,7 @@ void clap_trap_enable(void) {
  *
  */
 void clap_trap_disable(void) {
-    userspace_config.clap_trap_enable = false;
+    userspace_config.gaming.clap_trap_enable = false;
     eeconfig_update_user_datablock(&userspace_config);
 }
 
@@ -69,7 +69,7 @@ void clap_trap_disable(void) {
  *
  */
 void clap_trap_toggle(void) {
-    userspace_config.clap_trap_enable = !userspace_config.clap_trap_enable;
+    userspace_config.gaming.clap_trap_enable = !userspace_config.gaming.clap_trap_enable;
     eeconfig_update_user_datablock(&userspace_config);
 }
 
@@ -179,7 +179,7 @@ bool process_clap_trap(uint16_t keycode, keyrecord_t *record) {
         }
     }
 
-    if (!userspace_config.clap_trap_enable) {
+    if (!userspace_config.gaming.clap_trap_enable) {
         return true;
     }
 

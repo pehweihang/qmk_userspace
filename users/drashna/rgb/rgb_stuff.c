@@ -48,7 +48,7 @@ uint32_t rgb_startup_animation(uint32_t triger_time, void *cb_arg) {
         rgblight_sethsv_noeeprom((counter + old_hsv.h) % 255, 255, old_hsv.v);
         if (counter >= 255) {
             is_rgblight_startup = false;
-            if (userspace_config.rgb_layer_change) {
+            if (userspace_config.rgb.layer_change) {
                 layer_state_set_rgb_light(layer_state);
             } else {
                 rgblight_set_hsv_and_mode(old_hsv.h, old_hsv.s, old_hsv.v, old_mode);
@@ -86,7 +86,7 @@ void keyboard_post_init_rgb_light(void) {
 #endif // RGB_MATRIX_ENABLE && RGBLIGHT_CUSTOM_DRIVER
 #if defined(RGBLIGHT_STARTUP_ANIMATION)
     is_enabled = rgblight_is_enabled();
-    if (userspace_config.rgb_layer_change) {
+    if (userspace_config.rgb.layer_change) {
         layer_state_set_rgb_light(layer_state);
     }
     old_hsv  = rgblight_get_hsv();
@@ -95,14 +95,14 @@ void keyboard_post_init_rgb_light(void) {
     is_rgblight_startup = true;
     rgb_startup_token   = defer_exec(300, rgb_startup_animation, NULL);
 #endif // RGBLIGHT_STARTUP_ANIMATION
-    if (userspace_config.rgb_layer_change) {
+    if (userspace_config.rgb.layer_change) {
         layer_state_set_rgb_light(layer_state);
     }
 }
 
 layer_state_t layer_state_set_rgb_light(layer_state_t state) {
 #ifdef RGBLIGHT_ENABLE
-    if (userspace_config.rgb_layer_change) {
+    if (userspace_config.rgb.layer_change) {
         switch (get_highest_layer(state & ~((layer_state_t)1 << _MOUSE))) {
             case _MEDIA:
                 rgblight_set_hsv_and_mode(HSV_CHARTREUSE, RGBLIGHT_MODE_KNIGHT + 1);

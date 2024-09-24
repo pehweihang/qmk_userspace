@@ -45,7 +45,7 @@ void rgb_matrix_layer_helper(uint8_t hue, uint8_t sat, uint8_t val, uint8_t mode
 
 void housekeeping_task_rgb_matrix(void) {
 #if defined(RGB_MATRIX_FRAMEBUFFER_EFFECTS)
-    if (userspace_config.rgb_matrix_idle_anim && rgb_matrix_get_mode() == RGB_MATRIX_TYPING_HEATMAP &&
+    if (userspace_config.rgb.idle_anim && rgb_matrix_get_mode() == RGB_MATRIX_TYPING_HEATMAP &&
         sync_timer_elapsed32(hypno_timer) > 15000) {
         rgb_matrix_mode_noeeprom(RGB_MATRIX_REST_MODE);
     }
@@ -54,11 +54,11 @@ void housekeeping_task_rgb_matrix(void) {
 
 void keyboard_post_init_rgb_matrix(void) {
 #if defined(RGB_MATRIX_FRAMEBUFFER_EFFECTS)
-    if (userspace_config.rgb_matrix_idle_anim) {
+    if (userspace_config.rgb.idle_anim) {
         rgb_matrix_mode_noeeprom(RGB_MATRIX_REST_MODE);
     }
 #endif // RGB_MATRIX_FRAMEBUFFER_EFFECTS
-    if (userspace_config.rgb_layer_change) {
+    if (userspace_config.rgb.layer_change) {
         rgb_matrix_set_flags(LED_FLAG_UNDERGLOW | LED_FLAG_KEYLIGHT | LED_FLAG_INDICATOR);
     } else {
         rgb_matrix_set_flags(LED_FLAG_ALL);
@@ -71,7 +71,7 @@ bool process_record_user_rgb_matrix(uint16_t keycode, keyrecord_t *record) {
 #endif
 #if defined(RGB_MATRIX_FRAMEBUFFER_EFFECTS)
     hypno_timer = sync_timer_read32();
-    if (userspace_config.rgb_matrix_idle_anim && rgb_matrix_get_mode() == RGB_MATRIX_REST_MODE) {
+    if (userspace_config.rgb.idle_anim && rgb_matrix_get_mode() == RGB_MATRIX_REST_MODE) {
         rgb_matrix_mode_noeeprom(RGB_MATRIX_TYPING_HEATMAP);
     }
 #endif // RGB_MATRIX_FRAMEBUFFER_EFFECTS
@@ -128,7 +128,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         return false;
     }
 
-    if (userspace_config.rgb_layer_change) {
+    if (userspace_config.rgb.layer_change) {
 #if defined(RGBLIGHT_ENABLE) && defined(RGBLIGHT_CUSTOM)
 #    if defined(SPLIT_KEYBOARD) && defined(SPLIT_LAYER_STATE_ENABLE)
         static layer_state_t old_layer_state = 0, old_default_layer_state = 0;
@@ -280,10 +280,10 @@ bool has_rgb_matrix_config_changed(void) {
 
 void rgb_matrix_idle_anim_toggle(void) {
 #if defined(RGB_MATRIX_ENABLE) && defined(RGB_MATRIX_FRAMEBUFFER_EFFECTS)
-    userspace_config.rgb_matrix_idle_anim ^= 1;
-    dprintf("RGB Matrix Idle Animation [EEPROM]: %u\n", userspace_config.rgb_matrix_idle_anim);
+    userspace_config.rgb.idle_anim ^= 1;
+    dprintf("RGB Matrix Idle Animation [EEPROM]: %u\n", userspace_config.rgb.idle_anim);
     eeconfig_update_user_datablock(&userspace_config);
-    if (userspace_config.rgb_matrix_idle_anim) {
+    if (userspace_config.rgb.idle_anim) {
         rgb_matrix_mode_noeeprom(RGB_MATRIX_TYPING_HEATMAP);
     }
 #endif // RGB_MATRIX_ENABLE && RGB_MATRIX_FRAMEBUFFER_EFFECTS

@@ -252,15 +252,16 @@ void shutdown_quantum_painter(bool jump_to_bootloader) {
  * @param val value/brightness value to use
  * @param write_to_eeprom save changes to eeprom?
  */
-void painter_sethsv_eeprom_helper(uint8_t hue, uint8_t sat, uint8_t val, bool write_to_eeprom) {
-    userspace_config.painter_hsv.h = hue;
-    userspace_config.painter_hsv.s = sat;
-    userspace_config.painter_hsv.v = val;
+void painter_sethsv_eeprom_helper(uint8_t hue, uint8_t sat, uint8_t val, bool write_to_eeprom, bool primary) {
+    HSV* hsv = primary ? &userspace_config.painter.primary_hsv : &userspace_config.painter.secondary_hsv;
+    hsv->h   = hue;
+    hsv->s   = sat;
+    hsv->v   = val;
     if (write_to_eeprom) {
         eeconfig_update_user_datablock(&userspace_config);
     }
-    dprintf("painter set hsv [%s]: %u,%u,%u\n", (write_to_eeprom) ? "EEPROM" : "NOEEPROM",
-            userspace_config.painter_hsv.h, userspace_config.painter_hsv.s, userspace_config.painter_hsv.v);
+    dprintf("painter set %s hsv [%s]: %u,%u,%u\n", primary ? "primary" : "secondary",
+            write_to_eeprom ? "EEPROM" : "NOEEPROM", hsv->h, hsv->s, hsv->v);
 }
 /**
  * @brief Sets the HSV for painter rendering, without saving to eeprom
@@ -269,8 +270,8 @@ void painter_sethsv_eeprom_helper(uint8_t hue, uint8_t sat, uint8_t val, bool wr
  * @param sat satuartion value to use
  * @param val value/brightness value to use
  */
-void painter_sethsv_noeeprom(uint8_t hue, uint8_t sat, uint8_t val) {
-    painter_sethsv_eeprom_helper(hue, sat, val, false);
+void painter_sethsv_noeeprom(uint8_t hue, uint8_t sat, uint8_t val, bool primary) {
+    painter_sethsv_eeprom_helper(hue, sat, val, false, primary);
 }
 /**
  * @brief Sets the HSV for painter rendering, and saves to eeprom
@@ -279,8 +280,8 @@ void painter_sethsv_noeeprom(uint8_t hue, uint8_t sat, uint8_t val) {
  * @param sat satuartion value to use
  * @param val value/brightness value to use
  */
-void painter_sethsv(uint8_t hue, uint8_t sat, uint8_t val) {
-    painter_sethsv_eeprom_helper(hue, sat, val, true);
+void painter_sethsv(uint8_t hue, uint8_t sat, uint8_t val, bool primary) {
+    painter_sethsv_eeprom_helper(hue, sat, val, true, primary);
 }
 
 /**
@@ -288,8 +289,8 @@ void painter_sethsv(uint8_t hue, uint8_t sat, uint8_t val) {
  *
  * @return HSV
  */
-HSV painter_get_hsv(void) {
-    return userspace_config.painter_hsv;
+HSV painter_get_hsv(bool primary) {
+    return primary ? userspace_config.painter.primary_hsv : userspace_config.painter.secondary_hsv;
 }
 
 /**
@@ -297,8 +298,8 @@ HSV painter_get_hsv(void) {
  *
  * @return uint8_t
  */
-uint8_t painter_get_hue(void) {
-    return userspace_config.painter_hsv.h;
+uint8_t painter_get_hue(bool primary) {
+    return primary ? userspace_config.painter.primary_hsv.h : userspace_config.painter.secondary_hsv.h;
 }
 
 /**
@@ -306,8 +307,8 @@ uint8_t painter_get_hue(void) {
  *
  * @return uint8_t
  */
-uint8_t painter_get_sat(void) {
-    return userspace_config.painter_hsv.s;
+uint8_t painter_get_sat(bool primary) {
+    return primary ? userspace_config.painter.primary_hsv.s : userspace_config.painter.secondary_hsv.s;
 }
 
 /**
@@ -315,17 +316,8 @@ uint8_t painter_get_sat(void) {
  *
  * @return uint8_t
  */
-uint8_t painter_get_val(void) {
-    return userspace_config.painter_hsv.v;
-}
-
-/**
- * @brief Get the current hue offset value for the painter
- *
- * @return uint8_t
- */
-uint8_t painter_get_hue_offset(void) {
-    return userspace_config.painter_offset;
+uint8_t painter_get_val(bool primary) {
+    return primary ? userspace_config.painter.primary_hsv.v : userspace_config.painter.secondary_hsv.v;
 }
 
 /**
@@ -333,23 +325,23 @@ uint8_t painter_get_hue_offset(void) {
  *
  * @param write_to_eeprom Save to eeprom?
  */
-void painter_increase_hue_helper(bool write_to_eeprom) {
-    painter_sethsv_eeprom_helper(qadd8(userspace_config.painter_hsv.h, PAINTER_HUE_STEP),
-                                 userspace_config.painter_hsv.s, userspace_config.painter_hsv.v, write_to_eeprom);
+void painter_increase_hue_helper(bool write_to_eeprom, bool primary) {
+    HSV* hsv = primary ? &userspace_config.painter.primary_hsv : &userspace_config.painter.secondary_hsv;
+    painter_sethsv_eeprom_helper(qadd8(hsv->h, PAINTER_HUE_STEP), hsv->s, hsv->v, write_to_eeprom, primary);
 }
 
 /**
  * @brief Increments hue up by the step value, without saving to eeprom
  */
-void painter_increase_hue_noeeprom(void) {
-    painter_increase_hue_helper(false);
+void painter_increase_hue_noeeprom(bool primary) {
+    painter_increase_hue_helper(false, primary);
 }
 
 /**
  * @brief Increments hue up by the step value, and saves to eeprom
  */
-void painter_increase_hue(void) {
-    painter_increase_hue_helper(true);
+void painter_increase_hue(bool primary) {
+    painter_increase_hue_helper(true, primary);
 }
 
 /**
@@ -357,23 +349,23 @@ void painter_increase_hue(void) {
  *
  * @param write_to_eeprom Save to eeprom?
  */
-void painter_decrease_hue_helper(bool write_to_eeprom) {
-    painter_sethsv_eeprom_helper(qsub8(userspace_config.painter_hsv.h, PAINTER_HUE_STEP),
-                                 userspace_config.painter_hsv.s, userspace_config.painter_hsv.v, write_to_eeprom);
+void painter_decrease_hue_helper(bool write_to_eeprom, bool primary) {
+    HSV* hsv = primary ? &userspace_config.painter.primary_hsv : &userspace_config.painter.secondary_hsv;
+    painter_sethsv_eeprom_helper(qsub8(hsv->h, PAINTER_HUE_STEP), hsv->s, hsv->v, write_to_eeprom, primary);
 }
 
 /**
  * @brief Decrements hue down by the step value, without saving to eeprom
  */
-void painter_decrease_hue_noeeprom(void) {
-    painter_decrease_hue_helper(false);
+void painter_decrease_hue_noeeprom(bool primary) {
+    painter_decrease_hue_helper(false, primary);
 }
 
 /**
  * @brief Decrements hue down by the step value, and saves to eeprom
  */
-void painter_decrease_hue(void) {
-    painter_decrease_hue_helper(true);
+void painter_decrease_hue(bool primary) {
+    painter_decrease_hue_helper(true, primary);
 }
 
 /**
@@ -381,24 +373,23 @@ void painter_decrease_hue(void) {
  *
  * @param write_to_eeprom Save to eeprom?
  */
-void painter_increase_sat_helper(bool write_to_eeprom) {
-    painter_sethsv_eeprom_helper(userspace_config.painter_hsv.h,
-                                 qadd8(userspace_config.painter_hsv.s, PAINTER_SAT_STEP),
-                                 userspace_config.painter_hsv.v, write_to_eeprom);
+void painter_increase_sat_helper(bool write_to_eeprom, bool primary) {
+    HSV* hsv = primary ? &userspace_config.painter.primary_hsv : &userspace_config.painter.secondary_hsv;
+    painter_sethsv_eeprom_helper(hsv->h, qadd8(hsv->s, PAINTER_SAT_STEP), hsv->v, write_to_eeprom, primary);
 }
 
 /**
  * @brief Increments saturation up by the step value, without saving to eeprom
  */
-void painter_increase_sat_noeeprom(void) {
-    painter_increase_sat_helper(false);
+void painter_increase_sat_noeeprom(bool primary) {
+    painter_increase_sat_helper(false, primary);
 }
 
 /**
  * @brief Increments saturation up by the step value, and saves to eeprom
  */
-void painter_increase_sat(void) {
-    painter_increase_sat_helper(true);
+void painter_increase_sat(bool primary) {
+    painter_increase_sat_helper(true, primary);
 }
 
 /**
@@ -406,24 +397,23 @@ void painter_increase_sat(void) {
  *
  * @param write_to_eeprom Save to eeprom?
  */
-void painter_decrease_sat_helper(bool write_to_eeprom) {
-    painter_sethsv_eeprom_helper(userspace_config.painter_hsv.h,
-                                 qsub8(userspace_config.painter_hsv.s, PAINTER_SAT_STEP),
-                                 userspace_config.painter_hsv.v, write_to_eeprom);
+void painter_decrease_sat_helper(bool write_to_eeprom, bool primary) {
+    HSV* hsv = primary ? &userspace_config.painter.primary_hsv : &userspace_config.painter.secondary_hsv;
+    painter_sethsv_eeprom_helper(hsv->h, qsub8(hsv->s, PAINTER_SAT_STEP), hsv->v, write_to_eeprom, primary);
 }
 
 /**
  * @brief Decrements saturation down by the step value, without saving to eeprom
  */
-void painter_decrease_sat_noeeprom(void) {
-    painter_decrease_sat_helper(false);
+void painter_decrease_sat_noeeprom(bool primary) {
+    painter_decrease_sat_helper(false, primary);
 }
 
 /**
  * @brief Decrements saturation down by the step value, and saves to eeprom
  */
-void painter_decrease_sat(void) {
-    painter_decrease_sat_helper(true);
+void painter_decrease_sat(bool primary) {
+    painter_decrease_sat_helper(true, primary);
 }
 
 /**
@@ -431,23 +421,23 @@ void painter_decrease_sat(void) {
  *
  * @param write_to_eeprom Save to eeprom?
  */
-void painter_increase_val_helper(bool write_to_eeprom) {
-    painter_sethsv_eeprom_helper(userspace_config.painter_hsv.h, userspace_config.painter_hsv.s,
-                                 qadd8(userspace_config.painter_hsv.v, PAINTER_VAL_STEP), write_to_eeprom);
+void painter_increase_val_helper(bool write_to_eeprom, bool primary) {
+    HSV* hsv = primary ? &userspace_config.painter.primary_hsv : &userspace_config.painter.secondary_hsv;
+    painter_sethsv_eeprom_helper(hsv->h, hsv->s, qadd8(hsv->v, PAINTER_VAL_STEP), write_to_eeprom, primary);
 }
 
 /**
  * @brief Increments value/brightness up by the step value, without saving to eeprom
  */
-void painter_increase_val_noeeprom(void) {
-    painter_increase_val_helper(false);
+void painter_increase_val_noeeprom(bool primary) {
+    painter_increase_val_helper(false, primary);
 }
 
 /**
  * @brief Increments value/brightness up by the step value, and saves to eeprom
  */
-void painter_increase_val(void) {
-    painter_increase_val_helper(true);
+void painter_increase_val(bool primary) {
+    painter_increase_val_helper(true, primary);
 }
 
 /**
@@ -455,77 +445,21 @@ void painter_increase_val(void) {
  *
  * @param write_to_eeprom Save to eeprom?
  */
-void painter_decrease_val_helper(bool write_to_eeprom) {
-    painter_sethsv_eeprom_helper(userspace_config.painter_hsv.h, userspace_config.painter_hsv.s,
-                                 qsub8(userspace_config.painter_hsv.v, PAINTER_VAL_STEP), write_to_eeprom);
+void painter_decrease_val_helper(bool write_to_eeprom, bool primary) {
+    HSV* hsv = primary ? &userspace_config.painter.primary_hsv : &userspace_config.painter.secondary_hsv;
+    painter_sethsv_eeprom_helper(hsv->h, hsv->s, qsub8(hsv->v, PAINTER_VAL_STEP), write_to_eeprom, primary);
 }
 
 /**
  * @brief Decrements value/brightness down by the step value, without saving to eeprom
  */
-void painter_decrease_val_noeeprom(void) {
-    painter_decrease_val_helper(false);
+void painter_decrease_val_noeeprom(bool primary) {
+    painter_decrease_val_helper(false, primary);
 }
 
 /**
  * @brief Decrements value/brightness down by the step value, and saves to eeprom
  */
-void painter_decrease_val(void) {
-    painter_decrease_val_helper(true);
-}
-
-/**
- * @brief Increments hue offset up by the step value
- *
- * @param write_to_eeprom Save to eeprom?
- */
-void painter_increase_hue_offset_helper(bool write_to_eeprom) {
-    userspace_config.painter_offset = qadd8(userspace_config.painter_offset, PAINTER_HUE_STEP);
-    if (write_to_eeprom) {
-        eeconfig_update_user_datablock(&userspace_config);
-    }
-    dprintf("painter set offset [%s]: %u\n", (write_to_eeprom) ? "EEPROM" : "NOEEPROM",
-            userspace_config.painter_offset);
-}
-
-/**
- * @brief Increments hue offset up by the step value, without saving to eeprom
- */
-void painter_increase_hue_offset_noeeprom(void) {
-    painter_increase_hue_offset_helper(false);
-}
-
-/**
- * @brief Increments hue offset up by the step value, and saves to eeprom
- */
-void painter_increase_hue_offset(void) {
-    painter_increase_hue_offset_helper(true);
-}
-
-/**
- * @brief Decrements hue offset down by the step value
- *
- * @param write_to_eeprom Save to eeprom?
- */
-void painter_decrease_hue_offset_helper(bool write_to_eeprom) {
-    userspace_config.painter_offset = qsub8(userspace_config.painter_offset, PAINTER_HUE_STEP);
-    if (write_to_eeprom) {
-        eeconfig_update_user_datablock(&userspace_config);
-    }
-    dprintf("painter set offset [%s]: %u\n", (write_to_eeprom) ? "EEPROM" : "NOEEPROM",
-            userspace_config.painter_offset);
-}
-
-/**
- * @brief Decrements hue offset down by the step value, without saving to eeprom
- */
-void painter_decrease_hue_offset_noeeprom(void) {
-    painter_decrease_hue_offset_helper(false);
-}
-
-/**
- * @brief Decrements hue offset down by the step value, and saves to eeprom
- */
-void painter_decrease_hue_offset(void) {
-    painter_decrease_hue_offset_helper(true);
+void painter_decrease_val(bool primary) {
+    painter_decrease_val_helper(true, primary);
 }

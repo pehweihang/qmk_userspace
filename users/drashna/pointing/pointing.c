@@ -156,7 +156,7 @@ bool process_record_pointing(uint16_t keycode, keyrecord_t* record) {
     switch (keycode) {
         case KC_ACCEL:
             if (record->event.pressed) {
-                userspace_config.enable_acceleration ^= 1;
+                userspace_config.pointing.enable_acceleration ^= 1;
                 mouse_jiggler = false;
             }
             break;

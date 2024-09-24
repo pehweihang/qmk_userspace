@@ -107,19 +107,19 @@ bool process_record_user_oled(uint16_t keycode, keyrecord_t *record) {
     if (record->event.pressed) {
         switch (keycode) {
             case OLED_BRIGHTNESS_INC:
-                userspace_config.oled_brightness = qadd8(userspace_config.oled_brightness, OLED_BRIGHTNESS_STEP);
-                oled_set_brightness(userspace_config.oled_brightness);
+                userspace_config.oled.brightness = qadd8(userspace_config.oled.brightness, OLED_BRIGHTNESS_STEP);
+                oled_set_brightness(userspace_config.oled.brightness);
                 eeconfig_update_user_datablock(&userspace_config);
                 break;
             case OLED_BRIGHTNESS_DEC:
-                userspace_config.oled_brightness = qsub8(userspace_config.oled_brightness, OLED_BRIGHTNESS_STEP);
-                oled_set_brightness(userspace_config.oled_brightness);
+                userspace_config.oled.brightness = qsub8(userspace_config.oled.brightness, OLED_BRIGHTNESS_STEP);
+                oled_set_brightness(userspace_config.oled.brightness);
                 eeconfig_update_user_datablock(&userspace_config);
                 break;
             case OLED_LOCK:
-                userspace_config.oled_lock = !userspace_config.oled_lock;
+                userspace_config.oled.screen_lock = !userspace_config.oled.screen_lock;
                 eeconfig_update_user_datablock(&userspace_config);
-                if (userspace_config.oled_lock) {
+                if (userspace_config.oled.screen_lock) {
                     oled_on();
                 }
                 break;
@@ -440,7 +440,7 @@ void render_user_status(uint8_t col, uint8_t line) {
     oled_write_P(PSTR(" "), false);
 #endif
 #if defined(RGB_MATRIX_ENABLE)
-    oled_write_P(PSTR(OLED_RENDER_USER_ANIM), userspace_config.rgb_matrix_idle_anim);
+    oled_write_P(PSTR(OLED_RENDER_USER_ANIM), userspace_config.rgb.idle_anim);
 #    if !defined(OLED_DISPLAY_VERBOSE)
     oled_write_P(PSTR(" "), false);
 #    endif
@@ -462,7 +462,7 @@ void render_user_status(uint8_t col, uint8_t line) {
 #endif
 
     static const char PROGMEM rgb_layer_status[2][3] = {{0xEE, 0xEF, 0}, {0xF0, 0xF1, 0}};
-    oled_write_P(rgb_layer_status[userspace_config.rgb_layer_change], false);
+    oled_write_P(rgb_layer_status[userspace_config.rgb.layer_change], false);
     static const char PROGMEM cat_mode[3] = {0xF9, 0xFA, 0};
     oled_write_P(cat_mode, get_keyboard_lock());
 #if defined(UNICODE_COMMON_ENABLE)
@@ -1070,7 +1070,7 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     rotation            = oled_init_keymap(rotation, has_run);
 
     if (has_run) {
-        oled_set_brightness(userspace_config.oled_brightness);
+        oled_set_brightness(userspace_config.oled.brightness);
         return rotation;
     }
 
@@ -1174,7 +1174,7 @@ void housekeeping_task_oled(void) {
 
     if (is_device_suspended() || is_oled_force_off) {
         is_oled_enabled = false;
-    } else if (userspace_config.oled_lock) {
+    } else if (userspace_config.oled.screen_lock) {
         is_oled_enabled = true;
     } else if (last_input_activity_elapsed() < (10 * 60 * 1000)) {
         is_oled_enabled = true;
@@ -1183,8 +1183,8 @@ void housekeeping_task_oled(void) {
         oled_screensaver_enabled = true;
     }
 
-    if (oled_get_brightness() != userspace_config.oled_brightness) {
-        oled_set_brightness(userspace_config.oled_brightness);
+    if (oled_get_brightness() != userspace_config.oled.brightness) {
+        oled_set_brightness(userspace_config.oled.brightness);
     }
 }
 

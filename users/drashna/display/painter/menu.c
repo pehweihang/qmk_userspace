@@ -40,16 +40,16 @@ deferred_token menu_deferred_token = INVALID_DEFERRED_TOKEN;
 static bool menu_handler_display(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            userspace_config.display_mode = (userspace_config.display_mode - 1) % 3;
-            if (userspace_config.display_mode > 2) {
-                userspace_config.display_mode = 2;
+            userspace_config.painter.display_mode = (userspace_config.painter.display_mode - 1) % 3;
+            if (userspace_config.painter.display_mode > 2) {
+                userspace_config.painter.display_mode = 2;
             }
             eeconfig_update_user_datablock(&userspace_config);
             return false;
         case menu_input_right:
-            userspace_config.display_mode = (userspace_config.display_mode + 1) % 3;
-            if (userspace_config.display_mode > 2) {
-                userspace_config.display_mode = 0;
+            userspace_config.painter.display_mode = (userspace_config.painter.display_mode + 1) % 3;
+            if (userspace_config.painter.display_mode > 2) {
+                userspace_config.painter.display_mode = 0;
             }
             eeconfig_update_user_datablock(&userspace_config);
             return false;
@@ -59,7 +59,7 @@ static bool menu_handler_display(menu_input_t input) {
 }
 
 void display_handler_display(char *text_buffer, size_t buffer_len) {
-    switch (userspace_config.display_mode) {
+    switch (userspace_config.painter.display_mode) {
         case 0:
             strncpy(text_buffer, "Console", buffer_len - 1);
             return;
@@ -77,16 +77,16 @@ void display_handler_display(char *text_buffer, size_t buffer_len) {
 static bool menu_handler_slave_image(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            userspace_config.display_logo = (userspace_config.display_logo - 1) % 11;
-            if (userspace_config.display_logo > 10) {
-                userspace_config.display_logo = 10;
+            userspace_config.painter.display_logo = (userspace_config.painter.display_logo - 1) % 11;
+            if (userspace_config.painter.display_logo > 10) {
+                userspace_config.painter.display_logo = 10;
             }
             eeconfig_update_user_datablock(&userspace_config);
             return false;
         case menu_input_right:
-            userspace_config.display_logo = (userspace_config.display_logo + 1) % 11;
-            if (userspace_config.display_logo > 10) {
-                userspace_config.display_logo = 0;
+            userspace_config.painter.display_logo = (userspace_config.painter.display_logo + 1) % 11;
+            if (userspace_config.painter.display_logo > 10) {
+                userspace_config.painter.display_logo = 0;
             }
             eeconfig_update_user_datablock(&userspace_config);
             return false;
@@ -96,7 +96,7 @@ static bool menu_handler_slave_image(menu_input_t input) {
 }
 
 void display_handler_slave_side_image(char *text_buffer, size_t buffer_len) {
-    switch (userspace_config.display_logo) {
+    switch (userspace_config.painter.display_logo) {
         case 0:
             strncpy(text_buffer, "Samurai", buffer_len - 1);
             return;
@@ -134,30 +134,31 @@ void display_handler_slave_side_image(char *text_buffer, size_t buffer_len) {
 
     strncpy(text_buffer, "Unknown", buffer_len);
 }
+static bool painter_is_primary = true;
 
 static bool menu_handler_display_hue(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            painter_decrease_hue();
+            painter_decrease_hue(painter_is_primary);
             return false;
         case menu_input_right:
-            painter_increase_hue();
+            painter_increase_hue(painter_is_primary);
             return false;
         default:
             return true;
     }
 }
 void display_handler_display_hue(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%d", painter_get_hue());
+    snprintf(text_buffer, buffer_len - 1, "%d", painter_get_hue(painter_is_primary));
 }
 
 static bool menu_handler_display_sat(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            painter_decrease_sat();
+            painter_decrease_sat(painter_is_primary);
             return false;
         case menu_input_right:
-            painter_increase_sat();
+            painter_increase_sat(painter_is_primary);
             return false;
         default:
             return true;
@@ -165,16 +166,16 @@ static bool menu_handler_display_sat(menu_input_t input) {
 }
 
 void display_handler_display_sat(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%d", painter_get_sat());
+    snprintf(text_buffer, buffer_len - 1, "%d", painter_get_sat(painter_is_primary));
 }
 
 static bool menu_handler_display_val(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            painter_decrease_val();
+            painter_decrease_val(painter_is_primary);
             return false;
         case menu_input_right:
-            painter_increase_val();
+            painter_increase_val(painter_is_primary);
             return false;
         default:
             return true;
@@ -182,24 +183,22 @@ static bool menu_handler_display_val(menu_input_t input) {
 }
 
 void display_handler_display_val(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%d", painter_get_val());
+    snprintf(text_buffer, buffer_len - 1, "%d", painter_get_val(painter_is_primary));
 }
 
-static bool menu_handler_display_hue_offset(menu_input_t input) {
+static bool menu_handler_display_hsv(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            painter_decrease_hue_offset();
-            return false;
         case menu_input_right:
-            painter_increase_hue_offset();
+            painter_is_primary = !painter_is_primary;
             return false;
         default:
             return true;
     }
 }
 
-void display_handler_display_hue_offset(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%d", painter_get_hue_offset());
+void display_handler_display_hsv(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", painter_is_primary ? "Primary" : "Secondary");
 }
 
 menu_entry_t display_option_entries[] = {
@@ -214,6 +213,12 @@ menu_entry_t display_option_entries[] = {
         .text                  = "Slave Side Image",
         .child.menu_handler    = menu_handler_slave_image,
         .child.display_handler = display_handler_slave_side_image,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Display HSV",
+        .child.menu_handler    = menu_handler_display_hsv,
+        .child.display_handler = display_handler_display_hsv,
     },
     {
         .flags                 = menu_flag_is_value,
@@ -232,12 +237,6 @@ menu_entry_t display_option_entries[] = {
         .text                  = "Display Value",
         .child.menu_handler    = menu_handler_display_val,
         .child.display_handler = display_handler_display_val,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Display Hue Offset",
-        .child.menu_handler    = menu_handler_display_hue_offset,
-        .child.display_handler = display_handler_display_hue_offset,
     },
 };
 
@@ -334,7 +333,7 @@ static bool menu_handler_rgb_layer(menu_input_t input) {
 }
 
 void display_handler_rgb_layer(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.rgb_layer_change ? "on" : "off");
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.rgb.layer_change ? "on" : "off");
 }
 
 #endif // RGB_MATRIX_ENABLE || RGBLIGHT_ENABLE
@@ -455,7 +454,7 @@ static bool menu_handler_rgb_idle(menu_input_t input) {
 }
 
 void display_handler_rgb_idle(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.rgb_matrix_idle_anim ? "on" : "off");
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.rgb.idle_anim ? "on" : "off");
 }
 
 menu_entry_t rgb_matrix_entries[] = {
@@ -789,7 +788,7 @@ static bool menu_handler_gaming_song_enabled(menu_input_t input) {
     switch (input) {
         case menu_input_left:
         case menu_input_right:
-            userspace_config.gaming_song_enable = !userspace_config.gaming_song_enable;
+            userspace_config.gaming.song_enable = !userspace_config.gaming.song_enable;
             set_doom_song(layer_state);
             return false;
         default:
@@ -798,7 +797,7 @@ static bool menu_handler_gaming_song_enabled(menu_input_t input) {
 }
 
 void display_handler_gaming_song_enabled(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.gaming_song_enable ? "on" : "off");
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.gaming.song_enable ? "on" : "off");
 }
 
 menu_entry_t audio_entries[] = {
@@ -876,7 +875,7 @@ static bool menu_handler_auto_mouse_accel(menu_input_t input) {
     switch (input) {
         case menu_input_left:
         case menu_input_right:
-            userspace_config.enable_acceleration ^= 1;
+            userspace_config.pointing.enable_acceleration ^= 1;
             eeconfig_update_user_datablock(&userspace_config);
 
             return false;
@@ -886,7 +885,7 @@ static bool menu_handler_auto_mouse_accel(menu_input_t input) {
 }
 
 void display_handler_auto_mouse_accel(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.enable_acceleration ? "on" : "off");
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.pointing.enable_acceleration ? "on" : "off");
 }
 
 extern bool     mouse_jiggler;
@@ -1409,7 +1408,7 @@ static bool menu_handler_overwatch_mode(menu_input_t input) {
     switch (input) {
         case menu_input_left:
         case menu_input_right:
-            userspace_config.is_overwatch = !userspace_config.is_overwatch;
+            userspace_config.gaming.is_overwatch = !userspace_config.gaming.is_overwatch;
             eeconfig_update_user_datablock(&userspace_config);
             return false;
         default:
@@ -1418,14 +1417,14 @@ static bool menu_handler_overwatch_mode(menu_input_t input) {
 }
 
 void display_handler_overwatch_mode(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.is_overwatch ? "on" : "off");
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.gaming.is_overwatch ? "on" : "off");
 }
 
 static bool menu_handler_gamepad_swap(menu_input_t input) {
     switch (input) {
         case menu_input_left:
         case menu_input_right:
-            userspace_config.swapped_numbers = !userspace_config.swapped_numbers;
+            userspace_config.gaming.swapped_numbers = !userspace_config.gaming.swapped_numbers;
             eeconfig_update_user_datablock(&userspace_config);
             return false;
         default:
@@ -1434,14 +1433,14 @@ static bool menu_handler_gamepad_swap(menu_input_t input) {
 }
 
 void display_handler_gamepad_swap(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.swapped_numbers ? "swapped" : "normal");
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.gaming.swapped_numbers ? "swapped" : "normal");
 }
 
 static bool menu_handler_clap_trap(menu_input_t input) {
     switch (input) {
         case menu_input_left:
         case menu_input_right:
-            userspace_config.clap_trap_enable = !userspace_config.clap_trap_enable;
+            userspace_config.gaming.clap_trap_enable = !userspace_config.gaming.clap_trap_enable;
             eeconfig_update_user_datablock(&userspace_config);
             return false;
         default:
@@ -1450,14 +1449,14 @@ static bool menu_handler_clap_trap(menu_input_t input) {
 }
 
 void display_handler_clap_trap(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.clap_trap_enable ? "on" : "off");
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.gaming.clap_trap_enable ? "on" : "off");
 }
 
 static bool menu_handler_i2c_scanner(menu_input_t input) {
     switch (input) {
         case menu_input_left:
         case menu_input_right:
-            userspace_config.i2c_scanner_enable = !userspace_config.i2c_scanner_enable;
+            userspace_config.debug.i2c_scanner_enable = !userspace_config.debug.i2c_scanner_enable;
             eeconfig_update_user_datablock(&userspace_config);
             return false;
         default:
@@ -1466,14 +1465,14 @@ static bool menu_handler_i2c_scanner(menu_input_t input) {
 }
 
 void display_handler_i2c_scanner(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.i2c_scanner_enable ? "on" : "off");
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.debug.i2c_scanner_enable ? "on" : "off");
 }
 
 static bool menu_handler_scan_rate(menu_input_t input) {
     switch (input) {
         case menu_input_left:
         case menu_input_right:
-            userspace_config.matrix_scan_print = !userspace_config.matrix_scan_print;
+            userspace_config.debug.matrix_scan_print = !userspace_config.debug.matrix_scan_print;
             eeconfig_update_user_datablock(&userspace_config);
             return false;
         default:
@@ -1482,7 +1481,7 @@ static bool menu_handler_scan_rate(menu_input_t input) {
 }
 
 void display_handler_scan_rate(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.matrix_scan_print ? "on" : "off");
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.debug.matrix_scan_print ? "on" : "off");
 }
 
 menu_entry_t user_settings_option_entries[] = {
@@ -1849,8 +1848,7 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
         // uint8_t       hue      = rgb_matrix_get_hue();
         menu_entry_t *menu     = get_current_menu();
         menu_entry_t *selected = get_selected_menu_item();
-        HSV           hsv      = painter_get_hsv();
-        uint8_t       hue      = hsv.h + painter_get_hue_offset();
+        HSV           hsv = painter_get_hsv(true), hsv_bg = painter_get_hsv(false);
 
         uint16_t y = start_y;
         qp_rect(display, start_x, y, render_width, y + 6 + font_oled->line_height + 2, hsv.h, hsv.s, hsv.v, true);
@@ -1860,11 +1858,12 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
             menu_entry_t *child = &menu->parent.children[i];
             uint16_t      x     = start_x + 2 + qp_textwidth(font_oled, ">");
             if (child == selected) {
-                qp_rect(display, start_x, y - 2, render_width, y + font_oled->line_height + 1, hue, hsv.s, hsv.v, true);
-                qp_drawtext_recolor(display, start_x + 1, y, font_oled, ">", 0, 0, 0, hue, hsv.s, hsv.v);
+                qp_rect(display, start_x, y - 2, render_width, y + font_oled->line_height + 1, hsv_bg.h, hsv_bg.s,
+                        hsv_bg.v, true);
+                qp_drawtext_recolor(display, start_x + 1, y, font_oled, ">", 0, 0, 0, hsv_bg.h, hsv_bg.s, hsv_bg.v);
                 x += qp_drawtext_recolor(display, x, y, font_oled,
-                                         truncate_text(child->text, render_width, font_oled, false, true), 0, 0, 0, hue,
-                                         hsv.s, hsv.v);
+                                         truncate_text(child->text, render_width, font_oled, false, true), 0, 0, 0,
+                                         hsv_bg.h, hsv_bg.s, hsv_bg.v);
             } else {
                 x += qp_drawtext_recolor(display, x, y, font_oled,
                                          truncate_text(child->text, render_width, font_oled, false, true), hsv.h, hsv.s,
@@ -1873,7 +1872,7 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
             if (child->flags & menu_flag_is_parent) {
                 if (child == selected) {
                     qp_drawtext_recolor(display, render_width - (qp_textwidth(font_oled, ">") + 2), y, font_oled, ">",
-                                        0, 0, 0, hue, hsv.s, hsv.v);
+                                        0, 0, 0, hsv_bg.h, hsv_bg.s, hsv_bg.v);
                 } else {
                     qp_drawtext_recolor(display, render_width - (qp_textwidth(font_oled, ">") + 2), y, font_oled, ">",
                                         hsv.h, hsv.s, hsv.v, 0, 0, 0);
@@ -1884,7 +1883,7 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
                 child->child.display_handler(val, sizeof(val));
                 snprintf(buf, sizeof(buf), ": %s", val);
                 if (child == selected) {
-                    qp_drawtext_recolor(display, x, y, font_oled, buf, 0, 0, 0, hue, hsv.s, hsv.v);
+                    qp_drawtext_recolor(display, x, y, font_oled, buf, 0, 0, 0, hsv_bg.h, hsv_bg.s, hsv_bg.v);
                 } else {
                     qp_drawtext_recolor(display, x, y, font_oled, buf, hsv.h, hsv.s, hsv.v, 0, 0, 0);
                 }

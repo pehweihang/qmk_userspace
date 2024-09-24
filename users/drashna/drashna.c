@@ -86,7 +86,7 @@ void tap_code16_nomods(uint16_t kc) {
 #    endif // I2C_SCANNER_TIMEOUT
 
 void do_scan(void) {
-    if (!userspace_config.i2c_scanner_enable) {
+    if (!userspace_config.debug.i2c_scanner_enable) {
         return;
     }
     uint8_t nDevices = 0;
@@ -485,7 +485,7 @@ void matrix_scan_rate_task(void) {
 
     if (timer_elapsed32(matrix_timer) >= 1000) {
 #ifndef NO_PRINT
-        if (userspace_config.matrix_scan_print) {
+        if (userspace_config.debug.matrix_scan_print) {
             xprintf("matrix scan frequency: %lu\n", matrix_scan_count);
         }
 #endif // NO_PRINT
@@ -529,9 +529,9 @@ extern audio_config_t audio_config;
 void set_doom_song(layer_state_t state) {
     static bool is_gaming_layer_active = false, is_doom_song_active = false;
 
-    if (userspace_config.gaming_song_enable != is_doom_song_active ||
+    if (userspace_config.gaming.song_enable != is_doom_song_active ||
         is_gaming_layer_active != layer_state_cmp(state, _GAMEPAD)) {
-        is_doom_song_active    = userspace_config.gaming_song_enable;
+        is_doom_song_active    = userspace_config.gaming.song_enable;
         is_gaming_layer_active = layer_state_cmp(state, _GAMEPAD);
         if (is_gaming_layer_active && is_doom_song_active) {
             PLAY_LOOP(doom_song);

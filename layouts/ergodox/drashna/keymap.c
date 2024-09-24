@@ -168,7 +168,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case KC_1:
-            if (IS_LAYER_ON(_GAMEPAD) && userspace_config.swapped_numbers) {
+            if (IS_LAYER_ON(_GAMEPAD) && userspace_config.gaming.swapped_numbers) {
                 if (record->event.pressed) {
                     register_code(KC_2);
                 } else {
@@ -178,7 +178,7 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
             }
             break;
         case KC_2:
-            if (IS_LAYER_ON(_GAMEPAD) && userspace_config.swapped_numbers) {
+            if (IS_LAYER_ON(_GAMEPAD) && userspace_config.gaming.swapped_numbers) {
                 if (record->event.pressed) {
                     register_code(KC_1);
                 } else {
@@ -189,7 +189,7 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
             break;
         case KC_SWAP_NUM:
             if (record->event.pressed) {
-                userspace_config.swapped_numbers ^= 1;
+                userspace_config.gaming.swapped_numbers ^= 1;
                 eeconfig_update_user_datablock(&userspace_config);
             }
             break;
@@ -259,8 +259,8 @@ bool rgb_matrix_indicators_advanced_keymap(uint8_t led_min, uint8_t led_max) {
         RGB_MATRIX_INDICATOR_SET_COLOR(35, 0x00, 0xFF, 0xFF); // D
         RGB_MATRIX_INDICATOR_SET_COLOR(34, 0x7A, 0x00, 0xFF); // F
 
-        RGB_MATRIX_INDICATOR_SET_COLOR((userspace_config.swapped_numbers ? 26 : 27), 0xFF, 0xFF, 0xFF); // 1
-        RGB_MATRIX_INDICATOR_SET_COLOR((userspace_config.swapped_numbers ? 27 : 26), 0x00, 0xFF, 0x00); // 2
+        RGB_MATRIX_INDICATOR_SET_COLOR((userspace_config.gaming.swapped_numbers ? 26 : 27), 0xFF, 0xFF, 0xFF); // 1
+        RGB_MATRIX_INDICATOR_SET_COLOR((userspace_config.gaming.swapped_numbers ? 27 : 26), 0x00, 0xFF, 0x00); // 2
         RGB_MATRIX_INDICATOR_SET_COLOR(25, 0x7A, 0x00, 0xFF);                                           // 3
     }
     return true;

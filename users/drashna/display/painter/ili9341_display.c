@@ -58,7 +58,7 @@ void render_frame(painter_device_t display) {
     uint16_t height;
     qp_get_geometry(ili9341_display, &width, &height, NULL, NULL, NULL);
 
-    HSV hsv = painter_get_hsv();
+    HSV hsv = painter_get_hsv(true);
     // frame top
     qp_drawimage_recolor(ili9341_display, 1, 2, frame_top, hsv.h, hsv.s, hsv.v, 0, 0, 0);
     // lines for frame sides
@@ -160,18 +160,16 @@ void ili9341_display_power(bool on) {
 __attribute__((weak)) void ili9341_draw_user(void) {
     bool hue_redraw = false;
 
-    static HSV     last_hsv        = {0};
-    static uint8_t last_hue_offset = 0;
-    HSV            curr_hsv        = painter_get_hsv();
+    static HSV last_hsv = {0}, last_hsv_secondary = {0};
+    HSV        curr_hsv = painter_get_hsv(true), curr_hsv_secondary = painter_get_hsv(false);
     if (memcmp(&last_hsv, &curr_hsv, sizeof(HSV)) != 0) {
         memcpy(&last_hsv, &curr_hsv, sizeof(HSV));
         hue_redraw = true;
     }
-    if (last_hue_offset != painter_get_hue_offset()) {
-        last_hue_offset = painter_get_hue_offset();
-        hue_redraw      = true;
+    if (memcmp(&last_hsv_secondary, &curr_hsv_secondary, sizeof(HSV)) != 0) {
+        memcpy(&last_hsv_secondary, &curr_hsv_secondary, sizeof(HSV));
+        hue_redraw = true;
     }
-    const uint8_t offset_hue   = curr_hsv.h + painter_get_hue_offset();
     const uint8_t disabled_val = curr_hsv.v / 2;
 
     uint16_t width;
@@ -213,8 +211,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "SCANS: ", curr_hsv.h, curr_hsv.s,
                                         curr_hsv.v, 0, 0, 0);
             snprintf(buf, sizeof(buf), "%-5lu", last_scan_update);
-            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, offset_hue, curr_hsv.s, curr_hsv.v, 0, 0,
-                                0);
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv_secondary.h, curr_hsv_secondary.s,
+                                curr_hsv_secondary.v, 0, 0, 0);
         }
         ypos += font_oled->line_height + 4;
 
@@ -233,8 +231,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "WPM: ", curr_hsv.h, curr_hsv.s,
                                         curr_hsv.v, 0, 0, 0);
             snprintf(buf, sizeof(buf), "   %3u", get_current_wpm());
-            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, offset_hue, curr_hsv.s, curr_hsv.v, 0, 0,
-                                0);
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv_secondary.h, curr_hsv_secondary.s,
+                                curr_hsv_secondary.v, 0, 0, 0);
         }
 #endif // WPM_ENABLE
 
@@ -251,15 +249,15 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                                         curr_hsv.s, curr_hsv.v, 0, 0, 0) +
                     5;
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"CAPS",
-                                        last_led_state.caps_lock ? offset_hue : curr_hsv.h, curr_hsv.s,
+                                        last_led_state.caps_lock ? curr_hsv_secondary.h : curr_hsv.h, curr_hsv.s,
                                         last_led_state.caps_lock ? curr_hsv.v : disabled_val, 0, 0, 0) +
                     5;
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"SCRL",
-                                        last_led_state.scroll_lock ? offset_hue : curr_hsv.h, curr_hsv.s,
+                                        last_led_state.scroll_lock ? curr_hsv_secondary.h : curr_hsv.h, curr_hsv.s,
                                         last_led_state.scroll_lock ? curr_hsv.v : disabled_val, 0, 0, 0) +
                     5;
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"NUM",
-                                        last_led_state.num_lock ? offset_hue : curr_hsv.h, curr_hsv.s,
+                                        last_led_state.num_lock ? curr_hsv_secondary.h : curr_hsv.h, curr_hsv.s,
                                         last_led_state.num_lock ? curr_hsv.v : disabled_val, 0, 0, 0);
             if (max_led_xpos < xpos) {
                 max_led_xpos = xpos;
@@ -283,16 +281,18 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                          last_keymap_config.swap_lctl_lgui ? apple_logo : windows_logo);
             xpos += windows_logo->width + 5;
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"NKRO",
-                                        last_keymap_config.nkro ? offset_hue : curr_hsv.h, curr_hsv.s,
+                                        last_keymap_config.nkro ? curr_hsv_secondary.h : curr_hsv.h, curr_hsv.s,
                                         last_keymap_config.nkro ? curr_hsv.v : disabled_val, 0, 0, 0) +
                     5;
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"CRCT",
-                                        last_keymap_config.autocorrect_enable ? offset_hue : curr_hsv.h, curr_hsv.s,
-                                        last_keymap_config.autocorrect_enable ? curr_hsv.v : disabled_val, 0, 0, 0) +
+                                        last_keymap_config.autocorrect_enable ? curr_hsv_secondary.h : curr_hsv.h,
+                                        curr_hsv.s, last_keymap_config.autocorrect_enable ? curr_hsv.v : disabled_val,
+                                        0, 0, 0) +
                     5;
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"1SHT",
-                                        last_keymap_config.oneshot_enable ? offset_hue : curr_hsv.h, curr_hsv.s,
-                                        last_keymap_config.oneshot_enable ? curr_hsv.v : disabled_val, 0, 0, 0);
+            xpos +=
+                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"1SHT",
+                                    last_keymap_config.oneshot_enable ? curr_hsv_secondary.h : curr_hsv.h, curr_hsv.s,
+                                    last_keymap_config.oneshot_enable ? curr_hsv.v : disabled_val, 0, 0, 0);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -304,19 +304,21 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             memcpy(&last_user_state, &user_runtime_state, sizeof(user_runtime_state));
             xpos                = 80 + 4 + windows_logo->width + 5;
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"AUDIO",
-                                        last_user_state.audio_enable ? offset_hue : curr_hsv.h, curr_hsv.s,
+                                        last_user_state.audio_enable ? curr_hsv_secondary.h : curr_hsv.h, curr_hsv.s,
                                         last_user_state.audio_enable ? curr_hsv.v : disabled_val, 0, 0, 0) +
                     5;
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"CLCK",
-                                        last_user_state.audio_clicky_enable ? offset_hue : curr_hsv.h, curr_hsv.s,
-                                        last_user_state.audio_clicky_enable ? curr_hsv.v : disabled_val, 0, 0, 0) +
-                    5;
+            xpos +=
+                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"CLCK",
+                                    last_user_state.audio_clicky_enable ? curr_hsv_secondary.h : curr_hsv.h, curr_hsv.s,
+                                    last_user_state.audio_clicky_enable ? curr_hsv.v : disabled_val, 0, 0, 0) +
+                5;
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"HOST",
-                                        last_user_state.host_driver_disabled ? offset_hue : curr_hsv.h, curr_hsv.s,
-                                        last_user_state.host_driver_disabled ? curr_hsv.v : disabled_val, 0, 0, 0) +
+                                        last_user_state.host_driver_disabled ? curr_hsv_secondary.h : curr_hsv.h,
+                                        curr_hsv.s, last_user_state.host_driver_disabled ? curr_hsv.v : disabled_val, 0,
+                                        0, 0) +
                     5;
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"SWAP",
-                                        last_user_state.swap_hands ? offset_hue : curr_hsv.h, curr_hsv.s,
+                                        last_user_state.swap_hands ? curr_hsv_secondary.h : curr_hsv.h, curr_hsv.s,
                                         last_user_state.swap_hands ? curr_hsv.v : disabled_val, 0, 0, 0);
         }
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -334,8 +336,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "CPI:   ", curr_hsv.h, curr_hsv.s,
                                         curr_hsv.v, 0, 0, 0);
             snprintf(buf, sizeof(buf), "%5u", curr_cpi);
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, offset_hue, curr_hsv.s, curr_hsv.v,
-                                        0, 0, 0);
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv_secondary.h,
+                                        curr_hsv_secondary.s, curr_hsv_secondary.v, 0, 0, 0);
         }
         ypos += font_oled->line_height + 4;
 #    endif
@@ -348,7 +350,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             last_am_state = get_auto_mouse_enable();
             xpos          = 5;
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Auto Layer",
-                                        get_auto_mouse_enable() ? offset_hue : curr_hsv.h, curr_hsv.s,
+                                        get_auto_mouse_enable() ? curr_hsv_secondary.h : curr_hsv.h, curr_hsv.s,
                                         get_auto_mouse_enable() ? curr_hsv.v : disabled_val, 0, 0, 0);
         }
         ypos += font_oled->line_height + 4;
@@ -362,10 +364,10 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         if (hue_redraw || last_ds_state != charybdis_get_pointer_dragscroll_enabled()) {
             last_ds_state = charybdis_get_pointer_dragscroll_enabled();
             xpos = 5;
-            xpos +=
-                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Drag-Scroll",
-                                    charybdis_get_pointer_dragscroll_enabled() ? offset_hue : curr_hsv.h, curr_hsv.s,
-                                    charybdis_get_pointer_dragscroll_enabled() ? curr_hsv.v : disabled_val, 0, 0, 0);
+            xpos += qp_drawtext_recolor(
+                ili9341_display, xpos, ypos, font_oled, "Drag-Scroll",
+                charybdis_get_pointer_dragscroll_enabled() ? curr_hsv_secondary.h : curr_hsv.h, curr_hsv.s,
+                charybdis_get_pointer_dragscroll_enabled() ? curr_hsv.v : disabled_val, 0, 0, 0);
         }
         ypos += font_oled->line_height + 4;
 
@@ -378,8 +380,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             last_sp_state = charybdis_get_pointer_sniping_enabled();
             xpos          = 5;
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Sniping",
-                                        charybdis_get_pointer_sniping_enabled() ? offset_hue : curr_hsv.h, curr_hsv.s,
-                                        charybdis_get_pointer_sniping_enabled() ? curr_hsv.v : disabled_val, 0, 0, 0);
+                                        charybdis_get_pointer_sniping_enabled() ? curr_hsv_secondary.h : curr_hsv.h,
+                                        curr_hsv.s, charybdis_get_pointer_sniping_enabled() ? curr_hsv.v : disabled_val,
+                                        0, 0, 0);
         }
 #    endif
 #endif // POINTING_DEVICE_ENABLE
@@ -422,8 +425,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                                 curr_hsv.v, 0, 0, 0);
             ypos += font_oled->line_height + 4;
             snprintf(buf, sizeof(buf), "%14s", unicode_mode_str[last_unicode_typing_mode]);
-            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, offset_hue, curr_hsv.s, curr_hsv.v, 0, 0,
-                                0);
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv_secondary.h, curr_hsv_secondary.s,
+                                curr_hsv_secondary.v, 0, 0, 0);
         }
 #endif // CUSTOM_UNICODE_ENABLE
 
@@ -441,44 +444,44 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                     2;
 
             if (qp_drawimage_recolor(ili9341_display, xpos, ypos, shift_icon,
-                                     last_mods & MOD_BIT_LSHIFT ? offset_hue : curr_hsv.h, curr_hsv.s,
+                                     last_mods & MOD_BIT_LSHIFT ? curr_hsv_secondary.h : curr_hsv.h, curr_hsv.s,
                                      last_mods & MOD_BIT_LSHIFT ? curr_hsv.v : disabled_val, 0, 0, 0)) {
                 xpos += shift_icon->width + 2;
             }
             if (qp_drawimage_recolor(ili9341_display, xpos, ypos,
                                      keymap_config.swap_lctl_lgui ? command_icon : windows_icon,
-                                     last_mods & MOD_BIT_LGUI ? offset_hue : curr_hsv.h, curr_hsv.s,
+                                     last_mods & MOD_BIT_LGUI ? curr_hsv_secondary.h : curr_hsv.h, curr_hsv.s,
                                      last_mods & MOD_BIT_LGUI ? curr_hsv.v : disabled_val, 0, 0, 0)) {
                 xpos += windows_icon->width + 2;
             }
             if (qp_drawimage_recolor(ili9341_display, xpos, ypos, alt_icon,
-                                     last_mods & MOD_BIT_LALT ? offset_hue : curr_hsv.h, curr_hsv.s,
+                                     last_mods & MOD_BIT_LALT ? curr_hsv_secondary.h : curr_hsv.h, curr_hsv.s,
                                      last_mods & MOD_BIT_LALT ? curr_hsv.v : disabled_val, 0, 0, 0)) {
                 xpos += alt_icon->width + 2;
             }
             if (qp_drawimage_recolor(ili9341_display, xpos, ypos, control_icon,
-                                     last_mods & MOD_BIT_LCTRL ? offset_hue : curr_hsv.h, curr_hsv.s,
+                                     last_mods & MOD_BIT_LCTRL ? curr_hsv_secondary.h : curr_hsv.h, curr_hsv.s,
                                      last_mods & MOD_BIT_LCTRL ? curr_hsv.v : disabled_val, 0, 0, 0)) {
                 xpos += control_icon->width + 2;
             }
             if (qp_drawimage_recolor(ili9341_display, xpos, ypos, control_icon,
-                                     last_mods & MOD_BIT_RCTRL ? offset_hue : curr_hsv.h, curr_hsv.s,
+                                     last_mods & MOD_BIT_RCTRL ? curr_hsv_secondary.h : curr_hsv.h, curr_hsv.s,
                                      last_mods & MOD_BIT_RCTRL ? curr_hsv.v : disabled_val, 0, 0, 0)) {
                 xpos += control_icon->width + 2;
             }
             if (qp_drawimage_recolor(ili9341_display, xpos, ypos, alt_icon,
-                                     last_mods & MOD_BIT_RALT ? offset_hue : curr_hsv.h, curr_hsv.s,
+                                     last_mods & MOD_BIT_RALT ? curr_hsv_secondary.h : curr_hsv.h, curr_hsv.s,
                                      last_mods & MOD_BIT_RALT ? curr_hsv.v : disabled_val, 0, 0, 0)) {
                 xpos += alt_icon->width + 2;
             }
             if (qp_drawimage_recolor(ili9341_display, xpos, ypos,
                                      keymap_config.swap_rctl_rgui ? command_icon : windows_icon,
-                                     last_mods & MOD_BIT_RGUI ? offset_hue : curr_hsv.h, curr_hsv.s,
+                                     last_mods & MOD_BIT_RGUI ? curr_hsv_secondary.h : curr_hsv.h, curr_hsv.s,
                                      last_mods & MOD_BIT_RGUI ? curr_hsv.v : disabled_val, 0, 0, 0)) {
                 xpos += windows_icon->width + 2;
             }
             if (qp_drawimage_recolor(ili9341_display, xpos, ypos, shift_icon,
-                                     last_mods & MOD_BIT_RSHIFT ? offset_hue : curr_hsv.h, curr_hsv.s,
+                                     last_mods & MOD_BIT_RSHIFT ? curr_hsv_secondary.h : curr_hsv.h, curr_hsv.s,
                                      last_mods & MOD_BIT_RSHIFT ? curr_hsv.v : disabled_val, 0, 0, 0)) {
                 xpos += shift_icon->width + 2;
             }
@@ -496,8 +499,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                                         curr_hsv.v, 0, 0, 0);
 
             snprintf(buf, sizeof(buf), "%9s", os_variant_to_string(current_detected_os));
-            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, offset_hue, curr_hsv.s, curr_hsv.v, 0, 0,
-                                0);
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv_secondary.h, curr_hsv_secondary.s,
+                                curr_hsv_secondary.v, 0, 0, 0);
         }
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //  RGB Light Settings
@@ -598,8 +601,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                                 0, 0, 0);
             ypos += font_oled->line_height + 4;
             snprintf(buf, sizeof(buf), "%10s", get_layer_name_string(default_layer_state, false, true));
-            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, offset_hue, curr_hsv.s, curr_hsv.v, 0, 0,
-                                0);
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv_secondary.h, curr_hsv_secondary.s,
+                                curr_hsv_secondary.v, 0, 0, 0);
         } else {
             ypos += font_oled->line_height + 4;
         }
@@ -617,8 +620,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 temp = last_layer_state & ~((layer_state_t)1 << _MOUSE);
             }
             snprintf(buf, sizeof(buf), "%10s", get_layer_name_string(temp, false, false));
-            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, offset_hue, curr_hsv.s, curr_hsv.v, 0, 0,
-                                0);
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv_secondary.h, curr_hsv_secondary.s,
+                                curr_hsv_secondary.v, 0, 0, 0);
             ypos = 122 + 4;
             xpos = 190;
             qp_drawimage_recolor(ili9341_display, xpos, ypos, gamepad_icon, curr_hsv.h, curr_hsv.s,
@@ -654,8 +657,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                                 curr_hsv.v, 0, 0, 0);
             ypos += font_oled->line_height + 4;
             snprintf(buf, sizeof(buf), "%19s", autocorrected_str_raw[0]);
-            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, offset_hue, curr_hsv.s, curr_hsv.v, 0, 0,
-                                0);
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv_secondary.h, curr_hsv_secondary.s,
+                                curr_hsv_secondary.v, 0, 0, 0);
 
             ypos += font_oled->line_height + 4;
             qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Original Text: ", curr_hsv.h, curr_hsv.s,
@@ -663,8 +666,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             ypos += font_oled->line_height + 4;
             snprintf(buf, sizeof(buf), "%19s", autocorrected_str_raw[1]);
 
-            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, offset_hue, curr_hsv.s, curr_hsv.v, 0, 0,
-                                0);
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv_secondary.h, curr_hsv_secondary.s,
+                                curr_hsv_secondary.v, 0, 0, 0);
             autocorrect_str_has_changed = false;
         } else {
             // we called ypos inside the function ... to make sure we don't skip a line on future passes ....
@@ -765,8 +768,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             }
 
             static uint8_t last_display_mode = 0xFF;
-            if (last_display_mode != userspace_config.display_mode) {
-                last_display_mode       = userspace_config.display_mode;
+            if (last_display_mode != userspace_config.painter.display_mode) {
+                last_display_mode       = userspace_config.painter.display_mode;
                 force_full_block_redraw = true;
             }
 
@@ -781,7 +784,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
             surface_ypos += 3;
             xpos = 3;
-            switch (userspace_config.display_mode) {
+            switch (userspace_config.painter.display_mode) {
                 case 0:
                     if (hue_redraw || block_redraw || console_log_needs_redraw) {
                         static uint16_t max_line_width = 0;
@@ -823,10 +826,10 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                                 if (keycode < ARRAY_SIZE(code_to_name)) {
                                     code[0] = pgm_read_byte(&code_to_name[keycode]);
                                 }
-                                xpos += qp_drawtext_recolor(menu_surface, xpos, temp_ypos, font_oled, (char *)code,
-                                                            curr_hsv.h, curr_hsv.s,
-                                                            peek_matrix_layer_map(y, x) ? 0 : curr_hsv.v, offset_hue,
-                                                            curr_hsv.s, peek_matrix_layer_map(y, x) ? curr_hsv.v : 0);
+                                xpos += qp_drawtext_recolor(
+                                    menu_surface, xpos, temp_ypos, font_oled, (char *)code, curr_hsv.h, curr_hsv.s,
+                                    peek_matrix_layer_map(y, x) ? 0 : curr_hsv.v, curr_hsv_secondary.h, curr_hsv.s,
+                                    peek_matrix_layer_map(y, x) ? curr_hsv.v : 0);
                                 xpos += qp_drawtext_recolor(menu_surface, xpos, temp_ypos, font_oled, " ", 0, 0, 0, 0,
                                                             0, 0);
                             }
@@ -861,11 +864,11 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 #endif // SPLIT_KEYBOARD
         static uint8_t display_mode = 0xFF;
         static bool    force_redraw = false;
-        if (display_mode != userspace_config.display_logo) {
-            display_mode                 = userspace_config.display_logo;
+        if (display_mode != userspace_config.painter.display_logo) {
+            display_mode                 = userspace_config.painter.display_logo;
             painter_image_handle_t frame = NULL;
 
-            switch (userspace_config.display_logo) {
+            switch (userspace_config.painter.display_logo) {
                 case 0:
                     frame = qp_load_image_mem(gfx_samurai_cyberpunk_minimal_dark_8k_b3_240x320);
                     break;
@@ -907,7 +910,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 qp_close_image(frame);
             }
         }
-        if (userspace_config.display_logo == 10) {
+        if (userspace_config.painter.display_logo == 10) {
             if (hue_redraw || force_redraw || console_log_needs_redraw) {
                 for (uint8_t i = 0; i < DISPLAY_CONSOLE_LOG_LINE_NUM; i++) {
                     static uint16_t max_line_width = 5;

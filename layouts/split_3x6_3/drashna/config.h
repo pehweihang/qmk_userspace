@@ -91,3 +91,5 @@
 #    undef TAPPING_TERM
 #endif
 #define TAPPING_TERM 200
+
+#define EECONFIG_USER_DATA_SIZE 14

@@ -42,6 +42,7 @@ painter_image_handle_t windows_logo, apple_logo, linux_logo;
 painter_image_handle_t shift_icon, control_icon, alt_icon, command_icon, windows_icon;
 painter_image_handle_t mouse_icon;
 painter_image_handle_t gamepad_icon;
+painter_image_handle_t qmk_banner;
 
 #define SURFACE_MENU_WIDTH  236
 #define SURFACE_MENU_HEIGHT 121
@@ -119,6 +120,7 @@ void init_display_ili9341(void) {
 
     mouse_icon   = qp_load_image_mem(gfx_mouse_icon);
     gamepad_icon = qp_load_image_mem(gfx_gamepad_24x24);
+    qmk_banner   = qp_load_image_mem(gfx_qmk_powered_by);
 
     ili9341_display =
         qp_ili9341_make_spi_device(240, 320, DISPLAY_CS_PIN, DISPLAY_DC_PIN, DISPLAY_RST_PIN, DISPLAY_SPI_DIVIDER, 0);
@@ -872,6 +874,13 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                                              curr_hsv.primary.h, curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
                         render_character_set(menu_surface, &xpos, max_font_xpos[2], &surface_ypos, font_oled,
                                              curr_hsv.primary.h, curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
+                    }
+                    break;
+                case 3:
+                    if (hue_redraw || block_redraw) {
+                        qp_drawimage_recolor(menu_surface, 0, (SURFACE_MENU_HEIGHT - qmk_banner->height) - 1,
+                                             qmk_banner, curr_hsv.primary.h, curr_hsv.primary.s, curr_hsv.primary.v, 0,
+                                             0, 0);
                     }
                     break;
                 default:

@@ -4,6 +4,7 @@
 #pragma once
 
 #include "display/painter/graphics/qmk_logo_220x220.qgf.h"
+#include "display/painter/graphics/qmk_powered_by.qgf.h"
 #include "display/painter/graphics/anime-girl-jacket-240x320.qgf.h"
 #include "display/painter/graphics/asuka-240x320.qgf.h"
 #include "display/painter/graphics/matrix.qgf.h"

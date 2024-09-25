@@ -40,15 +40,15 @@ deferred_token menu_deferred_token = INVALID_DEFERRED_TOKEN;
 static bool menu_handler_display(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            userspace_config.painter.display_mode = (userspace_config.painter.display_mode - 1) % 3;
-            if (userspace_config.painter.display_mode > 2) {
-                userspace_config.painter.display_mode = 2;
+            userspace_config.painter.display_mode = (userspace_config.painter.display_mode - 1) % 4;
+            if (userspace_config.painter.display_mode > 3) {
+                userspace_config.painter.display_mode = 3;
             }
             eeconfig_update_user_datablock(&userspace_config);
             return false;
         case menu_input_right:
-            userspace_config.painter.display_mode = (userspace_config.painter.display_mode + 1) % 3;
-            if (userspace_config.painter.display_mode > 2) {
+            userspace_config.painter.display_mode = (userspace_config.painter.display_mode + 1) % 4;
+            if (userspace_config.painter.display_mode > 3) {
                 userspace_config.painter.display_mode = 0;
             }
             eeconfig_update_user_datablock(&userspace_config);
@@ -68,6 +68,9 @@ void display_handler_display(char *text_buffer, size_t buffer_len) {
             return;
         case 2:
             strncpy(text_buffer, "Fonts", buffer_len - 1);
+            return;
+        case 3:
+            strncpy(text_buffer, "QMK Banner", buffer_len - 1);
             return;
     }
 

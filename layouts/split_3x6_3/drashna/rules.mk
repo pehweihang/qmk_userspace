@@ -51,6 +51,8 @@ ifeq ($(strip $(MCU)), atmega32u4)
 endif
 
 ifeq ($(strip $(USE_ARM_CONFIG)), yes)
+    LTO_ENABLE                  = no
+    LTO_SUPPORTED               = no
     HAPTIC_ENABLE               = no
     WS2812_DRIVER               = pwm
     SERIAL_DRIVER               = usart

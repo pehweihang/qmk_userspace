@@ -980,7 +980,7 @@ static bool menu_handler_mouse_accel_offset(menu_input_t input) {
 }
 
 void display_handler_mouse_accel_offset(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%1.2f", pointing_device_accel_get_offset());
+    snprintf(text_buffer, buffer_len - 1, "%2.2f", pointing_device_accel_get_offset());
 }
 
 static bool menu_handler_mouse_accel_limit(menu_input_t input) {

@@ -289,7 +289,7 @@ void                       eeconfig_init_user(void) {
         .v = 255,
     };
     userspace_config.painter.hsv.secondary = (HSV){
-        .h = 49,
+        .h = 48,
         .s = 255,
         .v = 255,
     };

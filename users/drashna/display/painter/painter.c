@@ -228,7 +228,7 @@ void shutdown_quantum_painter(bool jump_to_bootloader) {
 }
 
 #ifndef PAINTER_HUE_STEP
-#    define PAINTER_HUE_STEP 8
+#    define PAINTER_HUE_STEP 4
 #endif // PAINTER_HUE_STEP
 
 #ifndef PAINTER_SAT_STEP

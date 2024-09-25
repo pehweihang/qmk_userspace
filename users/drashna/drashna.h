@@ -91,6 +91,11 @@ void center_text(const char *text, char *output, uint8_t width);
 #endif // !defined(RGB_MATRIX_ENABLE) && !defined(RGBLIGHT_ENABLE)
 
 typedef struct PACKED {
+    HSV primary;
+    HSV secondary;
+} dual_hsv_t;
+
+typedef struct PACKED {
     struct {
         bool layer_change : 1;
         bool idle_anim    : 1;
@@ -115,8 +120,7 @@ typedef struct PACKED {
     struct {
         uint8_t display_mode : 2;
         uint8_t display_logo : 4;
-        HSV     primary_hsv;
-        HSV     secondary_hsv;
+        dual_hsv_t hsv;
     } painter;
     bool nuke_switch : 1;
     bool check       : 1;

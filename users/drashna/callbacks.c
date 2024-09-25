@@ -283,12 +283,12 @@ void                       eeconfig_init_user(void) {
 #else  // OLED_ENABLE
     userspace_config.oled.brightness = 255;
 #endif // OLED_ENABLE
-    userspace_config.painter.primary_hsv = (HSV){
+    userspace_config.painter.hsv.primary = (HSV){
         .h = 128,
         .s = 255,
         .v = 255,
     };
-    userspace_config.painter.secondary_hsv = (HSV){
+    userspace_config.painter.hsv.secondary = (HSV){
         .h = 49,
         .s = 255,
         .v = 255,

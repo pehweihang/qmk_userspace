@@ -1,4 +1,6 @@
 // Copyright 2021 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
+// Copyright 2024 burkfers (@burkfers)
+// Copyright 2024 Wimads (@wimads)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "pointing.h"
@@ -18,23 +20,6 @@ static uint16_t mouse_debounce_timer = 0;
 #    define TAP_CHECK TAPPING_TERM
 #endif // TAPPING_TERM_PER_KEY
 
-#ifndef POINTING_DEVICE_ACCEL_CURVE_A
-#    define POINTING_DEVICE_ACCEL_CURVE_A 7
-#endif // POINTING_DEVICE_ACCEL_CURVE_A
-#ifndef POINTING_DEVICE_ACCEL_CURVE_B
-#    define POINTING_DEVICE_ACCEL_CURVE_B 0.05
-#endif // POINTING_DEVICE_ACCEL_CURVE_B
-#ifndef POINTING_DEVICE_ACCEL_CURVE_C
-#    define POINTING_DEVICE_ACCEL_CURVE_C 0.3
-#endif // POINTING_DEVICE_ACCEL_CURVE_C
-#ifndef POINTING_DEVICE_ACCEL_CURVE_D
-#    define POINTING_DEVICE_ACCEL_CURVE_D 0.1
-#endif // POINTING_DEVICE_ACCEL_CURVE_D
-#ifndef POINTING_DEVICE_ACCEL_HISTORY_TIME
-#    define POINTING_DEVICE_ACCEL_HISTORY_TIME 100
-#endif // POINTING_DEVICE_ACCEL_HISTORY_TIME
-#define POINTING_DEVICE_ACCEL_ACCUM
-
 #ifndef MOUSE_JIGGLER_THRESHOLD
 #    define MOUSE_JIGGLER_THRESHOLD 20
 #endif // MOUSE_JIGGLER_THRESHOLD
@@ -42,15 +27,8 @@ static uint16_t mouse_debounce_timer = 0;
 #    define MOUSE_JIGGLER_INTERVAL_MS 16
 #endif // MOUSE_JIGGLER_INTERVAL_MS
 
-static uint32_t maccel_timer = 0;
-
-static float maccel_a = POINTING_DEVICE_ACCEL_CURVE_A;
-static float maccel_b = POINTING_DEVICE_ACCEL_CURVE_B;
-static float maccel_c = POINTING_DEVICE_ACCEL_CURVE_C;
-static float maccel_d = POINTING_DEVICE_ACCEL_CURVE_D;
-
-static float maccel_accum_x = 0;
-static float maccel_accum_y = 0;
+#define _CONSTRAIN(amt, low, high) ((amt) < (low) ? (low) : ((amt) > (high) ? (high) : (amt)))
+#define CONSTRAIN_REPORT(val)      (mouse_xy_report_t) _CONSTRAIN(val, XY_REPORT_MIN, XY_REPORT_MAX)
 
 uint16_t            mouse_jiggler_timer = 0;
 bool                mouse_jiggler       = false;
@@ -63,6 +41,8 @@ typedef struct {
     int8_t            h;
 } mouse_movement_t;
 mouse_movement_t total_mouse_movement = {0, 0, 0, 0};
+
+static uint32_t pointing_device_accel_timer = 0;
 
 __attribute__((weak)) void pointing_device_init_keymap(void) {}
 
@@ -103,67 +83,128 @@ __attribute__((weak)) report_mouse_t pointing_device_task_keymap(report_mouse_t 
 }
 
 report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
-    if (!(mouse_report.x == 0 && mouse_report.y == 0) && (timer_elapsed(mouse_debounce_timer) > TAP_CHECK)) {
-        const float speed = maccel_d * (sqrtf(mouse_report.x * mouse_report.x + mouse_report.y * mouse_report.y)) /
-                            timer_elapsed32(maccel_timer);
-        float scale_factor = 1 - (1 - maccel_c) * expf(-1 * (speed - maccel_b) * maccel_a);
-        if (speed <= maccel_b) {
-            scale_factor = maccel_c;
-        }
-        const float x = (mouse_report.x * scale_factor);
-        const float y = (mouse_report.y * scale_factor);
-        maccel_timer  = timer_read32();
-
-        pd_dprintf("maccel: x: %i, y: %i, speed %f -> factor %f; x': %3f, y': %3f\n", mouse_report.x, mouse_report.y,
-                   speed, scale_factor, x, y);
-
-#ifdef POINTING_DEVICE_ACCEL_ACCUM
-        // report the integer part
-        mouse_report.x = (mouse_xy_report_t)x;
-        mouse_report.y = (mouse_xy_report_t)y;
-
-        // accumulate remaining fraction
-        maccel_accum_x += (x - mouse_report.x);
-        maccel_accum_y += (y - mouse_report.y);
-
-        // pay out accumulated fraction once it's whole
-        if (maccel_accum_x >= 1) {
-            mouse_report.x += 1;
-            maccel_accum_x -= 1;
-        } else if (maccel_accum_x <= -1) {
-            mouse_report.x -= 1;
-            maccel_accum_x += 1;
-        }
-        if (maccel_accum_y >= 1) {
-            mouse_report.y += 1;
-            maccel_accum_y -= 1;
-        } else if (maccel_accum_y <= -1) {
-            mouse_report.y -= 1;
-            maccel_accum_y += 1;
-        }
-        pd_dprintf("maccel accum: x: %3f, y: %3f\n", maccel_accum_x, maccel_accum_y);
-#endif // POINTING_DEVICE_ACCEL_ACCUM
-        mouse_report.x = x;
-        mouse_report.y = y;
-    }
-
     mouse_jiggler_check(&mouse_report);
+
+    // rounding carry to recycle dropped floats from int mouse reports, to smoothen low speed movements (credit
+    // @ankostis)
+    static float rounding_carry_x = 0;
+    static float rounding_carry_y = 0;
+    // time since last mouse report:
+    const uint16_t delta_time = timer_elapsed32(pointing_device_accel_timer);
+    // skip maccel maths if report = 0, or if maccel not enabled.
+    if ((mouse_report.x == 0 && mouse_report.y == 0) || !userspace_config.pointing.enable_acceleration) {
+        return pointing_device_task_keymap(mouse_report);
+    }
+    // reset timer:
+    pointing_device_accel_timer = timer_read32();
+    // Reset carry if too much time passed
+    if (delta_time > POINTING_DEVICE_ACCEL_ROUNDING_CARRY_TIMEOUT_MS) {
+        rounding_carry_x = 0;
+        rounding_carry_y = 0;
+    }
+    // Reset carry when pointer swaps direction, to follow user's hand.
+    if (mouse_report.x * rounding_carry_x < 0) rounding_carry_x = 0;
+    if (mouse_report.y * rounding_carry_y < 0) rounding_carry_y = 0;
+    // Limit expensive calls to get device cpi settings only when mouse stationary for > 200ms.
+    static uint16_t device_cpi = 300;
+    if (delta_time > POINTING_DEVICE_ACCEL_CPI_THROTTLE_MS) {
+        device_cpi = pointing_device_get_cpi();
+    }
+    // calculate dpi correction factor (for normalizing velocity range across different user dpi settings)
+    const float dpi_correction = (float)1000.0f / device_cpi;
+    // calculate euclidean distance moved (sqrt(x^2 + y^2))
+    const float distance = sqrtf(mouse_report.x * mouse_report.x + mouse_report.y * mouse_report.y);
+    // calculate delta velocity: dv = distance/dt
+    const float velocity_raw = distance / delta_time;
+    // correct raw velocity for dpi
+    const float velocity = dpi_correction * velocity_raw;
+    // letter variables for readability of maths:
+    const float k = userspace_config.pointing.takeoff;
+    const float g = userspace_config.pointing.growth_rate;
+    const float s = userspace_config.pointing.offset;
+    const float m = userspace_config.pointing.limit;
+    // acceleration factor: f(v) = 1 - (1 - M) / {1 + e^[K(v - S)]}^(G/K):
+    // Generalised Sigmoid Function, see https://www.desmos.com/calculator/k9vr0y2gev
+    const float pointing_device_accel_factor =
+        POINTING_DEVICE_ACCEL_LIMIT_UPPER -
+        (POINTING_DEVICE_ACCEL_LIMIT_UPPER - m) / powf(1 + expf(k * (velocity - s)), g / k);
+    // multiply mouse reports by acceleration factor, and account for previous quantization errors:
+    const float new_x = rounding_carry_x + pointing_device_accel_factor * mouse_report.x;
+    const float new_y = rounding_carry_y + pointing_device_accel_factor * mouse_report.y;
+    // Accumulate any difference from next integer (quantization).
+    rounding_carry_x = new_x - (int)new_x;
+    rounding_carry_y = new_y - (int)new_y;
+    // clamp values
+    const mouse_xy_report_t x = CONSTRAIN_REPORT(new_x);
+    const mouse_xy_report_t y = CONSTRAIN_REPORT(new_y);
+
+// console output for debugging (enable/disable in config.h)
+#ifdef POINTING_DEVICE_ACCEL_DEBUG
+    const float distance_out = sqrtf(x * x + y * y);
+    const float velocity_out = velocity * pointing_device_accel_factor;
+    printf("MACCEL: DPI:%4i Tko: %.3f Grw: %.3f Ofs: %.3f Lmt: %.3f | Fct: %.3f v.in: %.3f v.out: %.3f d.in: %3i "
+           "d.out: %3i\n",
+           device_cpi, userspace_config.pointing.takeoff, userspace_config.pointing.growth_rate,
+           userspace_config.pointing.offset, userspace_config.pointing.limit, pointing_device_accel_factor, velocity,
+           velocity_out, CONSTRAIN_REPORT(distance), CONSTRAIN_REPORT(distance_out));
+#endif // POINTING_DEVICE_ACCEL_DEBUG
+
+    // report back accelerated values
+    mouse_report.x = x;
+    mouse_report.y = y;
 
     return pointing_device_task_keymap(mouse_report);
 }
 
 bool process_record_pointing(uint16_t keycode, keyrecord_t* record) {
     switch (keycode) {
-        case KC_ACCEL:
-            if (record->event.pressed) {
-                userspace_config.pointing.enable_acceleration ^= 1;
-                mouse_jiggler = false;
-            }
-            break;
         case PD_JIGGLER:
             if (record->event.pressed) {
                 mouse_jiggler_timer = timer_read();
                 mouse_jiggler       = !mouse_jiggler;
+            }
+            break;
+        case PD_ACCEL_TOGGLE:
+            if (record->event.pressed) {
+                pointing_device_accel_toggle_enabled();
+            }
+            break;
+        case PD_ACCEL_TAKEOFF:
+            if (record->event.pressed) {
+                pointing_device_accel_set_takeoff(
+                    pointing_device_accel_get_takeoff() +
+                    pointing_device_accel_get_mod_step(POINTING_DEVICE_ACCEL_TAKEOFF_STEP));
+                printf("MACCEL:keycode: TKO: %.3f gro: %.3f ofs: %.3f lmt: %.3f\n", userspace_config.pointing.takeoff,
+                       userspace_config.pointing.growth_rate, userspace_config.pointing.offset,
+                       userspace_config.pointing.limit);
+            }
+            break;
+        case PD_ACCEL_GROWTH_RATE:
+            if (record->event.pressed) {
+                pointing_device_accel_set_growth_rate(
+                    pointing_device_accel_get_growth_rate() +
+                    pointing_device_accel_get_mod_step(POINTING_DEVICE_ACCEL_GROWTH_RATE_STEP));
+                printf("MACCEL:keycode: tko: %.3f GRO: %.3f ofs: %.3f lmt: %.3f\n", userspace_config.pointing.takeoff,
+                       userspace_config.pointing.growth_rate, userspace_config.pointing.offset,
+                       userspace_config.pointing.limit);
+            }
+            break;
+        case PD_ACCEL_OFFSET:
+            if (record->event.pressed) {
+                pointing_device_accel_set_offset(pointing_device_accel_get_offset() +
+                                                 pointing_device_accel_get_mod_step(POINTING_DEVICE_ACCEL_OFFSET_STEP));
+                printf("MACCEL:keycode: tko: %.3f gro: %.3f OFS: %.3f lmt: %.3f\n", userspace_config.pointing.takeoff,
+                       userspace_config.pointing.growth_rate, userspace_config.pointing.offset,
+                       userspace_config.pointing.limit);
+            }
+            break;
+        case PD_ACCEL_LIMIT:
+            if (record->event.pressed) {
+                pointing_device_accel_set_limit(pointing_device_accel_get_limit() +
+                                                pointing_device_accel_get_mod_step(POINTING_DEVICE_ACCEL_LIMIT_STEP));
+                printf("MACCEL:keycode: tko: %.3f gro: %.3f ofs: %.3f LMT: %.3f\n", userspace_config.pointing.takeoff,
+                       userspace_config.pointing.growth_rate, userspace_config.pointing.offset,
+                       userspace_config.pointing.limit);
             }
             break;
         default:
@@ -210,13 +251,140 @@ bool is_mouse_record_user(uint16_t keycode, keyrecord_t* record) {
         (defined(KEYBOARD_bastardkb_dilemma) && !defined(NO_DILEMMA_KEYCODES))
         case QK_KB ... QK_KB_MAX:
 #    endif
-        case KC_ACCEL:
-        case PD_JIGGLER:
+        case PD_JIGGLER ... PD_ACCEL_LIMIT:
             return true;
     }
     return false;
 }
 #endif
+
+/**
+ * @brief Gets the takeoff value for the acceleration curve
+ *
+ * @return float
+ */
+float pointing_device_accel_get_takeoff(void) {
+    return userspace_config.pointing.takeoff;
+}
+
+/**
+ * @brief Gets the growth rate for the acceleration curve
+ *
+ * @return float
+ */
+float pointing_device_accel_get_growth_rate(void) {
+    return userspace_config.pointing.growth_rate;
+}
+
+/**
+ * @brief Gets the offset for the acceleration curve
+ *
+ * @return float
+ */
+float pointing_device_accel_get_offset(void) {
+    return userspace_config.pointing.offset;
+}
+
+/**
+ * @brief Gets the limit for the acceleration curve
+ *
+ * @return float
+ */
+float pointing_device_accel_get_limit(void) {
+    return userspace_config.pointing.limit;
+}
+
+/**
+ * @brief Sets the takeoff value for the acceleration curve
+ *
+ * @param val
+ */
+void pointing_device_accel_set_takeoff(float val) {
+    if (val >= 0.5) { // value less than 0.5 leads to nonsensical results
+        userspace_config.pointing.takeoff = val;
+    }
+    eeconfig_update_user_datablock(&userspace_config);
+}
+
+/**
+ * @brief Sets the growth rate for the acceleration curve
+ *
+ * @param val
+ */
+void pointing_device_accel_set_growth_rate(float val) {
+    if (val >= 0) { // value less 0 leads to nonsensical results
+        userspace_config.pointing.growth_rate = val;
+    }
+    eeconfig_update_user_datablock(&userspace_config);
+}
+
+/**
+ * @brief Sets the offset for the acceleration curve
+ *
+ * @param val
+ */
+void pointing_device_accel_set_offset(float val) {
+    userspace_config.pointing.offset = val;
+    eeconfig_update_user_datablock(&userspace_config);
+}
+
+/**
+ * @brief Sets the limit for the acceleration curve
+ *
+ * @param val
+ */
+void pointing_device_accel_set_limit(float val) {
+    if (val >= 0) {
+        userspace_config.pointing.limit = val;
+    }
+    eeconfig_update_user_datablock(&userspace_config);
+}
+
+/**
+ * @brief Enables or disables the acceleration curve
+ *
+ * @param enable
+ */
+void pointing_device_accel_enabled(bool enable) {
+    userspace_config.pointing.enable_acceleration = enable;
+    eeconfig_update_user_datablock(&userspace_config);
+#ifdef POINTING_DEVICE_ACCEL_DEBUG
+    printf("maccel: enabled: %d\n", userspace_config.pointing.enabled);
+#endif
+}
+
+/**
+ * @brief Toggles the acceleration curve
+ *
+ */
+bool pointing_device_accel_get_enabled(void) {
+    return userspace_config.pointing.enable_acceleration;
+}
+
+/**
+ * @brief Toggles the acceleration curve
+ *
+ */
+void pointing_device_accel_toggle_enabled(void) {
+    pointing_device_accel_enabled(!pointing_device_accel_get_enabled());
+}
+
+/**
+ * @brief Gets the step value for the acceleration curve
+ *
+ * @param step
+ * @return float
+ */
+float pointing_device_accel_get_mod_step(float step) {
+    const uint8_t mod_mask = get_mods() | get_oneshot_mods();
+    if (mod_mask & MOD_MASK_CTRL) {
+        step *= 10; // control increases by factor 10
+    }
+    if (mod_mask & MOD_MASK_SHIFT) {
+        step *= -1; // shift inverts
+    }
+    return step;
+}
 
 #ifdef POINTING_MODE_MAP_ENABLE
 enum keymap_pointing_mode_ids {

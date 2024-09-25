@@ -116,6 +116,10 @@ typedef struct PACKED {
     } debug;
     struct {
         bool enable_acceleration : 1;
+        float growth_rate;
+        float offset;
+        float limit;
+        float takeoff;
     } pointing;
     struct {
         uint8_t display_mode : 2;

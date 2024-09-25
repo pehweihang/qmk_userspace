@@ -36,6 +36,7 @@ void keyboard_post_init_unicode(void);
 #ifdef SPLIT_KEYBOARD
 #    include "split_util.h"
 #endif // SPLIT_KEYBOARD
+#include "pointing/pointing.h"
 
 user_runtime_config_t user_runtime_state;
 
@@ -293,6 +294,11 @@ void                       eeconfig_init_user(void) {
         .s = 255,
         .v = 255,
     };
+
+    userspace_config.pointing.growth_rate = POINTING_DEVICE_ACCEL_GROWTH_RATE;
+    userspace_config.pointing.offset      = POINTING_DEVICE_ACCEL_OFFSET;
+    userspace_config.pointing.limit       = POINTING_DEVICE_ACCEL_LIMIT;
+    userspace_config.pointing.takeoff     = POINTING_DEVICE_ACCEL_TAKEOFF;
 
     // ensure that nkro is enabled
     keymap_config.raw  = eeconfig_read_keymap();

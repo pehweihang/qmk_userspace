@@ -871,23 +871,6 @@ void display_handler_auto_mouse_layer(char *text_buffer, size_t buffer_len) {
     snprintf(text_buffer, buffer_len - 1, "%s", layer_name(get_auto_mouse_layer()));
 }
 
-static bool menu_handler_auto_mouse_accel(menu_input_t input) {
-    switch (input) {
-        case menu_input_left:
-        case menu_input_right:
-            userspace_config.pointing.enable_acceleration ^= 1;
-            eeconfig_update_user_datablock(&userspace_config);
-
-            return false;
-        default:
-            return true;
-    }
-}
-
-void display_handler_auto_mouse_accel(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.pointing.enable_acceleration ? "on" : "off");
-}
-
 extern bool     mouse_jiggler;
 extern uint16_t mouse_jiggler_timer;
 
@@ -926,7 +909,141 @@ void display_handler_dpi_config(char *text_buffer, size_t buffer_len) {
 }
 #    endif
 
+static bool menu_handler_mouse_accel_toggle(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            pointing_device_accel_toggle_enabled();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_mouse_accel_toggle(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", pointing_device_accel_get_enabled() ? "on" : "off");
+}
+
+static bool menu_handler_mouse_accel_takeoff(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            pointing_device_accel_set_takeoff(pointing_device_accel_get_takeoff() -
+                                              pointing_device_accel_get_mod_step(POINTING_DEVICE_ACCEL_TAKEOFF_STEP));
+            return false;
+        case menu_input_right:
+            pointing_device_accel_set_takeoff(pointing_device_accel_get_takeoff() +
+                                              pointing_device_accel_get_mod_step(POINTING_DEVICE_ACCEL_TAKEOFF_STEP));
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_mouse_accel_takeoff(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%1.2f", pointing_device_accel_get_takeoff());
+}
+
+static bool menu_handler_mouse_accel_growth_rate(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            pointing_device_accel_set_growth_rate(
+                pointing_device_accel_get_growth_rate() -
+                pointing_device_accel_get_mod_step(POINTING_DEVICE_ACCEL_GROWTH_RATE_STEP));
+            return false;
+        case menu_input_right:
+            pointing_device_accel_set_growth_rate(
+                pointing_device_accel_get_growth_rate() +
+                pointing_device_accel_get_mod_step(POINTING_DEVICE_ACCEL_GROWTH_RATE_STEP));
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_mouse_accel_growth_rate(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%1.2f", pointing_device_accel_get_growth_rate());
+}
+
+static bool menu_handler_mouse_accel_offset(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            pointing_device_accel_set_offset(pointing_device_accel_get_offset() -
+                                             pointing_device_accel_get_mod_step(POINTING_DEVICE_ACCEL_OFFSET_STEP));
+            return false;
+        case menu_input_right:
+            pointing_device_accel_set_offset(pointing_device_accel_get_offset() +
+                                             pointing_device_accel_get_mod_step(POINTING_DEVICE_ACCEL_OFFSET_STEP));
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_mouse_accel_offset(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%1.2f", pointing_device_accel_get_offset());
+}
+
+static bool menu_handler_mouse_accel_limit(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            pointing_device_accel_set_limit(pointing_device_accel_get_limit() -
+                                            pointing_device_accel_get_mod_step(POINTING_DEVICE_ACCEL_LIMIT_STEP));
+            return false;
+        case menu_input_right:
+            pointing_device_accel_set_limit(pointing_device_accel_get_limit() +
+                                            pointing_device_accel_get_mod_step(POINTING_DEVICE_ACCEL_LIMIT_STEP));
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_mouse_accel_limit(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%1.2f", pointing_device_accel_get_limit());
+}
+
+menu_entry_t pointing_acceleration_entries[] = {
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Acceleration",
+        .child.menu_handler    = menu_handler_mouse_accel_toggle,
+        .child.display_handler = display_handler_mouse_accel_toggle,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Takeoff",
+        .child.menu_handler    = menu_handler_mouse_accel_takeoff,
+        .child.display_handler = display_handler_mouse_accel_takeoff,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Growth Rate",
+        .child.menu_handler    = menu_handler_mouse_accel_growth_rate,
+        .child.display_handler = display_handler_mouse_accel_growth_rate,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Offset",
+        .child.menu_handler    = menu_handler_mouse_accel_offset,
+        .child.display_handler = display_handler_mouse_accel_offset,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Limit",
+        .child.menu_handler    = menu_handler_mouse_accel_limit,
+        .child.display_handler = display_handler_mouse_accel_limit,
+    },
+};
+
 menu_entry_t pointing_entries[] = {
+#    if defined(KEYBOARD_handwired_tractyl_manuform) || defined(KEYBOARD_bastardkb_charybdis)
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "DPI Config",
+        .child.menu_handler    = menu_handler_dpi_config,
+        .child.display_handler = display_handler_dpi_config,
+    },
+#    endif
     {
         .flags                 = menu_flag_is_value,
         .text                  = "Auto Mouse Enable",
@@ -941,24 +1058,16 @@ menu_entry_t pointing_entries[] = {
     },
     {
         .flags                 = menu_flag_is_value,
-        .text                  = "Auto Mouse Acceleration",
-        .child.menu_handler    = menu_handler_auto_mouse_accel,
-        .child.display_handler = display_handler_auto_mouse_accel,
-    },
-    {
-        .flags                 = menu_flag_is_value,
         .text                  = "Mouse Jiggler",
         .child.menu_handler    = menu_handler_mouse_jiggler,
         .child.display_handler = display_handler_mouse_jiggler,
     },
-#    if defined(KEYBOARD_handwired_tractyl_manuform) || defined(KEYBOARD_bastardkb_charybdis)
     {
-        .flags                 = menu_flag_is_value,
-        .text                  = "DPI Config",
-        .child.menu_handler    = menu_handler_dpi_config,
-        .child.display_handler = display_handler_dpi_config,
+        .flags              = menu_flag_is_parent,
+        .text               = "Mouse Acceleration",
+        .parent.children    = pointing_acceleration_entries,
+        .parent.child_count = ARRAY_SIZE(pointing_acceleration_entries),
     },
-#    endif
 };
 #endif // POINTING_DEVICE_ENABLE
 

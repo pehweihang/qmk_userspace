@@ -25,27 +25,13 @@
 #    include "vendor.h"
 #endif // VENDOR_RTC_DRIVER_ENABLE
 
-#define strncpy_nowarn(...)                                          \
-    __extension__({                                                  \
-        _Pragma("GCC diagnostic push");                              \
-        _Pragma("GCC diagnostic ignored \"-Wstringop-truncation\""); \
-        const char *_strncpy_nowarn = strncpy(__VA_ARGS__);          \
-        _Pragma("GCC diagnostic pop");                               \
-        _strncpy_nowarn;                                             \
-    })
+#define strncpy_nowarn(...) (strncpy(__VA_ARGS__) < 0 ? abort() : (void)0)
 
 /**
  * @brief hack for snprintf warning
  *
  */
-#define snprintf_nowarn(...)                                       \
-    __extension__({                                                \
-        _Pragma("GCC diagnostic push");                            \
-        _Pragma("GCC diagnostic ignored \"-Wformat-truncation\""); \
-        const int _snprintf_nowarn = snprintf(__VA_ARGS__);        \
-        _Pragma("GCC diagnostic pop");                             \
-        _snprintf_nowarn;                                          \
-    })
+#define snprintf_nowarn(...) (snprintf(__VA_ARGS__) < 0 ? abort() : (void)0)
 
 #ifndef RTC_READ_INTERVAL
 #    define RTC_READ_INTERVAL 250

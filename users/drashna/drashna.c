@@ -371,14 +371,7 @@ const char *get_layer_name_string(layer_state_t state, bool alt_name, bool is_de
  * @brief hack for snprintf warning
  *
  */
-#define snprintf_nowarn(...)                                       \
-    __extension__({                                                \
-        _Pragma("GCC diagnostic push");                            \
-        _Pragma("GCC diagnostic ignored \"-Wformat-truncation\""); \
-        const int _snprintf_nowarn = snprintf(__VA_ARGS__);        \
-        _Pragma("GCC diagnostic pop");                             \
-        _snprintf_nowarn;                                          \
-    })
+#define snprintf_nowarn(...) (snprintf(__VA_ARGS__) < 0 ? abort() : (void)0)
 
 /**
  * @brief Center text in a string. Useful for monospaced font rendering such as oled display feature.

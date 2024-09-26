@@ -134,22 +134,16 @@ _Static_assert(sizeof(userspace_config_t) <= EECONFIG_USER_DATA_SIZE, "User EECO
 
 extern userspace_config_t userspace_config;
 
-typedef union {
-    uint32_t raw;
-    struct {
-        bool     audio_enable         : 1;
-        bool     audio_clicky_enable  : 1;
-        bool     tap_toggling         : 1;
-        uint8_t  unicode_mode         : 3;
-        bool     swap_hands           : 1;
-        bool     host_driver_disabled : 1;
-        uint8_t  unicode_typing_mode  : 3;
-        bool     is_caps_word         : 1;
-        uint32_t reserved             : 20;
-    };
+typedef struct PACKED {
+    bool    audio_enable         : 1;
+    bool    audio_clicky_enable  : 1;
+    bool    tap_toggling         : 1;
+    uint8_t unicode_mode         : 3;
+    bool    swap_hands           : 1;
+    bool    host_driver_disabled : 1;
+    uint8_t unicode_typing_mode  : 3;
+    bool    is_caps_word         : 1;
 } user_runtime_config_t;
-
-_Static_assert(sizeof(user_runtime_config_t) == sizeof(uint32_t), "Userspace Runtime config out of spec.");
 
 extern user_runtime_config_t user_runtime_state;
 

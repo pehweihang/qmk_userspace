@@ -197,10 +197,11 @@ void user_transport_update(void) {
 void user_transport_sync(void) {
     if (is_keyboard_master()) {
         // Keep track of the last state, so that we can tell if we need to propagate to slave
-        static uint32_t last_sync[6], last_user_state = 0;
-        static uint16_t last_keymap = 0;
-        static userspace_config_t last_config = {0};
-        bool            needs_sync  = false;
+        bool                         needs_sync      = false;
+        static uint16_t              last_keymap     = 0;
+        static uint32_t              last_sync[6]    = {0};
+        static user_runtime_config_t last_user_state = {0};
+        static userspace_config_t    last_config     = {0};
 #if defined(DISPLAY_DRIVER_ENABLE) && defined(DISPLAY_KEYLOGGER_ENABLE)
         static char keylog_temp[DISPLAY_KEYLOGGER_LENGTH + 1] = {0};
 #endif // DISPLAY_DRIVER_ENABLE && DISPLAY_KEYLOGGER_ENABLE

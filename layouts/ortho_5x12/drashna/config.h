@@ -17,7 +17,7 @@
 #    define RGBLIGHT_EFFECT_RGB_TEST
 #    define RGBLIGHT_EFFECT_ALTERNATING
 #    define RGBLIGHT_EFFECT_TWINKLE
-#    define RGBLED_NUM 29 // Number of LEDs
+#    define RGBLIGHT_LED_COUNT 29 // Number of LEDs
 #    undef RGBLIGHT_HUE_STEP
 #    define RGBLIGHT_HUE_STEP 8
 #    undef RGBLIGHT_SAT_STEP

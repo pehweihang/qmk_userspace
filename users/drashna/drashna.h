@@ -8,6 +8,7 @@
 #include "keyrecords/process_records.h"
 #include "callbacks.h"
 #include "names.h"
+#include "quantum/unicode/unicode.h"
 
 #if defined(RGBLIGHT_ENABLE)
 #    include "rgb/rgb_stuff.h"

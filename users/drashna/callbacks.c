@@ -17,7 +17,7 @@
 #ifdef CUSTOM_DYNAMIC_MACROS_ENABLE
 #    include "keyrecords/custom_dynamic_macros.h"
 #endif // CUSTOM_DYNAMIC_MACROS_ENABLE
-#if HAL_USE_I2C == TRUE
+#if defined(__arm__) && HAL_USE_I2C == TRUE
 void housekeeping_task_i2c_scanner(void);
 void keyboard_post_init_i2c(void);
 #endif // HAL_USE_I2C == TRUE
@@ -79,7 +79,7 @@ void                       keyboard_post_init_user(void) {
     void keyboard_post_init_qp(void);
     keyboard_post_init_quantum_painter();
 #endif // CUSTOM_QUANTUM_PAINTER_ENABLE
-#if HAL_USE_I2C == TRUE
+#if defined(__arm__) && HAL_USE_I2C == TRUE
     keyboard_post_init_i2c();
 #endif // HAL_USE_I2C == TRUE
 #ifdef CUSTOM_UNICODE_ENABLE
@@ -390,7 +390,7 @@ void                       housekeeping_task_user(void) {
 #if defined(CUSTOM_RGBLIGHT)
     housekeeping_task_rgb_light();
 #endif // CUSTOM_RGBLIGHT
-#if HAL_USE_I2C == TRUE
+#if defined(__arm__) && HAL_USE_I2C == TRUE
     housekeeping_task_i2c_scanner();
 #endif // HAL_USE_I2C == TRUE
 #ifdef CUSTOM_OLED_DRIVER

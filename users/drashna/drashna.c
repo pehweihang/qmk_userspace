@@ -77,7 +77,7 @@ void tap_code16_nomods(uint16_t kc) {
     set_mods(temp_mod);
 }
 
-#if HAL_USE_I2C == TRUE
+#if defined(__arm__) && HAL_USE_I2C == TRUE
 #    include "i2c_master.h"
 #    include "debug.h"
 

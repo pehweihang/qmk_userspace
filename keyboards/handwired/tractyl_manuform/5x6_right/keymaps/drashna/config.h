@@ -40,3 +40,4 @@
 #endif
 
 #define QUANTUM_PAINTER_DISPLAY_TIMEOUT 600000
+#define RGB_MATRIX_TIMEOUT              600000

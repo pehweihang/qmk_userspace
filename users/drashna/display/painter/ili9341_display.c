@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "drashna.h"
+#include "version.h"
 #include "qp.h"
 #include "qp_surface.h"
 #include "qp_ili9xxx_opcodes.h"
@@ -761,7 +762,6 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             qp_rect(ili9341_display, xpos, ypos, max_rtc_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
         }
 #else
-#    include "version.h"
         if (hue_redraw) {
             snprintf(buf, sizeof(buf), "Built on: %s", QMK_BUILDDATE);
 
@@ -878,7 +878,30 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                     break;
                 case 3:
                     if (hue_redraw || block_redraw) {
-                        qp_drawimage_recolor(menu_surface, 0, (SURFACE_MENU_HEIGHT - qmk_banner->height) - 1,
+                        uint16_t surface_xpos = 5, surface_ypos = 5;
+                        snprintf(buf, sizeof(buf), "%s", QMK_BUILDDATE);
+                        surface_xpos += qp_drawtext_recolor(menu_surface, surface_xpos, surface_ypos, font_oled,
+                                                            "Built on: ", curr_hsv.primary.h, curr_hsv.primary.s,
+                                                            curr_hsv.primary.v, 0, 0, 0);
+                        qp_drawtext_recolor(menu_surface, surface_xpos, surface_ypos, font_oled, buf,
+                                            curr_hsv.secondary.h, curr_hsv.secondary.s, curr_hsv.secondary.v, 0, 0, 0);
+                        surface_xpos = 5;
+                        surface_ypos += font_oled->line_height + 4;
+                        snprintf(buf, sizeof(buf), "%s", QMK_VERSION);
+                        surface_xpos += qp_drawtext_recolor(menu_surface, surface_xpos, surface_ypos, font_oled,
+                                                            "Built from: ", curr_hsv.primary.h, curr_hsv.primary.s,
+                                                            curr_hsv.primary.v, 0, 0, 0);
+                        qp_drawtext_recolor(menu_surface, surface_xpos, surface_ypos, font_oled, buf,
+                                            curr_hsv.secondary.h, curr_hsv.secondary.s, curr_hsv.secondary.v, 0, 0, 0);
+                        surface_ypos += font_oled->line_height + 4;
+                        surface_xpos = 5;
+                        surface_xpos += qp_drawtext_recolor(menu_surface, surface_xpos, surface_ypos, font_oled,
+                                                            "Built with: ", curr_hsv.primary.h, curr_hsv.primary.s,
+                                                            curr_hsv.primary.v, 0, 0, 0);
+                        qp_drawtext_recolor(menu_surface, surface_xpos, surface_ypos, font_oled, __VERSION__,
+                                            curr_hsv.secondary.h, curr_hsv.secondary.s, curr_hsv.secondary.v, 0, 0, 0);
+
+                        qp_drawimage_recolor(menu_surface, 0, (SURFACE_MENU_HEIGHT - qmk_banner->height) - 3,
                                              qmk_banner, curr_hsv.primary.h, curr_hsv.primary.s, curr_hsv.primary.v, 0,
                                              0, 0);
                     }

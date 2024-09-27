@@ -25,6 +25,10 @@
 #    include "vendor.h"
 #endif // VENDOR_RTC_DRIVER_ENABLE
 
+#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+void display_menu_set_dirty(void);
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
+
 #define strncpy_nowarn(...) (strncpy(__VA_ARGS__) < 0 ? abort() : (void)0)
 
 /**
@@ -71,7 +75,7 @@ uint32_t convert_to_unixtime(rtc_time_t time) {
     // count leap days
     days += (365 * years + (years + 3) / 4);
     unixtime = ((days * 24UL + time.hour) * 60 + time.minute) * 60 + time.second + SECONDS_FROM_1970_TO_2000 +
-               (TIME_OFFSET * 3000);
+               (TIME_OFFSET * 3600);
     return unixtime;
 }
 
@@ -237,10 +241,6 @@ void rtc_task(void) {
 #endif // VENDOR_RTC_DRIVER_ENABLE
         if (connected) {
             last_rtc_read = timer_read() + RTC_READ_INTERVAL;
-#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
-            void display_menu_set_dirty(void);
-            display_menu_set_dirty();
-#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
         } else {
             last_rtc_read = timer_read() + (RTC_READ_INTERVAL * 100);
         }
@@ -265,9 +265,29 @@ char *rtc_read_date_str(void) {
  * @return char* HH:MM:SS
  */
 char *rtc_read_time_str(void) {
-    static char time_str[11] = {0};
-    snprintf_nowarn(time_str, sizeof(time_str), "%02d:%02d:%02d%s", rtc_time.hour, rtc_time.minute, rtc_time.second,
-                    rtc_time.format == RTC_FORMAT_24H ? "" : (rtc_time.am_pm == RTC_AM ? "AM" : "PM"));
+    static char      time_str[11] = {0};
+    uint8_t          hour         = rtc_time.hour;
+    rtc_time_am_pm_t am_pm        = rtc_time.am_pm;
+
+    if (rtc_time.is_dst) {
+        if (rtc_time.format == RTC_FORMAT_12H) {
+            if (hour == 12) {
+                hour  = 1;
+                am_pm = am_pm == RTC_AM ? RTC_PM : RTC_AM;
+            } else {
+                hour++;
+            }
+        } else {
+            if (hour == 23) {
+                hour = 0;
+            } else {
+                hour++;
+            }
+        }
+    }
+
+    snprintf_nowarn(time_str, sizeof(time_str), "%02d:%02d:%02d%s", hour, rtc_time.minute, rtc_time.second,
+                    rtc_time.format == RTC_FORMAT_24H ? "" : (am_pm == RTC_AM ? "AM" : "PM"));
     return time_str;
 }
 
@@ -288,10 +308,29 @@ char *rtc_read_date_time_str(void) {
  * @return char* YYYY-MM-DDTHH:MM:SS
  */
 char *rtc_read_date_time_iso8601_str(void) {
-    static char date_time_str[22] = {0};
+    static char      date_time_str[22] = {0};
+    uint8_t          hour              = rtc_time.hour;
+    rtc_time_am_pm_t am_pm             = rtc_time.am_pm;
+
+    if (rtc_time.is_dst) {
+        if (rtc_time.format == RTC_FORMAT_12H) {
+            if (hour == 12) {
+                hour  = 1;
+                am_pm = am_pm == RTC_AM ? RTC_PM : RTC_AM;
+            } else {
+                hour++;
+            }
+        } else {
+            if (hour == 23) {
+                hour = 0;
+            } else {
+                hour++;
+            }
+        }
+    }
     snprintf_nowarn(date_time_str, sizeof(date_time_str), "%04d-%02d-%02dT%02d:%02d:%02d%s", rtc_time.year,
-                    rtc_time.month, rtc_time.date, rtc_time.hour, rtc_time.minute, rtc_time.second,
-                    rtc_time.format == RTC_FORMAT_24H ? "" : (rtc_time.am_pm == RTC_AM ? "AM" : "PM"));
+                    rtc_time.month, rtc_time.date, hour, rtc_time.minute, rtc_time.second,
+                    rtc_time.format == RTC_FORMAT_24H ? "" : (am_pm == RTC_AM ? "AM" : "PM"));
     return date_time_str;
 }
 
@@ -348,6 +387,9 @@ void rtc_year_increase(void) {
     rtc_time_t time = rtc_read_time_struct();
     time.year++;
     rtc_set_time(time);
+#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+    display_menu_set_dirty();
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
 }
 
 /**
@@ -358,6 +400,9 @@ void rtc_year_decrease(void) {
     rtc_time_t time = rtc_read_time_struct();
     time.year--;
     rtc_set_time(time);
+#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+    display_menu_set_dirty();
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
 }
 
 /**
@@ -366,11 +411,17 @@ void rtc_year_decrease(void) {
  */
 void rtc_month_increase(void) {
     rtc_time_t time = rtc_read_time_struct();
-    time.month++;
-    if (time.month > 12) {
+    if (time.month == 12) {
         time.month = 1;
+        rtc_set_time(time);
+        rtc_year_increase();
+        return;
     }
+    time.month++;
     rtc_set_time(time);
+#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+    display_menu_set_dirty();
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
 }
 
 /**
@@ -379,11 +430,17 @@ void rtc_month_increase(void) {
  */
 void rtc_month_decrease(void) {
     rtc_time_t time = rtc_read_time_struct();
-    time.month--;
-    if (time.month < 1) {
+    if (time.month == 1) {
         time.month = 12;
+        rtc_set_time(time);
+        rtc_year_decrease();
+        return;
     }
+    time.month--;
     rtc_set_time(time);
+#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+    display_menu_set_dirty();
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
 }
 
 /**
@@ -392,11 +449,17 @@ void rtc_month_decrease(void) {
  */
 void rtc_date_increase(void) {
     rtc_time_t time = rtc_read_time_struct();
-    time.date++;
-    if (time.date > pgm_read_byte(days_in_month + time.month - 1)) {
+    if (time.date == pgm_read_byte(days_in_month + time.month - 1)) {
         time.date = 1;
+        rtc_set_time(time);
+        rtc_month_increase();
+        return;
     }
+    time.date++;
     rtc_set_time(time);
+#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+    display_menu_set_dirty();
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
 }
 
 /**
@@ -405,11 +468,17 @@ void rtc_date_increase(void) {
  */
 void rtc_date_decrease(void) {
     rtc_time_t time = rtc_read_time_struct();
-    time.date--;
-    if (time.date < 1) {
+    if (time.date == 1) {
         time.date = pgm_read_byte(days_in_month + time.month - 1);
+        rtc_set_time(time);
+        rtc_month_decrease();
+        return;
     }
+    time.date--;
     rtc_set_time(time);
+#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+    display_menu_set_dirty();
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
 }
 
 /**
@@ -418,11 +487,24 @@ void rtc_date_decrease(void) {
  */
 void rtc_hour_increase(void) {
     rtc_time_t time = rtc_read_time_struct();
-    time.hour++;
-    if (time.hour > 23) {
-        time.hour = 0;
+    if (time.format == RTC_FORMAT_12H) {
+        if (time.hour == 12) {
+            time.hour  = 1;
+            time.am_pm = time.am_pm == RTC_AM ? RTC_PM : RTC_AM;
+        } else {
+            time.hour++;
+        }
+    } else {
+        if (time.hour == 23) {
+            time.hour = 0;
+        } else {
+            time.hour++;
+        }
     }
     rtc_set_time(time);
+#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+    display_menu_set_dirty();
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
 }
 
 /**
@@ -431,11 +513,24 @@ void rtc_hour_increase(void) {
  */
 void rtc_hour_decrease(void) {
     rtc_time_t time = rtc_read_time_struct();
-    time.hour--;
-    if (time.hour < 0) {
-        time.hour = 23;
+    if (time.format == RTC_FORMAT_12H) {
+        if (time.hour == 1) {
+            time.hour  = 12;
+            time.am_pm = time.am_pm == RTC_AM ? RTC_PM : RTC_AM;
+        } else {
+            time.hour--;
+        }
+    } else {
+        if (time.hour == 0) {
+            time.hour = 24;
+        } else {
+            time.hour--;
+        }
     }
     rtc_set_time(time);
+#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+    display_menu_set_dirty();
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
 }
 
 /**
@@ -444,11 +539,18 @@ void rtc_hour_decrease(void) {
  */
 void rtc_minute_increase(void) {
     rtc_time_t time = rtc_read_time_struct();
-    time.minute++;
-    if (time.minute > 59) {
+
+    if (time.minute == 59) {
         time.minute = 0;
+        rtc_set_time(time);
+        rtc_hour_increase();
+        return;
     }
+    time.minute++;
     rtc_set_time(time);
+#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+    display_menu_set_dirty();
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
 }
 
 /**
@@ -457,11 +559,17 @@ void rtc_minute_increase(void) {
  */
 void rtc_minute_decrease(void) {
     rtc_time_t time = rtc_read_time_struct();
-    time.minute--;
-    if (time.minute < 0) {
+    if (time.minute == 0) {
         time.minute = 59;
+        rtc_set_time(time);
+        rtc_hour_decrease();
+        return;
     }
+    time.minute--;
     rtc_set_time(time);
+#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+    display_menu_set_dirty();
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
 }
 
 /**
@@ -470,11 +578,17 @@ void rtc_minute_decrease(void) {
  */
 void rtc_second_increase(void) {
     rtc_time_t time = rtc_read_time_struct();
-    time.second++;
-    if (time.second > 59) {
+    if (time.second == 59) {
         time.second = 0;
+        rtc_set_time(time);
+        rtc_minute_increase();
+        return;
     }
+    time.second++;
     rtc_set_time(time);
+#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+    display_menu_set_dirty();
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
 }
 
 /**
@@ -483,11 +597,17 @@ void rtc_second_increase(void) {
  */
 void rtc_second_decrease(void) {
     rtc_time_t time = rtc_read_time_struct();
-    time.second--;
-    if (time.second < 0) {
+    if (time.second == 0) {
         time.second = 59;
+        rtc_set_time(time);
+        rtc_minute_decrease();
+        return;
     }
+    time.second--;
     rtc_set_time(time);
+#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+    display_menu_set_dirty();
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
 }
 
 /**
@@ -496,8 +616,14 @@ void rtc_second_decrease(void) {
  */
 void rtc_am_pm_toggle(void) {
     rtc_time_t time = rtc_read_time_struct();
+    if (time.format == RTC_FORMAT_24H) {
+        return;
+    }
     time.am_pm      = (rtc_time_am_pm_t)(time.am_pm == RTC_AM ? RTC_PM : RTC_AM);
     rtc_set_time(time);
+#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+    display_menu_set_dirty();
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
 }
 
 /**
@@ -507,7 +633,23 @@ void rtc_am_pm_toggle(void) {
 void rtc_format_toggle(void) {
     rtc_time_t time = rtc_read_time_struct();
     time.format     = (rtc_time_format_t)(time.format == RTC_FORMAT_12H ? RTC_FORMAT_24H : RTC_FORMAT_12H);
+    if (time.format == RTC_FORMAT_12H) {
+        if (time.hour == 0) {
+            time.hour  = 12;
+            time.am_pm = RTC_AM;
+        } else if (time.hour > 12) {
+            time.hour -= 12;
+            time.am_pm = RTC_PM;
+        } else if (time.hour == 12) {
+            time.am_pm = RTC_PM;
+        } else {
+            time.am_pm = RTC_AM;
+        }
+    }
     rtc_set_time(time);
+#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+    display_menu_set_dirty();
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
 }
 
 /**
@@ -518,4 +660,7 @@ void rtc_dst_toggle(void) {
     rtc_time_t time = rtc_read_time_struct();
     time.is_dst     = !time.is_dst;
     rtc_set_time(time);
+#ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
+    display_menu_set_dirty();
+#endif // CUSTOM_QUANTUM_PAINTER_ENABLE
 }

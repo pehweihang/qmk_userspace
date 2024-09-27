@@ -1361,7 +1361,24 @@ static bool menu_handler_rtc_date(menu_input_t input) {
 
 void display_handler_rtc_hour(char *text_buffer, size_t buffer_len) {
     if (rtc_is_connected()) {
-        snprintf(text_buffer, buffer_len - 1, "%02d", rtc_read_time_struct().hour);
+        rtc_time_t time = rtc_read_time_struct();
+        if (time.is_dst) {
+            if (time.format == RTC_FORMAT_12H) {
+                if (time.hour == 12) {
+                    time.hour  = 1;
+                    time.am_pm = time.am_pm == RTC_AM ? RTC_PM : RTC_AM;
+                } else {
+                    time.hour++;
+                }
+            } else {
+                if (time.hour == 23) {
+                    time.hour = 0;
+                } else {
+                    time.hour++;
+                }
+            }
+        }
+        snprintf(text_buffer, buffer_len - 1, "%02d", time.hour);
     } else {
         snprintf(text_buffer, buffer_len - 1, "Not Connected");
     }

@@ -42,7 +42,7 @@ typedef struct {
 } rtc_time_t;
 
 #define SECONDS_FROM_1970_TO_2000 946684800
-#define TIME_OFFSET               6
+#define TIME_OFFSET               8 // How many hours the time is off from UTC (inverted, so -8 would be +8 hours)
 
 void rtc_init(void);
 void rtc_task(void);

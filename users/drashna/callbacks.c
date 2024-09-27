@@ -24,6 +24,9 @@ void keyboard_post_init_i2c(void);
 #ifdef RTC_ENABLE
 #    include "rtc.h"
 #endif // RTC_ENABLE
+#ifndef RTC_TIMEZONE
+#    define RTC_TIMEZONE -8
+#endif // RTC_TIMEZONE
 #ifdef CUSTOM_UNICODE_ENABLE
 void keyboard_post_init_unicode(void);
 #endif // CUSTOM_UNICODE_ENABLE
@@ -304,6 +307,7 @@ void                       eeconfig_init_user(void) {
     userspace_config.pointing.limit       = POINTING_DEVICE_ACCEL_LIMIT;
     userspace_config.pointing.takeoff     = POINTING_DEVICE_ACCEL_TAKEOFF;
 
+    userspace_config.rtc.timezone = RTC_TIMEZONE;
     // ensure that nkro is enabled
     keymap_config.raw  = eeconfig_read_keymap();
     keymap_config.nkro = true;

@@ -8,6 +8,7 @@
 #include "print.h"
 #include "timer.h"
 #include "progmem.h"
+#include "drashna.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -74,8 +75,8 @@ uint32_t convert_to_unixtime(rtc_time_t time) {
 
     // count leap days
     days += (365 * years + (years + 3) / 4);
-    unixtime = ((days * 24UL + time.hour) * 60 + time.minute) * 60 + time.second + SECONDS_FROM_1970_TO_2000 +
-               (TIME_OFFSET * 3600);
+    unixtime = ((days * 24UL + time.hour) * 60 + time.minute) * 60 + time.second + SECONDS_FROM_1970_TO_2000 -
+               (time.timezone * 3600);
     return unixtime;
 }
 
@@ -199,6 +200,22 @@ void rtc_set_time_split(rtc_time_t time, bool is_connected) {
     rtc_connected = is_connected;
 }
 
+static void rtc_check_dst_format(rtc_time_t *time) {
+#ifdef DS1307_RTC_DRIVER_ENABLE
+    time->is_dst = userspace_config.rtc.dst;
+#endif // DS1307_RTC_DRIVER_ENABLE
+#ifdef DS3231_RTC_DRIVER_ENABLE
+    time->is_dst = userspace_config.rtc.dst;
+#endif // DS3231_RTC_DRIVER_ENABLE
+#ifdef PCF8523_RTC_DRIVER_ENABLE
+    time->is_dst = userspace_config.rtc.dst;
+#endif // PCF8523_RTC_DRIVER_ENABLE
+#ifdef VENDOR_RTC_DRIVER_ENABLE
+    time->format = userspace_config.rtc.format_24h;
+#endif // VENDOR_RTC_DRIVER_ENABLE
+    rtc_time.timezone = userspace_config.rtc.timezone;
+}
+
 void rtc_init(void) {
 #ifdef DS3231_RTC_DRIVER_ENABLE
     rtc_initialized = ds3231_init(&rtc_time);
@@ -213,6 +230,7 @@ void rtc_init(void) {
     rtc_initialized = vendor_rtc_init(&rtc_time);
 #endif // VENDOR_RTC_DRIVER_ENABLE
     if (rtc_initialized) {
+        rtc_check_dst_format(&rtc_time);
         last_rtc_read = timer_read() + RTC_READ_INTERVAL;
     }
 }
@@ -241,6 +259,7 @@ void rtc_task(void) {
 #endif // VENDOR_RTC_DRIVER_ENABLE
         if (connected) {
             last_rtc_read = timer_read() + RTC_READ_INTERVAL;
+            rtc_check_dst_format(&rtc_time);
         } else {
             last_rtc_read = timer_read() + (RTC_READ_INTERVAL * 100);
         }
@@ -358,8 +377,11 @@ __attribute__((weak)) uint32_t get_fattime(void) {
  * @param is_dst Set daylight saving time
  */
 void rtc_set_time(rtc_time_t time) {
-    time.day_of_the_week = (rtc_time_day_of_the_week_t)day_of_the_week(time);
-    time.unixtime        = (uint32_t)convert_to_unixtime(time);
+    time.day_of_the_week            = (rtc_time_day_of_the_week_t)day_of_the_week(time);
+    time.unixtime                   = (uint32_t)convert_to_unixtime(time);
+    userspace_config.rtc.timezone   = time.timezone;
+    userspace_config.rtc.is_dst     = time.is_dst;
+    userspace_config.rtc.format_24h = time.format;
 
 #ifdef DS3231_RTC_DRIVER_ENABLE
     ds3231_set_time(time);
@@ -619,7 +641,7 @@ void rtc_am_pm_toggle(void) {
     if (time.format == RTC_FORMAT_24H) {
         return;
     }
-    time.am_pm      = (rtc_time_am_pm_t)(time.am_pm == RTC_AM ? RTC_PM : RTC_AM);
+    time.am_pm = (rtc_time_am_pm_t)(time.am_pm == RTC_AM ? RTC_PM : RTC_AM);
     rtc_set_time(time);
 #ifdef CUSTOM_QUANTUM_PAINTER_ENABLE
     display_menu_set_dirty();

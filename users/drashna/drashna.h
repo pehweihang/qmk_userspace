@@ -129,6 +129,11 @@ typedef union {
             uint8_t    display_logo : 4;
             dual_hsv_t hsv;
         } painter;
+        struct {
+            bool   format_24h : 1;
+            bool   is_dst     : 1;
+            int8_t timezone   : 6;
+        } rtc;
         bool nuke_switch : 1;
         bool check       : 1;
     };

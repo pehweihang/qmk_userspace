@@ -37,6 +37,7 @@ void convert_local_rtc_to_halrtc_struct(rtc_time_t *local, RTCDateTime *halrtc) 
     halrtc->dayofweek   = local->day_of_the_week;
     halrtc->day         = local->date;
     halrtc->millisecond = (local->second + (local->minute * 60) + (local->hour * 60 * 60)) * 1000;
+    halrtc->dstflag     = (uint32_t)local->is_dst;
 }
 
 void vendor_rtc_set_time(rtc_time_t time) {

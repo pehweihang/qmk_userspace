@@ -38,11 +38,11 @@ typedef struct {
     rtc_time_format_t          format;          /**< data format */
     rtc_time_am_pm_t           am_pm;           /**< am pm */
     bool                       is_dst;          /**< daylight saving time */
+    int8_t                     timezone;        /**< timezone */
     uint32_t                   unixtime;        /**< Unix Time */
 } rtc_time_t;
 
 #define SECONDS_FROM_1970_TO_2000 946684800
-#define TIME_OFFSET               8 // How many hours the time is off from UTC (inverted, so -8 would be +8 hours)
 
 void rtc_init(void);
 void rtc_task(void);

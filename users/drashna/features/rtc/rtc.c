@@ -213,7 +213,7 @@ static void rtc_check_dst_format(rtc_time_t *time) {
 #ifdef VENDOR_RTC_DRIVER_ENABLE
     time->format = userspace_config.rtc.format_24h;
 #endif // VENDOR_RTC_DRIVER_ENABLE
-    rtc_time.timezone = userspace_config.rtc.timezone;
+    time->timezone = userspace_config.rtc.timezone;
 }
 
 void rtc_init(void) {
@@ -382,6 +382,7 @@ void rtc_set_time(rtc_time_t time) {
     userspace_config.rtc.timezone   = time.timezone;
     userspace_config.rtc.is_dst     = time.is_dst;
     userspace_config.rtc.format_24h = time.format;
+    eeconfig_update_user_datablock(&userspace_config);
 
 #ifdef DS3231_RTC_DRIVER_ENABLE
     ds3231_set_time(time);

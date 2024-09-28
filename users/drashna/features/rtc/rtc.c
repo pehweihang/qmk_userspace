@@ -202,13 +202,13 @@ void rtc_set_time_split(rtc_time_t time, bool is_connected) {
 
 static void rtc_check_dst_format(rtc_time_t *time) {
 #ifdef DS1307_RTC_DRIVER_ENABLE
-    time->is_dst = userspace_config.rtc.dst;
+    time->is_dst = userspace_config.rtc.is_dst;
 #endif // DS1307_RTC_DRIVER_ENABLE
 #ifdef DS3231_RTC_DRIVER_ENABLE
-    time->is_dst = userspace_config.rtc.dst;
+    time->is_dst = userspace_config.rtc.is_dst;
 #endif // DS3231_RTC_DRIVER_ENABLE
 #ifdef PCF8523_RTC_DRIVER_ENABLE
-    time->is_dst = userspace_config.rtc.dst;
+    time->is_dst = userspace_config.rtc.is_dst;
 #endif // PCF8523_RTC_DRIVER_ENABLE
 #ifdef VENDOR_RTC_DRIVER_ENABLE
     time->format = userspace_config.rtc.format_24h;

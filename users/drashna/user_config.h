@@ -43,7 +43,7 @@ typedef union PACKED {
             float takeoff;
         } pointing;
         struct {
-            uint8_t    display_mode : 2;
+            uint8_t    display_mode : 3;
             uint8_t    display_logo : 4;
             dual_hsv_t hsv;
         } painter;

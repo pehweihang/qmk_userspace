@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "drashna.h"
+#include "user_config.h"
 #include "sendchar.h"
+#include "print.h"
 
 #ifdef LAYER_MAP_ENABLE
 #    include "layer_map.h"
@@ -13,7 +15,9 @@
 #ifdef QUANTUM_PAINTER_ENABLE
 #    include "display/painter/painter.h"
 #endif // QUANTUM_PAINTER_ENABLE
-
+#if defined(OLED_ENABLE) && defined(CUSTOM_OLED_DRIVER)
+#    include "display/oled/oled_stuff.h"
+#endif
 #ifdef CUSTOM_DYNAMIC_MACROS_ENABLE
 #    include "keyrecords/custom_dynamic_macros.h"
 #endif // CUSTOM_DYNAMIC_MACROS_ENABLE
@@ -38,8 +42,15 @@ void keyboard_post_init_unicode(void);
 #endif // LAYER_LOCK_ENABLE && LAYER_LOCK_IDLE_TIMEOUT
 #ifdef SPLIT_KEYBOARD
 #    include "split_util.h"
+#    include "split/transport_sync.h"
 #endif // SPLIT_KEYBOARD
 #include "pointing/pointing.h"
+#if defined(CUSTOM_RGBLIGHT)
+#    include "rgb/rgb_stuff.h"
+#endif // CUSTOM_RGBLIGHT
+#if defined(CUSTOM_RGB_MATRIX)
+#    include "rgb/rgb_matrix_stuff.h"
+#endif // CUSTOM_RGB_MATRIX
 
 user_runtime_config_t user_runtime_state;
 

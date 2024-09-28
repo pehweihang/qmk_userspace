@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "custom_tap_dance.h"
+#include "drashna.h"
 
 #define NUM_OF_DIABLO_KEYS 4
 // define diablo macro timer variables

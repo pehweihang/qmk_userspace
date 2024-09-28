@@ -1,6 +1,8 @@
 // Copyright 2021 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include "quantum.h"
+#include "process_records.h"
 #include "drashna.h"
 
 #ifdef TAPPING_TERM_PER_KEY

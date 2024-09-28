@@ -2,9 +2,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "drashna.h"
+#include "user_config.h"
+#include "keyrecords/process_records.h"
 #include "rgb_matrix.h"
+#include "debug.h"
 #include <ctype.h>
 #include "lib/lib8tion/lib8tion.h"
+#ifdef RGBLIGHT_ENABLE
+#    include "rgblight.h"
+#endif
+
 extern led_config_t g_led_config;
 
 static uint32_t hypno_timer;

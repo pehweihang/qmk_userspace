@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #pragma once
-#include "drashna.h"
+
+#include "quantum.h"
 #ifdef ACHORDION_ENABLE
 #    include "keyrecords/achordion.h"
 #endif // ACHORDION_ENABLE

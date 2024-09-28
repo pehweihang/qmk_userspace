@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "progmem.h"
+
 enum unicode_typing_modes {
     UCTM_NO_MODE,
     UCTM_WIDE,

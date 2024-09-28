@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "drashna.h"
+#include "user_config.h"
 #include "version.h"
 #include "qp.h"
 #include "qp_surface.h"

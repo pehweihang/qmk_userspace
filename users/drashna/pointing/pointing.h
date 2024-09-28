@@ -5,7 +5,8 @@
 
 #pragma once
 
-#include "drashna.h"
+#include "quantum/pointing_device/pointing_device.h"
+#include "action_layer.h"
 
 void           pointing_device_init_keymap(void);
 report_mouse_t pointing_device_task_keymap(report_mouse_t mouse_report);

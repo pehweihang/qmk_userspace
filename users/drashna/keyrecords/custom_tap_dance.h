@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #pragma once
-#include "drashna.h"
+
+#include "process_tap_dance.h"
 
 // define diablo macro timer variables
 extern uint8_t diablo_times[];

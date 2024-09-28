@@ -3,6 +3,8 @@
 // Copyright 2021 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include "user_config.h"
+#include "keyrecords/process_records.h"
 #include "drashna.h"
 #include "unicode.h"
 #include "process_unicode_common.h"

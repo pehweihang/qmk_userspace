@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "drashna.h"
+#include "user_config.h"
 #include <printf.h>
 #include "display/painter/menu.h"
 #include "display/painter/painter.h"

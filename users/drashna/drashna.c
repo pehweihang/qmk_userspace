@@ -461,6 +461,7 @@ void set_doom_song(layer_state_t state) {
 #endif // AUDIO_ENABLE
 
 #if 0
+https://github.com/libopencm3/libopencm3/blob/master/lib/stm32/common/desig_common_all.c
 #    include "hardware_id.h"
 void get_serial_number(void) {
     uint8_t uid[12];

@@ -41,6 +41,6 @@
 
 #define QUANTUM_PAINTER_DISPLAY_TIMEOUT 600000
 #define RGB_MATRIX_TIMEOUT              600000
-#define SPLIT_USB_TIMEOUT               300
-#define SPLIT_WATCHDOG_TIMEOUT          400
+#define SPLIT_USB_TIMEOUT               500
+#define SPLIT_WATCHDOG_TIMEOUT          700
 #define AUDIO_INIT_DELAY

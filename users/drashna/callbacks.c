@@ -345,13 +345,20 @@ __attribute__((weak)) void matrix_slave_scan_keymap(void) {}
 void                       matrix_slave_scan_user(void) {
     matrix_scan_rate_task();
 #    if defined(AUDIO_ENABLE) && defined(AUDIO_INIT_DELAY)
+#        if defined(SPLIT_WATCHDOG_ENABLE) && !defined(SPLIT_WATCHDOG_TIMEOUT)
+#            if defined(SPLIT_USB_TIMEOUT)
+#                define SPLIT_WATCHDOG_TIMEOUT (SPLIT_USB_TIMEOUT + 100)
+#            else
+#                define SPLIT_WATCHDOG_TIMEOUT 3000
+#            endif
+#        endif
     if (!is_keyboard_master()) {
         static bool     delayed_tasks_run  = false;
         static uint16_t delayed_task_timer = 0;
         if (!delayed_tasks_run) {
             if (!delayed_task_timer) {
                 delayed_task_timer = timer_read();
-            } else if (timer_elapsed(delayed_task_timer) > 300 && is_transport_connected()) {
+            } else if (timer_elapsed(delayed_task_timer) > (SPLIT_WATCHDOG_TIMEOUT + 100) && is_transport_connected()) {
                 audio_startup();
                 delayed_tasks_run = true;
             }

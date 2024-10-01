@@ -67,10 +67,10 @@ typedef struct PACKED {
         bool clicky_enable : 1;
     } audio;
     struct {
-        bool    tap_toggling         : 1;
-        bool    swap_hands           : 1;
-        bool    host_driver_disabled : 1;
-        bool    is_caps_word         : 1;
+        bool tap_toggling         : 1;
+        bool swap_hands           : 1;
+        bool host_driver_disabled : 1;
+        bool is_caps_word         : 1;
     } internals;
     struct {
         uint8_t mode        : 3;

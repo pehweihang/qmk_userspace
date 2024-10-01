@@ -74,7 +74,7 @@ typedef struct PACKED {
     } internals;
     struct {
         uint8_t mode        : 3;
-        uint8_t typing_mode : 3;
+        uint8_t typing_mode : 4;
     } unicode;
 } user_runtime_config_t;
 

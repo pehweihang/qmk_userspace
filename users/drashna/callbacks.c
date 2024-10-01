@@ -378,7 +378,7 @@ void                       housekeeping_task_user(void) {
         user_runtime_state.internals.tap_toggling = get_auto_mouse_toggle();
 #endif // POINTING_DEVICE_ENABLE && POINTING_DEVICE_AUTO_MOUSE_ENABLE
 #ifdef UNICODE_COMMON_ENABLE
-        user_runtime_state.unicode.mode = unicode_config.input_mode;
+        user_runtime_state.unicode.mode = get_unicode_input_mode();
 #endif // UNICODE_COMMON_ENABLE
 #ifdef SWAP_HANDS_ENABLE
         user_runtime_state.internals.swap_hands = swap_hands;

@@ -62,6 +62,13 @@ _Static_assert(sizeof(userspace_config_t) <= EECONFIG_USER_DATA_SIZE, "User EECO
 extern userspace_config_t userspace_config;
 
 typedef struct PACKED {
+    bool    dirty;
+    bool    is_in_menu;
+    uint8_t selected_child;
+    uint8_t menu_stack[8];
+} menu_state_t;
+
+typedef struct PACKED {
     struct {
         bool enable        : 1;
         bool clicky_enable : 1;
@@ -76,6 +83,7 @@ typedef struct PACKED {
         uint8_t mode        : 3;
         uint8_t typing_mode : 4;
     } unicode;
+    menu_state_t menu_state;
 } user_runtime_config_t;
 
 extern user_runtime_config_t user_runtime_state;

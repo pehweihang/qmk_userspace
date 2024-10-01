@@ -120,6 +120,14 @@ void keyboard_post_init_display_driver(void) {
         display_keylogger_string[DISPLAY_KEYLOGGER_LENGTH] = '\0';
     }
 #endif // DISPLAY_KEYLOGGER_ENABLE
+#if defined(QUANTUM_PAINTER_ENABLE)
+    user_runtime_state.menu_state = (menu_state_t){
+        .dirty          = false,
+        .is_in_menu     = false,
+        .menu_stack     = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
+        .selected_child = 0xFF,
+    };
+#endif // QUANTUM_PAINTER_ENABLE
 }
 
 bool           console_log_needs_redraw = false;

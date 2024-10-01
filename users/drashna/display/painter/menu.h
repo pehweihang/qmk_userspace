@@ -40,15 +40,6 @@ typedef struct _menu_entry_t {
     };
 } menu_entry_t;
 
-typedef struct _menu_state_t {
-    bool    dirty;
-    bool    is_in_menu;
-    uint8_t selected_child;
-    uint8_t menu_stack[8];
-} menu_state_t;
-
-extern menu_state_t display_menu_state;
-
 menu_entry_t *get_current_menu(void);
 menu_entry_t *get_selected_menu_item(void);
 bool          menu_handle_input(menu_input_t input);

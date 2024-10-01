@@ -1778,31 +1778,24 @@ menu_entry_t root = {
     .parent.child_count = ARRAY_SIZE(root_entries),
 };
 
-menu_state_t display_menu_state = {
-    .dirty          = false,
-    .is_in_menu     = false,
-    .menu_stack     = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
-    .selected_child = 0xFF,
-};
-
 menu_entry_t *get_current_menu(void) {
-    if (display_menu_state.menu_stack[0] == 0xFF) {
+    if (user_runtime_state.menu_state.menu_stack[0] == 0xFF) {
         return &root;
     }
 
     menu_entry_t *entry = &root;
-    for (int i = 0; i < sizeof(display_menu_state.menu_stack); ++i) {
-        if (display_menu_state.menu_stack[i] == 0xFF) {
+    for (int i = 0; i < sizeof(user_runtime_state.menu_state.menu_stack); ++i) {
+        if (user_runtime_state.menu_state.menu_stack[i] == 0xFF) {
             return entry;
         }
-        entry = &entry->parent.children[display_menu_state.menu_stack[i]];
+        entry = &entry->parent.children[user_runtime_state.menu_state.menu_stack[i]];
     }
 
     return entry;
 }
 
 menu_entry_t *get_selected_menu_item(void) {
-    return &(get_current_menu()->parent.children[display_menu_state.selected_child]);
+    return &(get_current_menu()->parent.children[user_runtime_state.menu_state.selected_child]);
 }
 
 uint32_t display_menu_timeout_handler(uint32_t trigger_time, void *cb_arg) {
@@ -1819,27 +1812,30 @@ bool menu_handle_input(menu_input_t input) {
     }
     switch (input) {
         case menu_input_exit:
-            display_menu_state.is_in_menu = false;
-            memset(display_menu_state.menu_stack, 0xFF, sizeof(display_menu_state.menu_stack));
-            display_menu_state.selected_child = 0xFF;
+            user_runtime_state.menu_state.is_in_menu = false;
+            memset(user_runtime_state.menu_state.menu_stack, 0xFF, sizeof(user_runtime_state.menu_state.menu_stack));
+            user_runtime_state.menu_state.selected_child = 0xFF;
             if (cancel_deferred_exec(menu_deferred_token)) {
                 menu_deferred_token = INVALID_DEFERRED_TOKEN;
             }
              return false;
         case menu_input_back:
             // Iterate backwards through the stack and remove the last entry
-            for (uint8_t i = 0; i < sizeof(display_menu_state.menu_stack); ++i) {
-                if (display_menu_state.menu_stack[sizeof(display_menu_state.menu_stack) - 1 - i] != 0xFF) {
-                    display_menu_state.selected_child =
-                        display_menu_state.menu_stack[sizeof(display_menu_state.menu_stack) - 1 - i];
-                    display_menu_state.menu_stack[sizeof(display_menu_state.menu_stack) - 1 - i] = 0xFF;
+            for (uint8_t i = 0; i < sizeof(user_runtime_state.menu_state.menu_stack); ++i) {
+                if (user_runtime_state.menu_state
+                        .menu_stack[sizeof(user_runtime_state.menu_state.menu_stack) - 1 - i] != 0xFF) {
+                    user_runtime_state.menu_state.selected_child =
+                        user_runtime_state.menu_state
+                            .menu_stack[sizeof(user_runtime_state.menu_state.menu_stack) - 1 - i];
+                    user_runtime_state.menu_state.menu_stack[sizeof(user_runtime_state.menu_state.menu_stack) - 1 - i] =
+                        0xFF;
                     break;
                 }
 
                 // If we've dropped out of the last entry in the stack, exit the menu
-                if (i == sizeof(display_menu_state.menu_stack) - 1) {
-                    display_menu_state.is_in_menu     = false;
-                    display_menu_state.selected_child = 0xFF;
+                if (i == sizeof(user_runtime_state.menu_state.menu_stack) - 1) {
+                    user_runtime_state.menu_state.is_in_menu     = false;
+                    user_runtime_state.menu_state.selected_child = 0xFF;
                 }
             }
             return false;
@@ -1847,27 +1843,29 @@ bool menu_handle_input(menu_input_t input) {
             // Only attempt to enter the next menu if we're a parent object
             if (selected->flags & menu_flag_is_parent) {
                 // Iterate forwards through the stack and add the selected entry
-                for (uint8_t i = 0; i < sizeof(display_menu_state.menu_stack); ++i) {
-                    if (display_menu_state.menu_stack[i] == 0xFF) {
-                        display_menu_state.menu_stack[i]  = display_menu_state.selected_child;
-                        display_menu_state.selected_child = 0;
+                for (uint8_t i = 0; i < sizeof(user_runtime_state.menu_state.menu_stack); ++i) {
+                    if (user_runtime_state.menu_state.menu_stack[i] == 0xFF) {
+                        user_runtime_state.menu_state.menu_stack[i]  = user_runtime_state.menu_state.selected_child;
+                        user_runtime_state.menu_state.selected_child = 0;
                         break;
                     }
                 }
             }
             return false;
         case menu_input_up:
-            display_menu_state.selected_child =
-                (display_menu_state.selected_child + menu->parent.child_count - 1) % menu->parent.child_count;
+            user_runtime_state.menu_state.selected_child =
+                (user_runtime_state.menu_state.selected_child + menu->parent.child_count - 1) %
+                menu->parent.child_count;
             return false;
         case menu_input_down:
-            display_menu_state.selected_child =
-                (display_menu_state.selected_child + menu->parent.child_count + 1) % menu->parent.child_count;
+            user_runtime_state.menu_state.selected_child =
+                (user_runtime_state.menu_state.selected_child + menu->parent.child_count + 1) %
+                menu->parent.child_count;
             return false;
         case menu_input_left:
         case menu_input_right:
             if (selected->flags & menu_flag_is_value) {
-                display_menu_state.dirty = true;
+                user_runtime_state.menu_state.dirty = true;
                 return selected->child.menu_handler(input);
             }
             return false;
@@ -1877,9 +1875,9 @@ bool menu_handle_input(menu_input_t input) {
 }
 
 bool process_record_menu(uint16_t keycode, keyrecord_t *record) {
-    if (keycode == DISPLAY_MENU && record->event.pressed && !display_menu_state.is_in_menu) {
-        display_menu_state.is_in_menu     = true;
-        display_menu_state.selected_child = 0;
+    if (keycode == DISPLAY_MENU && record->event.pressed && !user_runtime_state.menu_state.is_in_menu) {
+        user_runtime_state.menu_state.is_in_menu     = true;
+        user_runtime_state.menu_state.selected_child = 0;
         menu_deferred_token               = defer_exec(DISPLAY_MENU_TIMEOUT, display_menu_timeout_handler, NULL);
         return false;
     }
@@ -1924,7 +1922,7 @@ bool process_record_menu(uint16_t keycode, keyrecord_t *record) {
             break;
 #endif // POINTING_DEVICE_ENABLE
     }
-    if (display_menu_state.is_in_menu) {
+    if (user_runtime_state.menu_state.is_in_menu) {
         if (record->event.pressed) {
             switch (keycode) {
                 case DISPLAY_MENU:
@@ -1963,16 +1961,16 @@ extern painter_font_handle_t font_thintel, font_mono, font_oled;
 
 bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, uint16_t width, uint16_t height) {
     static menu_state_t last_state;
-    if (memcmp(&last_state, &display_menu_state, sizeof(menu_state_t)) == 0) {
-        return display_menu_state.is_in_menu;
+    if (memcmp(&last_state, &user_runtime_state.menu_state, sizeof(menu_state_t)) == 0) {
+        return user_runtime_state.menu_state.is_in_menu;
     }
 
-    display_menu_state.dirty = false;
-    memcpy(&last_state, &display_menu_state, sizeof(menu_state_t));
+    user_runtime_state.menu_state.dirty = false;
+    memcpy(&last_state, &user_runtime_state.menu_state, sizeof(menu_state_t));
 
     uint16_t render_width = width - start_x;
 
-    if (display_menu_state.is_in_menu) {
+    if (user_runtime_state.menu_state.is_in_menu) {
         qp_rect(display, start_x, start_y, render_width - 1, height - 1, 0, 0, 0, true);
 
         // uint8_t       hue      = rgb_matrix_get_hue();
@@ -2033,5 +2031,5 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
 }
 
 void display_menu_set_dirty(void) {
-    display_menu_state.dirty = true;
+    user_runtime_state.menu_state.dirty = true;
 }

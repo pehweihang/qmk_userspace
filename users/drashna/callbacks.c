@@ -371,22 +371,21 @@ __attribute__((weak)) void housekeeping_task_keymap(void) {}
 void                       housekeeping_task_user(void) {
     if (is_keyboard_master()) {
 #ifdef AUDIO_ENABLE
-        user_runtime_state.audio_enable        = is_audio_on();
-        user_runtime_state.audio_clicky_enable = is_clicky_on();
+        user_runtime_state.audio.enable        = is_audio_on();
+        user_runtime_state.audio.clicky_enable = is_clicky_on();
 #endif // AUDIO_ENABLE
 #if defined(POINTING_DEVICE_ENABLE) && defined(POINTING_DEVICE_AUTO_MOUSE_ENABLE)
-        user_runtime_state.tap_toggling = get_auto_mouse_toggle();
+        user_runtime_state.internals.tap_toggling = get_auto_mouse_toggle();
 #endif // POINTING_DEVICE_ENABLE && POINTING_DEVICE_AUTO_MOUSE_ENABLE
 #ifdef UNICODE_COMMON_ENABLE
-        user_runtime_state.unicode_mode        = unicode_config.input_mode;
-        user_runtime_state.unicode_typing_mode = unicode_typing_mode;
+        user_runtime_state.unicode.mode = unicode_config.input_mode;
 #endif // UNICODE_COMMON_ENABLE
 #ifdef SWAP_HANDS_ENABLE
-        user_runtime_state.swap_hands = swap_hands;
+        user_runtime_state.internals.swap_hands = swap_hands;
 #endif // SWAP_HANDS_ENABLE
-        user_runtime_state.host_driver_disabled = get_keyboard_lock();
+        user_runtime_state.internals.host_driver_disabled = get_keyboard_lock();
 #ifdef CAPS_WORD_ENABLE
-        user_runtime_state.is_caps_word = is_caps_word_on();
+        user_runtime_state.internals.is_caps_word = is_caps_word_on();
 #endif // CAPS_WORD_ENABLE
     }
 

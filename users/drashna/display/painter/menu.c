@@ -289,15 +289,15 @@ void display_handler_unicode(char *text_buffer, size_t buffer_len) {
 static bool menu_handler_unicode_typing(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            unicode_typing_mode = (unicode_typing_mode - 1) % UNCODES_MODE_END;
-            if (unicode_typing_mode >= UNCODES_MODE_END) {
-                unicode_typing_mode = UNCODES_MODE_END - 1;
+            user_runtime_state.unicode.typing_mode = (user_runtime_state.unicode.typing_mode - 1) % UNCODES_MODE_END;
+            if (user_runtime_state.unicode.typing_mode >= UNCODES_MODE_END) {
+                user_runtime_state.unicode.typing_mode = UNCODES_MODE_END - 1;
             }
             return false;
         case menu_input_right:
-            unicode_typing_mode = (unicode_typing_mode + 1) % UNCODES_MODE_END;
-            if (unicode_typing_mode >= UNCODES_MODE_END) {
-                unicode_typing_mode = 0;
+            user_runtime_state.unicode.typing_mode = (user_runtime_state.unicode.typing_mode + 1) % UNCODES_MODE_END;
+            if (user_runtime_state.unicode.typing_mode >= UNCODES_MODE_END) {
+                user_runtime_state.unicode.typing_mode = 0;
             }
             return false;
         default:
@@ -305,7 +305,7 @@ static bool menu_handler_unicode_typing(menu_input_t input) {
     }
 }
 void display_handler_unicode_typing(char *text_buffer, size_t buffer_len) {
-    strncpy(text_buffer, unicode_mode_str[unicode_typing_mode], buffer_len);
+    strncpy(text_buffer, unicode_mode_str[user_runtime_state.unicode.typing_mode], buffer_len);
 }
 
 menu_entry_t unicode_entries[] = {

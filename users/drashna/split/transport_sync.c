@@ -168,25 +168,24 @@ void user_transport_update(void) {
     if (is_keyboard_master()) {
     } else {
 #ifdef UNICODE_COMMON_ENABLE
-        unicode_config.input_mode = user_runtime_state.unicode_mode;
-        unicode_typing_mode       = user_runtime_state.unicode_typing_mode;
+        unicode_config.input_mode = user_runtime_state.unicode.mode;
 #endif // UNICODE_COMMON_ENABLE
 #if defined(POINTING_DEVICE_ENABLE) && defined(POINTING_DEVICE_AUTO_MOUSE_ENABLE)
-        if (get_auto_mouse_toggle() != user_runtime_state.tap_toggling) {
+        if (get_auto_mouse_toggle() != user_runtime_state.internals.tap_toggling) {
             auto_mouse_toggle();
         }
 #endif // POINTING_DEVICE_ENABLE && POINTING_DEVICE_AUTO_MOUSE_ENABLE
 #ifdef SWAP_HANDS_ENABLE
-        swap_hands = user_runtime_state.swap_hands;
+        swap_hands = user_runtime_state.internals.swap_hands;
 #endif // SWAP_HANDS_ENABLE
 #ifdef CAPS_WORD_ENABLE
-        if (user_runtime_state.is_caps_word) {
+        if (user_runtime_state.internals.is_caps_word) {
             caps_word_on();
         } else {
             caps_word_off();
         }
 #endif // CAPS_WORD_ENABLE
-        set_keyboard_lock(user_runtime_state.host_driver_disabled);
+        set_keyboard_lock(user_runtime_state.internals.host_driver_disabled);
     }
 }
 

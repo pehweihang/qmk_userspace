@@ -62,14 +62,20 @@ _Static_assert(sizeof(userspace_config_t) <= EECONFIG_USER_DATA_SIZE, "User EECO
 extern userspace_config_t userspace_config;
 
 typedef struct PACKED {
-    bool    audio_enable         : 1;
-    bool    audio_clicky_enable  : 1;
-    bool    tap_toggling         : 1;
-    uint8_t unicode_mode         : 3;
-    bool    swap_hands           : 1;
-    bool    host_driver_disabled : 1;
-    uint8_t unicode_typing_mode  : 3;
-    bool    is_caps_word         : 1;
+    struct {
+        bool enable        : 1;
+        bool clicky_enable : 1;
+    } audio;
+    struct {
+        bool    tap_toggling         : 1;
+        bool    swap_hands           : 1;
+        bool    host_driver_disabled : 1;
+        bool    is_caps_word         : 1;
+    } internals;
+    struct {
+        uint8_t mode        : 3;
+        uint8_t typing_mode : 3;
+    } unicode;
 } user_runtime_config_t;
 
 extern user_runtime_config_t user_runtime_state;

@@ -207,9 +207,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         static uint32_t last_scan_update = 0;
         if (hue_redraw || last_scan_update != get_matrix_scan_rate()) {
             last_scan_update = get_matrix_scan_rate();
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "SCANS: ", curr_hsv.primary.h,
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "SCANS:", curr_hsv.primary.h,
                                         curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
-            snprintf(buf, sizeof(buf), "%-5lu", last_scan_update);
+            snprintf(buf, sizeof(buf), "%5lu", last_scan_update);
             qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv.secondary.h, curr_hsv.secondary.s,
                                 curr_hsv.secondary.v, 0, 0, 0);
         }
@@ -227,9 +227,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         }
         if (hue_redraw || wpm_redraw) {
             uint16_t xpos = 5;
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "WPM: ", curr_hsv.primary.h,
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "WPM:", curr_hsv.primary.h,
                                         curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
-            snprintf(buf, sizeof(buf), "   %3u", get_current_wpm());
+            snprintf(buf, sizeof(buf), "    %3u", get_current_wpm());
             qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv.secondary.h, curr_hsv.secondary.s,
                                 curr_hsv.secondary.v, 0, 0, 0);
         }
@@ -309,26 +309,26 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             memcpy(&last_user_state, &user_runtime_state, sizeof(user_runtime_state));
             xpos = 80 + 4 + windows_logo->width + 5;
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"AUDIO",
-                                        last_user_state.audio_enable ? curr_hsv.secondary.h : curr_hsv.primary.h,
-                                        last_user_state.audio_enable ? curr_hsv.secondary.s : curr_hsv.primary.s,
-                                        last_user_state.audio_enable ? curr_hsv.primary.v : disabled_val, 0, 0, 0) +
+                                        last_user_state.audio.enable ? curr_hsv.secondary.h : curr_hsv.primary.h,
+                                        last_user_state.audio.enable ? curr_hsv.secondary.s : curr_hsv.primary.s,
+                                        last_user_state.audio.enable ? curr_hsv.primary.v : disabled_val, 0, 0, 0) +
                     5;
             xpos +=
                 qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"CLCK",
-                                    last_user_state.audio_clicky_enable ? curr_hsv.secondary.h : curr_hsv.primary.h,
-                                    last_user_state.audio_clicky_enable ? curr_hsv.secondary.s : curr_hsv.primary.s,
-                                    last_user_state.audio_clicky_enable ? curr_hsv.primary.v : disabled_val, 0, 0, 0) +
+                                    last_user_state.audio.clicky_enable ? curr_hsv.secondary.h : curr_hsv.primary.h,
+                                    last_user_state.audio.clicky_enable ? curr_hsv.secondary.s : curr_hsv.primary.s,
+                                    last_user_state.audio.clicky_enable ? curr_hsv.primary.v : disabled_val, 0, 0, 0) +
                 5;
             xpos +=
                 qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"HOST",
-                                    last_user_state.host_driver_disabled ? curr_hsv.secondary.h : curr_hsv.primary.h,
-                                    last_user_state.host_driver_disabled ? curr_hsv.secondary.s : curr_hsv.primary.s,
-                                    last_user_state.host_driver_disabled ? curr_hsv.primary.v : disabled_val, 0, 0, 0) +
+                                    last_user_state.internals.host_driver_disabled ? curr_hsv.secondary.h : curr_hsv.primary.h,
+                                    last_user_state.internals.host_driver_disabled ? curr_hsv.secondary.s : curr_hsv.primary.s,
+                                    last_user_state.internals.host_driver_disabled ? curr_hsv.primary.v : disabled_val, 0, 0, 0) +
                 5;
             xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"SWAP",
-                                        last_user_state.swap_hands ? curr_hsv.secondary.h : curr_hsv.primary.h,
-                                        last_user_state.swap_hands ? curr_hsv.secondary.s : curr_hsv.primary.s,
-                                        last_user_state.swap_hands ? curr_hsv.primary.v : disabled_val, 0, 0, 0);
+                                        last_user_state.internals.swap_hands ? curr_hsv.secondary.h : curr_hsv.primary.h,
+                                        last_user_state.internals.swap_hands ? curr_hsv.secondary.s : curr_hsv.primary.s,
+                                        last_user_state.internals.swap_hands ? curr_hsv.primary.v : disabled_val, 0, 0, 0);
         }
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Pointing Device CPI
@@ -431,8 +431,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
         ypos                                    = 80 + 4;
         static uint8_t last_unicode_typing_mode = 0;
-        if (hue_redraw || last_unicode_typing_mode != unicode_typing_mode) {
-            last_unicode_typing_mode = unicode_typing_mode;
+        if (hue_redraw || last_unicode_typing_mode != user_runtime_state.unicode.typing_mode) {
+            last_unicode_typing_mode = user_runtime_state.unicode.typing_mode;
             xpos                     = 149 + 4;
             qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Typing Mode:", curr_hsv.primary.h,
                                 curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);

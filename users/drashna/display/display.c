@@ -122,8 +122,13 @@ void keyboard_post_init_display_driver(void) {
 #endif // DISPLAY_KEYLOGGER_ENABLE
 #if defined(QUANTUM_PAINTER_ENABLE)
     user_runtime_state.menu_state = (menu_state_t){
-        .dirty          = false,
-        .is_in_menu     = false,
+#    ifdef DISPLAY_MENU_ENABLED_DEFAULT
+        .dirty      = true,
+        .is_in_menu = true,
+#    else
+        .dirty      = false,
+        .is_in_menu = false,
+#    endif // DISPLAY_MENU_ENABLED_DEFAULT
         .menu_stack     = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
         .selected_child = 0xFF,
     };

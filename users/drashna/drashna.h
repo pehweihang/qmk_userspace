@@ -33,6 +33,9 @@
 #ifdef ORBITAL_MOUSE_ENABLE
 #    include "orbital_mouse.h"
 #endif // ORBITAL_MOUSE_ENABLE
+#if defined(HAPTIC_ENABLE) && defined(HAPTIC_DRV2605L)
+#    include "drv2605l.h"
+#endif // HAPTIC_ENABLE && HAPTIC_DRV2605L
 
 bool mod_key_press_timer(uint16_t code, uint16_t mod_code, bool pressed);
 bool mod_key_press(uint16_t code, uint16_t mod_code, bool pressed, uint16_t this_timer);
@@ -58,3 +61,7 @@ const char *os_variant_to_string(os_variant_t os);
 #ifdef AUDIO_ENABLE
 void set_doom_song(layer_state_t state);
 #endif // AUDIO_ENABLE
+
+#if defined(HAPTIC_ENABLE) && defined(HAPTIC_DRV2605L)
+const char *get_haptic_drv2605l_effect_name(drv2605l_effect_t effect);
+#endif // HAPTIC_ENABLE && HAPTIC_DRV2605L

@@ -819,13 +819,13 @@ menu_entry_t audio_entries[] = {
     },
     {
         .flags                 = menu_flag_is_value,
-        .text                  = "Audio Clicky Enabled",
+        .text                  = "Clicky Enabled",
         .child.menu_handler    = menu_handler_audio_clicky_enabled,
         .child.display_handler = display_handler_audio_clicky_enabled,
     },
     {
         .flags                 = menu_flag_is_value,
-        .text                  = "Audio Clicky Frequency",
+        .text                  = "Clicky Frequency",
         .child.menu_handler    = menu_handler_audio_clicky_freq,
         .child.display_handler = display_handler_audio_clicky_freq,
     },
@@ -837,6 +837,189 @@ menu_entry_t audio_entries[] = {
     },
 };
 #endif // AUDIO_ENABLE
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Haptic
+
+#ifdef HAPTIC_ENABLE
+
+extern haptic_config_t haptic_config;
+
+static bool menu_handler_haptic_enabled(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            haptic_toggle();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_haptic_enabled(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", haptic_get_enable() ? "on" : "off");
+}
+
+static bool menu_handler_haptic_mode(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            haptic_mode_decrease();
+            return false;
+        case menu_input_right:
+            haptic_mode_increase();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_haptic_mode(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", get_haptic_drv2605l_effect_name(haptic_get_mode()));
+}
+
+#    ifdef HAPTIC_SOLENOID
+
+static bool menu_handler_haptic_buzz(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            haptic_buzz_toggle();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_haptic_buzz(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%d", haptic_get_buzz());
+}
+
+static bool menu_handler_haptic_dwell(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            haptic_dwell_decrease();
+            return false;
+        case menu_input_right:
+            haptic_dwell_increase();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_haptic_dwell(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%d", haptic_get_dwell());
+}
+#    endif
+
+static bool menu_handler_feedback_mode(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            haptic_feedback_toggle();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_feedback_mode(char *text_buffer, size_t buffer_len) {
+    switch (haptic_get_feedback()) {
+        case 0:
+            strncpy(text_buffer, "Press", buffer_len - 1);
+            return;
+        case 1:
+            strncpy(text_buffer, "Both", buffer_len - 1);
+            return;
+        case 2:
+            strncpy(text_buffer, "Release", buffer_len - 1);
+            return;
+    }
+}
+
+#    ifdef HAPTIC_DRV2605L
+static bool menu_handler_haptic_love_mode(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            haptic_toggle_continuous();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_haptic_love_mode(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", haptic_config.cont ? "Aaah! ;)" : "off");
+}
+
+static bool menu_handler_haptic_love_intensity(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+            haptic_cont_increase();
+            return false;
+        case menu_input_right:
+            haptic_cont_decrease();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_haptic_love_intensity(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%d", haptic_config.amplitude);
+}
+#    endif
+
+menu_entry_t haptic_entries[] = {
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Enabled",
+        .child.menu_handler    = menu_handler_haptic_enabled,
+        .child.display_handler = display_handler_haptic_enabled,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Mode",
+        .child.menu_handler    = menu_handler_haptic_mode,
+        .child.display_handler = display_handler_haptic_mode,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Feedback Mode",
+        .child.menu_handler    = menu_handler_feedback_mode,
+        .child.display_handler = display_handler_feedback_mode,
+    },
+#    ifdef HAPTIC_SOLENOID
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Buzz",
+        .child.menu_handler    = menu_handler_haptic_buzz,
+        .child.display_handler = display_handler_haptic_buzz,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Dwell",
+        .child.menu_handler    = menu_handler_haptic_dwell,
+        .child.display_handler = display_handler_haptic_dwell,
+    },
+#    endif // HAPTIC_SOLENOID
+#    ifdef HAPTIC_DRV2605L
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Continuous",
+        .child.menu_handler    = menu_handler_haptic_love_mode,
+        .child.display_handler = display_handler_haptic_love_mode,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Continuous Amplitude",
+        .child.menu_handler    = menu_handler_haptic_love_intensity,
+        .child.display_handler = display_handler_haptic_love_intensity,
+    },
+#    endif // HAPTIC_DRV2605L
+};
+#endif // HAPTIC_ENABLE
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Pointing Device
@@ -1651,6 +1834,14 @@ menu_entry_t user_settings_option_entries[] = {
 // Buy More
 
 menu_entry_t buy_more_entries[] = {
+#ifdef HAPTIC_ENABLE
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "Haptic Settings",
+        .parent.children    = haptic_entries,
+        .parent.child_count = ARRAY_SIZE(haptic_entries),
+    },
+#endif // HAPTIC_ENABLE
     {
         .flags              = menu_flag_is_parent,
         .text               = "Keymap Config",
@@ -1674,6 +1865,14 @@ menu_entry_t buy_more_entries[] = {
 };
 
 menu_entry_t buy_more_entries_less[] = {
+#ifdef HAPTIC_ENABLE
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "Haptic Settings",
+        .parent.children    = haptic_entries,
+        .parent.child_count = ARRAY_SIZE(haptic_entries),
+    },
+#endif // HAPTIC_ENABLE
     {
         .flags              = menu_flag_is_parent,
         .text               = "Keymap Config",
@@ -1725,6 +1924,15 @@ menu_entry_t root_entries[] = {
 #ifdef POINTING_DEVICE_ENABLE
     MENU_ENTRY_PARENT("Pointing Device Settings", pointing_entries),
 #endif // POINTING_DEVICE_ENABLE
+#if defined(HAPTIC_ENABLE) && __COUNTER__ < 7
+#    define DISPLAY_MENU_NO_HAPTIC
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "Haptic Settings",
+        .parent.children    = haptic_entries,
+        .parent.child_count = ARRAY_SIZE(haptic_entries),
+    },
+#endif
 #if __COUNTER__ < 7
 #    define DISPLAY_MENU_NO_KEYMAP
     {

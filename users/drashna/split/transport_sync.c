@@ -46,6 +46,11 @@ void user_runtime_state_sync(uint8_t initiator2target_buffer_size, const void* i
                              uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
     if (initiator2target_buffer_size == sizeof(user_runtime_state)) {
         memcpy(&user_runtime_state, initiator2target_buffer, initiator2target_buffer_size);
+        static bool suspend_state = false;
+        if (user_runtime_state.internals.is_device_suspended != suspend_state) {
+            suspend_state = user_runtime_state.internals.is_device_suspended;
+            set_is_device_suspended(suspend_state);
+        }
     }
 }
 

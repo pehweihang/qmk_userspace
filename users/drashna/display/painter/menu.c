@@ -874,11 +874,14 @@ static bool menu_handler_haptic_mode(menu_input_t input) {
 }
 
 void display_handler_haptic_mode(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%s", get_haptic_drv2605l_effect_name(haptic_get_mode()));
+    if (haptic_get_enable()) {
+        snprintf(text_buffer, buffer_len - 1, "%s", get_haptic_drv2605l_effect_name(haptic_get_mode()));
+    } else {
+        snprintf(text_buffer, buffer_len - 1, "off");
+    }
 }
 
 #    ifdef HAPTIC_SOLENOID
-
 static bool menu_handler_haptic_buzz(menu_input_t input) {
     switch (input) {
         case menu_input_left:
@@ -910,7 +913,7 @@ static bool menu_handler_haptic_dwell(menu_input_t input) {
 void display_handler_haptic_dwell(char *text_buffer, size_t buffer_len) {
     snprintf(text_buffer, buffer_len - 1, "%d", haptic_get_dwell());
 }
-#    endif
+#    endif // HAPTIC_SOLENOID
 
 static bool menu_handler_feedback_mode(menu_input_t input) {
     switch (input) {
@@ -969,7 +972,7 @@ static bool menu_handler_haptic_love_intensity(menu_input_t input) {
 void display_handler_haptic_love_intensity(char *text_buffer, size_t buffer_len) {
     snprintf(text_buffer, buffer_len - 1, "%d", haptic_config.amplitude);
 }
-#    endif
+#    endif // HAPTIC_DRV2605L
 
 menu_entry_t haptic_entries[] = {
     {

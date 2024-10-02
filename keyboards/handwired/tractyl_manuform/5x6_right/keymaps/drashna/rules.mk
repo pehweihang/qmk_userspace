@@ -54,6 +54,7 @@ ifeq ($(strip $(KEYBOARD)), handwired/tractyl_manuform/5x6_right/f405)
     RGB_MATRIX_ENABLE                = yes
     RGBLIGHT_DRIVER                  = custom
     LAYER_MAP_ENABLE                 = yes
+    HAPTIC_ENABLE                    = yes
 
     BACKLIGHT_ENABLE                 = yes
     QUANTUM_PAINTER_ENABLE           = yes

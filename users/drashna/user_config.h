@@ -78,6 +78,7 @@ typedef struct PACKED {
         bool swap_hands           : 1;
         bool host_driver_disabled : 1;
         bool is_caps_word         : 1;
+        bool is_device_suspended  : 1;
     } internals;
     struct {
         uint8_t mode        : 3;

@@ -118,30 +118,14 @@ void keylogger_string_sync(uint8_t initiator2target_buffer_size, const void* ini
 }
 
 /**
- * @brief Sync suspend state between halves of split keyboard
- *
- * @param initiator2target_buffer_size
- * @param initiator2target_buffer
- * @param target2initiator_buffer_size
- * @param target2initiator_buffer
- */
-void suspend_state_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
-                        uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
-    bool suspend_state = false;
-    memcpy(&suspend_state, initiator2target_buffer, initiator2target_buffer_size);
-    if (suspend_state != is_device_suspended()) {
-        set_is_device_suspended(suspend_state);
-    }
-}
-
-/**
  * @brief Send the suspend state to the other half of the split keyboard
  *
  * @param status
  */
 void send_device_suspend_state(bool status) {
     if (is_device_suspended() != status && is_keyboard_master()) {
-        transaction_rpc_send(RPC_ID_USER_SUSPEND_STATE_SYNC, sizeof(bool), &status);
+        user_runtime_state.internals.is_device_suspended = status;
+        transaction_rpc_send(RPC_ID_USER_RUNTIME_STATE_SYNC, sizeof(bool), &status);
         wait_ms(5);
     }
 }
@@ -157,7 +141,6 @@ void keyboard_post_init_transport_sync(void) {
     transaction_register_rpc(RPC_ID_USER_CONFIG_SYNC, user_config_sync);
     transaction_register_rpc(RPC_ID_USER_AUTOCORRECT_STR, autocorrect_string_sync);
     transaction_register_rpc(RPC_ID_USER_DISPLAY_KEYLOG_STR, keylogger_string_sync);
-    transaction_register_rpc(RPC_ID_USER_SUSPEND_STATE_SYNC, suspend_state_sync);
 }
 
 /**
@@ -198,7 +181,7 @@ void user_transport_sync(void) {
         // Keep track of the last state, so that we can tell if we need to propagate to slave
         bool                         needs_sync      = false;
         static uint16_t              last_keymap     = 0;
-        static uint32_t              last_sync[6]    = {0};
+        static uint32_t              last_sync[5]    = {0};
         static user_runtime_config_t last_user_state = {0};
         static userspace_config_t    last_config     = {0};
 #if defined(DISPLAY_DRIVER_ENABLE) && defined(DISPLAY_KEYLOGGER_ENABLE)
@@ -207,11 +190,7 @@ void user_transport_sync(void) {
 #if defined(AUTOCORRECT_ENABLE)
         static char temp_autocorrected_str[2][22] = {0};
 #endif // AUTOCORRECT_ENABLE
-        if (timer_elapsed32(last_sync[5]) > FORCED_SYNC_THROTTLE_MS && !is_device_suspended()) {
-            transaction_rpc_send(RPC_ID_USER_SUSPEND_STATE_SYNC, sizeof(bool), &needs_sync);
-            last_sync[5] = timer_read32();
-        }
-        // Check if the state values are different
+       // Check if the state values are different
         if (memcmp(&user_runtime_state, &last_user_state, sizeof(user_runtime_state))) {
             needs_sync = true;
             memcpy(&last_user_state, &user_runtime_state, sizeof(user_runtime_state));

@@ -7,7 +7,6 @@
 #include <ctype.h>
 
 userspace_config_t userspace_config;
-static bool        device_suspended = false;
 
 /**
  * @brief Handle registering a keycode, with optional modifer based on timed event
@@ -334,7 +333,7 @@ void center_text(const char *text, char *output, uint8_t width) {
  * @return false
  */
 bool is_device_suspended(void) {
-    return device_suspended;
+    return user_runtime_state.internals.is_device_suspended;
 }
 
 /**
@@ -346,7 +345,6 @@ void set_is_device_suspended(bool status) {
 #if defined(SPLIT_KEYBOARD) && defined(SPLIT_TRANSACTION_IDS_USER)
     send_device_suspend_state(status);
 #endif
-    device_suspended = status;
 }
 
 /**

@@ -154,6 +154,40 @@ void keyboard_post_init_transport_sync(void) {
  */
 void user_transport_update(void) {
     if (is_keyboard_master()) {
+        user_runtime_state.internals.host_driver_disabled = get_keyboard_lock();
+#if defined(POINTING_DEVICE_ENABLE) && defined(POINTING_DEVICE_AUTO_MOUSE_ENABLE)
+        user_runtime_state.internals.tap_toggling = get_auto_mouse_toggle();
+#endif // POINTING_DEVICE_ENABLE && POINTING_DEVICE_AUTO_MOUSE_ENABLE
+#ifdef UNICODE_COMMON_ENABLE
+        user_runtime_state.unicode.mode = get_unicode_input_mode();
+#endif // UNICODE_COMMON_ENABLE
+#ifdef SWAP_HANDS_ENABLE
+        user_runtime_state.internals.swap_hands = swap_hands;
+#endif // SWAP_HANDS_ENABLE
+#ifdef CAPS_WORD_ENABLE
+        user_runtime_state.internals.is_caps_word = is_caps_word_on();
+#endif // CAPS_WORD_ENABLE
+        user_runtime_state.mods = (sync_mods_t){
+            .mods      = get_mods(),
+            .weak_mods = get_weak_mods(),
+#ifndef NO_ACTION_ONESHOT
+            .oneshot_mods        = get_oneshot_mods(),
+            .oneshot_locked_mods = get_oneshot_locked_mods(),
+#endif // NO_ACTION_ONESHOT
+        };
+        user_runtime_state.layers = (sync_layer_t){
+            .layer_state         = layer_state,
+            .default_layer_state = default_layer_state,
+        };
+        user_runtime_state.leds = host_keyboard_led_state();
+#ifdef WPM_ENABLE
+        user_runtime_state.wpm_count = get_current_wpm();
+#endif // WPM_ENABLE
+        user_runtime_state.activity = (sync_activity_t){
+            .matrix_timestamp          = last_matrix_activity_time(),
+            .encoder_timestamp         = last_encoder_activity_time(),
+            .pointing_device_timestamp = last_pointing_device_activity_time(),
+        };
     } else {
 #ifdef UNICODE_COMMON_ENABLE
         unicode_config.input_mode = user_runtime_state.unicode.mode;

@@ -238,34 +238,25 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // LED Lock indicator(text)
 
-        ypos += font_oled->line_height + 4;
+        ypos                        = 24;
         static led_t last_led_state = {0};
         if (hue_redraw || last_led_state.raw != host_keyboard_led_state().raw) {
             last_led_state.raw           = host_keyboard_led_state().raw;
-            static uint16_t max_led_xpos = 0;
-            xpos                         = 5;
-            xpos +=
-                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"Locks:", curr_hsv.primary.h,
-                                    curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0) +
-                5;
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"CAPS",
-                                        last_led_state.caps_lock ? curr_hsv.secondary.h : curr_hsv.primary.h,
-                                        last_led_state.caps_lock ? curr_hsv.secondary.s : curr_hsv.primary.s,
-                                        last_led_state.caps_lock ? curr_hsv.primary.v : disabled_val, 0, 0, 0) +
-                    5;
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"SCRL",
-                                        last_led_state.scroll_lock ? curr_hsv.secondary.h : curr_hsv.primary.h,
-                                        last_led_state.scroll_lock ? curr_hsv.secondary.s : curr_hsv.primary.s,
-                                        last_led_state.scroll_lock ? curr_hsv.primary.v : disabled_val, 0, 0, 0) +
-                    5;
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"NUM",
-                                        last_led_state.num_lock ? curr_hsv.secondary.h : curr_hsv.primary.h,
-                                        last_led_state.num_lock ? curr_hsv.secondary.s : curr_hsv.primary.s,
-                                        last_led_state.num_lock ? curr_hsv.primary.v : disabled_val, 0, 0, 0);
-            if (max_led_xpos < xpos) {
-                max_led_xpos = xpos;
-            }
-            qp_rect(ili9341_display, xpos, ypos, max_led_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
+            xpos                         = width - (qp_textwidth(font_oled, "CAPS") + 4);
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"CAPS",
+                                last_led_state.caps_lock ? curr_hsv.secondary.h : curr_hsv.primary.h,
+                                last_led_state.caps_lock ? curr_hsv.secondary.s : curr_hsv.primary.s,
+                                last_led_state.caps_lock ? curr_hsv.primary.v : disabled_val, 0, 0, 0);
+            ypos += font_oled->line_height + 2;
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"SCRL",
+                                last_led_state.scroll_lock ? curr_hsv.secondary.h : curr_hsv.primary.h,
+                                last_led_state.scroll_lock ? curr_hsv.secondary.s : curr_hsv.primary.s,
+                                last_led_state.scroll_lock ? curr_hsv.primary.v : disabled_val, 0, 0, 0);
+            ypos += font_oled->line_height + 2;
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)" NUM",
+                                last_led_state.num_lock ? curr_hsv.secondary.h : curr_hsv.primary.h,
+                                last_led_state.num_lock ? curr_hsv.secondary.s : curr_hsv.primary.s,
+                                last_led_state.num_lock ? curr_hsv.primary.v : disabled_val, 0, 0, 0);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

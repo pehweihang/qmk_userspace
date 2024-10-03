@@ -174,6 +174,21 @@ void user_transport_update(void) {
         }
 #endif // CAPS_WORD_ENABLE
         set_keyboard_lock(user_runtime_state.internals.host_driver_disabled);
+
+        set_mods(user_runtime_state.mods.mods);
+        set_weak_mods(user_runtime_state.mods.weak_mods);
+#ifndef NO_ACTION_ONESHOT
+        set_oneshot_mods(user_runtime_state.mods.oneshot_mods);
+        set_oneshot_locked_mods(user_runtime_state.mods.oneshot_locked_mods);
+#endif // NO_ACTION_ONESHOT
+        layer_state         = user_runtime_state.layers.layer_state;
+        default_layer_state = user_runtime_state.layers.default_layer_state;
+        void set_split_host_keyboard_leds(uint8_t led_state);
+        set_split_host_keyboard_leds(user_runtime_state.leds.raw);
+        set_current_wpm(user_runtime_state.wpm_count);
+        set_activity_timestamps(user_runtime_state.activity.matrix_timestamp,
+                                user_runtime_state.activity.encoder_timestamp,
+                                user_runtime_state.activity.pointing_device_timestamp);
     }
 }
 

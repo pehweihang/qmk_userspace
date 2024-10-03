@@ -4,19 +4,12 @@
 #pragma once
 
 #define SPLIT_TRANSPORT_MIRROR
-#define SPLIT_LAYER_STATE_ENABLE
-#define SPLIT_LED_STATE_ENABLE
-#define SPLIT_MODS_ENABLE
 #if (defined(__AVR__) && defined(SPLIT_USB_DETECT)) || (!defined(__AVR__) && !defined(USB_VBUS_PIN))
 #    define SPLIT_WATCHDOG_ENABLE
 #endif // (defined(__AVR__) && defined(SPLIT_USB_DETECT)) || (!defined(__AVR__) && !defined(USB_VBUS_PIN))
-#define SPLIT_WPM_ENABLE
-#define SPLIT_ACTIVITY_ENABLE
 #define SPLIT_DETECTED_OS_ENABLE
 #define SPLIT_HAPTIC_ENABLE
-#ifdef SPLIT_OLED_ENABLE
-#    undef SPLIT_OLED_ENABLE
-#endif // SPLIT_OLED_ENABLE
+
 #if defined(__AVR__) && !defined(SELECT_SOFT_SERIAL_SPEED)
 #    define SELECT_SOFT_SERIAL_SPEED 1
 #endif // defined(__AVR__) && !defined(SELECT_SOFT_SERIAL_SPEED)
@@ -28,4 +21,17 @@
 // autocorrect and the like require larger data sets, so we need to increase the buffer size
 #    define RPC_M2S_BUFFER_SIZE 64
 #    define RPC_S2M_BUFFER_SIZE 64
+#    undef SPLIT_WPM_ENABLE
+#    undef SPLIT_ACTIVITY_ENABLE
+#    undef SPLIT_OLED_ENABLE
+#    undef SPLIT_LAYER_STATE_ENABLE
+#    undef SPLIT_LED_STATE_ENABLE
+#    undef SPLIT_MODS_ENABLE
+#else
+#    define SPLIT_WPM_ENABLE
+#    define SPLIT_ACTIVITY_ENABLE
+#    define SPLIT_OLED_ENABLE
+#    define SPLIT_LAYER_STATE_ENABLE
+#    define SPLIT_LED_STATE_ENABLE
+#    define SPLIT_MODS_ENABLE
 #endif // CUSTOM_SPLIT_TRANSPORT_SYNC

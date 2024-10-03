@@ -6,8 +6,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <util.h>
-#include "eeconfig.h"
+#include <eeconfig.h>
 #include <quantum/color.h>
+#include <action_layer.h>
+#include <led.h>
 
 typedef struct PACKED {
     HSV primary;
@@ -69,6 +71,24 @@ typedef struct PACKED {
 } menu_state_t;
 
 typedef struct PACKED {
+    uint8_t mods;
+    uint8_t weak_mods;
+    uint8_t oneshot_mods;
+    uint8_t oneshot_locked_mods;
+} sync_mods_t;
+
+typedef struct PACKED {
+    layer_state_t layer_state;
+    layer_state_t default_layer_state;
+} sync_layer_t;
+
+typedef struct PACKED {
+    uint32_t matrix_timestamp;
+    uint32_t encoder_timestamp;
+    uint32_t pointing_device_timestamp;
+} sync_activity_t;
+
+typedef struct PACKED {
     struct {
         bool enable        : 1;
         bool clicky_enable : 1;
@@ -84,7 +104,12 @@ typedef struct PACKED {
         uint8_t mode        : 3;
         uint8_t typing_mode : 4;
     } unicode;
-    menu_state_t menu_state;
+    menu_state_t    menu_state;
+    sync_mods_t     mods;
+    sync_layer_t    layers;
+    led_t           leds;
+    uint8_t         wpm_count;
+    sync_activity_t activity;
 } user_runtime_config_t;
 
 extern user_runtime_config_t user_runtime_state;

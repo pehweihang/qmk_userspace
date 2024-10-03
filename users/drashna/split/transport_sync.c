@@ -130,7 +130,7 @@ void keylogger_string_sync(uint8_t initiator2target_buffer_size, const void* ini
 void send_device_suspend_state(bool status) {
     if (is_device_suspended() != status && is_keyboard_master()) {
         user_runtime_state.internals.is_device_suspended = status;
-        transaction_rpc_send(RPC_ID_USER_RUNTIME_STATE_SYNC, sizeof(bool), &status);
+        transaction_rpc_send(RPC_ID_USER_RUNTIME_STATE_SYNC, sizeof(user_runtime_state), &user_runtime_state);
         wait_ms(5);
     }
 }

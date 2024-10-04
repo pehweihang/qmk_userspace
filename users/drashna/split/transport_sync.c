@@ -209,20 +209,42 @@ void user_transport_update(void) {
 #endif // CAPS_WORD_ENABLE
         set_keyboard_lock(user_runtime_state.internals.host_driver_disabled);
 
-        set_mods(user_runtime_state.mods.mods);
-        set_weak_mods(user_runtime_state.mods.weak_mods);
+        if (get_mods() != user_runtime_state.mods.mods) {
+            set_mods(user_runtime_state.mods.mods);
+        }
+        if (get_weak_mods() != user_runtime_state.mods.weak_mods) {
+            set_weak_mods(user_runtime_state.mods.weak_mods);
+        }
 #ifndef NO_ACTION_ONESHOT
-        set_oneshot_mods(user_runtime_state.mods.oneshot_mods);
-        set_oneshot_locked_mods(user_runtime_state.mods.oneshot_locked_mods);
+        if (get_oneshot_mods() != user_runtime_state.mods.oneshot_mods) {
+            set_oneshot_mods(user_runtime_state.mods.oneshot_mods);
+        }
+        if (get_oneshot_locked_mods() != user_runtime_state.mods.oneshot_locked_mods) {
+            set_oneshot_locked_mods(user_runtime_state.mods.oneshot_locked_mods);
+        }
 #endif // NO_ACTION_ONESHOT
-        layer_state         = user_runtime_state.layers.layer_state;
-        default_layer_state = user_runtime_state.layers.default_layer_state;
+
+        if (layer_state != user_runtime_state.layers.layer_state) {
+            layer_state_set(user_runtime_state.layers.layer_state);
+        }
+        if (default_layer_state != user_runtime_state.layers.default_layer_state) {
+            default_layer_set(user_runtime_state.layers.default_layer_state);
+        }
+
         void set_split_host_keyboard_leds(uint8_t led_state);
-        set_split_host_keyboard_leds(user_runtime_state.leds.raw);
-        set_current_wpm(user_runtime_state.wpm_count);
-        set_activity_timestamps(user_runtime_state.activity.matrix_timestamp,
-                                user_runtime_state.activity.encoder_timestamp,
-                                user_runtime_state.activity.pointing_device_timestamp);
+        if (host_keyboard_led_state().raw != user_runtime_state.leds.raw) {
+            set_split_host_keyboard_leds(user_runtime_state.leds.raw);
+        }
+        if (get_current_wpm() != user_runtime_state.wpm_count) {
+            set_current_wpm(user_runtime_state.wpm_count);
+        }
+        if (last_matrix_activity_time() != user_runtime_state.activity.matrix_timestamp ||
+            last_encoder_activity_time() != user_runtime_state.activity.encoder_timestamp ||
+            last_pointing_device_activity_time() != user_runtime_state.activity.pointing_device_timestamp) {
+            set_activity_timestamps(user_runtime_state.activity.matrix_timestamp,
+                                    user_runtime_state.activity.encoder_timestamp,
+                                    user_runtime_state.activity.pointing_device_timestamp);
+        }
     }
 }
 

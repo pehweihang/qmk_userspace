@@ -48,6 +48,8 @@ typedef union PACKED {
             uint8_t    display_mode : 3;
             uint8_t    display_logo : 4;
             dual_hsv_t hsv;
+            bool       inverted : 1;
+            uint8_t    rotation : 2;
         } painter;
         struct {
             bool   format_24h : 1;

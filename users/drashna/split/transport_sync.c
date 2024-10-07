@@ -245,6 +245,16 @@ void user_transport_update(void) {
                                     user_runtime_state.activity.encoder_timestamp,
                                     user_runtime_state.activity.pointing_device_timestamp);
         }
+#if defined(QUANTUM_PAINTER_ENABLE) && defined(QUANTUM_PAINTER_ILI9341_ENABLE)
+        static bool    last_inverted = false;
+        static uint8_t last_rotation = 0;
+        if (userspace_config.painter.inverted != last_inverted || userspace_config.painter.rotation != last_rotation) {
+            last_inverted = userspace_config.painter.inverted;
+            last_rotation = userspace_config.painter.rotation;
+            void init_display_ili9341_rotation(void);
+            init_display_ili9341_rotation();
+        }
+#endif // QUANTUM_PAINTER_ENABLE && QUANTUM_PAINTER_ILI9341_ENABLE
     }
 }
 

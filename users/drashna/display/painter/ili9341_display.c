@@ -50,7 +50,7 @@ painter_image_handle_t qmk_banner;
 #define SURFACE_MENU_HEIGHT 121
 
 uint8_t menu_buffer[SURFACE_REQUIRED_BUFFER_BYTE_SIZE(SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT, 16)];
-
+static bool has_run = false, forced_reinit = false;
 /**
  * @brief Draws the initial frame on the screen
  *
@@ -97,8 +97,41 @@ void render_frame(painter_device_t display) {
                         truncate_text(title, title_width, font_thintel, false, false), 0, 0, 0, hsv.h, hsv.s, hsv.v);
 }
 
-__attribute__((weak)) bool init_display_ili9341_inversion(void) {
-    return false;
+void init_display_ili9341_inversion(void) {
+    qp_comms_start(ili9341_display);
+    qp_comms_command(ili9341_display,
+                     userspace_config.painter.inverted ? ILI9XXX_CMD_INVERT_ON : ILI9XXX_CMD_INVERT_OFF);
+    qp_comms_stop(ili9341_display);
+    if (has_run) {
+        forced_reinit = true;
+    }
+}
+
+void init_display_ili9341_rotation(void) {
+    uint16_t width;
+    uint16_t height;
+
+    qp_init(ili9341_display, userspace_config.painter.rotation ? QP_ROTATION_0 : QP_ROTATION_180);
+    qp_get_geometry(ili9341_display, &width, &height, NULL, NULL, NULL);
+    qp_clear(ili9341_display);
+    qp_rect(ili9341_display, 0, 0, width - 1, height - 1, 0, 0, 0, true);
+
+    // if needs inversion, run it only afetr the clear and rect functions or otherwise it won't work
+    init_display_ili9341_inversion();
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Initial render of frame/logo
+
+    if (is_keyboard_master()) {
+        frame_top    = qp_load_image_mem(gfx_frame_top);
+        frame_bottom = qp_load_image_mem(gfx_frame_bottom);
+        render_frame(ili9341_display);
+    }
+    qp_power(ili9341_display, true);
+    qp_flush(ili9341_display);
+    if (has_run) {
+        forced_reinit = true;
+    }
+    has_run = true;
 }
 
 /**
@@ -130,31 +163,8 @@ void init_display_ili9341(void) {
 
     wait_ms(50);
 
-    uint16_t width;
-    uint16_t height;
-
-    qp_init(ili9341_display, QP_ROTATION_0);
     qp_init(menu_surface, QP_ROTATION_0);
-    qp_get_geometry(ili9341_display, &width, &height, NULL, NULL, NULL);
-    qp_clear(ili9341_display);
-    qp_rect(ili9341_display, 0, 0, width - 1, height - 1, 0, 0, 0, true);
-
-    // if needs inversion, run it only afetr the clear and rect functions or otherwise it won't work
-    if (init_display_ili9341_inversion()) {
-        qp_comms_start(ili9341_display);
-        qp_comms_command(ili9341_display, ILI9XXX_CMD_INVERT_ON);
-        qp_comms_stop(ili9341_display);
-    }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Initial render of frame/logo
-
-    if (is_keyboard_master()) {
-        frame_top    = qp_load_image_mem(gfx_frame_top);
-        frame_bottom = qp_load_image_mem(gfx_frame_bottom);
-        render_frame(ili9341_display);
-    }
-    qp_power(ili9341_display, true);
-    qp_flush(ili9341_display);
+    init_display_ili9341_rotation();
 }
 
 void ili9341_display_power(bool on) {
@@ -162,7 +172,7 @@ void ili9341_display_power(bool on) {
 }
 
 __attribute__((weak)) void ili9341_draw_user(void) {
-    bool hue_redraw = false;
+    bool hue_redraw = forced_reinit;
 
     static dual_hsv_t curr_hsv = {0};
     if (memcmp(&curr_hsv, &userspace_config.painter.hsv, sizeof(dual_hsv_t)) != 0) {
@@ -912,7 +922,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 #endif // SPLIT_KEYBOARD
         static uint8_t display_mode = 0xFF;
         static bool    force_redraw = false;
-        if (display_mode != userspace_config.painter.display_logo) {
+        if (display_mode != userspace_config.painter.display_logo || forced_reinit) {
             display_mode                 = userspace_config.painter.display_logo;
             painter_image_handle_t frame = NULL;
 
@@ -974,6 +984,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             }
         }
     }
+    forced_reinit = false;
     qp_flush(ili9341_display);
 }
 

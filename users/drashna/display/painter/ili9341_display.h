@@ -7,3 +7,5 @@ void init_display_ili9341(void);
 void ili9341_display_power(bool on);
 void ili9341_draw_user(void);
 bool ili9341_display_shutdown(bool jump_to_bootloader);
+void init_display_ili9341_rotation(void);
+void init_display_ili9341_inversion(void);

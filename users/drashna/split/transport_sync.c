@@ -210,10 +210,10 @@ void user_transport_update(void) {
 #endif // NO_ACTION_ONESHOT
 
         if (layer_state != user_runtime_state.layers.layer_state) {
-            layer_state_set(user_runtime_state.layers.layer_state);
+            layer_state = user_runtime_state.layers.layer_state;
         }
         if (default_layer_state != user_runtime_state.layers.default_layer_state) {
-            default_layer_set(user_runtime_state.layers.default_layer_state);
+            default_layer_state = user_runtime_state.layers.default_layer_state;
         }
 
         void set_split_host_keyboard_leds(uint8_t led_state);

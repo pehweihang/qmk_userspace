@@ -49,7 +49,7 @@ painter_image_handle_t qmk_banner;
 #define SURFACE_MENU_WIDTH  236
 #define SURFACE_MENU_HEIGHT 121
 
-uint8_t menu_buffer[SURFACE_REQUIRED_BUFFER_BYTE_SIZE(SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT, 16)];
+uint8_t     menu_buffer[SURFACE_REQUIRED_BUFFER_BYTE_SIZE(SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT, 16)];
 static bool has_run = false, forced_reinit = false;
 /**
  * @brief Draws the initial frame on the screen
@@ -172,7 +172,12 @@ void ili9341_display_power(bool on) {
 }
 
 __attribute__((weak)) void ili9341_draw_user(void) {
-    bool hue_redraw = forced_reinit;
+    bool            hue_redraw = forced_reinit;
+    static uint32_t last_tick  = 0;
+    uint32_t        now        = timer_read32();
+    if (TIMER_DIFF_32(now, last_tick) < (QUANTUM_PAINTER_TASK_THROTTLE)) {
+        return;
+    }
 
     static dual_hsv_t curr_hsv = {0};
     if (memcmp(&curr_hsv, &userspace_config.painter.hsv, sizeof(dual_hsv_t)) != 0) {
@@ -251,8 +256,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         ypos                        = 24;
         static led_t last_led_state = {0};
         if (hue_redraw || last_led_state.raw != host_keyboard_led_state().raw) {
-            last_led_state.raw           = host_keyboard_led_state().raw;
-            xpos                         = width - (qp_textwidth(font_oled, "CAPS") + 4);
+            last_led_state.raw = host_keyboard_led_state().raw;
+            xpos               = width - (qp_textwidth(font_oled, "CAPS") + 4);
             qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"CAPS",
                                 last_led_state.caps_lock ? curr_hsv.secondary.h : curr_hsv.primary.h,
                                 last_led_state.caps_lock ? curr_hsv.secondary.s : curr_hsv.primary.s,
@@ -320,16 +325,17 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                                     last_user_state.audio.clicky_enable ? curr_hsv.secondary.s : curr_hsv.primary.s,
                                     last_user_state.audio.clicky_enable ? curr_hsv.primary.v : disabled_val, 0, 0, 0) +
                 5;
+            xpos += qp_drawtext_recolor(
+                        ili9341_display, xpos, ypos, font_oled, (const char *)"HOST",
+                        last_user_state.internals.host_driver_disabled ? curr_hsv.secondary.h : curr_hsv.primary.h,
+                        last_user_state.internals.host_driver_disabled ? curr_hsv.secondary.s : curr_hsv.primary.s,
+                        last_user_state.internals.host_driver_disabled ? curr_hsv.primary.v : disabled_val, 0, 0, 0) +
+                    5;
             xpos +=
-                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"HOST",
-                                    last_user_state.internals.host_driver_disabled ? curr_hsv.secondary.h : curr_hsv.primary.h,
-                                    last_user_state.internals.host_driver_disabled ? curr_hsv.secondary.s : curr_hsv.primary.s,
-                                    last_user_state.internals.host_driver_disabled ? curr_hsv.primary.v : disabled_val, 0, 0, 0) +
-                5;
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"SWAP",
-                                        last_user_state.internals.swap_hands ? curr_hsv.secondary.h : curr_hsv.primary.h,
-                                        last_user_state.internals.swap_hands ? curr_hsv.secondary.s : curr_hsv.primary.s,
-                                        last_user_state.internals.swap_hands ? curr_hsv.primary.v : disabled_val, 0, 0, 0);
+                qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, (const char *)"SWAP",
+                                    last_user_state.internals.swap_hands ? curr_hsv.secondary.h : curr_hsv.primary.h,
+                                    last_user_state.internals.swap_hands ? curr_hsv.secondary.s : curr_hsv.primary.s,
+                                    last_user_state.internals.swap_hands ? curr_hsv.primary.v : disabled_val, 0, 0, 0);
         }
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Pointing Device CPI
@@ -986,6 +992,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
     }
     forced_reinit = false;
     qp_flush(ili9341_display);
+    last_tick = now;
 }
 
 bool ili9341_display_shutdown(bool jump_to_bootloader) {

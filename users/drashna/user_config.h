@@ -9,6 +9,7 @@
 #include <eeconfig.h>
 #include <quantum/color.h>
 #include <action_layer.h>
+#include <keycode_config.h>
 #include <led.h>
 
 typedef struct PACKED {
@@ -112,6 +113,7 @@ typedef struct PACKED {
     led_t           leds;
     uint8_t         wpm_count;
     sync_activity_t activity;
+    keymap_config_t keymap_config;
 } user_runtime_config_t;
 
 extern user_runtime_config_t user_runtime_state;

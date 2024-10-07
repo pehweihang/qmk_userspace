@@ -55,21 +55,6 @@ void user_runtime_state_sync(uint8_t initiator2target_buffer_size, const void* i
 }
 
 /**
- * @brief Syncs keymap_config between halves of split keyboard
- *
- * @param initiator2target_buffer_size
- * @param initiator2target_buffer
- * @param target2initiator_buffer_size
- * @param target2initiator_buffer
- */
-void user_keymap_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
-                      uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
-    if (initiator2target_buffer_size == sizeof(keymap_config)) {
-        memcpy(&keymap_config, initiator2target_buffer, initiator2target_buffer_size);
-    }
-}
-
-/**
  * @brief Syncs userspace_config between halves of split keyboard
  *
  * @param initiator2target_buffer_size
@@ -142,7 +127,6 @@ void send_device_suspend_state(bool status) {
 void keyboard_post_init_transport_sync(void) {
     // Register keyboard state sync split transaction
     transaction_register_rpc(RPC_ID_USER_RUNTIME_STATE_SYNC, user_runtime_state_sync);
-    transaction_register_rpc(RPC_ID_USER_KEYMAP_SYNC, user_keymap_sync);
     transaction_register_rpc(RPC_ID_USER_CONFIG_SYNC, user_config_sync);
     transaction_register_rpc(RPC_ID_USER_AUTOCORRECT_STR, autocorrect_string_sync);
     transaction_register_rpc(RPC_ID_USER_DISPLAY_KEYLOG_STR, keylogger_string_sync);
@@ -188,6 +172,7 @@ void user_transport_update(void) {
             .encoder_timestamp         = last_encoder_activity_time(),
             .pointing_device_timestamp = last_pointing_device_activity_time(),
         };
+        user_runtime_state.keymap_config = keymap_config;
     } else {
 #ifdef UNICODE_COMMON_ENABLE
         unicode_config.input_mode = user_runtime_state.unicode.mode;
@@ -245,6 +230,9 @@ void user_transport_update(void) {
                                     user_runtime_state.activity.encoder_timestamp,
                                     user_runtime_state.activity.pointing_device_timestamp);
         }
+        if (keymap_config.raw != user_runtime_state.keymap_config.raw) {
+            keymap_config = user_runtime_state.keymap_config;
+        }
 #if defined(QUANTUM_PAINTER_ENABLE) && defined(QUANTUM_PAINTER_ILI9341_ENABLE)
         static bool    last_inverted = false;
         static uint8_t last_rotation = 0;
@@ -266,8 +254,7 @@ void user_transport_sync(void) {
     if (is_keyboard_master()) {
         // Keep track of the last state, so that we can tell if we need to propagate to slave
         bool                         needs_sync      = false;
-        static uint16_t              last_keymap     = 0;
-        static uint32_t              last_sync[5]    = {0};
+        static uint32_t              last_sync[4]    = {0};
         static user_runtime_config_t last_user_state = {0};
         static userspace_config_t    last_config     = {0};
 #if defined(DISPLAY_DRIVER_ENABLE) && defined(DISPLAY_KEYLOGGER_ENABLE)
@@ -295,9 +282,9 @@ void user_transport_sync(void) {
         }
 
         // Check if the state values are different
-        if (memcmp(&keymap_config, &last_keymap, sizeof(keymap_config))) {
+        if (memcmp(&userspace_config, &last_config, sizeof(userspace_config))) {
             needs_sync = true;
-            memcpy(&last_keymap, &keymap_config, sizeof(keymap_config));
+            memcpy(&last_config, &userspace_config, sizeof(userspace_config));
         }
 
         // Send to slave every FORCED_SYNC_THROTTLE_MS regardless of state change
@@ -307,27 +294,8 @@ void user_transport_sync(void) {
 
         // Perform the sync if requested
         if (needs_sync) {
-            if (transaction_rpc_send(RPC_ID_USER_KEYMAP_SYNC, sizeof(keymap_config), &keymap_config)) {
-                last_sync[1] = timer_read32();
-            }
-            needs_sync = false;
-        }
-
-        // Check if the state values are different
-        if (memcmp(&userspace_config, &last_config, sizeof(userspace_config))) {
-            needs_sync = true;
-            memcpy(&last_config, &userspace_config, sizeof(userspace_config));
-        }
-
-        // Send to slave every FORCED_SYNC_THROTTLE_MS regardless of state change
-        if (timer_elapsed32(last_sync[2]) > FORCED_SYNC_THROTTLE_MS) {
-            needs_sync = true;
-        }
-
-        // Perform the sync if requested
-        if (needs_sync) {
             if (transaction_rpc_send(RPC_ID_USER_CONFIG_SYNC, sizeof(userspace_config), &userspace_config)) {
-                last_sync[2] = timer_read32();
+                last_sync[1] = timer_read32();
             }
             needs_sync = false;
         }
@@ -338,7 +306,7 @@ void user_transport_sync(void) {
             needs_sync = true;
             memcpy(&keylog_temp, &display_keylogger_string, (DISPLAY_KEYLOGGER_LENGTH + 1));
         }
-        if (timer_elapsed32(last_sync[3]) > FORCED_SYNC_THROTTLE_MS) {
+        if (timer_elapsed32(last_sync[2]) > FORCED_SYNC_THROTTLE_MS) {
             needs_sync = true;
         }
 
@@ -346,7 +314,7 @@ void user_transport_sync(void) {
         if (needs_sync) {
             if (transaction_rpc_send(RPC_ID_USER_DISPLAY_KEYLOG_STR, (DISPLAY_KEYLOGGER_LENGTH + 1),
                                      &display_keylogger_string)) {
-                last_sync[3] = timer_read32();
+                last_sync[2] = timer_read32();
             }
             needs_sync = false;
         }
@@ -356,14 +324,14 @@ void user_transport_sync(void) {
             needs_sync = true;
             memcpy(&temp_autocorrected_str, &autocorrected_str, sizeof(autocorrected_str));
         }
-        if (timer_elapsed32(last_sync[4]) > FORCED_SYNC_THROTTLE_MS) {
+        if (timer_elapsed32(last_sync[3]) > FORCED_SYNC_THROTTLE_MS) {
             needs_sync = true;
         }
 
         // Perform the sync if requested
         if (needs_sync) {
             if (transaction_rpc_send(RPC_ID_USER_AUTOCORRECT_STR, sizeof(autocorrected_str), &autocorrected_str)) {
-                last_sync[4] = timer_read32();
+                last_sync[3] = timer_read32();
             }
             needs_sync = false;
         }

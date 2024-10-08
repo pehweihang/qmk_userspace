@@ -2,12 +2,11 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "clap_trap.h"
-#include <string.h>
 #include "keycodes.h"
 #include "keycode_config.h"
 #include "action_util.h"
 #include "debug.h"
-#include "drashna.h"
+#include "drashna_layers.h"
 #include "user_config.h"
 #include "keyrecords/process_records.h"
 

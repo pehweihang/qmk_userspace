@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "progmem.h"
+#include <stdint.h>
 
 enum unicode_typing_modes {
     UCTM_NO_MODE,
@@ -20,5 +20,4 @@ enum unicode_typing_modes {
     UNCODES_MODE_END,
 };
 
-extern const PROGMEM char unicode_mode_str[UNCODES_MODE_END][13];
-void                      set_unicode_input_mode_soft(uint8_t input_mode);
+void set_unicode_input_mode_soft(uint8_t input_mode);

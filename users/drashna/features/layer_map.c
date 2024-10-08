@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "action.h"
-#include "keyboard.h"
 #include "keymap_common.h"
 #include "action_layer.h"
 #include "layer_map.h"

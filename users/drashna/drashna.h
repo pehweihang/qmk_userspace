@@ -27,15 +27,9 @@
 #ifdef POINTING_DEVICE_ENABLE
 #    include "pointing/pointing.h"
 #endif // POINTING_DEVICE_ENABLE
-#ifdef OS_DETECTION_ENABLE
-#    include "os_detection.h"
-#endif // OS_DETECTION_ENABLE
 #ifdef ORBITAL_MOUSE_ENABLE
 #    include "orbital_mouse.h"
 #endif // ORBITAL_MOUSE_ENABLE
-#if defined(HAPTIC_ENABLE) && defined(HAPTIC_DRV2605L)
-#    include "drv2605l.h"
-#endif // HAPTIC_ENABLE && HAPTIC_DRV2605L
 
 bool mod_key_press_timer(uint16_t code, uint16_t mod_code, bool pressed);
 bool mod_key_press(uint16_t code, uint16_t mod_code, bool pressed, uint16_t this_timer);
@@ -54,14 +48,6 @@ uint16_t extract_basic_keycode(uint16_t keycode, keyrecord_t *record, bool check
 void     matrix_scan_rate_task(void);
 uint32_t get_matrix_scan_rate(void);
 
-#ifdef OS_DETECTION_ENABLE
-const char *os_variant_to_string(os_variant_t os);
-#endif
-
 #ifdef AUDIO_ENABLE
 void set_doom_song(layer_state_t state);
 #endif // AUDIO_ENABLE
-
-#if defined(HAPTIC_ENABLE) && defined(HAPTIC_DRV2605L)
-const char *get_haptic_drv2605l_effect_name(drv2605l_effect_t effect);
-#endif // HAPTIC_ENABLE && HAPTIC_DRV2605L

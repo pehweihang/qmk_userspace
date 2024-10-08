@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "custom_tap_dance.h"
-#include "drashna.h"
+#include "util.h"
+#include "action_layer.h"
+#include "drashna_layers.h"
 
 #define NUM_OF_DIABLO_KEYS 4
 // define diablo macro timer variables
@@ -61,7 +63,7 @@ void run_diablo_macro_check(void) {
             // reset the timer, since enough time has passed
             diablo_timer[index].timer = timer_read();
             // send keycode ONLY if we're on the diablo layer.
-            if (IS_LAYER_ON(_DIABLO)) {
+            if (layer_state_is(_DIABLO)) {
                 tap_code(diablo_timer[index].keycode);
             }
         }

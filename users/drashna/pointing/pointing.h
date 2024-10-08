@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "quantum/pointing_device/pointing_device.h"
+#include "report.h"
 #include "action_layer.h"
 
 void           pointing_device_init_keymap(void);

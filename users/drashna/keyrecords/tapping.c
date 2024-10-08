@@ -1,9 +1,8 @@
 // Copyright 2021 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "quantum.h"
 #include "process_records.h"
-#include "drashna.h"
+#include "drashna_layers.h"
 
 #ifdef TAPPING_TERM_PER_KEY
 __attribute__((weak)) uint16_t get_tapping_term_keymap(uint16_t keycode, keyrecord_t *record) {

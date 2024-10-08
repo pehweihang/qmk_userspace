@@ -2,7 +2,6 @@
 // Copyright 2024 Drashna (@drashna)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "drashna.h"
 #include "user_config.h"
 #include <printf.h>
 #include "display/painter/menu.h"
@@ -392,7 +391,7 @@ static bool menu_handler_unicode_typing(menu_input_t input) {
     }
 }
 void display_handler_unicode_typing(char *text_buffer, size_t buffer_len) {
-    strncpy(text_buffer, unicode_mode_str[user_runtime_state.unicode.typing_mode], buffer_len);
+    strncpy(text_buffer, unicode_typing_mode(user_runtime_state.unicode.typing_mode), buffer_len);
 }
 
 menu_entry_t unicode_entries[] = {
@@ -890,6 +889,7 @@ static bool menu_handler_gaming_song_enabled(menu_input_t input) {
         case menu_input_left:
         case menu_input_right:
             userspace_config.gaming.song_enable = !userspace_config.gaming.song_enable;
+            void set_doom_song(layer_state_t);
             set_doom_song(layer_state);
             return false;
         default:

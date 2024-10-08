@@ -2,10 +2,9 @@
 // Copyright 2018-2024 Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "drashna.h"
 #include "user_config.h"
+#include "names.h"
 #include "version.h"
-#include "qp.h"
 #include "qp_surface.h"
 #include "qp_ili9xxx_opcodes.h"
 #include "qp_comms.h"
@@ -15,22 +14,12 @@
 #ifdef SPLIT_KEYBOARD
 #    include "split_util.h"
 #endif // SPLIT_KEYBOARD
-#ifdef CUSTOM_SPLIT_TRANSPORT_SYNC
-#    include "split/transport_sync.h"
-#endif
 #ifdef RTC_ENABLE
 #    include "features/rtc/rtc.h"
 #endif
 #ifdef LAYER_MAP_ENABLE
 #    include "features/layer_map.h"
 #endif
-#ifdef CUSTOM_UNICODE_ENABLE
-#    include "keyrecords/unicode.h"
-#endif // CUSTOM_UNICODE_ENABLE
-
-#include <math.h>
-#include <stdio.h>
-#include <ctype.h>
 
 painter_device_t ili9341_display, menu_surface;
 
@@ -444,7 +433,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Typing Mode:", curr_hsv.primary.h,
                                 curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
             ypos += font_oled->line_height + 4;
-            snprintf(buf, sizeof(buf), "%14s", unicode_mode_str[last_unicode_typing_mode]);
+            snprintf(buf, sizeof(buf), "%14s", unicode_typing_mode(last_unicode_typing_mode));
             qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv.secondary.h, curr_hsv.secondary.s,
                                 curr_hsv.secondary.v, 0, 0, 0);
         }

@@ -9,20 +9,6 @@
 #include "unicode.h"
 #include "process_unicode_common.h"
 
-const char unicode_mode_str[UNCODES_MODE_END][13]         = {
-    "Normal",       // Normal
-    "Wide",         // ｗｉｄｅ
-    "Script",       // 𝒮𝒸𝓇𝒾𝓅𝓉
-    "Blocks",       //  🅱🅻🅾🅲🅺🆂
-    "Regional",     //  ‌‌🇷‌‌🇪‌‌🇬‌‌🇮‌‌🇴‌‌🇳‌‌🇦‌‌🇱‌‌
-    "Aussie",       // ǝᴉssnɐ
-    "Zalgo",        // z͚ͭ̐a̪̒͋ͤl͇̼̥̖̃͟͡g̸ͥỡ̳ͬ
-    "Super Script", // ˢᵘᵖᵉʳˢᶜʳᶦᵖᵗ
-    "Comic",        // ƈơɱıƈ
-    "Fraktur",      // 𝔉𝔯𝔞𝔨𝔱𝔲𝔯
-    "DoubleStruck", // 𝕯𝖔𝖚𝖇𝖑𝖊 𝕾𝖙𝖗𝖚𝖈𝖐
-};
-
 /**
  * @brief Registers the unicode keystrokes based on desired unicode
  *

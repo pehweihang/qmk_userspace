@@ -1,9 +1,9 @@
 // Copyright 2020 Christopher Courtney, aka Drashna Jael're  (@drashna) <drashna@live.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "drashna.h"
 #include "rgb_stuff.h"
-#include "eeprom.h"
+#include "user_config.h"
+#include "drashna_layers.h"
 #include <ctype.h>
 
 bool has_initialized;

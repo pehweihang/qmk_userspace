@@ -3,11 +3,13 @@
 // Copyright 2024 Wimads (@wimads)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include "pointing_device_auto_mouse.h"
+#include "keyrecords/process_records.h"
+#include "drashna_layers.h"
+#include "user_config.h"
 #include "pointing.h"
-#include <stdbool.h>
-#include "drashna.h"
 #include "math.h"
-#include "pointing_device_internal.h"
+#include <stdlib.h>
 
 static uint16_t mouse_debounce_timer = 0;
 

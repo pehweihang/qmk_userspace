@@ -16,14 +16,11 @@
  */
 
 #include "drashna.h"
-#include <ctype.h>
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
 #include "keyboard.h"
 #include "lib/lib8tion/lib8tion.h"
-#include <math.h>
-#include <stdio.h>
 #include "progmem.h"
 
 #ifdef RTC_ENABLE
@@ -677,7 +674,7 @@ void render_unicode_mode(uint8_t col, uint8_t line) {
     oled_set_cursor(col, line);
     oled_write_P(PSTR("Unicode:"), false);
     char buf[13] = {0};
-    snprintf(buf, sizeof(buf), "%12s", unicode_mode_str[user_runtime_state.unicode.typing_mode]);
+    snprintf(buf, sizeof(buf), "%12s", unicode_typing_mode(user_runtime_state.unicode.typing_mode));
     oled_write(buf, false);
 #endif
 }
@@ -687,7 +684,7 @@ void render_unicode_mode_small(uint8_t col, uint8_t line, bool invert) {
     oled_set_cursor(col, line);
     oled_write_P(PSTR("UC"), invert);
     char buf[13] = {0};
-    snprintf(buf, sizeof(buf), "%12s", unicode_mode_str[user_runtime_state.unicode.typing_mode]);
+    snprintf(buf, sizeof(buf), "%12s", unicode_typing_mode(user_runtime_state.unicode.typing_mode));
     oled_write(buf, invert);
 #endif
 }

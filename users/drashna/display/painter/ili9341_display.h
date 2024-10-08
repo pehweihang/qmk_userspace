@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 void init_display_ili9341(void);
 void ili9341_display_power(bool on);
 void ili9341_draw_user(void);

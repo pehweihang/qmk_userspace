@@ -948,6 +948,10 @@ void display_handler_haptic_enabled(char *text_buffer, size_t buffer_len) {
 }
 
 static bool menu_handler_haptic_mode(menu_input_t input) {
+    if (!haptic_get_enable()) {
+        return false;
+    }
+
     switch (input) {
         case menu_input_left:
             haptic_mode_decrease();
@@ -968,8 +972,43 @@ void display_handler_haptic_mode(char *text_buffer, size_t buffer_len) {
     }
 }
 
+static bool menu_handler_feedback_mode(menu_input_t input) {
+    if (!haptic_get_enable()) {
+        return false;
+    }
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            haptic_feedback_toggle();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_feedback_mode(char *text_buffer, size_t buffer_len) {
+    if (haptic_get_enable()) {
+        switch (haptic_get_feedback()) {
+            case 0:
+                strncpy(text_buffer, "Press", buffer_len - 1);
+                return;
+            case 1:
+                strncpy(text_buffer, "Both", buffer_len - 1);
+                return;
+            case 2:
+                strncpy(text_buffer, "Release", buffer_len - 1);
+                return;
+        }
+    } else {
+        strncpy(text_buffer, "off", buffer_len - 1);
+    }
+}
+
 #    ifdef HAPTIC_SOLENOID
 static bool menu_handler_haptic_buzz(menu_input_t input) {
+    if (!haptic_get_enable()) {
+        return false;
+    }
     switch (input) {
         case menu_input_left:
         case menu_input_right:
@@ -1002,31 +1041,6 @@ void display_handler_haptic_dwell(char *text_buffer, size_t buffer_len) {
 }
 #    endif // HAPTIC_SOLENOID
 
-static bool menu_handler_feedback_mode(menu_input_t input) {
-    switch (input) {
-        case menu_input_left:
-        case menu_input_right:
-            haptic_feedback_toggle();
-            return false;
-        default:
-            return true;
-    }
-}
-
-void display_handler_feedback_mode(char *text_buffer, size_t buffer_len) {
-    switch (haptic_get_feedback()) {
-        case 0:
-            strncpy(text_buffer, "Press", buffer_len - 1);
-            return;
-        case 1:
-            strncpy(text_buffer, "Both", buffer_len - 1);
-            return;
-        case 2:
-            strncpy(text_buffer, "Release", buffer_len - 1);
-            return;
-    }
-}
-
 #    ifdef HAPTIC_DRV2605L
 static bool menu_handler_haptic_love_mode(menu_input_t input) {
     switch (input) {
@@ -1057,7 +1071,11 @@ static bool menu_handler_haptic_love_intensity(menu_input_t input) {
 }
 
 void display_handler_haptic_love_intensity(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%d", haptic_config.amplitude);
+    if (haptic_config.cont) {
+        snprintf(text_buffer, buffer_len - 1, "%d", haptic_config.amplitude);
+    } else {
+        snprintf(text_buffer, buffer_len - 1, "off");
+    }
 }
 #    endif // HAPTIC_DRV2605L
 

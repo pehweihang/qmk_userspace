@@ -793,10 +793,6 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             static uint32_t block_timer  = 0;
             bool            block_redraw = false;
             uint16_t        surface_ypos = 0;
-            if (timer_elapsed(block_timer) > 125) {
-                block_timer  = timer_read();
-                block_redraw = true;
-            }
 
             static uint8_t last_display_mode = 0xFF;
             if (last_display_mode != userspace_config.painter.display_mode) {

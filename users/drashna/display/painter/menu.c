@@ -503,9 +503,15 @@ static bool menu_handler_rm_val(menu_input_t input) {
     switch (input) {
         case menu_input_left:
             rgb_matrix_decrease_val();
+#    if defined(RGBLIGHT_CUSTOM)
+            rgblight_sethsv_noeeprom(rgblight_get_hue(), rgblight_get_sat(), rgb_matrix_get_val());
+#    endif
             return false;
         case menu_input_right:
             rgb_matrix_increase_val();
+#    if defined(RGBLIGHT_CUSTOM)
+            rgblight_sethsv_noeeprom(rgblight_get_hue(), rgblight_get_sat(), rgb_matrix_get_val());
+#    endif
             return false;
         default:
             return true;
@@ -687,7 +693,11 @@ static bool menu_handler_rgbval(menu_input_t input) {
 }
 
 void display_handler_rgbval(char *text_buffer, size_t buffer_len) {
+#    if defined(RGB_MATRIX_ENABLE) && defined(RGBLIGHT_CUSTOM)
+    snprintf(text_buffer, buffer_len - 1, "%d", rgb_matrix_get_val());
+#    else
     snprintf(text_buffer, buffer_len - 1, "%d", rgblight_get_val());
+#    endif
 }
 
 static bool menu_handler_rgbspeed(menu_input_t input) {

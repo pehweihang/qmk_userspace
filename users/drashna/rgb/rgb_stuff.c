@@ -12,15 +12,15 @@ void rgblight_sethsv_default_helper(uint8_t index) {
     rgblight_sethsv_at(rgblight_get_hue(), rgblight_get_sat(), rgblight_get_val(), index);
 }
 void rgblight_set_hsv_and_mode(uint8_t hue, uint8_t sat, uint8_t val, uint8_t mode) {
-#if defined(RGB_MATRIX_ENABLE) && defined(RGBLIGHT_CUSTOM_DRIVER)
+#if defined(RGB_MATRIX_ENABLE) && defined(RGBLIGHT_CUSTOM)
     if (val > rgb_matrix_get_val()) {
         val = rgb_matrix_get_val();
     }
-#else  // RGB_MATRIX_ENABLE && RGBLIGHT_CUSTOM_DRIVER
+#else  // RGB_MATRIX_ENABLE && RGBLIGHT_CUSTOM
     if (val > rgblight_get_val()) {
         val = rgblight_get_val();
     }
-#endif // RGB_MATRIX_ENABLE && RGBLIGHT_CUSTOM_DRIVER
+#endif // RGB_MATRIX_ENABLE && RGBLIGHT_CUSTOM
     if (val > RGBLIGHT_LIMIT_VAL) {
         val = RGBLIGHT_LIMIT_VAL;
     }
@@ -71,19 +71,19 @@ bool is_rgblight_startup_running(void) {
 }
 
 void housekeeping_task_rgb_light(void) {
-#if defined(RGB_MATRIX_ENABLE) && defined(RGBLIGHT_CUSTOM_DRIVER)
+#if defined(RGB_MATRIX_ENABLE) && defined(RGBLIGHT_CUSTOM)
     if (rgblight_get_val() != rgb_matrix_get_val()) {
         rgblight_sethsv(rgblight_get_hue(), rgblight_get_sat(), rgb_matrix_get_val());
     }
-#endif // RGB_MATRIX_ENABLE && RGBLIGHT_CUSTOM_DRIVER
+#endif // RGB_MATRIX_ENABLE && RGBLIGHT_CUSTOM
 }
 
 void keyboard_post_init_rgb_light(void) {
-#if defined(RGB_MATRIX_ENABLE) && defined(RGBLIGHT_CUSTOM_DRIVER)
+#if defined(RGB_MATRIX_ENABLE) && defined(RGBLIGHT_CUSTOM)
     if (rgblight_get_val() != rgb_matrix_get_val()) {
         rgblight_sethsv(rgblight_get_hue(), rgblight_get_sat(), rgb_matrix_get_val());
     }
-#endif // RGB_MATRIX_ENABLE && RGBLIGHT_CUSTOM_DRIVER
+#endif // RGB_MATRIX_ENABLE && RGBLIGHT_CUSTOM
 #if defined(RGBLIGHT_STARTUP_ANIMATION)
     is_enabled = rgblight_is_enabled();
     if (userspace_config.rgb.layer_change) {

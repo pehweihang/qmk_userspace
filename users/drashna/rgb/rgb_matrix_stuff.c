@@ -138,7 +138,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     if (userspace_config.rgb.layer_change) {
 #if defined(RGBLIGHT_ENABLE) && defined(RGBLIGHT_CUSTOM)
 #    if defined(SPLIT_KEYBOARD) && defined(SPLIT_LAYER_STATE_ENABLE)
-        static layer_state_t old_layer_state = 0, old_default_layer_state = 0;
+        static layer_state_t old_layer_state = (layer_state_t)~0, old_default_layer_state = (layer_state_t)~0;
         if (!is_keyboard_master()) {
             if (layer_state != old_layer_state) {
                 old_layer_state = layer_state_set_rgb_light(layer_state);

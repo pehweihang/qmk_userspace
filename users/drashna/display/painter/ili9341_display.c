@@ -790,7 +790,6 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         if (render_menu(menu_surface, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT)) {
             force_full_block_redraw = true;
         } else {
-            static uint32_t block_timer  = 0;
             bool            block_redraw = false;
             uint16_t        surface_ypos = 0;
 

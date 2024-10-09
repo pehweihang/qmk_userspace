@@ -362,10 +362,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         }
         if (hue_redraw || auto_mouse_redraw) {
             xpos = 5;
-            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Auto Layer",
-                                get_auto_mouse_enable() ? curr_hsv.secondary.h : curr_hsv.primary.h,
-                                get_auto_mouse_enable() ? curr_hsv.secondary.s : curr_hsv.primary.s,
-                                get_auto_mouse_enable() ? curr_hsv.primary.v : disabled_val, 0, 0, 0);
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Auto Layer:", curr_hsv.primary.h,
+                                curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
         }
         ypos += font_oled->line_height + 4;
 
@@ -373,7 +371,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         if (hue_redraw || last_am_layer != get_auto_mouse_layer() || auto_mouse_redraw) {
             last_am_state = get_auto_mouse_layer();
             xpos          = 5;
-            snprintf(buf, sizeof(buf), "Layer: %s", layer_name(get_auto_mouse_layer()));
+            snprintf(buf, sizeof(buf), "%12s", layer_name(get_auto_mouse_layer()));
             qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled,
                                 truncate_text(buf, 80 - 5 - 2, font_oled, false, false),
                                 get_auto_mouse_enable() ? curr_hsv.secondary.h : curr_hsv.primary.h,

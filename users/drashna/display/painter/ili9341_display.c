@@ -58,8 +58,12 @@ void render_frame(painter_device_t display) {
     qp_line(ili9341_display, width - 2, frame_top->height, width - 2, height - frame_bottom->height, hsv.h, hsv.s,
             hsv.v);
 
-    qp_line(ili9341_display, 2, 54, width - 3, 54, hsv.h, hsv.s, hsv.v);
-    qp_line(ili9341_display, 80, 54, 80, 106, hsv.h, hsv.s, hsv.v);
+    // lines for pointing device block
+    qp_line(ili9341_display, 2, 43, 80, 43, hsv.h, hsv.s, hsv.v);
+    qp_line(ili9341_display, 80, 16, 80, 106, hsv.h, hsv.s, hsv.v);
+
+    // line for keyboard config
+    qp_line(ili9341_display, 80, 54, width - 3, 54, hsv.h, hsv.s, hsv.v);
 
     // lines for unicode typing mode and mode
     qp_line(ili9341_display, 80, 80, width - 3, 80, hsv.h, hsv.s, hsv.v);
@@ -194,7 +198,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
     if (is_keyboard_master()) {
         char     buf[50] = {0};
-        uint16_t ypos    = 18;
+        uint16_t ypos    = 20;
         uint16_t xpos    = 5;
 
         if (hue_redraw) {
@@ -211,7 +215,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         static uint32_t last_scan_update = 0;
         if (hue_redraw || last_scan_update != get_matrix_scan_rate()) {
             last_scan_update = get_matrix_scan_rate();
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "SCANS:", curr_hsv.primary.h,
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "SCANS: ", curr_hsv.primary.h,
                                         curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
             snprintf(buf, sizeof(buf), "%5lu", last_scan_update);
             qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv.secondary.h, curr_hsv.secondary.s,
@@ -231,7 +235,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         }
         if (hue_redraw || wpm_redraw) {
             uint16_t xpos = 5;
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "WPM:", curr_hsv.primary.h,
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "WPM: ", curr_hsv.primary.h,
                                         curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
             snprintf(buf, sizeof(buf), "    %3u", get_current_wpm());
             qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv.secondary.h, curr_hsv.secondary.s,
@@ -329,7 +333,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Pointing Device CPI
 
-        ypos = 54 + 4;
+        ypos = 43 + 4;
 #if defined(POINTING_DEVICE_ENABLE)
 #    if (defined(KEYBOARD_bastardkb_charybdis) || defined(KEYBOARD_handwired_tractyl_manuform))
         static uint16_t last_cpi = {0xFFFF};
@@ -351,15 +355,33 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
 #    ifdef POINTING_DEVICE_AUTO_MOUSE_ENABLE
         static uint8_t last_am_state = 0xFF;
-        if (hue_redraw || last_am_state != get_auto_mouse_enable()) {
-            last_am_state = get_auto_mouse_enable();
-            xpos          = 5;
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Auto Layer",
-                                        get_auto_mouse_enable() ? curr_hsv.secondary.h : curr_hsv.primary.h,
-                                        get_auto_mouse_enable() ? curr_hsv.secondary.s : curr_hsv.primary.s,
-                                        get_auto_mouse_enable() ? curr_hsv.primary.v : disabled_val, 0, 0, 0);
+        bool           auto_mouse_redraw = false;
+        if (last_am_state != get_auto_mouse_enable()) {
+            last_am_state     = get_auto_mouse_enable();
+            auto_mouse_redraw = true;
+        }
+        if (hue_redraw || auto_mouse_redraw) {
+            xpos = 5;
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "Auto Layer",
+                                get_auto_mouse_enable() ? curr_hsv.secondary.h : curr_hsv.primary.h,
+                                get_auto_mouse_enable() ? curr_hsv.secondary.s : curr_hsv.primary.s,
+                                get_auto_mouse_enable() ? curr_hsv.primary.v : disabled_val, 0, 0, 0);
         }
         ypos += font_oled->line_height + 4;
+
+        static uint8_t last_am_layer = 0xFF;
+        if (hue_redraw || last_am_layer != get_auto_mouse_layer() || auto_mouse_redraw) {
+            last_am_state = get_auto_mouse_layer();
+            xpos          = 5;
+            snprintf(buf, sizeof(buf), "Layer: %s", layer_name(get_auto_mouse_layer()));
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled,
+                                truncate_text(buf, 80 - 5 - 2, font_oled, false, false),
+                                get_auto_mouse_enable() ? curr_hsv.secondary.h : curr_hsv.primary.h,
+                                get_auto_mouse_enable() ? curr_hsv.secondary.s : curr_hsv.primary.s,
+                                get_auto_mouse_enable() ? curr_hsv.primary.v : disabled_val, 0, 0, 0);
+        }
+        ypos += font_oled->line_height + 4;
+
 #    endif
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -905,11 +927,12 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         qp_surface_draw(menu_surface, ili9341_display, 2, ypos, false);
 
     } else {
-#ifdef SPLIT_KEYBOARD
+#if 0
+#    ifdef SPLIT_KEYBOARD
         if (!is_transport_connected()) {
             return;
         }
-#endif // SPLIT_KEYBOARD
+#    endif // SPLIT_KEYBOARD
         static uint8_t display_mode = 0xFF;
         static bool    force_redraw = false;
         if (display_mode != userspace_config.painter.display_logo || forced_reinit) {
@@ -973,6 +996,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 console_log_needs_redraw = force_redraw = false;
             }
         }
+#endif
     }
     forced_reinit = false;
     qp_flush(ili9341_display);

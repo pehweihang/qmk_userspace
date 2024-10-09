@@ -925,7 +925,6 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         qp_surface_draw(menu_surface, ili9341_display, 2, ypos, false);
 
     } else {
-#if 0
 #    ifdef SPLIT_KEYBOARD
         if (!is_transport_connected()) {
             return;
@@ -994,7 +993,6 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 console_log_needs_redraw = force_redraw = false;
             }
         }
-#endif
     }
     forced_reinit = false;
     qp_flush(ili9341_display);

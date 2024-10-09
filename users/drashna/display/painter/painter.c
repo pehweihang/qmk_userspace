@@ -213,18 +213,16 @@ void suspend_wakeup_init_quantum_painter(void) {
 
 void shutdown_quantum_painter(bool jump_to_bootloader) {
 #ifdef QUANTUM_PAINTER_ILI9341_ENABLE
+    ili9341_display_power(true);
     if (!ili9341_display_shutdown(jump_to_bootloader)) {
         return;
     }
 #endif // QUANTUM_PAINTER_ILI9341_ENABLE
 #ifdef BACKLIGHT_ENABLE
-    qp_backlight_disable();
+    qp_backlight_enable();
 #elif defined(BACKLIGHT_PIN)
     gpio_write_pin_low(BACKLIGHT_PIN);
 #endif
-#ifdef QUANTUM_PAINTER_ILI9341_ENABLE
-    ili9341_display_power(false);
-#endif // QUANTUM_PAINTER_ILI9341_ENABLE
 }
 
 #ifndef PAINTER_HUE_STEP

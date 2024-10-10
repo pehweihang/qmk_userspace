@@ -220,9 +220,11 @@ void user_transport_update(void) {
         if (host_keyboard_led_state().raw != user_runtime_state.leds.raw) {
             set_split_host_keyboard_leds(user_runtime_state.leds.raw);
         }
+#ifdef WPM_ENABLE
         if (get_current_wpm() != user_runtime_state.wpm_count) {
             set_current_wpm(user_runtime_state.wpm_count);
         }
+#endif // WPM_ENABLE
         if (last_matrix_activity_time() != user_runtime_state.activity.matrix_timestamp ||
             last_encoder_activity_time() != user_runtime_state.activity.encoder_timestamp ||
             last_pointing_device_activity_time() != user_runtime_state.activity.pointing_device_timestamp) {

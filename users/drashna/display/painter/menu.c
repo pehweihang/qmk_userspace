@@ -1993,6 +1993,96 @@ menu_entry_t buy_more_entries[] = {
     },
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Debugging
+
+static bool menu_handler_debugging_enable(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            debug_enable = !debug_enable;
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_debugging_enable(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", debug_enable ? "enabled" : "disabled");
+}
+
+static bool menu_handler_keyboard_debugging(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            debug_keyboard = !debug_keyboard;
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_keyboard_debugging(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", debug_keyboard ? "enabled" : "disabled");
+}
+
+static bool menu_handler_matrix_debugging(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            debug_matrix = !debug_matrix;
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_matrix_debugging(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", debug_matrix ? "enabled" : "disabled");
+}
+
+static bool menu_handler_mouse_debugging(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            debug_mouse = !debug_mouse;
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_mouse_debugging(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", debug_mouse ? "enabled" : "disabled");
+}
+
+menu_entry_t debug_entries[] = {
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Debugging",
+        .child.menu_handler    = menu_handler_debugging_enable,
+        .child.display_handler = display_handler_debugging_enable,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Keyboard Debugging",
+        .child.menu_handler    = menu_handler_keyboard_debugging,
+        .child.display_handler = display_handler_keyboard_debugging,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Matrix Debugging",
+        .child.menu_handler    = menu_handler_matrix_debugging,
+        .child.display_handler = display_handler_matrix_debugging,
+    },
+    {
+        .flags                 = menu_flag_is_value,
+        .text                  = "Mouse Debugging",
+        .child.menu_handler    = menu_handler_mouse_debugging,
+        .child.display_handler = display_handler_mouse_debugging,
+    },
+};
+
 menu_entry_t buy_more_entries_less[] = {
 #ifdef HAPTIC_ENABLE
     {
@@ -2021,6 +2111,12 @@ menu_entry_t buy_more_entries_less[] = {
         .text               = "User Settings",
         .parent.children    = user_settings_option_entries,
         .parent.child_count = ARRAY_SIZE(user_settings_option_entries),
+    },
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "Debug Settings",
+        .parent.children    = debug_entries,
+        .parent.child_count = ARRAY_SIZE(debug_entries),
     },
 };
 

@@ -99,6 +99,8 @@ void keyboard_post_init_keymap(void) {
 }
 
 #if defined(OLED_ENABLE) && defined(OLED_DISPLAY_128X128)
+#    include "display/oled/oled_stuff.h"
+
 bool oled_task_keymap(void) {
     // No right side oled, so just exit.
     if (!is_keyboard_left()) {

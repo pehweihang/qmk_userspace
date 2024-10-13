@@ -11,6 +11,7 @@
 #include <action_layer.h>
 #include <keycode_config.h>
 #include <led.h>
+#include "debug.h"
 
 typedef struct PACKED {
     HSV primary;
@@ -114,6 +115,7 @@ typedef struct PACKED {
     uint8_t         wpm_count;
     sync_activity_t activity;
     keymap_config_t keymap_config;
+    debug_config_t  debug_config;
 } user_runtime_config_t;
 
 extern user_runtime_config_t user_runtime_state;

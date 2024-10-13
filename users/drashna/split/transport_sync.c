@@ -176,6 +176,7 @@ void user_transport_update(void) {
             .pointing_device_timestamp = last_pointing_device_activity_time(),
         };
         user_runtime_state.keymap_config = keymap_config;
+        user_runtime_state.debug_config  = debug_config;
     } else {
 #ifdef UNICODE_COMMON_ENABLE
         unicode_config.input_mode = user_runtime_state.unicode.mode;
@@ -237,6 +238,9 @@ void user_transport_update(void) {
         }
         if (keymap_config.raw != user_runtime_state.keymap_config.raw) {
             keymap_config = user_runtime_state.keymap_config;
+        }
+        if (debug_config.raw != user_runtime_state.debug_config.raw) {
+            debug_config = user_runtime_state.debug_config;
         }
 #if defined(QUANTUM_PAINTER_ENABLE) && defined(QUANTUM_PAINTER_ILI9341_ENABLE)
         static bool    last_inverted = false;

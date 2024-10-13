@@ -2,8 +2,8 @@
 // Copyright 2018-2024 Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "user_config.h"
-#include "names.h"
+#include "drashna_runtime.h"
+#include "drashna_names.h"
 #include "version.h"
 #include "qp_surface.h"
 #include "qp_ili9xxx_opcodes.h"
@@ -20,6 +20,9 @@
 #ifdef LAYER_MAP_ENABLE
 #    include "features/layer_map.h"
 #endif
+#ifdef KEYBOARD_LOCK_ENABLE
+#    include "features/keyboard_lock.h"
+#endif // KEYBOARD_LOCK_ENABLE
 
 painter_device_t ili9341_display, menu_surface;
 

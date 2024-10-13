@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "oled_stuff.h"
 #include "drashna.h"
 #include <string.h>
 #include <stdio.h>
@@ -32,6 +33,15 @@
 #ifdef LAYER_MAP_ENABLE
 #    include "layer_map.h"
 #endif
+#ifdef KEYBOARD_LOCK_ENABLE
+#    include "features/keyboard_lock.h"
+#endif // KEYBOARD_LOCK_ENABLE
+#if defined(RGBLIGHT_ENABLE)
+#    include "rgb/rgb_stuff.h"
+#endif // defined(RGBLIGHT_ENABLE)
+#if defined(RGB_MATRIX_ENABLE)
+#    include "rgb/rgb_matrix_stuff.h"
+#endif // defined(RGB_MATRIX_ENABLE)
 
 #ifndef OLED_BRIGHTNESS_STEP
 #    define OLED_BRIGHTNESS_STEP 32

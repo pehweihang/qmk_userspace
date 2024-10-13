@@ -2,7 +2,7 @@
 // Copyright 2024 Drashna (@drashna)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "user_config.h"
+#include "drashna_runtime.h"
 #include <printf.h>
 #include "display/painter/menu.h"
 #include "display/painter/painter.h"

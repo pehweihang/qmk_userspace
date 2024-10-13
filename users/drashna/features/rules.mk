@@ -1,7 +1,10 @@
 include $(USER_PATH)/features/rtc/rtc.mk
 VPATH += $(USER_PATH)/features/
 
+KEYBOARD_LOCK_ENABLE ?= yes
+
 USERSPACE_FEATURES = \
+    KEYBOARD_LOCK \
     LAYER_LOCK \
     LAYER_MAP \
     ORBITAL_MOUSE \

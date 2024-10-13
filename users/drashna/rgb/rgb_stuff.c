@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "rgb_stuff.h"
-#include "user_config.h"
+#include "drashna_runtime.h"
 #include "drashna_layers.h"
 #include <ctype.h>
 

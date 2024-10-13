@@ -2,8 +2,9 @@ SRC += $(USER_PATH)/drashna.c \
         $(USER_PATH)/callbacks.c \
         $(USER_PATH)/keyrecords/process_records.c \
         $(USER_PATH)/keyrecords/tapping.c \
-        $(USER_PATH)/names.c \
-        $(USER_PATH)/drashna_layers.c
+        $(USER_PATH)/drashna_names.c \
+        $(USER_PATH)/drashna_layers.c \
+        $(USER_PATH)/drashna_util.c
 
 # TOP_SYMBOLS = yes
 

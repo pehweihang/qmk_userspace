@@ -5,7 +5,7 @@
 #include "process_records.h"
 #include "drashna.h"
 #include "version.h"
-#include "names.h"
+#include "drashna_names.h"
 #ifdef OS_DETECTION_ENABLE
 #    include "os_detection.h"
 #endif // OS_DETECTION_ENABLE
@@ -18,6 +18,21 @@
 #ifdef DISPLAY_DRIVER_ENABLE
 #    include "display/display.h"
 #endif // DISPLAY_DRIVER_ENABLE
+#ifdef KEYBOARD_LOCK_ENABLE
+#    include "features/keyboard_lock.h"
+#endif // KEYBOARD_LOCK_ENABLE
+#if defined(CUSTOM_POINTING_DEVICE)
+#    include "pointing/pointing.h"
+#endif // CUSTOM_POINTING_DEVICE
+#ifdef ORBITAL_MOUSE_ENABLE
+#    include "orbital_mouse.h"
+#endif // ORBITAL_MOUSE_ENABLE
+#if defined(RGBLIGHT_ENABLE)
+#    include "rgb/rgb_stuff.h"
+#endif // defined(RGBLIGHT_ENABLE)
+#if defined(RGB_MATRIX_ENABLE)
+#    include "rgb/rgb_matrix_stuff.h"
+#endif // defined(RGB_MATRIX_ENABLE)
 
 uint16_t copy_paste_timer;
 

@@ -7,6 +7,9 @@
 #include "transactions.h"
 #include <string.h>
 #include "split_util.h"
+#ifdef KEYBOARD_LOCK_ENABLE
+#    include "features/keyboard_lock.h"
+#endif // KEYBOARD_LOCK_ENABLE
 
 #ifdef UNICODE_COMMON_ENABLE
 #    include "process_unicode_common.h"

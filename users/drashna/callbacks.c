@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "drashna.h"
-#include "user_config.h"
+#include "drashna_runtime.h"
 #include "sendchar.h"
 #include "print.h"
 
@@ -51,6 +51,9 @@ void keyboard_post_init_unicode(void);
 #if defined(CUSTOM_RGB_MATRIX)
 #    include "rgb/rgb_matrix_stuff.h"
 #endif // CUSTOM_RGB_MATRIX
+#ifdef ORBITAL_MOUSE_ENABLE
+#    include "orbital_mouse.h"
+#endif // ORBITAL_MOUSE_ENABLE
 
 user_runtime_config_t user_runtime_state;
 

@@ -21,6 +21,16 @@ static uint16_t mouse_debounce_timer = 0;
 #    endif
 #    define TAP_CHECK TAPPING_TERM
 #endif // TAPPING_TERM_PER_KEY
+#ifdef AUDIO_ENABLE
+#    ifndef POINTING_ACCEL_ON_SONG
+#        define POINTING_ACCEL_ON_SONG SONG(ZSA_STARTUP)
+#    endif // POINTING_ACCEL_ON_SONG
+#    ifndef POINTING_ACCEL_OFF_SONG
+#        define POINTING_ACCEL_OFF_SONG SONG(ZSA_GOODBYE)
+#    endif // POINTING_ACCEL_OFF_SONG
+static float accel_on_song[][2]  = POINTING_ACCEL_ON_SONG;
+static float accel_off_song[][2] = POINTING_ACCEL_OFF_SONG;
+#endif // AUDIO_ENABLE
 
 #ifndef MOUSE_JIGGLER_THRESHOLD
 #    define MOUSE_JIGGLER_THRESHOLD 20
@@ -353,6 +363,13 @@ void pointing_device_accel_enabled(bool enable) {
 #ifdef POINTING_DEVICE_ACCEL_DEBUG
     printf("maccel: enabled: %d\n", userspace_config.pointing.enabled);
 #endif
+#ifdef AUDIO_ENABLE
+    if (enable) {
+        PLAY_SONG(accel_on_song);
+    } else {
+        PLAY_SONG(accel_off_song);
+    }
+#endif // AUDIO_ENABLE
 }
 
 /**

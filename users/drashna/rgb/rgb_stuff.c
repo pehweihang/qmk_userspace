@@ -72,7 +72,7 @@ bool is_rgblight_startup_running(void) {
 
 void housekeeping_task_rgb_light(void) {
 #if defined(RGB_MATRIX_ENABLE) && defined(RGBLIGHT_CUSTOM)
-    if (rgblight_get_val() != rgb_matrix_get_val()) {
+    if (is_keyboard_master() && rgblight_get_val() != rgb_matrix_get_val()) {
         xprintf("[RGB Val] Matrix: %d, Light: %d\n", rgb_matrix_get_val(), rgblight_get_val());
         rgblight_sethsv(rgblight_get_hue(), rgblight_get_sat(), rgb_matrix_get_val());
     }
@@ -81,7 +81,7 @@ void housekeeping_task_rgb_light(void) {
 
 void keyboard_post_init_rgb_light(void) {
 #if defined(RGB_MATRIX_ENABLE) && defined(RGBLIGHT_CUSTOM)
-    if (rgblight_get_val() != rgb_matrix_get_val()) {
+    if (is_keyboard_master() && rgblight_get_val() != rgb_matrix_get_val()) {
         xprintf("[RGB Val] Matrix: %d, Light: %d\n", rgb_matrix_get_val(), rgblight_get_val());
         rgblight_sethsv(rgblight_get_hue(), rgblight_get_sat(), rgb_matrix_get_val());
     }

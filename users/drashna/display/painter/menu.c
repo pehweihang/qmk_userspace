@@ -1960,40 +1960,6 @@ menu_entry_t user_settings_option_entries[] = {
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Buy More
-
-menu_entry_t buy_more_entries[] = {
-#ifdef HAPTIC_ENABLE
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "Haptic Settings",
-        .parent.children    = haptic_entries,
-        .parent.child_count = ARRAY_SIZE(haptic_entries),
-    },
-#endif // HAPTIC_ENABLE
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "Keymap Config",
-        .parent.children    = keymap_config_entries,
-        .parent.child_count = ARRAY_SIZE(keymap_config_entries),
-    },
-#if defined(RTC_ENABLE) && !defined(DISPLAY_MENU_NO_RTC)
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "RTC Config",
-        .parent.children    = rtc_config_entries,
-        .parent.child_count = ARRAY_SIZE(rtc_config_entries),
-    },
-#endif // RTC_ENABLE
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "User Settings",
-        .parent.children    = user_settings_option_entries,
-        .parent.child_count = ARRAY_SIZE(user_settings_option_entries),
-    },
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Debugging
 
 static bool menu_handler_debugging_enable(menu_input_t input) {
@@ -2080,6 +2046,46 @@ menu_entry_t debug_entries[] = {
         .text                  = "Mouse Debugging",
         .child.menu_handler    = menu_handler_mouse_debugging,
         .child.display_handler = display_handler_mouse_debugging,
+    },
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Buy More
+
+menu_entry_t buy_more_entries[] = {
+#ifdef HAPTIC_ENABLE
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "Haptic Settings",
+        .parent.children    = haptic_entries,
+        .parent.child_count = ARRAY_SIZE(haptic_entries),
+    },
+#endif // HAPTIC_ENABLE
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "Keymap Config",
+        .parent.children    = keymap_config_entries,
+        .parent.child_count = ARRAY_SIZE(keymap_config_entries),
+    },
+#if defined(RTC_ENABLE) && !defined(DISPLAY_MENU_NO_RTC)
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "RTC Config",
+        .parent.children    = rtc_config_entries,
+        .parent.child_count = ARRAY_SIZE(rtc_config_entries),
+    },
+#endif // RTC_ENABLE
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "User Settings",
+        .parent.children    = user_settings_option_entries,
+        .parent.child_count = ARRAY_SIZE(user_settings_option_entries),
+    },
+    {
+        .flags              = menu_flag_is_parent,
+        .text               = "Debug Settings",
+        .parent.children    = debug_entries,
+        .parent.child_count = ARRAY_SIZE(debug_entries),
     },
 };
 

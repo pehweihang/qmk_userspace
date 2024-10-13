@@ -14,14 +14,9 @@
 #include "quantum/unicode/unicode.h"
 
 #if defined(RGB_MATRIX_ENABLE)
-#    include "rgb/rgb_matrix_stuff.h"
+void rgb_matrix_layer_helper(uint8_t hue, uint8_t sat, uint8_t val, uint8_t mode, uint8_t speed, uint8_t led_type,
+                             uint8_t led_min, uint8_t led_max);
 #endif // defined(RGB_MATRIX_ENABLE)
-#if defined(RGBLIGHT_ENABLE)
-#    include "rgb/rgb_stuff.h"
-#endif // defined(RGBLIGHT_ENABLE)
-#if defined(CUSTOM_OLED_DRIVER)
-#    include "display/oled/oled_stuff.h"
-#endif // CUSTOM_OLED_DRIVER
 
 void     matrix_scan_rate_task(void);
 uint32_t get_matrix_scan_rate(void);

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "drashna.h"
-#include "oled/oled_driver.h"
+#include "display/oled/oled_stuff.h"
 #include "rtc/rtc.h"
 #include "features/keyboard_lock.h"
 

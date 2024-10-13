@@ -4,6 +4,8 @@
 
 #include "drashna_runtime.h"
 #include "drashna_names.h"
+#include "drashna_layers.h"
+#include "drashna_util.h"
 #include "version.h"
 #include "qp_surface.h"
 #include "qp_ili9xxx_opcodes.h"
@@ -14,6 +16,12 @@
 #ifdef SPLIT_KEYBOARD
 #    include "split_util.h"
 #endif // SPLIT_KEYBOARD
+#if defined(RGB_MATRIX_ENABLE)
+#    include "rgb/rgb_matrix_stuff.h"
+#endif // defined(RGB_MATRIX_ENABLE)
+#if defined(RGBLIGHT_ENABLE)
+#    include "rgb/rgb_stuff.h"
+#endif // defined(RGBLIGHT_ENABLE)
 #ifdef RTC_ENABLE
 #    include "features/rtc/rtc.h"
 #endif
@@ -339,6 +347,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         ypos = 43 + 4;
 #if defined(POINTING_DEVICE_ENABLE)
 #    if (defined(KEYBOARD_bastardkb_charybdis) || defined(KEYBOARD_handwired_tractyl_manuform))
+#        include QMK_KEYBOARD_H
+
         static uint16_t last_cpi = {0xFFFF};
         uint16_t        curr_cpi = charybdis_get_pointer_sniping_enabled() ? charybdis_get_pointer_sniping_dpi()
                                                                            : charybdis_get_pointer_default_dpi();

@@ -4,7 +4,6 @@
 #include "display/painter/painter.h"
 #include "display/painter/menu.h"
 #include <stdio.h>
-#include "drashna.h"
 #include "drashna_runtime.h"
 
 #if defined(QUANTUM_PAINTER_ILI9341_ENABLE) && defined(CUSTOM_QUANTUM_PAINTER_ILI9341)

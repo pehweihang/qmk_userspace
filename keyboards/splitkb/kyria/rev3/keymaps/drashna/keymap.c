@@ -108,6 +108,7 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
 // clang-format on
 
 #ifdef OLED_ENABLE
+#    include "display/oled/oled_stuff.h"
 
 void render_oled_title(bool side) {
     oled_write_P(side ? PSTR("   Splitkb   ") : PSTR("    Kyria    "), true);

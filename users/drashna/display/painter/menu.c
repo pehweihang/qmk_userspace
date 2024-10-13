@@ -3,9 +3,12 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "drashna_runtime.h"
+#include "drashna_names.h"
+#include "drashna_layers.h"
 #include <printf.h>
 #include "display/painter/menu.h"
 #include "display/painter/painter.h"
+#include "keyrecords/process_records.h"
 #include "process_keycode/process_unicode_common.h"
 #include "unicode.h"
 
@@ -334,6 +337,7 @@ menu_entry_t display_option_entries[] = {
 // Unicode
 
 #ifdef UNICODE_COMMON_ENABLE
+
 static bool menu_handler_unicode(menu_input_t input) {
     switch (input) {
         case menu_input_left:
@@ -432,6 +436,8 @@ void display_handler_rgb_layer(char *text_buffer, size_t buffer_len) {
 // RGB Matrix
 
 #ifdef RGB_MATRIX_ENABLE
+#    include "rgb/rgb_matrix_stuff.h"
+
 static bool menu_handler_rm_enabled(menu_input_t input) {
     switch (input) {
         case menu_input_left:
@@ -609,6 +615,8 @@ menu_entry_t rgb_matrix_entries[] = {
 // RGB Light
 
 #ifdef RGBLIGHT_ENABLE
+#    include "rgb/rgb_stuff.h"
+
 static bool menu_handler_rgbenabled(menu_input_t input) {
     switch (input) {
         case menu_input_left:
@@ -1143,6 +1151,7 @@ menu_entry_t haptic_entries[] = {
 // Pointing Device
 
 #ifdef POINTING_DEVICE_ENABLE
+#    include "pointing/pointing.h"
 
 static bool menu_handler_auto_mouse_enable(menu_input_t input) {
     switch (input) {
@@ -1196,6 +1205,8 @@ void display_handler_mouse_jiggler(char *text_buffer, size_t buffer_len) {
 }
 
 #    if defined(KEYBOARD_handwired_tractyl_manuform) || defined(KEYBOARD_bastardkb_charybdis)
+#        include QMK_KEYBOARD_H
+
 static bool menu_handler_dpi_config(menu_input_t input) {
     switch (input) {
         case menu_input_left:

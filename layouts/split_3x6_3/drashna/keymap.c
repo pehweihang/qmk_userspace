@@ -85,6 +85,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // clang-format on
 
 #ifdef OLED_ENABLE
+#    include "display/oled/oled_stuff.h"
+
 oled_rotation_t oled_init_keymap(oled_rotation_t rotation, bool has_run) {
     return has_run ? rotation : OLED_ROTATION_270;
 }

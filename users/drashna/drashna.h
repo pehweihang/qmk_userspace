@@ -16,6 +16,9 @@
 #if defined(RGB_MATRIX_ENABLE)
 #    include "rgb/rgb_matrix_stuff.h"
 #endif // defined(RGB_MATRIX_ENABLE)
+#if defined(RGBLIGHT_ENABLE)
+#    include "rgb/rgb_stuff.h"
+#endif // defined(RGBLIGHT_ENABLE)
 #if defined(CUSTOM_OLED_DRIVER)
 #    include "display/oled/oled_stuff.h"
 #endif // CUSTOM_OLED_DRIVER

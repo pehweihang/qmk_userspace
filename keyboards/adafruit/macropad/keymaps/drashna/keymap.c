@@ -4,6 +4,7 @@
 #include "drashna.h"
 #include "oled/oled_driver.h"
 #include "rtc/rtc.h"
+#include "features/keyboard_lock.h"
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {

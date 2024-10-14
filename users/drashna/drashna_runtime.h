@@ -41,6 +41,7 @@ typedef union PACKED {
         } debug;
         struct {
             bool  enable_acceleration : 1;
+            bool  auto_mouse_layer_enable : 1;
             float growth_rate;
             float offset;
             float limit;

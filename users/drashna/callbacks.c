@@ -316,10 +316,18 @@ void                       eeconfig_init_user(void) {
         .v = 255,
     };
 
+#ifdef POINTING_DEVICE_ENABLE
     userspace_config.pointing.growth_rate = POINTING_DEVICE_ACCEL_GROWTH_RATE;
     userspace_config.pointing.offset      = POINTING_DEVICE_ACCEL_OFFSET;
     userspace_config.pointing.limit       = POINTING_DEVICE_ACCEL_LIMIT;
     userspace_config.pointing.takeoff     = POINTING_DEVICE_ACCEL_TAKEOFF;
+#else
+    userspace_config.pointing.growth_rate = 0.25;
+    userspace_config.pointing.offset      = 2.2;
+    userspace_config.pointing.limit       = 0.2;
+    userspace_config.pointing.takeoff     = 2.0;
+#endif // POINTING_DEVICE_ENABLE
+    userspace_config.pointing.auto_mouse_layer_enable = true;
 
     userspace_config.rtc.timezone = RTC_TIMEZONE;
     // ensure that nkro is enabled

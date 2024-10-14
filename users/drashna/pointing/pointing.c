@@ -60,7 +60,7 @@ __attribute__((weak)) void pointing_device_init_keymap(void) {}
 
 void pointing_device_init_user(void) {
     set_auto_mouse_layer(_MOUSE);
-    set_auto_mouse_enable(true);
+    set_auto_mouse_enable(userspace_config.pointing.auto_mouse_layer_enable);
 
     pointing_device_init_keymap();
 }
@@ -234,7 +234,7 @@ layer_state_t layer_state_set_pointing(layer_state_t state) {
         state |= ((layer_state_t)1 << _MOUSE);
         set_auto_mouse_enable(false); // auto mouse can be disabled any time during run time
     } else {
-        set_auto_mouse_enable(true);
+        set_auto_mouse_enable(userspace_config.pointing.auto_mouse_layer_enable);
     }
     return state;
 }

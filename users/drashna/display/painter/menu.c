@@ -1157,7 +1157,9 @@ static bool menu_handler_auto_mouse_enable(menu_input_t input) {
     switch (input) {
         case menu_input_left:
         case menu_input_right:
-            set_auto_mouse_enable(!get_auto_mouse_enable());
+            userspace_config.pointing.auto_mouse_layer_enable = !userspace_config.pointing.auto_mouse_layer_enable;
+            eeconfig_update_user_datablock(&userspace_config);
+            set_auto_mouse_enable(userspace_config.pointing.auto_mouse_layer_enable);
             return false;
         default:
             return true;
@@ -1165,7 +1167,7 @@ static bool menu_handler_auto_mouse_enable(menu_input_t input) {
 }
 
 void display_handler_auto_mouse_enable(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%s", get_auto_mouse_enable() ? "on" : "off");
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.pointing.auto_mouse_layer_enable ? "on" : "off");
 }
 
 static bool menu_handler_auto_mouse_layer(menu_input_t input) {

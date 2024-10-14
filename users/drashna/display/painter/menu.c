@@ -2054,6 +2054,17 @@ menu_entry_t debug_entries[] = {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Root menu
 
+// for whenever I figure out how to make this work:
+// [__COUNTER__] =
+//     {
+//         .flags                 = menu_flag_is_parent | menu_flag_is_value,
+//         .text                  = "Display Option",
+//         .parent.children       = display_option_entries,
+//         .parent.child_count    = ARRAY_SIZE(display_option_entries),
+//         .child.menu_handler    = menu_handler_display,
+//         .child.display_handler = display_handler_display,
+//     },
+
 #define MENU_ENTRY_PARENT(display_text, child)                  \
     [__COUNTER__] = {.flags              = menu_flag_is_parent, \
                      .text               = display_text,        \
@@ -2141,7 +2152,7 @@ bool menu_handle_input(menu_input_t input) {
             if (cancel_deferred_exec(menu_deferred_token)) {
                 menu_deferred_token = INVALID_DEFERRED_TOKEN;
             }
-             return false;
+            return false;
         case menu_input_back:
             // Iterate backwards through the stack and remove the last entry
             for (uint8_t i = 0; i < sizeof(user_runtime_state.menu_state.menu_stack); ++i) {
@@ -2201,7 +2212,7 @@ bool process_record_menu(uint16_t keycode, keyrecord_t *record) {
     if (keycode == DISPLAY_MENU && record->event.pressed && !user_runtime_state.menu_state.is_in_menu) {
         user_runtime_state.menu_state.is_in_menu     = true;
         user_runtime_state.menu_state.selected_child = 0;
-        menu_deferred_token               = defer_exec(DISPLAY_MENU_TIMEOUT, display_menu_timeout_handler, NULL);
+        menu_deferred_token = defer_exec(DISPLAY_MENU_TIMEOUT, display_menu_timeout_handler, NULL);
         return false;
     }
 

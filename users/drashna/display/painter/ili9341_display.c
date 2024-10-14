@@ -71,7 +71,9 @@ void render_frame(painter_device_t display) {
 
     // lines for pointing device block
     qp_line(ili9341_display, 2, 43, 80, 43, hsv.h, hsv.s, hsv.v);
+    // horizontal lines
     qp_line(ili9341_display, 80, 16, 80, 106, hsv.h, hsv.s, hsv.v);
+    qp_line(ili9341_display, 208, 16, 208, 54, hsv.h, hsv.s, hsv.v);
 
     // line for keyboard config
     qp_line(ili9341_display, 80, 54, width - 3, 54, hsv.h, hsv.s, hsv.v);
@@ -195,14 +197,17 @@ __attribute__((weak)) void ili9341_draw_user(void) {
     qp_get_geometry(ili9341_display, &width, &height, NULL, NULL, NULL);
 
 #if defined(RGB_MATRIX_ENABLE) || defined(RGBLIGHT_ENABLE)
+    bool rgb_redraw = false;
 #    if defined(RGB_MATRIX_ENABLE)
     if (has_rgb_matrix_config_changed()) {
         display_menu_set_dirty();
+        rgb_redraw = true;
     }
 #    endif
 #    if defined(RGBLIGHT_ENABLE)
     if (has_rgblight_config_changed()) {
         display_menu_set_dirty();
+        rgb_redraw = true;
     }
 #    endif
 #endif
@@ -253,6 +258,77 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                                 curr_hsv.secondary.v, 0, 0, 0);
         }
 #endif // WPM_ENABLE
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // RGB Matrix Settings
+
+        ypos = 20;
+#if defined(RGB_MATRIX_ENABLE)
+        if (hue_redraw || rgb_redraw) {
+            static uint16_t max_rgb_xpos = 0;
+            xpos                         = 83;
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "RGB Matrix Config:", curr_hsv.primary.h,
+                                curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
+
+            ypos += font_oled->line_height + 4;
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled,
+                                        truncate_text(rgb_matrix_get_effect_name(), 208 - 83, font_oled, false, false),
+                                        curr_hsv.primary.h, curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
+            if (max_rgb_xpos < xpos) {
+                max_rgb_xpos = xpos;
+            }
+            qp_rect(ili9341_display, xpos, ypos, max_rgb_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
+
+            xpos = 83;
+            ypos += font_oled->line_height + 4;
+            snprintf(buf, sizeof(buf), "HSV: %3d, %3d, %3d", rgb_matrix_get_hue(), rgb_matrix_get_sat(),
+                     rgb_matrix_get_val());
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv.primary.h, curr_hsv.primary.s,
+                                curr_hsv.primary.v, 0, 0, 0);
+            qp_rect(ili9341_display, 197, 43, 207, 53, rgb_matrix_get_hue(), rgb_matrix_get_sat(),
+                    (uint8_t)(rgb_matrix_get_val() * 0xFF / RGB_MATRIX_MAXIMUM_BRIGHTNESS), true);
+        }
+#endif // RGB_MATRIX_ENABLE
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // RGB Matrix Settings
+
+#if 0
+#    if defined(RGBLIGHT_ENABLE)
+        ypos += font_oled->line_height + 4;
+        if (hue_redraw || rgb_redraw) {
+            static uint16_t max_rgb_xpos = 0;
+            xpos                         = 5;
+            snprintf(buf, sizeof(buf), "RGB Light Mode: %s", rgblight_get_effect_name());
+            snprintf(buf, sizeof(buf), "%s", truncate_text(buf, width - 83 - 20, font_oled, false, false));
+
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv.primary.h,
+                                        curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
+            if (max_rgb_xpos < xpos) {
+                max_rgb_xpos = xpos;
+            }
+            qp_rect(ili9341_display, xpos, ypos, max_rgb_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
+
+            ypos += font_oled->line_height + 4;
+            static uint16_t max_hsv_xpos = 0;
+            xpos                         = 5;
+            snprintf(buf, sizeof(buf), "RGB Light HSV: %3d, %3d, %3d", rgblight_get_hue(), rgblight_get_sat(),
+                     rgblight_get_val());
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv.primary.h,
+                                        curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
+            if (max_hsv_xpos < xpos) {
+                max_hsv_xpos = xpos;
+            }
+            qp_rect(ili9341_display, xpos, ypos, max_hsv_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
+            qp_rect(ili9341_display, max_hsv_xpos + 5, ypos, max_hsv_xpos + 25, ypos + font_oled->line_height - 1,
+                    rgblight_get_hue(), rgblight_get_sat(), (uint8_t)(rgblight_get_val() * 0xFF / RGBLIGHT_LIMIT_VAL),
+                    true);
+        } else {
+            // we called ypos inside the function ... to make sure we don't skip a line on future passes ....
+            ypos += font_oled->line_height + 4;
+        }
+#    endif // RGBLIGHT_ENABLE
+#endif
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // LED Lock indicator(text)
@@ -552,84 +628,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv.secondary.h, curr_hsv.secondary.s,
                                 curr_hsv.secondary.v, 0, 0, 0);
         }
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //  RGB Light Settings
 #endif // OS_DETECTION_ENABLE
 
-#if 0
-#    if defined(RGBLIGHT_ENABLE)
-        ypos += font_oled->line_height + 4;
-        if (hue_redraw || rgb_redraw) {
-            static uint16_t max_rgb_xpos = 0;
-            xpos                         = 5;
-            snprintf(buf, sizeof(buf), "RGB Light Mode: %s", rgblight_get_effect_name());
-            snprintf(buf, sizeof(buf), "%s", truncate_text(buf, width - 7, font_oled, false, false));
-
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv.primary.h, curr_hsv.primary.s, curr_hsv.primary.v,
-                                        0, 0, 0);
-            if (max_rgb_xpos < xpos) {
-                max_rgb_xpos = xpos;
-            }
-            qp_rect(ili9341_display, xpos, ypos, max_rgb_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
-
-            ypos += font_oled->line_height + 4;
-            static uint16_t max_hsv_xpos = 0;
-            xpos                         = 5;
-            snprintf(buf, sizeof(buf), "RGB Light HSV: %3d, %3d, %3d", rgblight_get_hue(), rgblight_get_sat(),
-                     rgblight_get_val());
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv.primary.h, curr_hsv.primary.s, curr_hsv.primary.v,
-                                        0, 0, 0);
-            if (max_hsv_xpos < xpos) {
-                max_hsv_xpos = xpos;
-            }
-            qp_rect(ili9341_display, xpos, ypos, max_hsv_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
-            qp_rect(ili9341_display, max_hsv_xpos + 5, ypos, max_hsv_xpos + 25, ypos + font_oled->line_height - 1,
-                    rgblight_get_hue(), rgblight_get_sat(), (uint8_t)(rgblight_get_val() * 0xFF / RGBLIGHT_LIMIT_VAL),
-                    true);
-        } else {
-            // we called ypos inside the function ... to make sure we don't skip a line on future passes ....
-            ypos += font_oled->line_height + 4;
-        }
-#    endif // RGBLIGHT_ENABLE
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // RGB Matrix Settings
-
-#    if defined(RGB_MATRIX_ENABLE)
-        ypos += font_oled->line_height + 4;
-        if (hue_redraw || rgb_redraw) {
-            static uint16_t max_rgb_xpos = 0;
-            xpos                         = 5;
-            snprintf(buf, sizeof(buf), "RGB Matrix Mode: %s", rgb_matrix_get_effect_name());
-            snprintf(buf, sizeof(buf), "%s", truncate_text(buf, width - 7, font_oled, false, false));
-
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv.primary.h, curr_hsv.primary.s, curr_hsv.primary.v,
-                                        0, 0, 0);
-            if (max_rgb_xpos < xpos) {
-                max_rgb_xpos = xpos;
-            }
-            qp_rect(ili9341_display, xpos, ypos, max_rgb_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
-
-            ypos += font_oled->line_height + 4;
-            static uint16_t max_hsv_xpos = 0;
-            xpos                         = 5;
-            snprintf(buf, sizeof(buf), "RGB Matrix HSV: %3d, %3d, %3d", rgb_matrix_get_hue(), rgb_matrix_get_sat(),
-                     rgb_matrix_get_val());
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv.primary.h, curr_hsv.primary.s, curr_hsv.primary.v,
-                                        0, 0, 0);
-            if (max_hsv_xpos < xpos) {
-                max_hsv_xpos = xpos;
-            }
-            qp_rect(ili9341_display, xpos, ypos, max_hsv_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
-            qp_rect(ili9341_display, max_hsv_xpos + 5, ypos, max_hsv_xpos + 25, ypos + font_oled->line_height - 1,
-                    rgb_matrix_get_hue(), rgb_matrix_get_sat(),
-                    (uint8_t)(rgb_matrix_get_val() * 0xFF / RGB_MATRIX_MAXIMUM_BRIGHTNESS), true);
-        } else {
-            // we called ypos inside the function ... to make sure we don't skip a line on future passes ....
-            ypos += font_oled->line_height + 4;
-        }
-#    endif // RGB_MATRIX_ENABLE
-#endif
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //  Default layer state
 

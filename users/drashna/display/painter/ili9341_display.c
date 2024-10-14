@@ -265,26 +265,22 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         ypos = 20;
 #if defined(RGB_MATRIX_ENABLE)
         if (hue_redraw || rgb_redraw) {
-            static uint16_t max_rgb_xpos = 0;
             xpos                         = 83;
             qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "RGB Matrix Config:", curr_hsv.primary.h,
                                 curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
-
             ypos += font_oled->line_height + 4;
-            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled,
-                                        truncate_text(rgb_matrix_get_effect_name(), 208 - 83, font_oled, false, false),
-                                        curr_hsv.primary.h, curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
-            if (max_rgb_xpos < xpos) {
-                max_rgb_xpos = xpos;
-            }
-            qp_rect(ili9341_display, xpos, ypos, max_rgb_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
+            snprintf(buf, sizeof(buf), "%20s", rgb_matrix_get_effect_name());
+            xpos += qp_drawtext_recolor(ili9341_display, 208 - qp_textwidth(font_oled, buf), ypos, font_oled, buf,
+                                        curr_hsv.secondary.h, curr_hsv.secondary.s, curr_hsv.secondary.v, 0, 0, 0);
 
             xpos = 83;
             ypos += font_oled->line_height + 4;
-            snprintf(buf, sizeof(buf), "HSV: %3d, %3d, %3d", rgb_matrix_get_hue(), rgb_matrix_get_sat(),
+            xpos += qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "HSV: ", curr_hsv.primary.h,
+                                        curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
+            snprintf(buf, sizeof(buf), "%3d, %3d, %3d", rgb_matrix_get_hue(), rgb_matrix_get_sat(),
                      rgb_matrix_get_val());
-            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv.primary.h, curr_hsv.primary.s,
-                                curr_hsv.primary.v, 0, 0, 0);
+            qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, buf, curr_hsv.secondary.h, curr_hsv.secondary.s,
+                                curr_hsv.secondary.v, 0, 0, 0);
             qp_rect(ili9341_display, 197, 43, 207, 53, rgb_matrix_get_hue(), rgb_matrix_get_sat(),
                     (uint8_t)(rgb_matrix_get_val() * 0xFF / RGB_MATRIX_MAXIMUM_BRIGHTNESS), true);
         }

@@ -2052,83 +2052,6 @@ menu_entry_t debug_entries[] = {
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Buy More
-
-menu_entry_t buy_more_entries[] = {
-#ifdef HAPTIC_ENABLE
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "Haptic Settings",
-        .parent.children    = haptic_entries,
-        .parent.child_count = ARRAY_SIZE(haptic_entries),
-    },
-#endif // HAPTIC_ENABLE
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "Keymap Config",
-        .parent.children    = keymap_config_entries,
-        .parent.child_count = ARRAY_SIZE(keymap_config_entries),
-    },
-#if defined(RTC_ENABLE) && !defined(DISPLAY_MENU_NO_RTC)
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "RTC Config",
-        .parent.children    = rtc_config_entries,
-        .parent.child_count = ARRAY_SIZE(rtc_config_entries),
-    },
-#endif // RTC_ENABLE
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "User Settings",
-        .parent.children    = user_settings_option_entries,
-        .parent.child_count = ARRAY_SIZE(user_settings_option_entries),
-    },
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "Debug Settings",
-        .parent.children    = debug_entries,
-        .parent.child_count = ARRAY_SIZE(debug_entries),
-    },
-};
-
-menu_entry_t buy_more_entries_less[] = {
-#ifdef HAPTIC_ENABLE
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "Haptic Settings",
-        .parent.children    = haptic_entries,
-        .parent.child_count = ARRAY_SIZE(haptic_entries),
-    },
-#endif // HAPTIC_ENABLE
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "Keymap Config",
-        .parent.children    = keymap_config_entries,
-        .parent.child_count = ARRAY_SIZE(keymap_config_entries),
-    },
-#if defined(RTC_ENABLE) && !defined(DISPLAY_MENU_NO_RTC)
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "RTC Config",
-        .parent.children    = rtc_config_entries,
-        .parent.child_count = ARRAY_SIZE(rtc_config_entries),
-    },
-#endif // RTC_ENABLE
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "User Settings",
-        .parent.children    = user_settings_option_entries,
-        .parent.child_count = ARRAY_SIZE(user_settings_option_entries),
-    },
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "Debug Settings",
-        .parent.children    = debug_entries,
-        .parent.child_count = ARRAY_SIZE(debug_entries),
-    },
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Root menu
 
 #define MENU_ENTRY_PARENT(display_text, child)                  \
@@ -2157,57 +2080,16 @@ menu_entry_t root_entries[] = {
 #ifdef POINTING_DEVICE_ENABLE
     MENU_ENTRY_PARENT("Pointing Device Settings", pointing_entries),
 #endif // POINTING_DEVICE_ENABLE
-#if defined(HAPTIC_ENABLE) && __COUNTER__ < 7
-#    define DISPLAY_MENU_NO_HAPTIC
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "Haptic Settings",
-        .parent.children    = haptic_entries,
-        .parent.child_count = ARRAY_SIZE(haptic_entries),
-    },
-#endif
-#if __COUNTER__ < 7
-#    define DISPLAY_MENU_NO_KEYMAP
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "Keymap Config",
-        .parent.children    = keymap_config_entries,
-        .parent.child_count = ARRAY_SIZE(keymap_config_entries),
-    },
-#endif
-#if __COUNTER__ < 7 && defined(RTC_ENABLE)
-#    define DISPLAY_MENU_NO_RTC
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "RTC Config",
-        .parent.children    = rtc_config_entries,
-        .parent.child_count = ARRAY_SIZE(rtc_config_entries),
-    },
-#endif
-#if __COUNTER__ < 8
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "User Settings",
-        .parent.children    = user_settings_option_entries,
-        .parent.child_count = ARRAY_SIZE(user_settings_option_entries),
-    },
-#endif
-#if __COUNTER__ >= 8 && (!defined(DISPLAY_MENU_NO_KEYMAP) || !defined(DISPLAY_MENU_NO_RTC))
-    {
-        .flags = menu_flag_is_parent,
-        .text  = "More...",
-#    if defined(DISPLAY_MENU_NO_KEYMAP)
-        .parent.children    = buy_more_entries_less,
-        .parent.child_count = ARRAY_SIZE(buy_more_entries_less),
-#    else
-        .parent.children    = buy_more_entries,
-        .parent.child_count = ARRAY_SIZE(buy_more_entries),
-#    endif
-    },
-#endif
+#if defined(HAPTIC_ENABLE)
+    MENU_ENTRY_PARENT("Haptic Settings", haptic_entries),
+#endif // HAPTIC_ENABLE
+    MENU_ENTRY_PARENT("Keymap Settings", keymap_config_entries),
+#if defined(RTC_ENABLE)
+    MENU_ENTRY_PARENT("RTC Settings", rtc_config_entries),
+#endif // RTC_ENABLE
+    MENU_ENTRY_PARENT("User Settings", user_settings_option_entries),
+    MENU_ENTRY_PARENT("Debug Settings", debug_entries),
 };
-
-_Static_assert(ARRAY_SIZE(root_entries) <= 8, "Too many root menu entries");
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Root Title
@@ -2399,9 +2281,10 @@ bool process_record_menu(uint16_t keycode, keyrecord_t *record) {
 }
 
 extern painter_font_handle_t font_thintel, font_mono, font_oled;
-
 bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, uint16_t width, uint16_t height) {
     static menu_state_t last_state;
+    static uint8_t      scroll_offset = 0;
+
     if (memcmp(&last_state, &user_runtime_state.menu_state, sizeof(menu_state_t)) == 0) {
         return user_runtime_state.menu_state.is_in_menu;
     }
@@ -2414,7 +2297,6 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
     if (user_runtime_state.menu_state.is_in_menu) {
         qp_rect(display, start_x, start_y, render_width - 1, height - 1, 0, 0, 0, true);
 
-        // uint8_t       hue      = rgb_matrix_get_hue();
         menu_entry_t *menu     = get_current_menu();
         menu_entry_t *selected = get_selected_menu_item();
         dual_hsv_t    hsv      = painter_get_dual_hsv();
@@ -2425,7 +2307,16 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
         qp_drawtext_recolor(display, start_x + 4, y + 4, font_oled, menu->text, 0, 0, 0, hsv.primary.h, hsv.primary.s,
                             hsv.primary.v);
         y += font_oled->line_height + 11;
-        for (uint8_t i = 0; i < menu->parent.child_count; ++i) {
+
+        uint8_t visible_entries = (height - y) / (font_oled->line_height + 5);
+        if (user_runtime_state.menu_state.selected_child >= scroll_offset + visible_entries &&
+            user_runtime_state.menu_state.selected_child < menu->parent.child_count - 1) {
+            scroll_offset = user_runtime_state.menu_state.selected_child - visible_entries + 1;
+        } else if (user_runtime_state.menu_state.selected_child < scroll_offset) {
+            scroll_offset = user_runtime_state.menu_state.selected_child;
+        }
+
+        for (uint8_t i = scroll_offset; i < menu->parent.child_count && y < height; ++i) {
             menu_entry_t *child = &menu->parent.children[i];
             uint16_t      x     = start_x + 2 + qp_textwidth(font_oled, ">");
             if (child == selected) {

@@ -2320,13 +2320,17 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
         y += font_oled->line_height + 11;
 
         uint8_t visible_entries = (height - y) / (font_oled->line_height + 5);
-        if (user_runtime_state.menu_state.selected_child >= scroll_offset + visible_entries &&
-            user_runtime_state.menu_state.selected_child < menu->parent.child_count - 1) {
-            scroll_offset = user_runtime_state.menu_state.selected_child - visible_entries + 1;
-        } else if (user_runtime_state.menu_state.selected_child < scroll_offset) {
-            scroll_offset = user_runtime_state.menu_state.selected_child;
-        } else if (user_runtime_state.menu_state.selected_child == menu->parent.child_count - 1) {
-            scroll_offset = menu->parent.child_count - visible_entries - 1;
+        if (menu->parent.child_count > visible_entries) {
+            if (user_runtime_state.menu_state.selected_child >= scroll_offset + visible_entries &&
+                user_runtime_state.menu_state.selected_child < menu->parent.child_count - 1) {
+                scroll_offset = user_runtime_state.menu_state.selected_child - visible_entries + 1;
+            } else if (user_runtime_state.menu_state.selected_child < scroll_offset) {
+                scroll_offset = user_runtime_state.menu_state.selected_child;
+            } else if (user_runtime_state.menu_state.selected_child == menu->parent.child_count - 1) {
+                scroll_offset = menu->parent.child_count - visible_entries - 1;
+            }
+        } else {
+            scroll_offset = 0;
         }
 
         for (uint8_t i = scroll_offset; i < menu->parent.child_count && y < height; ++i) {

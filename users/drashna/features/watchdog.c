@@ -24,7 +24,7 @@
 #    define STM32_IWDG_RL_S(s)     STM32_IWDG_RL_US(s * 1000000.0)
 
 #    if !defined(WATCHDOG_TIMEOUT)
-#        define WATCHDOG_TIMEOUT 2.0
+#        define WATCHDOG_TIMEOUT 5.0
 #    endif // !defined(WATCHDOG_TIMEOUT)
 
 static WDGConfig wdgcfg = {

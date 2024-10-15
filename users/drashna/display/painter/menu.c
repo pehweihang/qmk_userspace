@@ -1922,7 +1922,7 @@ bool process_record_menu(uint16_t keycode, keyrecord_t *record) {
 extern painter_font_handle_t font_thintel, font_mono, font_oled;
 bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, uint16_t width, uint16_t height) {
     static menu_state_t last_state;
-    uint8_t             scroll_offset = 0;
+    static uint8_t      scroll_offset = 0;
 
     if (memcmp(&last_state, &user_runtime_state.menu_state, sizeof(menu_state_t)) == 0) {
         return user_runtime_state.menu_state.is_in_menu;
@@ -1952,12 +1952,17 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
             if (user_runtime_state.menu_state.selected_child >= scroll_offset + visible_entries &&
                 user_runtime_state.menu_state.selected_child < menu->parent.child_count - 1) {
                 scroll_offset = user_runtime_state.menu_state.selected_child - visible_entries + 1;
-            } else if (user_runtime_state.menu_state.selected_child < scroll_offset + 1 &&
-                       user_runtime_state.menu_state.selected_child != 0) {
-                scroll_offset = user_runtime_state.menu_state.selected_child - 1;
+            } else if (user_runtime_state.menu_state.selected_child < scroll_offset + 1) {
+                if (user_runtime_state.menu_state.selected_child != 0) {
+                    scroll_offset = user_runtime_state.menu_state.selected_child - 1;
+                } else {
+                    scroll_offset = 0;
+                }
             } else if (user_runtime_state.menu_state.selected_child == menu->parent.child_count - 1) {
                 scroll_offset = menu->parent.child_count - visible_entries - 1;
             }
+        } else {
+            scroll_offset = 0;
         }
 
         for (uint8_t i = scroll_offset; i < menu->parent.child_count && y < height; ++i) {

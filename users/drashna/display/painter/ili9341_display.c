@@ -269,7 +269,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             qp_drawtext_recolor(ili9341_display, xpos, ypos, font_oled, "RGB Matrix Config:", curr_hsv.primary.h,
                                 curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
             ypos += font_oled->line_height + 4;
-            snprintf(buf, sizeof(buf), "%20s", rgb_matrix_get_effect_name());
+            snprintf(buf, sizeof(buf), "%21s",
+                     truncate_text(rgb_matrix_get_effect_name(), 208 - 80, font_oled, false, false));
             xpos += qp_drawtext_recolor(ili9341_display, 208 - qp_textwidth(font_oled, buf), ypos, font_oled, buf,
                                         curr_hsv.secondary.h, curr_hsv.secondary.s, curr_hsv.secondary.v, 0, 0, 0);
 

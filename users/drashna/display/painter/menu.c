@@ -241,9 +241,7 @@ void display_handler_display_inverted(char *text_buffer, size_t buffer_len) {
     strncpy(text_buffer, userspace_config.painter.inverted ? "Inverted" : "Normal", buffer_len - 1);
 }
 
-static bool painter_is_primary = true;
-
-static bool menu_handler_display_hue(menu_input_t input) {
+static bool menu_handler_display_hue(menu_input_t input, bool painter_is_primary) {
     switch (input) {
         case menu_input_left:
             painter_decrease_hue(painter_is_primary);
@@ -255,11 +253,11 @@ static bool menu_handler_display_hue(menu_input_t input) {
             return true;
     }
 }
-void display_handler_display_hue(char *text_buffer, size_t buffer_len) {
+void display_handler_display_hue(char *text_buffer, size_t buffer_len, bool painter_is_primary) {
     snprintf(text_buffer, buffer_len - 1, "%d", painter_get_hue(painter_is_primary));
 }
 
-static bool menu_handler_display_sat(menu_input_t input) {
+static bool menu_handler_display_sat(menu_input_t input, bool painter_is_primary) {
     switch (input) {
         case menu_input_left:
             painter_decrease_sat(painter_is_primary);
@@ -272,11 +270,11 @@ static bool menu_handler_display_sat(menu_input_t input) {
     }
 }
 
-void display_handler_display_sat(char *text_buffer, size_t buffer_len) {
+void display_handler_display_sat(char *text_buffer, size_t buffer_len, bool painter_is_primary) {
     snprintf(text_buffer, buffer_len - 1, "%d", painter_get_sat(painter_is_primary));
 }
 
-static bool menu_handler_display_val(menu_input_t input) {
+static bool menu_handler_display_val(menu_input_t input, bool painter_is_primary) {
     switch (input) {
         case menu_input_left:
             painter_decrease_val(painter_is_primary);
@@ -289,34 +287,69 @@ static bool menu_handler_display_val(menu_input_t input) {
     }
 }
 
-void display_handler_display_val(char *text_buffer, size_t buffer_len) {
+void display_handler_display_val(char *text_buffer, size_t buffer_len, bool painter_is_primary) {
     snprintf(text_buffer, buffer_len - 1, "%d", painter_get_val(painter_is_primary));
 }
 
-static bool menu_handler_display_hsv(menu_input_t input) {
-    switch (input) {
-        case menu_input_left:
-        case menu_input_right:
-            painter_is_primary = !painter_is_primary;
-            return false;
-        default:
-            return true;
-    }
+static bool menu_handler_display_hue_primary(menu_input_t input) {
+    return menu_handler_display_hue(input, true);
 }
 
-void display_handler_display_hsv(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%s", painter_is_primary ? "Primary" : "Secondary");
+void display_handler_display_hue_primary(char *text_buffer, size_t buffer_len) {
+    display_handler_display_hue(text_buffer, buffer_len, true);
+}
+
+static bool menu_handler_display_sat_primary(menu_input_t input) {
+    return menu_handler_display_sat(input, true);
+}
+
+void display_handler_display_sat_primary(char *text_buffer, size_t buffer_len) {
+    display_handler_display_sat(text_buffer, buffer_len, true);
+}
+
+static bool menu_handler_display_val_primary(menu_input_t input) {
+    return menu_handler_display_val(input, true);
+}
+
+void display_handler_display_val_primary(char *text_buffer, size_t buffer_len) {
+    display_handler_display_val(text_buffer, buffer_len, true);
+}
+
+static bool menu_handler_display_hue_secondary(menu_input_t input) {
+    return menu_handler_display_hue(input, false);
+}
+
+void display_handler_display_hue_secondary(char *text_buffer, size_t buffer_len) {
+    display_handler_display_hue(text_buffer, buffer_len, false);
+}
+
+static bool menu_handler_display_sat_secondary(menu_input_t input) {
+    return menu_handler_display_sat(input, false);
+}
+
+void display_handler_display_sat_secondary(char *text_buffer, size_t buffer_len) {
+    display_handler_display_sat(text_buffer, buffer_len, false);
+}
+
+static bool menu_handler_display_val_secondary(menu_input_t input) {
+    return menu_handler_display_val(input, false);
+}
+
+void display_handler_display_val_secondary(char *text_buffer, size_t buffer_len) {
+    display_handler_display_val(text_buffer, buffer_len, false);
 }
 
 menu_entry_t display_option_entries[] = {
     MENU_ENTRY_CHILD("Display Option", display),
-    MENU_ENTRY_CHILD("Slave Side Image", slave_side_image),
-    MENU_ENTRY_CHILD("Display Rotation", display_rotation),
-    MENU_ENTRY_CHILD("Display Inverted", display_inverted),
-    MENU_ENTRY_CHILD("Display HSV", display_hsv),
-    MENU_ENTRY_CHILD("Display Hue", display_hue),
-    MENU_ENTRY_CHILD("Display Saturation", display_sat),
-    MENU_ENTRY_CHILD("Display Value", display_val),
+    MENU_ENTRY_CHILD("Image", slave_side_image),
+    MENU_ENTRY_CHILD("Rotation", display_rotation),
+    MENU_ENTRY_CHILD("Inverted", display_inverted),
+    MENU_ENTRY_CHILD("Primary Hue", display_hue_primary),
+    MENU_ENTRY_CHILD("Primary Saturation", display_sat_primary),
+    MENU_ENTRY_CHILD("Primary Value", display_val_primary),
+    MENU_ENTRY_CHILD("Secondary Hue", display_hue_secondary),
+    MENU_ENTRY_CHILD("Secondary Saturation", display_sat_secondary),
+    MENU_ENTRY_CHILD("Secondary Value", display_val_secondary),
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1245,7 +1278,7 @@ static bool menu_handler_keycode_disable_gui(menu_input_t input) {
 }
 
 void display_handler_keycode_disable_gui(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%s", keymap_config.no_gui ? "enabled" : "disabled");
+    snprintf(text_buffer, buffer_len - 1, "%s", keymap_config.no_gui ? "disabled" : "enabled");
 }
 
 __attribute__((unused)) static bool menu_handler_keycode_grave_esc(menu_input_t input) {
@@ -1330,12 +1363,15 @@ void display_handler_keycode_autocorrect(char *text_buffer, size_t buffer_len) {
 }
 
 menu_entry_t keymap_config_entries[] = {
-    MENU_ENTRY_CHILD("Control <-> Capslock", keycode_ctrl_caps), MENU_ENTRY_CHILD("Alt <-> GUI", keycode_alt_gui),
-    MENU_ENTRY_CHILD("Control <-> GUI", keycode_ctrl_gui),       MENU_ENTRY_CHILD("Disable GUI", keycode_disable_gui),
-    MENU_ENTRY_CHILD("N-Key Roll Over", keycode_nkro),           MENU_ENTRY_CHILD("Oneshot Keys", keycode_oneshot),
+    MENU_ENTRY_CHILD("Control <-> Capslock", keycode_ctrl_caps),
+    MENU_ENTRY_CHILD("Alt <-> GUI", keycode_alt_gui),
+    MENU_ENTRY_CHILD("Control <-> GUI", keycode_ctrl_gui),
+    MENU_ENTRY_CHILD("Grave <-> Escape", keycode_grave_esc),
+    MENU_ENTRY_CHILD("Backslash <-> Backspace", keycode_bslash_bspc),
+    MENU_ENTRY_CHILD("GUI", keycode_disable_gui),
+    MENU_ENTRY_CHILD("N-Key Roll Over", keycode_nkro),
+    MENU_ENTRY_CHILD("Oneshot Keys", keycode_oneshot),
     MENU_ENTRY_CHILD("Autocorrect", keycode_autocorrect),
-    // MENU_ENTRY_CHILD("Grave <-> Escape", keycode_grave_esc),
-    // MENU_ENTRY_CHILD("Backslash <-> Backspace", keycode_bslash_bspc),
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1621,9 +1657,9 @@ void display_handler_scan_rate(char *text_buffer, size_t buffer_len) {
 }
 
 menu_entry_t user_settings_option_entries[] = {
-    MENU_ENTRY_CHILD("Overwatch Mode", overwatch_mode),    MENU_ENTRY_CHILD("Gamepad 1<->2 Swap", gamepad_swap),
-    MENU_ENTRY_CHILD("SOCD Cleaner", clap_trap),           MENU_ENTRY_CHILD("I2C Scanner", i2c_scanner),
-    MENU_ENTRY_CHILD("Matrix Scan Rate Print", scan_rate),
+    MENU_ENTRY_CHILD("Overwatch Mode", overwatch_mode),
+    MENU_ENTRY_CHILD("Gamepad 1<->2 Swap", gamepad_swap),
+    MENU_ENTRY_CHILD("SOCD Cleaner", clap_trap),
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1690,10 +1726,12 @@ void display_handler_mouse_debugging(char *text_buffer, size_t buffer_len) {
 }
 
 menu_entry_t debug_entries[] = {
-    MENU_ENTRY_CHILD("Debugging", debugging_enable),
+    MENU_ENTRY_CHILD("Debugging", debugging_enable), // force formatting
     MENU_ENTRY_CHILD("Keyboard Debugging", keyboard_debugging),
     MENU_ENTRY_CHILD("Matrix Debugging", matrix_debugging),
     MENU_ENTRY_CHILD("Mouse Debugging", mouse_debugging),
+    MENU_ENTRY_CHILD("I2C Scanner", i2c_scanner),
+    MENU_ENTRY_CHILD("Matrix Scan Rate Print", scan_rate),
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

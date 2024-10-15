@@ -37,6 +37,32 @@ static float cg_swap_song[][2] = CG_SWAP_SONG;
 #endif // !DISPLAY_MENU_TIMEOUT
 deferred_token menu_deferred_token = INVALID_DEFERRED_TOKEN;
 
+#define MENU_ENTRY_CHILD(display_text, name)             \
+    {                                                    \
+        .flags                 = menu_flag_is_value,     \
+        .text                  = display_text,           \
+        .child.menu_handler    = menu_handler_##name,    \
+        .child.display_handler = display_handler_##name, \
+    }
+
+#define MENU_ENTRY_PARENT(display_text, child)     \
+    {                                              \
+        .flags              = menu_flag_is_parent, \
+        .text               = display_text,        \
+        .parent.children    = child,               \
+        .parent.child_count = ARRAY_SIZE(child),   \
+    }
+
+#define MENU_ENTRY_MULTI(display_text, child, name)                        \
+    {                                                                      \
+        .flags                 = menu_flag_is_parent | menu_flag_is_value, \
+        .text                  = display_text,                             \
+        .child.menu_handler    = menu_handler_##name,                      \
+        .child.display_handler = display_handler_##name,                   \
+        .parent.children       = child,                                    \
+        .parent.child_count    = ARRAY_SIZE(child),                        \
+    }
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Display options
 
@@ -80,7 +106,7 @@ void display_handler_display(char *text_buffer, size_t buffer_len) {
     strncpy(text_buffer, "Unknown", buffer_len);
 }
 
-static bool menu_handler_slave_image(menu_input_t input) {
+static bool menu_handler_slave_side_image(menu_input_t input) {
     switch (input) {
         case menu_input_left:
             userspace_config.painter.display_logo = (userspace_config.painter.display_logo - 1) % 11;
@@ -283,54 +309,14 @@ void display_handler_display_hsv(char *text_buffer, size_t buffer_len) {
 }
 
 menu_entry_t display_option_entries[] = {
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Display Option",
-        .child.menu_handler    = menu_handler_display,
-        .child.display_handler = display_handler_display,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Slave Side Image",
-        .child.menu_handler    = menu_handler_slave_image,
-        .child.display_handler = display_handler_slave_side_image,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Display Rotation",
-        .child.menu_handler    = menu_handler_display_rotation,
-        .child.display_handler = display_handler_display_rotation,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Display Inverted",
-        .child.menu_handler    = menu_handler_display_inverted,
-        .child.display_handler = display_handler_display_inverted,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Display HSV",
-        .child.menu_handler    = menu_handler_display_hsv,
-        .child.display_handler = display_handler_display_hsv,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Display Hue",
-        .child.menu_handler    = menu_handler_display_hue,
-        .child.display_handler = display_handler_display_hue,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Display Saturation",
-        .child.menu_handler    = menu_handler_display_sat,
-        .child.display_handler = display_handler_display_sat,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Display Value",
-        .child.menu_handler    = menu_handler_display_val,
-        .child.display_handler = display_handler_display_val,
-    },
+    MENU_ENTRY_CHILD("Display Option", display),
+    MENU_ENTRY_CHILD("Slave Side Image", slave_side_image),
+    MENU_ENTRY_CHILD("Display Rotation", display_rotation),
+    MENU_ENTRY_CHILD("Display Inverted", display_inverted),
+    MENU_ENTRY_CHILD("Display HSV", display_hsv),
+    MENU_ENTRY_CHILD("Display Hue", display_hue),
+    MENU_ENTRY_CHILD("Display Saturation", display_sat),
+    MENU_ENTRY_CHILD("Display Value", display_val),
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -399,18 +385,8 @@ void display_handler_unicode_typing(char *text_buffer, size_t buffer_len) {
 }
 
 menu_entry_t unicode_entries[] = {
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Unicode mode",
-        .child.menu_handler    = menu_handler_unicode,
-        .child.display_handler = display_handler_unicode,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Unicode Typing Mode",
-        .child.menu_handler    = menu_handler_unicode_typing,
-        .child.display_handler = display_handler_unicode_typing,
-    },
+    MENU_ENTRY_CHILD("Unicode mode", unicode),
+    MENU_ENTRY_CHILD("Unicode Typing Mode", unicode_typing),
 };
 #endif // UNICODE_COMMON_ENABLE
 
@@ -560,54 +536,14 @@ void display_handler_rgb_idle(char *text_buffer, size_t buffer_len) {
 }
 
 menu_entry_t rgb_matrix_entries[] = {
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "RGB Enabled",
-        .child.menu_handler    = menu_handler_rm_enabled,
-        .child.display_handler = display_handler_rm_enabled,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "RGB Mode",
-        .child.menu_handler    = menu_handler_rm_mode,
-        .child.display_handler = display_handler_rm_mode,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "RGB Hue",
-        .child.menu_handler    = menu_handler_rm_hue,
-        .child.display_handler = display_handler_rm_hue,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "RGB Saturation",
-        .child.menu_handler    = menu_handler_rm_sat,
-        .child.display_handler = display_handler_rm_sat,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "RGB Value",
-        .child.menu_handler    = menu_handler_rm_val,
-        .child.display_handler = display_handler_rm_val,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "RGB Speed",
-        .child.menu_handler    = menu_handler_rm_speed,
-        .child.display_handler = display_handler_rm_speed,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Layer Indication",
-        .child.menu_handler    = menu_handler_rgb_layer,
-        .child.display_handler = display_handler_rgb_layer,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Idle Animation",
-        .child.menu_handler    = menu_handler_rgb_idle,
-        .child.display_handler = display_handler_rgb_idle,
-    },
+    MENU_ENTRY_CHILD("RGB Enabled", rm_enabled),
+    MENU_ENTRY_CHILD("RGB Mode", rm_mode),
+    MENU_ENTRY_CHILD("RGB Hue", rm_hue),
+    MENU_ENTRY_CHILD("RGB Saturation", rm_sat),
+    MENU_ENTRY_CHILD("RGB Value", rm_val),
+    MENU_ENTRY_CHILD("RGB Speed", rm_speed),
+    MENU_ENTRY_CHILD("Layer Indication", rgb_layer),
+    MENU_ENTRY_CHILD("Idle Animation", rgb_idle),
 };
 #endif // RGB_MATRIX_ENABLE
 
@@ -725,48 +661,13 @@ void display_handler_rgbspeed(char *text_buffer, size_t buffer_len) {
 }
 
 menu_entry_t rgb_light_entries[] = {
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "RGB Enabled",
-        .child.menu_handler    = menu_handler_rgbenabled,
-        .child.display_handler = display_handler_rgbenabled,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "RGB Mode",
-        .child.menu_handler    = menu_handler_rgbmode,
-        .child.display_handler = display_handler_rgbmode,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "RGB Hue",
-        .child.menu_handler    = menu_handler_rgbhue,
-        .child.display_handler = display_handler_rgbhue,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "RGB Saturation",
-        .child.menu_handler    = menu_handler_rgbsat,
-        .child.display_handler = display_handler_rgbsat,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "RGB Value",
-        .child.menu_handler    = menu_handler_rgbval,
-        .child.display_handler = display_handler_rgbval,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "RGB Speed",
-        .child.menu_handler    = menu_handler_rgbspeed,
-        .child.display_handler = display_handler_rgbspeed,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Layer Indication",
-        .child.menu_handler    = menu_handler_rgb_layer,
-        .child.display_handler = display_handler_rgb_layer,
-    },
+    MENU_ENTRY_CHILD("RGB Enabled", rgbenabled),
+    MENU_ENTRY_CHILD("RGB Mode", rgbmode),
+    MENU_ENTRY_CHILD("RGB Hue", rgbhue),
+    MENU_ENTRY_CHILD("RGB Saturation", rgbsat),
+    MENU_ENTRY_CHILD("RGB Value", rgbval),
+    MENU_ENTRY_CHILD("RGB Speed", rgbspeed),
+    MENU_ENTRY_CHILD("Layer Indication", rgb_layer),
 };
 #endif // RGBLIGHT_ENABLE
 
@@ -807,18 +708,8 @@ void display_handler_bl_level(char *text_buffer, size_t buffer_len) {
 }
 
 menu_entry_t backlight_entries[] = {
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Backlight Enabled",
-        .child.menu_handler    = menu_handler_bl_enabled,
-        .child.display_handler = display_handler_bl_enabled,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Backlight Level",
-        .child.menu_handler    = menu_handler_bl_level,
-        .child.display_handler = display_handler_bl_level,
-    },
+    MENU_ENTRY_CHILD("Backlight Enabled", bl_enabled),
+    MENU_ENTRY_CHILD("Backlight Level", bl_level),
 };
 #endif // BACKLIGHT_ENABLE
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -910,36 +801,11 @@ void display_handler_gaming_song_enabled(char *text_buffer, size_t buffer_len) {
 }
 
 menu_entry_t audio_entries[] = {
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Audio Enabled",
-        .child.menu_handler    = menu_handler_audio_enabled,
-        .child.display_handler = display_handler_audio_enabled,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Music Mode Enabled",
-        .child.menu_handler    = menu_handler_music_enabled,
-        .child.display_handler = display_handler_music_enabled,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Clicky Enabled",
-        .child.menu_handler    = menu_handler_audio_clicky_enabled,
-        .child.display_handler = display_handler_audio_clicky_enabled,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Clicky Frequency",
-        .child.menu_handler    = menu_handler_audio_clicky_freq,
-        .child.display_handler = display_handler_audio_clicky_freq,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Gaming Song Enabled",
-        .child.menu_handler    = menu_handler_gaming_song_enabled,
-        .child.display_handler = display_handler_gaming_song_enabled,
-    },
+    MENU_ENTRY_CHILD("Audio Enabled", audio_enabled),
+    MENU_ENTRY_CHILD("Music Mode Enabled", music_enabled),
+    MENU_ENTRY_CHILD("Clicky Enabled", audio_clicky_enabled),
+    MENU_ENTRY_CHILD("Clicky Frequency", audio_clicky_freq),
+    MENU_ENTRY_CHILD("Gaming Song Enabled", gaming_song_enabled),
 };
 #endif // AUDIO_ENABLE
 
@@ -1098,51 +964,16 @@ void display_handler_haptic_love_intensity(char *text_buffer, size_t buffer_len)
 #    endif // HAPTIC_DRV2605L
 
 menu_entry_t haptic_entries[] = {
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Enabled",
-        .child.menu_handler    = menu_handler_haptic_enabled,
-        .child.display_handler = display_handler_haptic_enabled,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Mode",
-        .child.menu_handler    = menu_handler_haptic_mode,
-        .child.display_handler = display_handler_haptic_mode,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Feedback Mode",
-        .child.menu_handler    = menu_handler_feedback_mode,
-        .child.display_handler = display_handler_feedback_mode,
-    },
+    MENU_ENTRY_CHILD("Haptic Enabled", haptic_enabled),
+    MENU_ENTRY_CHILD("Haptic Mode", haptic_mode),
+    MENU_ENTRY_CHILD("Feedback Mode", feedback_mode),
 #    ifdef HAPTIC_SOLENOID
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Buzz",
-        .child.menu_handler    = menu_handler_haptic_buzz,
-        .child.display_handler = display_handler_haptic_buzz,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Dwell",
-        .child.menu_handler    = menu_handler_haptic_dwell,
-        .child.display_handler = display_handler_haptic_dwell,
-    },
+    MENU_ENTRY_CHILD("Buzz", haptic_buzz),
+    MENU_ENTRY_CHILD("Dwell", haptic_dwell),
 #    endif // HAPTIC_SOLENOID
 #    ifdef HAPTIC_DRV2605L
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Continuous",
-        .child.menu_handler    = menu_handler_haptic_love_mode,
-        .child.display_handler = display_handler_haptic_love_mode,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Continuous Amplitude",
-        .child.menu_handler    = menu_handler_haptic_love_intensity,
-        .child.display_handler = display_handler_haptic_love_intensity,
-    },
+    MENU_ENTRY_CHILD("Continuous", haptic_love_mode),
+    MENU_ENTRY_CHILD("Continuous Amplitude", haptic_love_intensity),
 #    endif // HAPTIC_DRV2605L
 };
 #endif // HAPTIC_ENABLE
@@ -1321,71 +1152,21 @@ void display_handler_mouse_accel_limit(char *text_buffer, size_t buffer_len) {
 }
 
 menu_entry_t pointing_acceleration_entries[] = {
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Acceleration",
-        .child.menu_handler    = menu_handler_mouse_accel_toggle,
-        .child.display_handler = display_handler_mouse_accel_toggle,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Takeoff",
-        .child.menu_handler    = menu_handler_mouse_accel_takeoff,
-        .child.display_handler = display_handler_mouse_accel_takeoff,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Growth Rate",
-        .child.menu_handler    = menu_handler_mouse_accel_growth_rate,
-        .child.display_handler = display_handler_mouse_accel_growth_rate,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Offset",
-        .child.menu_handler    = menu_handler_mouse_accel_offset,
-        .child.display_handler = display_handler_mouse_accel_offset,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Limit",
-        .child.menu_handler    = menu_handler_mouse_accel_limit,
-        .child.display_handler = display_handler_mouse_accel_limit,
-    },
+    MENU_ENTRY_CHILD("Acceleration", mouse_accel_toggle),
+    MENU_ENTRY_CHILD("Takeoff", mouse_accel_takeoff),
+    MENU_ENTRY_CHILD("Growth Rate", mouse_accel_growth_rate),
+    MENU_ENTRY_CHILD("Offset", mouse_accel_offset),
+    MENU_ENTRY_CHILD("Limit", mouse_accel_limit),
 };
 
 menu_entry_t pointing_entries[] = {
 #    if defined(KEYBOARD_handwired_tractyl_manuform) || defined(KEYBOARD_bastardkb_charybdis)
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "DPI Config",
-        .child.menu_handler    = menu_handler_dpi_config,
-        .child.display_handler = display_handler_dpi_config,
-    },
-#    endif
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Auto Mouse Enable",
-        .child.menu_handler    = menu_handler_auto_mouse_enable,
-        .child.display_handler = display_handler_auto_mouse_enable,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Auto Mouse Layer",
-        .child.menu_handler    = menu_handler_auto_mouse_layer,
-        .child.display_handler = display_handler_auto_mouse_layer,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Mouse Jiggler",
-        .child.menu_handler    = menu_handler_mouse_jiggler,
-        .child.display_handler = display_handler_mouse_jiggler,
-    },
-    {
-        .flags              = menu_flag_is_parent,
-        .text               = "Mouse Acceleration",
-        .parent.children    = pointing_acceleration_entries,
-        .parent.child_count = ARRAY_SIZE(pointing_acceleration_entries),
-    },
+    MENU_ENTRY_CHILD("DPI Config", dpi_config),
+#    endif // KEYBOARD_handwired_tractyl_manuform || KEYBOARD_bastardkb_charybdis
+    MENU_ENTRY_CHILD("Auto Mouse Enable", auto_mouse_enable),
+    MENU_ENTRY_CHILD("Auto Mouse Layer", auto_mouse_layer),
+    MENU_ENTRY_CHILD("Mouse Jiggler", mouse_jiggler),
+    MENU_ENTRY_PARENT("Mouse Acceleration", pointing_acceleration_entries),
 };
 #endif // POINTING_DEVICE_ENABLE
 
@@ -1549,60 +1330,12 @@ void display_handler_keycode_autocorrect(char *text_buffer, size_t buffer_len) {
 }
 
 menu_entry_t keymap_config_entries[] = {
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Control <-> Capslock",
-        .child.menu_handler    = menu_handler_keycode_ctrl_caps,
-        .child.display_handler = display_handler_keycode_ctrl_caps,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Alt <-> GUI",
-        .child.menu_handler    = menu_handler_keycode_alt_gui,
-        .child.display_handler = display_handler_keycode_alt_gui,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Control <-> GUI",
-        .child.menu_handler    = menu_handler_keycode_ctrl_gui,
-        .child.display_handler = display_handler_keycode_ctrl_gui,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Disable GUI",
-        .child.menu_handler    = menu_handler_keycode_disable_gui,
-        .child.display_handler = display_handler_keycode_disable_gui,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "N-Key Roll Over",
-        .child.menu_handler    = menu_handler_keycode_nkro,
-        .child.display_handler = display_handler_keycode_nkro,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Oneshot Keys",
-        .child.menu_handler    = menu_handler_keycode_oneshot,
-        .child.display_handler = display_handler_keycode_oneshot,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Autocorrect",
-        .child.menu_handler    = menu_handler_keycode_autocorrect,
-        .child.display_handler = display_handler_keycode_autocorrect,
-    },
-    // {
-    //     .flags                 = menu_flag_is_value,
-    //     .text                  = "Grave <-> Escape",
-    //     .child.menu_handler    = menu_handler_keycode_grave_esc,
-    //     .child.display_handler = display_handler_keycode_grave_esc,
-    // },
-    // {
-    //     .flags                 = menu_flag_is_value,
-    //     .text                  = "Backslash <-> Backspace",
-    //     .child.menu_handler    = menu_handler_keycode_bslash_bspc,
-    //     .child.display_handler = display_handler_keycode_bslash_bspc,
-    // },
+    MENU_ENTRY_CHILD("Control <-> Capslock", keycode_ctrl_caps), MENU_ENTRY_CHILD("Alt <-> GUI", keycode_alt_gui),
+    MENU_ENTRY_CHILD("Control <-> GUI", keycode_ctrl_gui),       MENU_ENTRY_CHILD("Disable GUI", keycode_disable_gui),
+    MENU_ENTRY_CHILD("N-Key Roll Over", keycode_nkro),           MENU_ENTRY_CHILD("Oneshot Keys", keycode_oneshot),
+    MENU_ENTRY_CHILD("Autocorrect", keycode_autocorrect),
+    // MENU_ENTRY_CHILD("Grave <-> Escape", keycode_grave_esc),
+    // MENU_ENTRY_CHILD("Backslash <-> Backspace", keycode_bslash_bspc),
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1793,55 +1526,14 @@ static bool menu_handler_rtc_dst(menu_input_t input) {
 }
 
 menu_entry_t rtc_config_entries[] = {
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Year",
-        .child.menu_handler    = menu_handler_rtc_year,
-        .child.display_handler = display_handler_rtc_year,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Month",
-        .child.menu_handler    = menu_handler_rtc_month,
-        .child.display_handler = display_handler_rtc_month,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Date",
-        .child.menu_handler    = menu_handler_rtc_date,
-        .child.display_handler = display_handler_rtc_date,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Hour",
-        .child.menu_handler    = menu_handler_rtc_hour,
-        .child.display_handler = display_handler_rtc_hour,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Minute",
-        .child.menu_handler    = menu_handler_rtc_minute,
-        .child.display_handler = display_handler_rtc_minute,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Second",
-        .child.menu_handler    = menu_handler_rtc_second,
-        .child.display_handler = display_handler_rtc_second,
-
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "12/24 Hour Format",
-        .child.menu_handler    = menu_handler_rtc_hour_format,
-        .child.display_handler = display_handler_rtc_hour_format,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "DST",
-        .child.menu_handler    = menu_handler_rtc_dst,
-        .child.display_handler = display_handler_rtc_dst,
-    },
+    MENU_ENTRY_CHILD("Year", rtc_year),
+    MENU_ENTRY_CHILD("Month", rtc_month),
+    MENU_ENTRY_CHILD("Date", rtc_date),
+    MENU_ENTRY_CHILD("Hour", rtc_hour),
+    MENU_ENTRY_CHILD("Minute", rtc_minute),
+    MENU_ENTRY_CHILD("Second", rtc_second),
+    MENU_ENTRY_CHILD("12/24 Hour Format", rtc_hour_format),
+    MENU_ENTRY_CHILD("DST", rtc_dst),
 };
 #endif // RTC_ENABLE
 
@@ -1929,36 +1621,9 @@ void display_handler_scan_rate(char *text_buffer, size_t buffer_len) {
 }
 
 menu_entry_t user_settings_option_entries[] = {
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Overwatch Mode",
-        .child.menu_handler    = menu_handler_overwatch_mode,
-        .child.display_handler = display_handler_overwatch_mode,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Gamepad 1<->2 Swap",
-        .child.menu_handler    = menu_handler_gamepad_swap,
-        .child.display_handler = display_handler_gamepad_swap,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "SOCD Cleaner",
-        .child.menu_handler    = menu_handler_clap_trap,
-        .child.display_handler = display_handler_clap_trap,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "I2C Scanner",
-        .child.menu_handler    = menu_handler_i2c_scanner,
-        .child.display_handler = display_handler_i2c_scanner,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Matrix Scan Rate Print",
-        .child.menu_handler    = menu_handler_scan_rate,
-        .child.display_handler = display_handler_scan_rate,
-    },
+    MENU_ENTRY_CHILD("Overwatch Mode", overwatch_mode),    MENU_ENTRY_CHILD("Gamepad 1<->2 Swap", gamepad_swap),
+    MENU_ENTRY_CHILD("SOCD Cleaner", clap_trap),           MENU_ENTRY_CHILD("I2C Scanner", i2c_scanner),
+    MENU_ENTRY_CHILD("Matrix Scan Rate Print", scan_rate),
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2025,51 +1690,14 @@ void display_handler_mouse_debugging(char *text_buffer, size_t buffer_len) {
 }
 
 menu_entry_t debug_entries[] = {
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Debugging",
-        .child.menu_handler    = menu_handler_debugging_enable,
-        .child.display_handler = display_handler_debugging_enable,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Keyboard Debugging",
-        .child.menu_handler    = menu_handler_keyboard_debugging,
-        .child.display_handler = display_handler_keyboard_debugging,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Matrix Debugging",
-        .child.menu_handler    = menu_handler_matrix_debugging,
-        .child.display_handler = display_handler_matrix_debugging,
-    },
-    {
-        .flags                 = menu_flag_is_value,
-        .text                  = "Mouse Debugging",
-        .child.menu_handler    = menu_handler_mouse_debugging,
-        .child.display_handler = display_handler_mouse_debugging,
-    },
+    MENU_ENTRY_CHILD("Debugging", debugging_enable),
+    MENU_ENTRY_CHILD("Keyboard Debugging", keyboard_debugging),
+    MENU_ENTRY_CHILD("Matrix Debugging", matrix_debugging),
+    MENU_ENTRY_CHILD("Mouse Debugging", mouse_debugging),
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Root menu
-
-// for whenever I figure out how to make this work:
-// [__COUNTER__] =
-//     {
-//         .flags                 = menu_flag_is_parent | menu_flag_is_value,
-//         .text                  = "Display Option",
-//         .parent.children       = display_option_entries,
-//         .parent.child_count    = ARRAY_SIZE(display_option_entries),
-//         .child.menu_handler    = menu_handler_display,
-//         .child.display_handler = display_handler_display,
-//     },
-
-#define MENU_ENTRY_PARENT(display_text, child)                  \
-    [__COUNTER__] = {.flags              = menu_flag_is_parent, \
-                     .text               = display_text,        \
-                     .parent.children    = child,               \
-                     .parent.child_count = ARRAY_SIZE(child)}
 
 menu_entry_t root_entries[] = {
     MENU_ENTRY_PARENT("Display Option", display_option_entries),
@@ -2345,6 +1973,12 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
                                          truncate_text(child->text, render_width, font_oled, false, true), 0, 0, 0,
                                          hsv.secondary.h, hsv.secondary.s, hsv.secondary.v);
             } else {
+                if ((i == scroll_offset && scroll_offset > 0) ||
+                    (i == scroll_offset + visible_entries &&
+                     scroll_offset + visible_entries + 1 < menu->parent.child_count)) {
+                    qp_drawtext_recolor(display, start_x + 1, y, font_oled, "+", hsv.primary.h, hsv.primary.s,
+                                        hsv.primary.v, 0, 255, 0);
+                }
                 x += qp_drawtext_recolor(display, x, y, font_oled,
                                          truncate_text(child->text, render_width, font_oled, false, true),
                                          hsv.primary.h, hsv.primary.s, hsv.primary.v, 0, 255, 0);

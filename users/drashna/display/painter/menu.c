@@ -1922,7 +1922,7 @@ bool process_record_menu(uint16_t keycode, keyrecord_t *record) {
 extern painter_font_handle_t font_thintel, font_mono, font_oled;
 bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, uint16_t width, uint16_t height) {
     static menu_state_t last_state;
-    static uint8_t      scroll_offset = 0;
+    uint8_t             scroll_offset = 0;
 
     if (memcmp(&last_state, &user_runtime_state.menu_state, sizeof(menu_state_t)) == 0) {
         return user_runtime_state.menu_state.is_in_menu;

@@ -90,6 +90,7 @@ void render_frame(painter_device_t _display) {
     qp_line(_display, 186, 122, 186, 171, hsv.h, hsv.s, hsv.v);
 
     qp_line(_display, 2, 171, width - 3, 171, hsv.h, hsv.s, hsv.v);
+    qp_line(_display, 2, 292, width - 3, 292, hsv.h, hsv.s, hsv.v);
 
     // frame bottom
     qp_drawimage_recolor(_display, 1, height - frame_bottom->height, frame_bottom, hsv.h, hsv.s, hsv.v, 0, 0, 0);
@@ -800,12 +801,12 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 #endif // RTC_ENABLE
 
         static bool force_full_block_redraw = false;
-        ypos -= SURFACE_MENU_HEIGHT + 4;
+        ypos                                = 172;
         if (render_menu(menu_surface, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT)) {
             force_full_block_redraw = true;
         } else {
             bool     block_redraw = false;
-            uint16_t surface_ypos = 0;
+            uint16_t surface_ypos = 2, surface_xpos = 3;
 
             static uint8_t last_display_mode = 0xFF;
             if (last_display_mode != userspace_config.painter.display_mode) {
@@ -815,29 +816,23 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
             if (force_full_block_redraw) {
                 qp_rect(menu_surface, 0, 0, SURFACE_MENU_WIDTH - 1, SURFACE_MENU_HEIGHT - 1, 0, 0, 0, true);
-                // qp_line(menu_surface, 0, 0, SURFACE_MENU_WIDTH - 1, 0, curr_hsv.primary.h, curr_hsv.primary.s,
-                //         curr_hsv.primary.v);
-                qp_line(menu_surface, 0, SURFACE_MENU_HEIGHT - 1, SURFACE_MENU_WIDTH - 1, SURFACE_MENU_HEIGHT - 1,
-                        curr_hsv.primary.h, curr_hsv.primary.s, curr_hsv.primary.v);
                 force_full_block_redraw = false;
                 block_redraw            = true;
             }
 
-            surface_ypos += 3;
-            xpos = 3;
             switch (userspace_config.painter.display_mode) {
                 case 0:
                     if (hue_redraw || block_redraw || console_log_needs_redraw) {
                         static uint16_t max_line_width = 0;
                         for (uint8_t i = DISPLAY_CONSOLE_LOG_LINE_START; i < DISPLAY_CONSOLE_LOG_LINE_NUM; i++) {
-                            xpos = 5;
-                            xpos += qp_drawtext_recolor(menu_surface, xpos, surface_ypos, font_oled, logline_ptrs[i],
-                                                        curr_hsv.primary.h, curr_hsv.primary.s, curr_hsv.primary.v, 0,
-                                                        0, 0);
-                            if (max_line_width < xpos) {
-                                max_line_width = xpos;
+                            surface_xpos = 2;
+                            surface_xpos += qp_drawtext_recolor(menu_surface, surface_xpos, surface_ypos, font_oled,
+                                                                logline_ptrs[i], curr_hsv.primary.h, curr_hsv.primary.s,
+                                                                curr_hsv.primary.v, 0, 0, 0);
+                            if (max_line_width < surface_xpos) {
+                                max_line_width = surface_xpos;
                             }
-                            qp_rect(menu_surface, xpos, surface_ypos, max_line_width,
+                            qp_rect(menu_surface, surface_xpos, surface_ypos, max_line_width,
                                     surface_ypos + font_oled->line_height, 0, 0, 0, true);
                             surface_ypos += font_oled->line_height + 4;
                         }
@@ -852,7 +847,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                         surface_ypos += font_oled->line_height + 4;
                         uint16_t temp_ypos = surface_ypos;
                         for (uint8_t y = 0; y < LAYER_MAP_ROWS; y++) {
-                            xpos = 20;
+                            surface_xpos = 20;
                             for (uint8_t x = 0; x < LAYER_MAP_COLS; x++) {
                                 uint16_t keycode = extract_basic_keycode(layer_map[y][x], NULL, false);
                                 wchar_t  code[2] = {0};
@@ -868,13 +863,13 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                                 if (keycode < ARRAY_SIZE(code_to_name)) {
                                     code[0] = pgm_read_byte(&code_to_name[keycode]);
                                 }
-                                xpos += qp_drawtext_recolor(menu_surface, xpos, temp_ypos, font_oled, (char *)code,
-                                                            curr_hsv.primary.h, curr_hsv.primary.s,
-                                                            peek_matrix_layer_map(y, x) ? 0 : curr_hsv.primary.v,
-                                                            curr_hsv.secondary.h, curr_hsv.secondary.s,
-                                                            peek_matrix_layer_map(y, x) ? curr_hsv.secondary.v : 0);
-                                xpos += qp_drawtext_recolor(menu_surface, xpos, temp_ypos, font_oled, " ", 0, 0, 0, 0,
-                                                            0, 0);
+                                surface_xpos += qp_drawtext_recolor(
+                                    menu_surface, surface_xpos, temp_ypos, font_oled, (char *)code, curr_hsv.primary.h,
+                                    curr_hsv.primary.s, peek_matrix_layer_map(y, x) ? 0 : curr_hsv.primary.v,
+                                    curr_hsv.secondary.h, curr_hsv.secondary.s,
+                                    peek_matrix_layer_map(y, x) ? curr_hsv.secondary.v : 0);
+                                surface_xpos += qp_drawtext_recolor(menu_surface, surface_xpos, temp_ypos, font_oled,
+                                                                    " ", 0, 0, 0, 0, 0, 0);
                             }
                             temp_ypos += font_oled->line_height + 4;
                         }
@@ -885,17 +880,18 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 case 2:
                     if (hue_redraw || block_redraw) {
                         static uint16_t max_font_xpos[3][4] = {0};
-                        render_character_set(menu_surface, &xpos, max_font_xpos[0], &surface_ypos, font_thintel,
+                        render_character_set(menu_surface, &surface_xpos, max_font_xpos[0], &surface_ypos, font_thintel,
                                              curr_hsv.primary.h, curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
-                        render_character_set(menu_surface, &xpos, max_font_xpos[1], &surface_ypos, font_mono,
+                        render_character_set(menu_surface, &surface_xpos, max_font_xpos[1], &surface_ypos, font_mono,
                                              curr_hsv.primary.h, curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
-                        render_character_set(menu_surface, &xpos, max_font_xpos[2], &surface_ypos, font_oled,
+                        render_character_set(menu_surface, &surface_xpos, max_font_xpos[2], &surface_ypos, font_oled,
                                              curr_hsv.primary.h, curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
                     }
                     break;
                 case 3:
                     if (hue_redraw || block_redraw) {
-                        uint16_t surface_xpos = 5, surface_ypos = 5;
+                        surface_xpos = 5;
+                        surface_ypos = 5;
                         snprintf(buf, sizeof(buf), "%s", QMK_BUILDDATE);
                         surface_xpos += qp_drawtext_recolor(menu_surface, surface_xpos, surface_ypos, font_oled,
                                                             "Built on: ", curr_hsv.primary.h, curr_hsv.primary.s,

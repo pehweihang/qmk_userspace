@@ -2003,7 +2003,7 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
             scroll_offset = 0;
         }
 
-        for (uint8_t i = scroll_offset; i < menu->parent.child_count && y < height; ++i) {
+        for (uint8_t i = scroll_offset; i < menu->parent.child_count && i <= (scroll_offset + visible_entries); ++i) {
             menu_entry_t *child = &menu->parent.children[i];
             uint16_t      x     = start_x + 2 + qp_textwidth(font_oled, ">");
             if (child == selected) {

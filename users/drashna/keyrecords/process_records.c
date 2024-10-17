@@ -36,7 +36,7 @@
 
 uint16_t copy_paste_timer;
 
-static void konami_code_handler(void) {
+__attribute__((weak)) void konami_code_handler(void) {
     dprintf("Konami code entered\n");
     wait_ms(50);
     reset_keyboard();

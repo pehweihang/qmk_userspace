@@ -1874,6 +1874,87 @@ bool menu_handle_input(menu_input_t input) {
     }
 }
 
+__attribute__((weak)) bool process_record_menu_user(uint16_t keycode, bool keep_processing) {
+    const bool is_qwerty  = get_highest_layer(default_layer_state) == _QWERTY,
+               is_dvorak  = get_highest_layer(default_layer_state) == _DVORAK,
+               is_colemak = get_highest_layer(default_layer_state) == _COLEMAK ||
+                            get_highest_layer(default_layer_state) == _COLEMAK_DH;
+
+    switch (keycode) {
+        case KC_D:
+            if (is_qwerty) {
+                return menu_handle_input(menu_input_down);
+            }
+            return keep_processing;
+        case KC_E:
+            if (is_qwerty) {
+                return menu_handle_input(menu_input_up);
+            } else if (is_dvorak) {
+                return menu_handle_input(menu_input_down);
+            }
+            return keep_processing;
+        case KC_F:
+            if (is_qwerty) {
+                return menu_handle_input(menu_input_right);
+            } else if (is_colemak) {
+                return menu_handle_input(menu_input_up);
+            }
+            return keep_processing;
+        case KC_O:
+            if (is_dvorak) {
+                return menu_handle_input(menu_input_left);
+            }
+            return keep_processing;
+        case KC_R:
+            if (is_colemak) {
+                return menu_handle_input(menu_input_left);
+            }
+            return keep_processing;
+        case KC_S:
+            if (is_qwerty) {
+                return menu_handle_input(menu_input_left);
+            } else if (is_colemak) {
+                return menu_handle_input(menu_input_down);
+            }
+            return keep_processing;
+        case KC_T:
+            if (is_colemak) {
+                return menu_handle_input(menu_input_right);
+            }
+            return keep_processing;
+        case KC_U:
+            if (is_dvorak) {
+                return menu_handle_input(menu_input_right);
+            }
+            return keep_processing;
+        case KC_DOT:
+            if (is_dvorak) {
+                return menu_handle_input(menu_input_right);
+            }
+            return keep_processing;
+        case DISPLAY_MENU:
+            return menu_handle_input(menu_input_exit);
+        case KC_ESC:
+        case KC_BSPC:
+        case KC_DEL:
+            return menu_handle_input(menu_input_back);
+        case KC_SPACE:
+        case KC_ENTER:
+        case KC_RETURN:
+            return menu_handle_input(menu_input_enter);
+        case KC_UP:
+            return menu_handle_input(menu_input_up);
+        case KC_DOWN:
+            return menu_handle_input(menu_input_down);
+        case KC_LEFT:
+            return menu_handle_input(menu_input_left);
+        case KC_RIGHT:
+            return menu_handle_input(menu_input_right);
+        default:
+            return keep_processing;
+    }
+}
+
 bool process_record_menu(uint16_t keycode, keyrecord_t *record) {
     if (keycode == DISPLAY_MENU && record->event.pressed && !user_runtime_state.menu_state.is_in_menu) {
         user_runtime_state.menu_state.is_in_menu     = true;
@@ -1924,32 +2005,7 @@ bool process_record_menu(uint16_t keycode, keyrecord_t *record) {
     }
     if (user_runtime_state.menu_state.is_in_menu) {
         if (record->event.pressed) {
-            switch (keycode) {
-                case DISPLAY_MENU:
-                    return menu_handle_input(menu_input_exit);
-                case KC_ESC:
-                case KC_BSPC:
-                case KC_DEL:
-                    return menu_handle_input(menu_input_back);
-                case KC_SPACE:
-                case KC_ENTER:
-                case KC_RETURN:
-                    return menu_handle_input(menu_input_enter);
-                case KC_UP:
-                case KC_W:
-                    return menu_handle_input(menu_input_up);
-                case KC_DOWN:
-                case KC_S:
-                    return menu_handle_input(menu_input_down);
-                case KC_LEFT:
-                case KC_A:
-                    return menu_handle_input(menu_input_left);
-                case KC_RIGHT:
-                case KC_D:
-                    return menu_handle_input(menu_input_right);
-                default:
-                    return keep_processing;
-            }
+            return process_record_menu_user(keycode, keep_processing);
         }
         return keep_processing;
     }

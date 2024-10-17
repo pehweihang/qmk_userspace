@@ -69,7 +69,7 @@ void render_frame(painter_device_t _display) {
     qp_line(_display, 1, frame_top->height, 1, height - frame_bottom->height, hsv.h, hsv.s, hsv.v);
     qp_line(_display, width - 2, frame_top->height, width - 2, height - frame_bottom->height, hsv.h, hsv.s, hsv.v);
 
-    if (!is_keyboard_master()) {
+    if (is_keyboard_master()) {
         // lines for pointing device block
         qp_line(_display, 2, 43, 80, 43, hsv.h, hsv.s, hsv.v);
         // horizontal lines
@@ -182,9 +182,10 @@ void ili9341_display_power(bool on) {
 }
 
 __attribute__((weak)) void ili9341_draw_user(void) {
-    bool            hue_redraw = forced_reinit;
-    static uint32_t last_tick  = 0;
-    uint32_t        now        = timer_read32();
+    bool            hue_redraw          = forced_reinit;
+    static bool     screen_saver_redraw = false;
+    static uint32_t last_tick           = 0;
+    uint32_t        now                 = timer_read32();
     if (TIMER_DIFF_32(now, last_tick) < (QUANTUM_PAINTER_TASK_THROTTLE)) {
         return;
     }
@@ -217,50 +218,53 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 #endif
 
     if (last_input_activity_elapsed() > (QUANTUM_PAINTER_DISPLAY_TIMEOUT * 2 / 3)) {
-        xprintf("Display timeout: %ld\n", last_input_activity_elapsed());
-        // static uint8_t display_mode = 0xFF;
-        // if (display_mode != userspace_config.painter.display_logo) {
-        //     display_mode = userspace_config.painter.display_logo;
-        //     switch (userspace_config.painter.display_logo) {
-        // case 0:
-        //     frame = qp_load_image_mem(gfx_samurai_cyberpunk_minimal_dark_8k_b3_240x320);
-        //     break;
-        // case 1:
-        //     frame = qp_load_image_mem(gfx_anime_girl_jacket_240x320);
-        //     break;
-        // case 2:
-        //     frame = qp_load_image_mem(gfx_asuka_240x320);
-        //     break;
-        // case 3:
-        //     frame = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_00_240x320);
-        //     break;
-        // case 4:
-        //     frame = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_01_240x320);
-        //     break;
-        // case 5:
-        //     frame = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_02_240x320);
-        //     break;
-        // case 6:
-        //     frame = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_03_240x320);
-        //     break;
-        // case 7:
-        //     frame = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_04_240x320);
-        //     break;
-        // case 8:
-        //     frame = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_05_240x320);
-        //     break;
-        // case 9:
-        //     frame = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_06_240x320);
-        //     break;
-        //     }
-        //     if (screen_saver != NULL) {
-        //         qp_drawimage(display, 0, 0, screen_saver);
-        //         qp_close_image(screen_saver);
-        //     }
-        forced_reinit = true;
-        // }
+        static uint8_t display_mode = 0xFF;
+        if (display_mode != userspace_config.painter.display_mode || screen_saver_redraw == false) {
+            display_mode        = userspace_config.painter.display_mode;
+            screen_saver_redraw = true;
+            switch (userspace_config.painter.display_logo) {
+                case 0:
+                    screen_saver = qp_load_image_mem(gfx_samurai_cyberpunk_minimal_dark_8k_b3_240x320);
+                    break;
+                case 1:
+                    screen_saver = qp_load_image_mem(gfx_anime_girl_jacket_240x320);
+                    break;
+                case 2:
+                    screen_saver = qp_load_image_mem(gfx_asuka_240x320);
+                    break;
+                case 3:
+                    screen_saver = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_00_240x320);
+                    break;
+                case 4:
+                    screen_saver = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_01_240x320);
+                    break;
+                case 5:
+                    screen_saver = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_02_240x320);
+                    break;
+                case 6:
+                    screen_saver = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_03_240x320);
+                    break;
+                case 7:
+                    screen_saver = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_04_240x320);
+                    break;
+                case 8:
+                    screen_saver = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_05_240x320);
+                    break;
+                case 9:
+                    screen_saver = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_06_240x320);
+                    break;
+            }
+            if (screen_saver != NULL) {
+                qp_drawimage(display, 0, 0, screen_saver);
+                qp_close_image(screen_saver);
+            }
+        }
     } else {
-        if (!is_keyboard_master()) {
+        if (screen_saver_redraw) {
+            hue_redraw          = true;
+            screen_saver_redraw = false;
+        }
+        if (is_keyboard_master()) {
             char     buf[50] = {0};
             uint16_t ypos    = 20;
             uint16_t xpos    = 5;

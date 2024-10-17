@@ -106,18 +106,18 @@ void display_handler_display(char *text_buffer, size_t buffer_len) {
     strncpy(text_buffer, "Unknown", buffer_len);
 }
 
-static bool menu_handler_slave_side_image(menu_input_t input) {
+static bool menu_handler_display_image(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            userspace_config.painter.display_logo = (userspace_config.painter.display_logo - 1) % 11;
-            if (userspace_config.painter.display_logo > 10) {
-                userspace_config.painter.display_logo = 10;
+            userspace_config.painter.display_logo = (userspace_config.painter.display_logo - 1) % 10;
+            if (userspace_config.painter.display_logo > 9) {
+                userspace_config.painter.display_logo = 9;
             }
             eeconfig_update_user_datablock(&userspace_config);
             return false;
         case menu_input_right:
-            userspace_config.painter.display_logo = (userspace_config.painter.display_logo + 1) % 11;
-            if (userspace_config.painter.display_logo > 10) {
+            userspace_config.painter.display_logo = (userspace_config.painter.display_logo + 1) % 10;
+            if (userspace_config.painter.display_logo > 9) {
                 userspace_config.painter.display_logo = 0;
             }
             eeconfig_update_user_datablock(&userspace_config);
@@ -127,7 +127,7 @@ static bool menu_handler_slave_side_image(menu_input_t input) {
     }
 }
 
-void display_handler_slave_side_image(char *text_buffer, size_t buffer_len) {
+void display_handler_display_image(char *text_buffer, size_t buffer_len) {
     switch (userspace_config.painter.display_logo) {
         case 0:
             strncpy(text_buffer, "Samurai", buffer_len - 1);
@@ -158,9 +158,6 @@ void display_handler_slave_side_image(char *text_buffer, size_t buffer_len) {
             return;
         case 9:
             strncpy(text_buffer, "Eva Unit 06", buffer_len - 1);
-            return;
-        case 10:
-            strncpy(text_buffer, "Console", buffer_len - 1);
             return;
     }
 
@@ -341,7 +338,7 @@ void display_handler_display_val_secondary(char *text_buffer, size_t buffer_len)
 
 menu_entry_t display_option_entries[] = {
     MENU_ENTRY_CHILD("Display Option", display),
-    MENU_ENTRY_CHILD("Image", slave_side_image),
+    MENU_ENTRY_CHILD("Image", display_image),
     MENU_ENTRY_CHILD("Rotation", display_rotation),
     MENU_ENTRY_CHILD("Inverted", display_inverted),
     MENU_ENTRY_CHILD("Primary Hue", display_hue_primary),

@@ -34,7 +34,7 @@ extern bool keylogger_has_changed;
 #    if defined(OLED_ENABLE) && !defined(QUANTUM_PAINTER_ENABLE)
 #        define DISPLAY_CONSOLE_LOG_LINE_NUM 4
 #    else // OLED_ENABLE && !QUANTUM_PAINTER_ENABLE
-#        define DISPLAY_CONSOLE_LOG_LINE_NUM 26
+#        define DISPLAY_CONSOLE_LOG_LINE_NUM 24
 #    endif // OLED_ENABLE && !QUANTUM_PAINTER_ENABLE
 #endif
 #if DISPLAY_CONSOLE_LOG_LINE_NUM > 10

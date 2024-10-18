@@ -130,12 +130,10 @@ void init_display_ili9341_rotation(void) {
     init_display_ili9341_inversion();
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Initial render of frame/logo
+    frame_top    = qp_load_image_mem(gfx_frame_top);
+    frame_bottom = qp_load_image_mem(gfx_frame_bottom);
+    render_frame(display);
 
-    if (is_keyboard_master()) {
-        frame_top    = qp_load_image_mem(gfx_frame_top);
-        frame_bottom = qp_load_image_mem(gfx_frame_bottom);
-        render_frame(display);
-    }
     qp_power(display, true);
     qp_flush(display);
     if (has_run) {

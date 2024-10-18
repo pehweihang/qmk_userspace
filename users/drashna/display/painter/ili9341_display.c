@@ -272,7 +272,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
     }
 #    endif
 #endif
-    if (last_input_activity_elapsed() > (QUANTUM_PAINTER_DISPLAY_TIMEOUT * 2 / 3)) {
+    if (last_input_activity_elapsed() > (QUANTUM_PAINTER_DISPLAY_TIMEOUT * 2 / 3) &&
+        last_input_activity_elapsed() < 4000000000) {
         if (!screen_saver_redraw) {
             dprintf("Screen saver: %lu\n", last_input_activity_elapsed());
         }

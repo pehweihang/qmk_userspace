@@ -265,17 +265,18 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             qp_rect(display, 0, 0, width - 1, height - 1, 0, 0, 0, true);
             render_frame(display);
         }
+        if (hue_redraw) {
+            qp_rect(display, width - mouse_icon->width - 6, 5, width - 6, 5 + mouse_icon->height - 1, 0, 0, 0, true);
+            qp_drawimage_recolor(display, width - mouse_icon->width - 6, 5, mouse_icon,
+                                 is_keyboard_master() ? curr_hsv.secondary.h : curr_hsv.primary.h,
+                                 is_keyboard_master() ? curr_hsv.secondary.s : curr_hsv.primary.s,
+                                 is_keyboard_master() ? curr_hsv.secondary.v : curr_hsv.primary.v, 0, 0, 0);
+        }
+
         if (is_keyboard_master()) {
             char     buf[50] = {0};
             uint16_t ypos    = 20;
             uint16_t xpos    = 5;
-
-            if (hue_redraw) {
-                qp_rect(display, width - mouse_icon->width - 6, 5, width - 6, 5 + mouse_icon->height - 1, 0, 0, 0,
-                        true);
-                qp_drawimage_recolor(display, width - mouse_icon->width - 6, 5, mouse_icon, curr_hsv.primary.h,
-                                     curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
-            }
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Matrix Scan rate
@@ -997,12 +998,6 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             if (!is_transport_connected()) {
                 return;
             }
-            if (hue_redraw) {
-                qp_rect(display, width - mouse_icon->width - 6, 5, width - 6, 5 + mouse_icon->height - 1, 0, 0, 0,
-                        true);
-                qp_drawimage_recolor(display, width - mouse_icon->width - 6, 5, mouse_icon, curr_hsv.primary.h,
-                                     curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
-            }
             uint16_t    ypos                    = 172;
             static bool force_full_block_redraw = false;
             if (render_menu(menu_surface, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT)) {
@@ -1031,7 +1026,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         }
 
 #endif // SPLIT_KEYBOARD
-        forced_reinit = false;
+        forced_reinit       = false;
         screen_saver_redraw = false;
     }
     qp_flush(display);

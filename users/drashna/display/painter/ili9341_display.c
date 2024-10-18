@@ -92,6 +92,23 @@ void render_rtc_time(painter_device_t device, painter_font_handle_t font, uint16
 #endif // RTC_ENABLE
 }
 
+void painter_render_console(painter_device_t device, painter_font_handle_t font, uint16_t x, uint16_t y,
+                            bool force_redraw, hsv_t *hsv, uint8_t start, uint8_t end) {
+    static uint16_t max_line_width = 0;
+    if (console_log_needs_redraw || force_redraw) {
+        for (uint8_t i = start; i < end; i++) {
+            uint16_t xpos =
+                x + qp_drawtext_recolor(device, x, y, font, logline_ptrs[i], hsv->h, hsv->s, hsv->v, 0, 0, 0);
+            if (max_line_width < xpos) {
+                max_line_width = xpos;
+            }
+            qp_rect(device, xpos, y, max_line_width, y + font->line_height, 0, 0, 0, true);
+            y += font->line_height + 4;
+        }
+        console_log_needs_redraw = false;
+    }
+}
+
 /**
  * @brief Draws the initial frame on the screen
  *
@@ -899,22 +916,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
                 switch (userspace_config.painter.display_mode) {
                     case 0:
-                        if (hue_redraw || block_redraw || console_log_needs_redraw) {
-                            static uint16_t max_line_width = 0;
-                            for (uint8_t i = DISPLAY_CONSOLE_LOG_LINE_START; i < DISPLAY_CONSOLE_LOG_LINE_NUM; i++) {
-                                surface_xpos = 2;
-                                surface_xpos += qp_drawtext_recolor(menu_surface, surface_xpos, surface_ypos, font_oled,
-                                                                    logline_ptrs[i], curr_hsv.primary.h,
-                                                                    curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
-                                if (max_line_width < surface_xpos) {
-                                    max_line_width = surface_xpos;
-                                }
-                                qp_rect(menu_surface, surface_xpos, surface_ypos, max_line_width,
-                                        surface_ypos + font_oled->line_height, 0, 0, 0, true);
-                                surface_ypos += font_oled->line_height + 4;
-                            }
-                            console_log_needs_redraw = false;
-                        }
+                        painter_render_console(menu_surface, font_oled, 2, surface_ypos, hue_redraw || block_redraw,
+                                               &curr_hsv.primary, DISPLAY_CONSOLE_LOG_LINE_START,
+                                               DISPLAY_CONSOLE_LOG_LINE_NUM);
                         break;
                     case 1:
                         //  Layer Map render
@@ -1020,22 +1024,11 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             } else {
                 ypos = 19;
                 if (force_full_block_redraw) {
-                    qp_rect(display, 2, 19, width - 3, 291, 0, 0, 0, true);
+                    qp_rect(display, 2, ypos, width - 3, 291, 0, 0, 0, true);
                 }
-                if (hue_redraw || console_log_needs_redraw || force_full_block_redraw) {
-                    for (uint8_t i = 0; i < (DISPLAY_CONSOLE_LOG_LINE_NUM - 1); i++) {
-                        static uint16_t max_line_width = 0;
-                        uint16_t        xpos           = 5;
-                        xpos += qp_drawtext_recolor(display, xpos, ypos, font_oled, logline_ptrs[i], curr_hsv.primary.h,
-                                                    curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
-                        if (max_line_width < xpos) {
-                            max_line_width = xpos;
-                        }
-                        qp_rect(display, xpos, ypos, max_line_width, ypos + font_oled->line_height, 0, 0, 0, true);
-                        ypos += font_oled->line_height + 4;
-                    }
-                    force_full_block_redraw = console_log_needs_redraw = false;
-                }
+                painter_render_console(display, font_oled, 2, ypos, hue_redraw || force_full_block_redraw,
+                                       &curr_hsv.primary, 0, (DISPLAY_CONSOLE_LOG_LINE_NUM - 1));
+                force_full_block_redraw = false;
             }
             ypos = height - (16 + font_oled->line_height);
             render_rtc_time(display, font_oled, 5, ypos, width, hue_redraw, &curr_hsv.primary);

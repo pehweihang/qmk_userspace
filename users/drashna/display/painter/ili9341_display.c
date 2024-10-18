@@ -13,6 +13,7 @@
 #include "display/painter/painter.h"
 #include "display/painter/ili9341_display.h"
 #include "display/painter/menu.h"
+#include "lib/lib8tion/lib8tion.h"
 #ifdef SPLIT_KEYBOARD
 #    include "split_util.h"
 #endif // SPLIT_KEYBOARD
@@ -237,6 +238,27 @@ void ili9341_display_power(bool on) {
     qp_power(display, on);
 }
 
+__attribute__((weak)) bool screen_saver_sanity_checks(void) {
+    static uint32_t last_tick = 0;
+    uint32_t        now       = last_input_activity_elapsed();
+    uint32_t        diff      = abs8(now - last_tick);
+    last_tick                 = now;
+    // if the last activity has been more than 45 days ago... doubt. Likely corruption.
+    if (now > 4000000000) {
+        return false;
+    }
+    // if the difference between the last tick and this one is more than 10 times the throttle, doubt.
+    if (diff > ((QUANTUM_PAINTER_TASK_THROTTLE) * 10)) {
+        return false;
+    }
+    // if last activity has been been a third of the timeout, believe.
+    if (now > ((QUANTUM_PAINTER_DISPLAY_TIMEOUT) / 3)) {
+        return true;
+    }
+
+    return false;
+}
+
 __attribute__((weak)) void ili9341_draw_user(void) {
     bool            hue_redraw          = forced_reinit;
     static bool     screen_saver_redraw = false;
@@ -272,8 +294,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
     }
 #    endif
 #endif
-    if (last_input_activity_elapsed() > (QUANTUM_PAINTER_DISPLAY_TIMEOUT * 2 / 3) &&
-        last_input_activity_elapsed() < 4000000000) {
+    if (screen_saver_sanity_checks()) {
         if (!screen_saver_redraw) {
             dprintf("Screen saver: %lu\n", last_input_activity_elapsed());
         }

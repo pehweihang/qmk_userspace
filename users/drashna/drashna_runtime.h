@@ -40,7 +40,7 @@ typedef union PACKED {
             bool matrix_scan_print  : 1;
         } debug;
         struct {
-            bool  enable_acceleration : 1;
+            bool  enable_acceleration     : 1;
             bool  auto_mouse_layer_enable : 1;
             float growth_rate;
             float offset;

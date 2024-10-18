@@ -261,8 +261,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         }
     } else {
         if (screen_saver_redraw) {
-            hue_redraw          = true;
-            screen_saver_redraw = false;
+            hue_redraw = true;
+            qp_rect(display, 0, 0, width - 1, height - 1, 0, 0, 0, true);
+            render_frame(display);
         }
         if (is_keyboard_master()) {
             char     buf[50] = {0};
@@ -270,7 +271,6 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             uint16_t xpos    = 5;
 
             if (hue_redraw) {
-                render_frame(display);
                 qp_rect(display, width - mouse_icon->width - 6, 5, width - 6, 5 + mouse_icon->height - 1, 0, 0, 0,
                         true);
                 qp_drawimage_recolor(display, width - mouse_icon->width - 6, 5, mouse_icon, curr_hsv.primary.h,
@@ -870,7 +870,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                     force_full_block_redraw = true;
                 }
 
-                if (force_full_block_redraw) {
+                if (force_full_block_redraw || screen_saver_redraw) {
                     qp_rect(menu_surface, 0, 0, SURFACE_MENU_WIDTH - 1, SURFACE_MENU_HEIGHT - 1, 0, 0, 0, true);
                     force_full_block_redraw = false;
                     block_redraw            = true;
@@ -992,13 +992,12 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 return;
             }
             if (hue_redraw) {
-                render_frame(display);
                 qp_rect(display, width - mouse_icon->width - 6, 5, width - 6, 5 + mouse_icon->height - 1, 0, 0, 0,
                         true);
                 qp_drawimage_recolor(display, width - mouse_icon->width - 6, 5, mouse_icon, curr_hsv.primary.h,
                                      curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
             }
-            if (hue_redraw || console_log_needs_redraw || forced_reinit) {
+            if (hue_redraw || console_log_needs_redraw) {
                 uint16_t ypos = 20;
                 for (uint8_t i = 0; i < DISPLAY_CONSOLE_LOG_LINE_NUM; i++) {
                     static uint16_t max_line_width = 0;
@@ -1017,6 +1016,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
 #endif // SPLIT_KEYBOARD
         forced_reinit = false;
+        screen_saver_redraw = false;
     }
     qp_flush(display);
     last_tick = now;

@@ -48,7 +48,11 @@ _Static_assert(sizeof(user_runtime_config_t) <= RPC_M2S_BUFFER_SIZE,
 void user_runtime_state_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
                              uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
     if (initiator2target_buffer_size == sizeof(user_runtime_state)) {
+        bool dirty = user_runtime_state.menu_state.dirty;
         memcpy(&user_runtime_state, initiator2target_buffer, initiator2target_buffer_size);
+        if (dirty) {
+            user_runtime_state.menu_state.dirty = true;
+        }
         static bool suspend_state = false;
         if (user_runtime_state.internals.is_device_suspended != suspend_state) {
             suspend_state = user_runtime_state.internals.is_device_suspended;

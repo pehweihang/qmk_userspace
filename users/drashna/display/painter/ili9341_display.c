@@ -995,20 +995,30 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 qp_drawimage_recolor(display, width - mouse_icon->width - 6, 5, mouse_icon, curr_hsv.primary.h,
                                      curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
             }
-            if (hue_redraw || console_log_needs_redraw) {
-                uint16_t ypos = 20;
-                for (uint8_t i = 0; i < DISPLAY_CONSOLE_LOG_LINE_NUM; i++) {
-                    static uint16_t max_line_width = 0;
-                    uint16_t        xpos           = 5;
-                    xpos += qp_drawtext_recolor(display, xpos, ypos, font_oled, logline_ptrs[i], curr_hsv.primary.h,
-                                                curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
-                    if (max_line_width < xpos) {
-                        max_line_width = xpos;
-                    }
-                    qp_rect(display, xpos, ypos, max_line_width, ypos + font_oled->line_height, 0, 0, 0, true);
-                    ypos += font_oled->line_height + 4;
+            uint16_t    ypos                    = 172;
+            static bool force_full_block_redraw = false;
+            if (render_menu(menu_surface, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT)) {
+                force_full_block_redraw = true;
+                qp_surface_draw(menu_surface, display, 2, ypos, false);
+            } else {
+                ypos = 20;
+                if (force_full_block_redraw) {
+                    qp_rect(display, 2, 19, width - 3, height - 14, 0, 0, 0, true);
                 }
-                console_log_needs_redraw = false;
+                if (hue_redraw || console_log_needs_redraw || force_full_block_redraw) {
+                    for (uint8_t i = 0; i < DISPLAY_CONSOLE_LOG_LINE_NUM; i++) {
+                        static uint16_t max_line_width = 0;
+                        uint16_t        xpos           = 5;
+                        xpos += qp_drawtext_recolor(display, xpos, ypos, font_oled, logline_ptrs[i], curr_hsv.primary.h,
+                                                    curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
+                        if (max_line_width < xpos) {
+                            max_line_width = xpos;
+                        }
+                        qp_rect(display, xpos, ypos, max_line_width, ypos + font_oled->line_height, 0, 0, 0, true);
+                        ypos += font_oled->line_height + 4;
+                    }
+                    force_full_block_redraw = console_log_needs_redraw = false;
+                }
             }
         }
 

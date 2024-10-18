@@ -214,8 +214,10 @@ __attribute__((weak)) void ili9341_draw_user(void) {
     }
 #    endif
 #endif
-
     if (last_input_activity_elapsed() > (QUANTUM_PAINTER_DISPLAY_TIMEOUT * 2 / 3)) {
+        if (!screen_saver_redraw) {
+            dprintf("Screen saver: %lu\n", last_input_activity_elapsed());
+        }
         static uint8_t display_mode = 0xFF;
         if (display_mode != userspace_config.painter.display_mode || screen_saver_redraw == false) {
             display_mode        = userspace_config.painter.display_mode;
@@ -856,9 +858,15 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
             static bool force_full_block_redraw = false;
             ypos                                = 172;
-            if (render_menu(menu_surface, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT)) {
+#if !defined(SPLIT_KEYBOARD)
+            if (render_menu(menu_surface, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT) *) {
                 force_full_block_redraw = true;
-            } else {
+            } else
+#else
+            // force set the dirty flag to false since we aren't actually rendering the menu on this side.
+            user_runtime_state.menu_state.dirty = false;
+#endif
+            {
                 bool     block_redraw = false;
                 uint16_t surface_ypos = 2, surface_xpos = 3;
 

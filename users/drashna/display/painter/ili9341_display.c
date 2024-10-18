@@ -52,6 +52,46 @@ painter_image_handle_t screen_saver;
 
 uint8_t     menu_buffer[SURFACE_REQUIRED_BUFFER_BYTE_SIZE(SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT, 16)];
 static bool has_run = false, forced_reinit = false;
+
+/**
+ * @brief Renders RTC Time to display
+ *
+ * @param device screen to render to
+ * @param font font to use
+ * @param x x position to start rendering
+ * @param y y position to start rendering
+ * @param display_width maximum width for rendering
+ * @param force_redraw do we need to redraw regardless of time
+ * @param hsv hsv value to render with
+ */
+void render_rtc_time(painter_device_t device, painter_font_handle_t font, uint16_t x, uint16_t y,
+                     uint16_t display_width, bool force_redraw, hsv_t *hsv) {
+#ifdef RTC_ENABLE
+    static uint16_t rtc_timer  = 0;
+    bool            rtc_redraw = false;
+    if (timer_elapsed(rtc_timer) > 125 && rtc_is_connected()) {
+        rtc_timer  = timer_read();
+        rtc_redraw = true;
+    }
+    if (force_redraw || rtc_redraw) {
+        char buf[40] = {0};
+        if (rtc_is_connected()) {
+            snprintf(buf, sizeof(buf), "RTC Date/Time: %s", rtc_read_date_time_str());
+        } else {
+            snprintf(buf, sizeof(buf), "RTC Device Not Connected");
+        }
+
+        uint8_t title_width = qp_textwidth(font_oled, buf);
+        if (title_width > (display_width - 6)) {
+            title_width = display_width - 6;
+        }
+        uint8_t title_xpos = (display_width - title_width) / 2;
+
+        qp_drawtext_recolor(display, title_xpos, y, font_oled, buf, hsv->h, hsv->s, hsv->v, 0, 0, 0);
+    }
+#endif // RTC_ENABLE
+}
+
 /**
  * @brief Draws the initial frame on the screen
  *
@@ -92,8 +132,9 @@ void render_frame(painter_device_t _display) {
         qp_line(_display, 186, 122, 186, 171, hsv.h, hsv.s, hsv.v);
 
         qp_line(_display, 2, 171, width - 3, 171, hsv.h, hsv.s, hsv.v);
-        qp_line(_display, 2, 292, width - 3, 292, hsv.h, hsv.s, hsv.v);
     }
+    // line above rtc
+    qp_line(_display, 2, 292, width - 3, 292, hsv.h, hsv.s, hsv.v);
     // frame bottom
     qp_drawimage_recolor(_display, 1, height - frame_bottom->height, frame_bottom, hsv.h, hsv.s, hsv.v, 0, 0, 0);
 
@@ -811,36 +852,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             // RTC
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            ypos -= (font_oled->line_height + 3);
+            ypos -= (font_oled->line_height + 4);
 #ifdef RTC_ENABLE
-            static uint16_t rtc_timer  = 0;
-            bool            rtc_redraw = false;
-            if (timer_elapsed(rtc_timer) > 125 && rtc_is_connected()) {
-                rtc_timer  = timer_read();
-                rtc_redraw = true;
-            }
-            if (hue_redraw || rtc_redraw) {
-                static uint16_t max_rtc_xpos = 0;
-                xpos                         = 5;
-                if (rtc_is_connected()) {
-                    snprintf(buf, sizeof(buf), "RTC Date/Time: %s", rtc_read_date_time_str());
-                } else {
-                    snprintf(buf, sizeof(buf), "RTC Device Not Connected");
-                }
-
-                uint8_t title_width = qp_textwidth(font_oled, buf);
-                if (title_width > (width - 6)) {
-                    title_width = width - 6;
-                }
-                uint8_t title_xpos = (width - title_width) / 2;
-
-                xpos += qp_drawtext_recolor(display, title_xpos, ypos, font_oled, buf, curr_hsv.primary.h,
-                                            curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
-                if (max_rtc_xpos < xpos) {
-                    max_rtc_xpos = xpos;
-                }
-                qp_rect(display, xpos, ypos, max_rtc_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
-            }
+            render_rtc_time(display, font_oled, 5, ypos, width, hue_redraw, &curr_hsv.primary);
 #else
             if (hue_redraw) {
                 snprintf(buf, sizeof(buf), "Built on: %s", QMK_BUILDDATE);
@@ -1004,12 +1018,12 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 force_full_block_redraw = true;
                 qp_surface_draw(menu_surface, display, 2, ypos, false);
             } else {
-                ypos = 20;
+                ypos = 19;
                 if (force_full_block_redraw) {
-                    qp_rect(display, 2, 19, width - 3, height - 14, 0, 0, 0, true);
+                    qp_rect(display, 2, 19, width - 3, 291, 0, 0, 0, true);
                 }
                 if (hue_redraw || console_log_needs_redraw || force_full_block_redraw) {
-                    for (uint8_t i = 0; i < DISPLAY_CONSOLE_LOG_LINE_NUM; i++) {
+                    for (uint8_t i = 0; i < (DISPLAY_CONSOLE_LOG_LINE_NUM - 1); i++) {
                         static uint16_t max_line_width = 0;
                         uint16_t        xpos           = 5;
                         xpos += qp_drawtext_recolor(display, xpos, ypos, font_oled, logline_ptrs[i], curr_hsv.primary.h,
@@ -1023,6 +1037,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                     force_full_block_redraw = console_log_needs_redraw = false;
                 }
             }
+            ypos = height - (16 + font_oled->line_height);
+            render_rtc_time(display, font_oled, 5, ypos, width, hue_redraw, &curr_hsv.primary);
         }
 
 #endif // SPLIT_KEYBOARD

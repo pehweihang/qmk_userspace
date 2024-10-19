@@ -293,6 +293,10 @@ __attribute__((weak)) bool screen_saver_sanity_checks(void) {
     if (now > 4000000000) {
         return false;
     }
+    // if time since firmware start has been less than 10 seconds, doubt.
+    if (timer_elapsed32(0) < 10000) {
+        return false;
+    }
     // if the difference between the last tick and this one is more than 10 times the throttle, doubt.
     if (diff > ((QUANTUM_PAINTER_TASK_THROTTLE) * 10)) {
         return false;

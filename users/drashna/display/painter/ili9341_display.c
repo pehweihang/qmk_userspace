@@ -320,8 +320,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         hue_redraw = true;
     }
     const uint8_t disabled_val = curr_hsv.primary.v / 2;
-    uint16_t width;
-    uint16_t height;
+    uint16_t      width;
+    uint16_t      height;
     qp_get_geometry(display, &width, &height, NULL, NULL, NULL);
 
 #if defined(RGB_MATRIX_ENABLE) || defined(RGBLIGHT_ENABLE)
@@ -390,12 +390,27 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             qp_rect(display, 0, 0, width - 1, height - 1, 0, 0, 0, true);
             render_frame(display);
         }
-        if (hue_redraw) {
+        bool transport_icon_redraw = false;
+#ifdef SPLIT_KEYBOARD
+        static bool transport_connected = true;
+        if (transport_connected != is_transport_connected()) {
+            transport_connected   = is_transport_connected();
+            transport_icon_redraw = true;
+        }
+#endif
+        if (hue_redraw || transport_icon_redraw) {
             qp_rect(display, width - mouse_icon->width - 6, 5, width - 6, 5 + mouse_icon->height - 1, 0, 0, 0, true);
             qp_drawimage_recolor(display, width - mouse_icon->width - 6, 5, mouse_icon,
                                  is_keyboard_master() ? curr_hsv.secondary.h : curr_hsv.primary.h,
                                  is_keyboard_master() ? curr_hsv.secondary.s : curr_hsv.primary.s,
-                                 is_keyboard_master() ? curr_hsv.secondary.v : curr_hsv.primary.v, 0, 0, 0);
+#ifdef SPLIT_KEYBOARD
+                                 is_transport_connected()
+                                     ? is_keyboard_master() ? curr_hsv.secondary.v : curr_hsv.primary.v
+                                     : disabled_val,
+#else
+                                 curr_hsv.secondary.v,
+#endif
+                                 0, 0, 0);
         }
         char     buf[50] = {0};
         uint16_t ypos    = 20;

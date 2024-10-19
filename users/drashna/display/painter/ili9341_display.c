@@ -110,6 +110,50 @@ void painter_render_console(painter_device_t device, painter_font_handle_t font,
     }
 }
 
+void painter_render_scan_rate(painter_device_t device, painter_font_handle_t font, uint16_t x, uint16_t y,
+                              bool force_redraw, dual_hsv_t *curr_hsv) {
+    static uint32_t last_scan_rate = 0;
+    static char     buf[6]         = {0};
+    if (last_scan_rate != get_matrix_scan_rate() || force_redraw) {
+        last_scan_rate = get_matrix_scan_rate();
+        x += qp_drawtext_recolor(device, x, y, font, "SCANS: ", curr_hsv->primary.h, curr_hsv->primary.s,
+                                 curr_hsv->primary.v, 0, 0, 0);
+        snprintf(buf, sizeof(buf), "%5lu", get_matrix_scan_rate());
+        qp_drawtext_recolor(device, x, y, font, buf, curr_hsv->secondary.h, curr_hsv->secondary.s,
+                            curr_hsv->secondary.v, 0, 0, 0);
+    }
+}
+
+/**
+ * @brief Render the current wpm count to the display
+ *
+ * @param device
+ * @param font
+ * @param x
+ * @param y
+ * @param force_redraw
+ * @param curr_hsv
+ */
+void painter_render_wpm(painter_device_t device, painter_font_handle_t font, uint16_t x, uint16_t y, bool force_redraw,
+                        dual_hsv_t *curr_hsv) {
+#ifdef WPM_ENABLE
+    static uint32_t last_wpm_update = 0;
+    static char     buf[4]          = {0};
+    bool            wpm_redraw      = false;
+    if (timer_elapsed32(last_wpm_update) > 250) {
+        last_wpm_update = timer_read32();
+        wpm_redraw      = true;
+    }
+    if (wpm_redraw || force_redraw) {
+        x += qp_drawtext_recolor(device, x, y, font, "WPM:     ", curr_hsv->primary.h, curr_hsv->primary.s,
+                                 curr_hsv->primary.v, 0, 0, 0);
+        snprintf(buf, sizeof(buf), "%3u", get_current_wpm());
+        qp_drawtext_recolor(device, x, y, font, buf, curr_hsv->secondary.h, curr_hsv->secondary.s,
+                            curr_hsv->secondary.v, 0, 0, 0);
+    }
+#endif // WPM_ENABLE
+}
+
 /**
  * @brief Draws the initial frame on the screen
  *
@@ -127,13 +171,16 @@ void render_frame(painter_device_t _display) {
     qp_line(_display, 1, frame_top->height, 1, height - frame_bottom->height, hsv.h, hsv.s, hsv.v);
     qp_line(_display, width - 2, frame_top->height, width - 2, height - frame_bottom->height, hsv.h, hsv.s, hsv.v);
 
-    if (is_keyboard_master()) {
-        // lines for pointing device block
-        qp_line(_display, 2, 43, 80, 43, hsv.h, hsv.s, hsv.v);
-        // horizontal lines
-        qp_line(_display, 80, 16, 80, 106, hsv.h, hsv.s, hsv.v);
-        qp_line(_display, 208, 16, 208, 54, hsv.h, hsv.s, hsv.v);
+    // lines for pointing device block
+    qp_line(_display, 2, 43, 80, 43, hsv.h, hsv.s, hsv.v);
+    // horizontal lines
+    qp_line(_display, 80, 16, 80, 43, hsv.h, hsv.s, hsv.v);
 
+    if (is_keyboard_master()) {
+        // caps lock horizontal line
+        qp_line(_display, 208, 16, 208, 54, hsv.h, hsv.s, hsv.v);
+        // line under rgb matrix
+        qp_line(_display, 80, 43, 80, 106, hsv.h, hsv.s, hsv.v);
         // line for keyboard config
         qp_line(_display, 80, 54, width - 3, 54, hsv.h, hsv.s, hsv.v);
 
@@ -148,9 +195,8 @@ void render_frame(painter_device_t _display) {
         qp_line(_display, 2, 122, width - 3, 122, hsv.h, hsv.s, hsv.v);
         qp_line(_display, 121, 122, 121, 171, hsv.h, hsv.s, hsv.v);
         qp_line(_display, 186, 122, 186, 171, hsv.h, hsv.s, hsv.v);
-
-        qp_line(_display, 2, 171, width - 3, 171, hsv.h, hsv.s, hsv.v);
     }
+    qp_line(_display, 2, 171, width - 3, 171, hsv.h, hsv.s, hsv.v);
     // line above rtc
     qp_line(_display, 2, 292, width - 3, 292, hsv.h, hsv.s, hsv.v);
     // frame bottom
@@ -274,7 +320,6 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         hue_redraw = true;
     }
     const uint8_t disabled_val = curr_hsv.primary.v / 2;
-
     uint16_t width;
     uint16_t height;
     qp_get_geometry(display, &width, &height, NULL, NULL, NULL);
@@ -352,49 +397,17 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                                  is_keyboard_master() ? curr_hsv.secondary.s : curr_hsv.primary.s,
                                  is_keyboard_master() ? curr_hsv.secondary.v : curr_hsv.primary.v, 0, 0, 0);
         }
+        char     buf[50] = {0};
+        uint16_t ypos    = 20;
+        uint16_t xpos    = 5;
 
-        if (is_keyboard_master()) {
-            char     buf[50] = {0};
-            uint16_t ypos    = 20;
-            uint16_t xpos    = 5;
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Matrix Scan rate
-
-            static uint32_t last_scan_update = 0;
-            if (hue_redraw || last_scan_update != get_matrix_scan_rate()) {
-                last_scan_update = get_matrix_scan_rate();
-                xpos += qp_drawtext_recolor(display, xpos, ypos, font_oled, "SCANS: ", curr_hsv.primary.h,
-                                            curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
-                snprintf(buf, sizeof(buf), "%5lu", last_scan_update);
-                qp_drawtext_recolor(display, xpos, ypos, font_oled, buf, curr_hsv.secondary.h, curr_hsv.secondary.s,
-                                    curr_hsv.secondary.v, 0, 0, 0);
-            }
-            ypos += font_oled->line_height + 4;
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //  WPM
-
+        painter_render_scan_rate(display, font_oled, xpos, ypos, hue_redraw, &curr_hsv);
+        ypos += font_oled->line_height + 4;
 #ifdef WPM_ENABLE
-            bool            wpm_redraw      = false;
-            static uint32_t last_wpm_update = 0;
-            if (timer_elapsed32(last_wpm_update) > 250) {
-                last_wpm_update = timer_read32();
-                wpm_redraw      = true;
-            }
-            if (hue_redraw || wpm_redraw) {
-                uint16_t xpos = 5;
-                xpos += qp_drawtext_recolor(display, xpos, ypos, font_oled, "WPM: ", curr_hsv.primary.h,
-                                            curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
-                snprintf(buf, sizeof(buf), "    %3u", get_current_wpm());
-                qp_drawtext_recolor(display, xpos, ypos, font_oled, buf, curr_hsv.secondary.h, curr_hsv.secondary.s,
-                                    curr_hsv.secondary.v, 0, 0, 0);
-            }
+        painter_render_wpm(display, font_oled, 5, ypos, hue_redraw, &curr_hsv);
 #endif // WPM_ENABLE
 
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // RGB Matrix Settings
-
+        if (is_keyboard_master()) {
             ypos = 20;
 #if defined(RGB_MATRIX_ENABLE)
             if (hue_redraw || rgb_redraw) {
@@ -913,7 +926,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             static bool force_full_block_redraw = false;
             ypos                                = 172;
 #if !defined(SPLIT_KEYBOARD)
-            if (render_menu(menu_surface, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT) *) {
+            if (render_menu(menu_surface, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT)) {
                 force_full_block_redraw = true;
             } else
 #else
@@ -1032,29 +1045,29 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                         break;
                 }
             }
-            qp_surface_draw(menu_surface, display, 2, ypos, false);
 #ifdef SPLIT_KEYBOARD
         } else {
             if (!is_transport_connected()) {
                 return;
             }
-            uint16_t    ypos                    = 172;
             static bool force_full_block_redraw = false;
             if (render_menu(menu_surface, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT)) {
                 force_full_block_redraw = true;
-                qp_surface_draw(menu_surface, display, 2, ypos, false);
             } else {
-                ypos = 19;
+                ypos = 3;
                 if (force_full_block_redraw) {
-                    qp_rect(display, 2, ypos, width - 3, 291, 0, 0, 0, true);
+                    qp_rect(menu_surface, 0, 0, SURFACE_MENU_WIDTH - 1, SURFACE_MENU_HEIGHT - 1, 0, 0, 0, true);
                 }
-                painter_render_console(display, font_oled, 2, ypos, hue_redraw || force_full_block_redraw,
-                                       &curr_hsv.primary, 0, (DISPLAY_CONSOLE_LOG_LINE_NUM - 1));
+                painter_render_console(menu_surface, font_oled, 2, ypos,
+                                       hue_redraw || force_full_block_redraw || screen_saver_redraw, &curr_hsv.primary,
+                                       DISPLAY_CONSOLE_LOG_LINE_START, DISPLAY_CONSOLE_LOG_LINE_NUM);
+
                 force_full_block_redraw = false;
             }
             ypos = height - (16 + font_oled->line_height);
             render_rtc_time(display, font_oled, 5, ypos, width, hue_redraw, &curr_hsv.primary);
         }
+        qp_surface_draw(menu_surface, display, 2, 172, screen_saver_redraw);
 
 #endif // SPLIT_KEYBOARD
         forced_reinit       = false;

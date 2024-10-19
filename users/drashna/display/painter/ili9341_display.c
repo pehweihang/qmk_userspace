@@ -1075,7 +1075,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 force_full_block_redraw = true;
             } else {
                 ypos = 3;
-                if (force_full_block_redraw) {
+                if (force_full_block_redraw || screen_saver_redraw) {
                     qp_rect(menu_surface, 0, 0, SURFACE_MENU_WIDTH - 1, SURFACE_MENU_HEIGHT - 1, 0, 0, 0, true);
                 }
                 painter_render_console(menu_surface, font_oled, 2, ypos,

@@ -1062,10 +1062,11 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             }
 #ifdef SPLIT_KEYBOARD
         } else {
+            static bool force_full_block_redraw = false;
             if (!is_transport_connected()) {
+                force_full_block_redraw = true;
                 return;
             }
-            static bool force_full_block_redraw = false;
             if (render_menu(menu_surface, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT)) {
                 force_full_block_redraw = true;
             } else {

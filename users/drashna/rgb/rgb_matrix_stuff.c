@@ -67,9 +67,9 @@ void keyboard_post_init_rgb_matrix(void) {
     }
 #endif // RGB_MATRIX_FRAMEBUFFER_EFFECTS
     if (userspace_config.rgb.layer_change) {
-        rgb_matrix_set_flags(LED_FLAG_UNDERGLOW | LED_FLAG_KEYLIGHT | LED_FLAG_INDICATOR);
+        rgb_matrix_set_flags_noeeprom(LED_FLAG_UNDERGLOW | LED_FLAG_KEYLIGHT | LED_FLAG_INDICATOR);
     } else {
-        rgb_matrix_set_flags(LED_FLAG_ALL);
+        rgb_matrix_set_flags_noeeprom(LED_FLAG_ALL);
     }
 }
 

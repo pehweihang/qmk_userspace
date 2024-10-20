@@ -88,11 +88,23 @@ void render_rtc_time(painter_device_t device, painter_font_handle_t font, uint16
         }
         uint8_t title_xpos = (display_width - title_width) / 2;
 
-        qp_drawtext_recolor(display, title_xpos, y, font_oled, buf, hsv->h, hsv->s, hsv->v, 0, 0, 0);
+        qp_drawtext_recolor(device, title_xpos, y, font_oled, buf, hsv->h, hsv->s, hsv->v, 0, 0, 0);
     }
 #endif // RTC_ENABLE
 }
 
+/**
+ * @brief Render the console log to the display
+ *
+ * @param device device to render to
+ * @param font font to render with
+ * @param x x position to start rendering
+ * @param y y position to start rendering
+ * @param force_redraw do we forcibly redraw the console log
+ * @param hsv colors to render with
+ * @param start start line to render
+ * @param end last line to render
+ */
 void painter_render_console(painter_device_t device, painter_font_handle_t font, uint16_t x, uint16_t y,
                             bool force_redraw, hsv_t *hsv, uint8_t start, uint8_t end) {
     static uint16_t max_line_width = 0;
@@ -109,13 +121,23 @@ void painter_render_console(painter_device_t device, painter_font_handle_t font,
         console_log_needs_redraw = false;
     }
 }
+/**
+ * @brief Render the pointing device to the display
+ *
+ * @param device device to render to
+ * @param font font to render with
+ * @param x x position to start rendering
+ * @param y y position to start rendering
+ * @param force_redraw do we forcibly redraw the pointing device
+ * @param curr_hsv painter colors
+ */
 
 void painter_render_scan_rate(painter_device_t device, painter_font_handle_t font, uint16_t x, uint16_t y,
                               bool force_redraw, dual_hsv_t *curr_hsv) {
     static uint32_t last_scan_rate = 0;
-    static char     buf[6]         = {0};
     if (last_scan_rate != get_matrix_scan_rate() || force_redraw) {
         last_scan_rate = get_matrix_scan_rate();
+        char buf[6]    = {0};
         x += qp_drawtext_recolor(device, x, y, font, "SCANS: ", curr_hsv->primary.h, curr_hsv->primary.s,
                                  curr_hsv->primary.v, 0, 0, 0);
         snprintf(buf, sizeof(buf), "%5lu", get_matrix_scan_rate());
@@ -124,30 +146,57 @@ void painter_render_scan_rate(painter_device_t device, painter_font_handle_t fon
     }
 }
 
+/**
+ * @brief Render the RGB Mode and HSV to the display, with a fancy swatch for the HSV color
+ *
+ * @param device device to render to
+ * @param font font to render with
+ * @param x x position to start rendering
+ * @param y y position to start rendering
+ * @param force_redraw do we forcibly redraw the RGB config
+ * @param curr_hsv painter colors
+ * @param get_rgb_mode
+ * @param get_rgb_hsv
+ * @param matrix
+ */
 void painter_render_rgb(painter_device_t device, painter_font_handle_t font, uint16_t x, uint16_t y, bool force_redraw,
                         dual_hsv_t *curr_hsv, const char *(*get_rgb_mode)(void), hsv_t (*get_rgb_hsv)(void),
                         bool        matrix) {
 #if defined(RGB_MATRIX_ENABLE) || defined(RGBLIGHT_ENABLE)
-    char  buf[22] = {0};
-    hsv_t rgb_hsv = get_rgb_hsv();
-    qp_drawtext_recolor(device, x, y, font, matrix ? "RGB Matrix Config:" : "RGB Light Config:", curr_hsv->primary.h,
-                        curr_hsv->primary.s, curr_hsv->primary.v, 0, 0, 0);
-    y += font->line_height + 4;
-    snprintf(buf, sizeof(buf), "%21s", truncate_text(get_rgb_mode(), 125, font, false, false));
-    qp_drawtext_recolor(device, x + 125 - qp_textwidth(font, buf), y, font, buf, curr_hsv->secondary.h,
-                        curr_hsv->secondary.s, curr_hsv->secondary.v, 0, 0, 0);
+    char buf[22] = {0};
+    if (force_redraw) {
+        hsv_t rgb_hsv = get_rgb_hsv();
+        qp_drawtext_recolor(device, x, y, font,
+                            matrix ? "RGB Matrix Config:" : "RGB Light Config:", curr_hsv->primary.h,
+                            curr_hsv->primary.s, curr_hsv->primary.v, 0, 0, 0);
+        y += font->line_height + 4;
+        snprintf(buf, sizeof(buf), "%21s", truncate_text(get_rgb_mode(), 125, font, false, false));
+        qp_drawtext_recolor(device, x + 125 - qp_textwidth(font, buf), y, font, buf, curr_hsv->secondary.h,
+                            curr_hsv->secondary.s, curr_hsv->secondary.v, 0, 0, 0);
 
-    y += font->line_height + 4;
-    x += qp_drawtext_recolor(device, x, y, font, "HSV: ", curr_hsv->primary.h, curr_hsv->primary.s, curr_hsv->primary.v,
-                             0, 0, 0);
-    snprintf(buf, sizeof(buf), "%3d, %3d, %3d", rgb_hsv.h, rgb_hsv.s, rgb_hsv.v);
-    qp_drawtext_recolor(device, x, y, font, buf, curr_hsv->secondary.h, curr_hsv->secondary.s, curr_hsv->secondary.v, 0,
-                        0, 0);
-    qp_rect(device, 197, 43, 207, 53, rgb_hsv.h, rgb_hsv.s,
-            (uint8_t)(rgb_hsv.v * 0xFF / (matrix ? RGB_MATRIX_MAXIMUM_BRIGHTNESS : RGBLIGHT_LIMIT_VAL)), true);
+        y += font->line_height + 4;
+        x += qp_drawtext_recolor(device, x, y, font, "HSV: ", curr_hsv->primary.h, curr_hsv->primary.s,
+                                 curr_hsv->primary.v, 0, 0, 0);
+        snprintf(buf, sizeof(buf), "%3d, %3d, %3d", rgb_hsv.h, rgb_hsv.s, rgb_hsv.v);
+        qp_drawtext_recolor(device, x, y, font, buf, curr_hsv->secondary.h, curr_hsv->secondary.s,
+                            curr_hsv->secondary.v, 0, 0, 0);
+        qp_rect(device, 197, 43, 207, 53, rgb_hsv.h, rgb_hsv.s,
+                (uint8_t)(rgb_hsv.v * 0xFF / (matrix ? RGB_MATRIX_MAXIMUM_BRIGHTNESS : RGBLIGHT_LIMIT_VAL)), true);
+    }
 #endif // defined(RGB_MATRIX_ENABLE)
 }
 
+/**
+ * @brief Render the Caps Lock, Scroll Lock and Num Lock states to the display
+ *
+ * @param device device to render to
+ * @param font font to draw with
+ * @param x x position to start rendering
+ * @param y y position to start rendering
+ * @param force_redraw do we forcible redraw the lock states
+ * @param curr_hsv painter hsv values
+ * @param disabled_val disabled entry render value
+ */
 void painter_render_lock_state(painter_device_t device, painter_font_handle_t font, uint16_t x, uint16_t y,
                                bool force_redraw, dual_hsv_t *curr_hsv, uint8_t disabled_val) {
     static led_t last_led_state = {0};
@@ -184,12 +233,8 @@ void painter_render_wpm(painter_device_t device, painter_font_handle_t font, uin
 #ifdef WPM_ENABLE
     static uint32_t last_wpm_update = 0;
     static char     buf[4]          = {0};
-    bool            wpm_redraw      = false;
-    if (timer_elapsed32(last_wpm_update) > 250) {
-        last_wpm_update = timer_read32();
-        wpm_redraw      = true;
-    }
-    if (wpm_redraw || force_redraw) {
+    if (force_redraw || last_wpm_update != get_current_wpm()) {
+        last_wpm_update = get_current_wpm();
         x += qp_drawtext_recolor(device, x, y, font, "WPM:     ", curr_hsv->primary.h, curr_hsv->primary.s,
                                  curr_hsv->primary.v, 0, 0, 0);
         snprintf(buf, sizeof(buf), "%3u", get_current_wpm());
@@ -204,53 +249,53 @@ void painter_render_wpm(painter_device_t device, painter_font_handle_t font, uin
  *
  * @param display
  */
-void render_frame(painter_device_t _display) {
+void render_frame(painter_device_t device) {
     uint16_t width;
     uint16_t height;
-    qp_get_geometry(_display, &width, &height, NULL, NULL, NULL);
+    qp_get_geometry(device, &width, &height, NULL, NULL, NULL);
 
     HSV hsv = painter_get_hsv(true);
     // frame top
-    qp_drawimage_recolor(_display, 1, 2, frame_top, hsv.h, hsv.s, hsv.v, 0, 0, 0);
+    qp_drawimage_recolor(device, 1, 2, frame_top, hsv.h, hsv.s, hsv.v, 0, 0, 0);
     // lines for frame sides
-    qp_line(_display, 1, frame_top->height, 1, height - frame_bottom->height, hsv.h, hsv.s, hsv.v);
-    qp_line(_display, width - 2, frame_top->height, width - 2, height - frame_bottom->height, hsv.h, hsv.s, hsv.v);
+    qp_line(device, 1, frame_top->height, 1, height - frame_bottom->height, hsv.h, hsv.s, hsv.v);
+    qp_line(device, width - 2, frame_top->height, width - 2, height - frame_bottom->height, hsv.h, hsv.s, hsv.v);
 
     // horizontal line below rgb
-    qp_line(_display, 80, 54, width - 3, 54, hsv.h, hsv.s, hsv.v);
+    qp_line(device, 80, 54, width - 3, 54, hsv.h, hsv.s, hsv.v);
 
     // caps lock horizontal line
-    qp_line(_display, 208, 16, 208, 54, hsv.h, hsv.s, hsv.v);
+    qp_line(device, 208, 16, 208, 54, hsv.h, hsv.s, hsv.v);
 
     if (is_keyboard_master()) {
         // vertical lines next to scan rate + wpm + pointing
-        qp_line(_display, 80, 16, 80, 106, hsv.h, hsv.s, hsv.v);
+        qp_line(device, 80, 16, 80, 106, hsv.h, hsv.s, hsv.v);
         // horizontal line below scan rate + wpm
-        qp_line(_display, 2, 43, 80, 43, hsv.h, hsv.s, hsv.v);
+        qp_line(device, 2, 43, 80, 43, hsv.h, hsv.s, hsv.v);
 
         // lines for unicode typing mode and mode
-        qp_line(_display, 80, 80, width - 3, 80, hsv.h, hsv.s, hsv.v);
-        qp_line(_display, 149, 80, 149, 106, hsv.h, hsv.s, hsv.v);
+        qp_line(device, 80, 80, width - 3, 80, hsv.h, hsv.s, hsv.v);
+        qp_line(device, 149, 80, 149, 106, hsv.h, hsv.s, hsv.v);
 
         // lines for mods and OS detection
-        qp_line(_display, 2, 107, width - 3, 107, hsv.h, hsv.s, hsv.v);
-        qp_line(_display, 155, 107, 155, 122, hsv.h, hsv.s, hsv.v);
+        qp_line(device, 2, 107, width - 3, 107, hsv.h, hsv.s, hsv.v);
+        qp_line(device, 155, 107, 155, 122, hsv.h, hsv.s, hsv.v);
         // lines for autocorrect and layers
-        qp_line(_display, 2, 122, width - 3, 122, hsv.h, hsv.s, hsv.v);
-        qp_line(_display, 121, 122, 121, 171, hsv.h, hsv.s, hsv.v);
-        qp_line(_display, 186, 122, 186, 171, hsv.h, hsv.s, hsv.v);
+        qp_line(device, 2, 122, width - 3, 122, hsv.h, hsv.s, hsv.v);
+        qp_line(device, 121, 122, 121, 171, hsv.h, hsv.s, hsv.v);
+        qp_line(device, 186, 122, 186, 171, hsv.h, hsv.s, hsv.v);
     } else {
         // horizontal line below scan rate + wpm
-        qp_line(_display, 2, 43, 80, 43, hsv.h, hsv.s, hsv.v);
+        qp_line(device, 2, 43, 80, 43, hsv.h, hsv.s, hsv.v);
         // vertical line next to pointing device block
-        qp_line(_display, 80, 16, 80, 54, hsv.h, hsv.s, hsv.v);
+        qp_line(device, 80, 16, 80, 54, hsv.h, hsv.s, hsv.v);
     }
     // line above menu block
-    qp_line(_display, 2, 171, width - 3, 171, hsv.h, hsv.s, hsv.v);
+    qp_line(device, 2, 171, width - 3, 171, hsv.h, hsv.s, hsv.v);
     // line above rtc
-    qp_line(_display, 2, 292, width - 3, 292, hsv.h, hsv.s, hsv.v);
+    qp_line(device, 2, 292, width - 3, 292, hsv.h, hsv.s, hsv.v);
     // frame bottom
-    qp_drawimage_recolor(_display, 1, height - frame_bottom->height, frame_bottom, hsv.h, hsv.s, hsv.v, 0, 0, 0);
+    qp_drawimage_recolor(device, 1, height - frame_bottom->height, frame_bottom, hsv.h, hsv.s, hsv.v, 0, 0, 0);
 
     char title[50] = {0};
     snprintf(title, sizeof(title), "%s", PRODUCT);
@@ -259,7 +304,7 @@ void render_frame(painter_device_t _display) {
         title_width = width - 55;
     }
     uint8_t title_xpos = (width - title_width) / 2;
-    qp_drawtext_recolor(_display, title_xpos, 4, font_thintel,
+    qp_drawtext_recolor(device, title_xpos, 4, font_thintel,
                         truncate_text(title, title_width, font_thintel, false, false), 0, 0, 0, hsv.h, hsv.s, hsv.v);
 }
 
@@ -487,8 +532,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // LED Lock indicator(text)
 
-            ypos                        = 24;
-            xpos                        = 212;
+            ypos = 24;
+            xpos = 212;
             painter_render_lock_state(display, font_oled, xpos, ypos, hue_redraw, &curr_hsv, disabled_val);
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

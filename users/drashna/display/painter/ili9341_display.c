@@ -171,18 +171,17 @@ void render_frame(painter_device_t _display) {
     qp_line(_display, 1, frame_top->height, 1, height - frame_bottom->height, hsv.h, hsv.s, hsv.v);
     qp_line(_display, width - 2, frame_top->height, width - 2, height - frame_bottom->height, hsv.h, hsv.s, hsv.v);
 
-    // lines for pointing device block
-    qp_line(_display, 2, 43, 80, 43, hsv.h, hsv.s, hsv.v);
-    // horizontal lines
-    qp_line(_display, 80, 16, 80, 43, hsv.h, hsv.s, hsv.v);
+    // horizontal line below rgb
+    qp_line(_display, 80, 54, width - 3, 54, hsv.h, hsv.s, hsv.v);
+
+    // caps lock horizontal line
+    qp_line(_display, 208, 16, 208, 54, hsv.h, hsv.s, hsv.v);
 
     if (is_keyboard_master()) {
-        // caps lock horizontal line
-        qp_line(_display, 208, 16, 208, 54, hsv.h, hsv.s, hsv.v);
-        // line under rgb matrix
-        qp_line(_display, 80, 43, 80, 106, hsv.h, hsv.s, hsv.v);
-        // line for keyboard config
-        qp_line(_display, 80, 54, width - 3, 54, hsv.h, hsv.s, hsv.v);
+        // vertical lines next to scan rate + wpm + pointing
+        qp_line(_display, 80, 16, 80, 106, hsv.h, hsv.s, hsv.v);
+        // horizontal line below scan rate + wpm
+        qp_line(_display, 2, 43, 80, 43, hsv.h, hsv.s, hsv.v);
 
         // lines for unicode typing mode and mode
         qp_line(_display, 80, 80, width - 3, 80, hsv.h, hsv.s, hsv.v);
@@ -195,7 +194,13 @@ void render_frame(painter_device_t _display) {
         qp_line(_display, 2, 122, width - 3, 122, hsv.h, hsv.s, hsv.v);
         qp_line(_display, 121, 122, 121, 171, hsv.h, hsv.s, hsv.v);
         qp_line(_display, 186, 122, 186, 171, hsv.h, hsv.s, hsv.v);
+    } else {
+        // horizontal line below scan rate + wpm
+        qp_line(_display, 2, 43, 80, 43, hsv.h, hsv.s, hsv.v);
+        // vertical line next to pointing device block
+        qp_line(_display, 80, 16, 80, 54, hsv.h, hsv.s, hsv.v);
     }
+    // line above menu block
     qp_line(_display, 2, 171, width - 3, 171, hsv.h, hsv.s, hsv.v);
     // line above rtc
     qp_line(_display, 2, 292, width - 3, 292, hsv.h, hsv.s, hsv.v);
@@ -451,46 +456,6 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                         (uint8_t)(rgb_matrix_get_val() * 0xFF / RGB_MATRIX_MAXIMUM_BRIGHTNESS), true);
             }
 #endif // RGB_MATRIX_ENABLE
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // RGB Matrix Settings
-
-#if 0
-#    if defined(RGBLIGHT_ENABLE)
-        ypos += font_oled->line_height + 4;
-        if (hue_redraw || rgb_redraw) {
-            static uint16_t max_rgb_xpos = 0;
-            xpos                         = 5;
-            snprintf(buf, sizeof(buf), "RGB Light Mode: %s", rgblight_get_effect_name());
-            snprintf(buf, sizeof(buf), "%s", truncate_text(buf, width - 83 - 20, font_oled, false, false));
-
-            xpos += qp_drawtext_recolor(display, xpos, ypos, font_oled, buf, curr_hsv.primary.h,
-                                        curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
-            if (max_rgb_xpos < xpos) {
-                max_rgb_xpos = xpos;
-            }
-            qp_rect(display, xpos, ypos, max_rgb_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
-
-            ypos += font_oled->line_height + 4;
-            static uint16_t max_hsv_xpos = 0;
-            xpos                         = 5;
-            snprintf(buf, sizeof(buf), "RGB Light HSV: %3d, %3d, %3d", rgblight_get_hue(), rgblight_get_sat(),
-                     rgblight_get_val());
-            xpos += qp_drawtext_recolor(display, xpos, ypos, font_oled, buf, curr_hsv.primary.h,
-                                        curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
-            if (max_hsv_xpos < xpos) {
-                max_hsv_xpos = xpos;
-            }
-            qp_rect(display, xpos, ypos, max_hsv_xpos, ypos + font_oled->line_height, 0, 0, 0, true);
-            qp_rect(display, max_hsv_xpos + 5, ypos, max_hsv_xpos + 25, ypos + font_oled->line_height - 1,
-                    rgblight_get_hue(), rgblight_get_sat(), (uint8_t)(rgblight_get_val() * 0xFF / RGBLIGHT_LIMIT_VAL),
-                    true);
-        } else {
-            // we called ypos inside the function ... to make sure we don't skip a line on future passes ....
-            ypos += font_oled->line_height + 4;
-        }
-#    endif // RGBLIGHT_ENABLE
-#endif
 
             //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // LED Lock indicator(text)
@@ -1071,6 +1036,30 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 force_full_block_redraw = true;
                 return;
             }
+#    if defined(RGBLIGHT_ENABLE)
+            ypos = 20;
+            xpos = 83;
+            if (hue_redraw || rgb_redraw) {
+                qp_drawtext_recolor(display, xpos, ypos, font_oled, "RGB Light Config:", curr_hsv.primary.h,
+                                    curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
+                ypos += font_oled->line_height + 4;
+                snprintf(buf, sizeof(buf), "%21s",
+                         truncate_text(rgblight_get_effect_name(), 208 - 80, font_oled, false, false));
+                xpos += qp_drawtext_recolor(display, 208 - qp_textwidth(font_oled, buf), ypos, font_oled, buf,
+                                            curr_hsv.secondary.h, curr_hsv.secondary.s, curr_hsv.secondary.v, 0, 0, 0);
+
+                xpos = 83;
+                ypos += font_oled->line_height + 4;
+                xpos += qp_drawtext_recolor(display, xpos, ypos, font_oled, "HSV: ", curr_hsv.primary.h,
+                                            curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
+                snprintf(buf, sizeof(buf), "%3d, %3d, %3d", rgblight_get_hue(), rgblight_get_sat(), rgblight_get_val());
+                qp_drawtext_recolor(display, xpos, ypos, font_oled, buf, curr_hsv.secondary.h, curr_hsv.secondary.s,
+                                    curr_hsv.secondary.v, 0, 0, 0);
+                qp_rect(display, 197, 43, 207, 53, rgblight_get_hue(), rgblight_get_sat(),
+                        (uint8_t)(rgblight_get_val() * 0xFF / RGBLIGHT_LIMIT_VAL), true);
+            }
+#    endif // RGBLIGHT_ENABLE
+
             if (render_menu(menu_surface, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT)) {
                 force_full_block_redraw = true;
             } else {

@@ -88,12 +88,6 @@ typedef struct PACKED {
 } sync_layer_t;
 
 typedef struct PACKED {
-    uint32_t matrix_timestamp;
-    uint32_t encoder_timestamp;
-    uint32_t pointing_device_timestamp;
-} sync_activity_t;
-
-typedef struct PACKED {
     struct {
         bool enable        : 1;
         bool clicky_enable : 1;
@@ -114,7 +108,6 @@ typedef struct PACKED {
     sync_layer_t    layers;
     led_t           leds;
     uint8_t         wpm_count;
-    sync_activity_t activity;
     keymap_config_t keymap_config;
     debug_config_t  debug_config;
 } user_runtime_config_t;

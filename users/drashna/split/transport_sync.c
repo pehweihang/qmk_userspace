@@ -174,11 +174,6 @@ void user_transport_update(void) {
 #ifdef WPM_ENABLE
         user_runtime_state.wpm_count = get_current_wpm();
 #endif // WPM_ENABLE
-        user_runtime_state.activity = (sync_activity_t){
-            .matrix_timestamp          = last_matrix_activity_time(),
-            .encoder_timestamp         = last_encoder_activity_time(),
-            .pointing_device_timestamp = last_pointing_device_activity_time(),
-        };
         user_runtime_state.keymap_config = keymap_config;
         user_runtime_state.debug_config  = debug_config;
     } else {
@@ -233,13 +228,6 @@ void user_transport_update(void) {
             set_current_wpm(user_runtime_state.wpm_count);
         }
 #endif // WPM_ENABLE
-        if (last_matrix_activity_time() != user_runtime_state.activity.matrix_timestamp ||
-            last_encoder_activity_time() != user_runtime_state.activity.encoder_timestamp ||
-            last_pointing_device_activity_time() != user_runtime_state.activity.pointing_device_timestamp) {
-            set_activity_timestamps(user_runtime_state.activity.matrix_timestamp,
-                                    user_runtime_state.activity.encoder_timestamp,
-                                    user_runtime_state.activity.pointing_device_timestamp);
-        }
         if (keymap_config.raw != user_runtime_state.keymap_config.raw) {
             keymap_config = user_runtime_state.keymap_config;
         }

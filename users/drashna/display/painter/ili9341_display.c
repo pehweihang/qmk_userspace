@@ -124,6 +124,51 @@ void painter_render_scan_rate(painter_device_t device, painter_font_handle_t fon
     }
 }
 
+void painter_render_rgb(painter_device_t device, painter_font_handle_t font, uint16_t x, uint16_t y, bool force_redraw,
+                        dual_hsv_t *curr_hsv, const char *(*get_rgb_mode)(void), hsv_t (*get_rgb_hsv)(void),
+                        bool        matrix) {
+#if defined(RGB_MATRIX_ENABLE) || defined(RGBLIGHT_ENABLE)
+    char  buf[22] = {0};
+    hsv_t rgb_hsv = get_rgb_hsv();
+    qp_drawtext_recolor(device, x, y, font, matrix ? "RGB Matrix Config:" : "RGB Light Config:", curr_hsv->primary.h,
+                        curr_hsv->primary.s, curr_hsv->primary.v, 0, 0, 0);
+    y += font->line_height + 4;
+    snprintf(buf, sizeof(buf), "%21s", truncate_text(get_rgb_mode(), 125, font, false, false));
+    qp_drawtext_recolor(device, x + 125 - qp_textwidth(font, buf), y, font, buf, curr_hsv->secondary.h,
+                        curr_hsv->secondary.s, curr_hsv->secondary.v, 0, 0, 0);
+
+    y += font->line_height + 4;
+    x += qp_drawtext_recolor(device, x, y, font, "HSV: ", curr_hsv->primary.h, curr_hsv->primary.s, curr_hsv->primary.v,
+                             0, 0, 0);
+    snprintf(buf, sizeof(buf), "%3d, %3d, %3d", rgb_hsv.h, rgb_hsv.s, rgb_hsv.v);
+    qp_drawtext_recolor(device, x, y, font, buf, curr_hsv->secondary.h, curr_hsv->secondary.s, curr_hsv->secondary.v, 0,
+                        0, 0);
+    qp_rect(device, 197, 43, 207, 53, rgb_hsv.h, rgb_hsv.s,
+            (uint8_t)(rgb_hsv.v * 0xFF / (matrix ? RGB_MATRIX_MAXIMUM_BRIGHTNESS : RGBLIGHT_LIMIT_VAL)), true);
+#endif // defined(RGB_MATRIX_ENABLE)
+}
+
+void painter_render_lock_state(painter_device_t device, painter_font_handle_t font, uint16_t x, uint16_t y,
+                               bool force_redraw, dual_hsv_t *curr_hsv, uint8_t disabled_val) {
+    static led_t last_led_state = {0};
+    if (force_redraw || last_led_state.raw != host_keyboard_led_state().raw) {
+        last_led_state.raw = host_keyboard_led_state().raw;
+        qp_drawtext_recolor(device, x, y, font, "CAPS",
+                            last_led_state.caps_lock ? curr_hsv->secondary.h : curr_hsv->primary.h,
+                            last_led_state.caps_lock ? curr_hsv->secondary.s : curr_hsv->primary.s,
+                            last_led_state.caps_lock ? curr_hsv->primary.v : disabled_val, 0, 0, 0);
+        y += font->line_height + 2;
+        qp_drawtext_recolor(device, x, y, font, "SCRL",
+                            last_led_state.scroll_lock ? curr_hsv->secondary.h : curr_hsv->primary.h,
+                            last_led_state.scroll_lock ? curr_hsv->secondary.s : curr_hsv->primary.s,
+                            last_led_state.scroll_lock ? curr_hsv->primary.v : disabled_val, 0, 0, 0);
+        y += font->line_height + 2;
+        qp_drawtext_recolor(device, x, y, font, " NUM",
+                            last_led_state.num_lock ? curr_hsv->secondary.h : curr_hsv->primary.h,
+                            last_led_state.num_lock ? curr_hsv->secondary.s : curr_hsv->primary.s,
+                            last_led_state.num_lock ? curr_hsv->primary.v : disabled_val, 0, 0, 0);
+    }
+}
 /**
  * @brief Render the current wpm count to the display
  *
@@ -433,53 +478,18 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
         if (is_keyboard_master()) {
             ypos = 20;
+            xpos = 83;
 #if defined(RGB_MATRIX_ENABLE)
-            if (hue_redraw || rgb_redraw) {
-                xpos = 83;
-                qp_drawtext_recolor(display, xpos, ypos, font_oled, "RGB Matrix Config:", curr_hsv.primary.h,
-                                    curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
-                ypos += font_oled->line_height + 4;
-                snprintf(buf, sizeof(buf), "%21s",
-                         truncate_text(rgb_matrix_get_effect_name(), 208 - 80, font_oled, false, false));
-                xpos += qp_drawtext_recolor(display, 208 - qp_textwidth(font_oled, buf), ypos, font_oled, buf,
-                                            curr_hsv.secondary.h, curr_hsv.secondary.s, curr_hsv.secondary.v, 0, 0, 0);
-
-                xpos = 83;
-                ypos += font_oled->line_height + 4;
-                xpos += qp_drawtext_recolor(display, xpos, ypos, font_oled, "HSV: ", curr_hsv.primary.h,
-                                            curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
-                snprintf(buf, sizeof(buf), "%3d, %3d, %3d", rgb_matrix_get_hue(), rgb_matrix_get_sat(),
-                         rgb_matrix_get_val());
-                qp_drawtext_recolor(display, xpos, ypos, font_oled, buf, curr_hsv.secondary.h, curr_hsv.secondary.s,
-                                    curr_hsv.secondary.v, 0, 0, 0);
-                qp_rect(display, 197, 43, 207, 53, rgb_matrix_get_hue(), rgb_matrix_get_sat(),
-                        (uint8_t)(rgb_matrix_get_val() * 0xFF / RGB_MATRIX_MAXIMUM_BRIGHTNESS), true);
-            }
+            painter_render_rgb(display, font_oled, xpos, ypos, hue_redraw || rgb_redraw, &curr_hsv,
+                               rgb_matrix_get_effect_name, rgb_matrix_get_hsv, true);
 #endif // RGB_MATRIX_ENABLE
 
             //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // LED Lock indicator(text)
 
             ypos                        = 24;
-            static led_t last_led_state = {0};
-            if (hue_redraw || last_led_state.raw != host_keyboard_led_state().raw) {
-                last_led_state.raw = host_keyboard_led_state().raw;
-                xpos               = width - (qp_textwidth(font_oled, "CAPS") + 4);
-                qp_drawtext_recolor(display, xpos, ypos, font_oled, (const char *)"CAPS",
-                                    last_led_state.caps_lock ? curr_hsv.secondary.h : curr_hsv.primary.h,
-                                    last_led_state.caps_lock ? curr_hsv.secondary.s : curr_hsv.primary.s,
-                                    last_led_state.caps_lock ? curr_hsv.primary.v : disabled_val, 0, 0, 0);
-                ypos += font_oled->line_height + 2;
-                qp_drawtext_recolor(display, xpos, ypos, font_oled, (const char *)"SCRL",
-                                    last_led_state.scroll_lock ? curr_hsv.secondary.h : curr_hsv.primary.h,
-                                    last_led_state.scroll_lock ? curr_hsv.secondary.s : curr_hsv.primary.s,
-                                    last_led_state.scroll_lock ? curr_hsv.primary.v : disabled_val, 0, 0, 0);
-                ypos += font_oled->line_height + 2;
-                qp_drawtext_recolor(display, xpos, ypos, font_oled, (const char *)" NUM",
-                                    last_led_state.num_lock ? curr_hsv.secondary.h : curr_hsv.primary.h,
-                                    last_led_state.num_lock ? curr_hsv.secondary.s : curr_hsv.primary.s,
-                                    last_led_state.num_lock ? curr_hsv.primary.v : disabled_val, 0, 0, 0);
-            }
+            xpos                        = 212;
+            painter_render_lock_state(display, font_oled, xpos, ypos, hue_redraw, &curr_hsv, disabled_val);
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Keymap config (nkro, autocorrect, oneshots)
@@ -495,19 +505,19 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                 xpos = 80 + 4;
                 qp_drawimage(display, xpos, ypos + 2, last_keymap_config.swap_lctl_lgui ? apple_logo : windows_logo);
                 xpos += windows_logo->width + 5;
-                xpos += qp_drawtext_recolor(display, xpos, ypos, font_oled, (const char *)"NKRO",
+                xpos += qp_drawtext_recolor(display, xpos, ypos, font_oled, "NKRO",
                                             last_keymap_config.nkro ? curr_hsv.secondary.h : curr_hsv.primary.h,
                                             last_keymap_config.nkro ? curr_hsv.secondary.s : curr_hsv.primary.s,
                                             last_keymap_config.nkro ? curr_hsv.primary.v : disabled_val, 0, 0, 0) +
                         5;
                 xpos += qp_drawtext_recolor(
-                            display, xpos, ypos, font_oled, (const char *)"CRCT",
+                            display, xpos, ypos, font_oled, "CRCT",
                             last_keymap_config.autocorrect_enable ? curr_hsv.secondary.h : curr_hsv.primary.h,
                             last_keymap_config.autocorrect_enable ? curr_hsv.secondary.s : curr_hsv.primary.s,
                             last_keymap_config.autocorrect_enable ? curr_hsv.primary.v : disabled_val, 0, 0, 0) +
                         5;
                 xpos +=
-                    qp_drawtext_recolor(display, xpos, ypos, font_oled, (const char *)"1SHT",
+                    qp_drawtext_recolor(display, xpos, ypos, font_oled, "1SHT",
                                         last_keymap_config.oneshot_enable ? curr_hsv.secondary.h : curr_hsv.primary.h,
                                         last_keymap_config.oneshot_enable ? curr_hsv.secondary.s : curr_hsv.primary.s,
                                         last_keymap_config.oneshot_enable ? curr_hsv.primary.v : disabled_val, 0, 0, 0);
@@ -521,26 +531,26 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             if (hue_redraw || memcmp(&user_runtime_state, &last_user_state, sizeof(user_runtime_state))) {
                 memcpy(&last_user_state, &user_runtime_state, sizeof(user_runtime_state));
                 xpos = 80 + 4 + windows_logo->width + 5;
-                xpos += qp_drawtext_recolor(display, xpos, ypos, font_oled, (const char *)"AUDIO",
+                xpos += qp_drawtext_recolor(display, xpos, ypos, font_oled, "AUDIO",
                                             last_user_state.audio.enable ? curr_hsv.secondary.h : curr_hsv.primary.h,
                                             last_user_state.audio.enable ? curr_hsv.secondary.s : curr_hsv.primary.s,
                                             last_user_state.audio.enable ? curr_hsv.primary.v : disabled_val, 0, 0, 0) +
                         5;
                 xpos += qp_drawtext_recolor(
-                            display, xpos, ypos, font_oled, (const char *)"CLCK",
+                            display, xpos, ypos, font_oled, "CLCK",
                             last_user_state.audio.clicky_enable ? curr_hsv.secondary.h : curr_hsv.primary.h,
                             last_user_state.audio.clicky_enable ? curr_hsv.secondary.s : curr_hsv.primary.s,
                             last_user_state.audio.clicky_enable ? curr_hsv.primary.v : disabled_val, 0, 0, 0) +
                         5;
                 xpos +=
                     qp_drawtext_recolor(
-                        display, xpos, ypos, font_oled, (const char *)"HOST",
+                        display, xpos, ypos, font_oled, "HOST",
                         last_user_state.internals.host_driver_disabled ? curr_hsv.secondary.h : curr_hsv.primary.h,
                         last_user_state.internals.host_driver_disabled ? curr_hsv.secondary.s : curr_hsv.primary.s,
                         last_user_state.internals.host_driver_disabled ? curr_hsv.primary.v : disabled_val, 0, 0, 0) +
                     5;
                 xpos += qp_drawtext_recolor(
-                    display, xpos, ypos, font_oled, (const char *)"SWAP",
+                    display, xpos, ypos, font_oled, "SWAP",
                     last_user_state.internals.swap_hands ? curr_hsv.secondary.h : curr_hsv.primary.h,
                     last_user_state.internals.swap_hands ? curr_hsv.secondary.s : curr_hsv.primary.s,
                     last_user_state.internals.swap_hands ? curr_hsv.primary.v : disabled_val, 0, 0, 0);
@@ -1039,25 +1049,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 #    if defined(RGBLIGHT_ENABLE)
             ypos = 20;
             xpos = 83;
-            if (hue_redraw || rgb_redraw) {
-                qp_drawtext_recolor(display, xpos, ypos, font_oled, "RGB Light Config:", curr_hsv.primary.h,
-                                    curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
-                ypos += font_oled->line_height + 4;
-                snprintf(buf, sizeof(buf), "%21s",
-                         truncate_text(rgblight_get_effect_name(), 208 - 80, font_oled, false, false));
-                xpos += qp_drawtext_recolor(display, 208 - qp_textwidth(font_oled, buf), ypos, font_oled, buf,
-                                            curr_hsv.secondary.h, curr_hsv.secondary.s, curr_hsv.secondary.v, 0, 0, 0);
-
-                xpos = 83;
-                ypos += font_oled->line_height + 4;
-                xpos += qp_drawtext_recolor(display, xpos, ypos, font_oled, "HSV: ", curr_hsv.primary.h,
-                                            curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
-                snprintf(buf, sizeof(buf), "%3d, %3d, %3d", rgblight_get_hue(), rgblight_get_sat(), rgblight_get_val());
-                qp_drawtext_recolor(display, xpos, ypos, font_oled, buf, curr_hsv.secondary.h, curr_hsv.secondary.s,
-                                    curr_hsv.secondary.v, 0, 0, 0);
-                qp_rect(display, 197, 43, 207, 53, rgblight_get_hue(), rgblight_get_sat(),
-                        (uint8_t)(rgblight_get_val() * 0xFF / RGBLIGHT_LIMIT_VAL), true);
-            }
+            painter_render_rgb(display, font_oled, xpos, ypos, hue_redraw || rgb_redraw, &curr_hsv,
+                               rgblight_get_effect_name, rgblight_get_hsv, false);
 #    endif // RGBLIGHT_ENABLE
 
             if (render_menu(menu_surface, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT)) {

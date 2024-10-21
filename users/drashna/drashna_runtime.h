@@ -60,6 +60,8 @@ typedef union PACKED {
             int8_t timezone   : 6;
         } rtc;
         bool nuke_switch : 1;
+        // because lazy
+        bool audio_mouse_clicky : 1;
         bool check       : 1;
     };
 } userspace_config_t;

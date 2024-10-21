@@ -56,6 +56,35 @@ mouse_movement_t total_mouse_movement = {0, 0, 0, 0};
 
 static uint32_t pointing_device_accel_timer = 0;
 
+#ifdef AUDIO_ENABLE
+// brackets: 1st is number of buttons, 2nd is number of notes, 3rd is number of octaves
+// Increase the first 2,if you want more than 2 notes here
+float fp_mouse_sounds[][2][2] = {
+    SONG(FP_MOUSE_SOUND_1),
+    SONG(FP_MOUSE_SOUND_2),
+    SONG(FP_MOUSE_SOUND_3),
+};
+
+_Static_assert(ARRAY_SIZE(fp_mouse_sounds) <= 8, "Too many mouse sounds defined");
+
+uint8_t pointing_device_handle_buttons(uint8_t buttons, bool pressed, pointing_device_buttons_t button) {
+    uint8_t button_mask = 1 << button;
+
+    if ((buttons & button_mask) != (pressed ? button_mask : 0) && pressed && button <= ARRAY_SIZE(fp_mouse_sounds) &&
+        !is_clicky_on() && userspace_config.audio_mouse_clicky) {
+        PLAY_SONG(fp_mouse_sounds[button]);
+    }
+
+    if (pressed) {
+        buttons |= button_mask;
+    } else {
+        buttons &= ~button_mask;
+    }
+
+    return buttons;
+}
+#endif // AUDIO_ENABLE
+
 __attribute__((weak)) void pointing_device_init_keymap(void) {}
 
 void pointing_device_init_user(void) {

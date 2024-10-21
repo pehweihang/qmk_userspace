@@ -788,7 +788,7 @@ static bool menu_handler_audio_clicky_enabled(menu_input_t input) {
 }
 
 void display_handler_audio_clicky_enabled(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%s", is_clicky_on() ? "on" : "off");
+    snprintf(text_buffer, buffer_len - 1, "%s", is_clicky_on() ? "enabled" : "disabled");
 }
 
 static bool menu_handler_audio_clicky_freq(menu_input_t input) {
@@ -814,6 +814,7 @@ static bool menu_handler_gaming_song_enabled(menu_input_t input) {
         case menu_input_left:
         case menu_input_right:
             userspace_config.gaming.song_enable = !userspace_config.gaming.song_enable;
+            eeconfig_update_user_datablock(&userspace_config);
             void set_doom_song(layer_state_t);
             set_doom_song(layer_state);
             return false;
@@ -823,15 +824,34 @@ static bool menu_handler_gaming_song_enabled(menu_input_t input) {
 }
 
 void display_handler_gaming_song_enabled(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.gaming.song_enable ? "on" : "off");
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.gaming.song_enable ? "enabled" : "disabled");
+}
+
+static bool menu_handler_audio_mouse_clicky(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            userspace_config.audio_mouse_clicky = !userspace_config.audio_mouse_clicky;
+            eeconfig_update_user_datablock(&userspace_config);
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_audio_mouse_clicky(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.audio_mouse_clicky ? "enabled" : "disabled");
 }
 
 menu_entry_t audio_entries[] = {
-    MENU_ENTRY_CHILD("Audio Enabled", audio_enabled),
-    MENU_ENTRY_CHILD("Music Mode Enabled", music_enabled),
-    MENU_ENTRY_CHILD("Clicky Enabled", audio_clicky_enabled),
+    MENU_ENTRY_CHILD("Audio", audio_enabled),
+    MENU_ENTRY_CHILD("Music Mode", music_enabled),
+    MENU_ENTRY_CHILD("Clicky", audio_clicky_enabled),
     MENU_ENTRY_CHILD("Clicky Frequency", audio_clicky_freq),
-    MENU_ENTRY_CHILD("Gaming Song Enabled", gaming_song_enabled),
+    MENU_ENTRY_CHILD("Gaming Song", gaming_song_enabled),
+#    ifdef POINTING_DEVICE_ENABLE
+    MENU_ENTRY_CHILD("Mouse Clicky", audio_mouse_clicky),
+#    endif
 };
 #endif // AUDIO_ENABLE
 
@@ -1024,7 +1044,8 @@ static bool menu_handler_auto_mouse_enable(menu_input_t input) {
 }
 
 void display_handler_auto_mouse_enable(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.pointing.auto_mouse_layer_enable ? "on" : "off");
+    snprintf(text_buffer, buffer_len - 1, "%s",
+             userspace_config.pointing.auto_mouse_layer_enable ? "enabled" : "disabled");
 }
 
 static bool menu_handler_auto_mouse_layer(menu_input_t input) {
@@ -1186,13 +1207,16 @@ menu_entry_t pointing_acceleration_entries[] = {
 };
 
 menu_entry_t pointing_entries[] = {
+    MENU_ENTRY_PARENT("Mouse Acceleration", pointing_acceleration_entries),
 #    if defined(KEYBOARD_handwired_tractyl_manuform) || defined(KEYBOARD_bastardkb_charybdis)
     MENU_ENTRY_CHILD("DPI Config", dpi_config),
 #    endif // KEYBOARD_handwired_tractyl_manuform || KEYBOARD_bastardkb_charybdis
-    MENU_ENTRY_CHILD("Auto Mouse Enable", auto_mouse_enable),
+    MENU_ENTRY_CHILD("Auto Mouse", auto_mouse_enable),
     MENU_ENTRY_CHILD("Auto Mouse Layer", auto_mouse_layer),
     MENU_ENTRY_CHILD("Mouse Jiggler", mouse_jiggler),
-    MENU_ENTRY_PARENT("Mouse Acceleration", pointing_acceleration_entries),
+#    ifdef AUDIO_ENABLE
+    MENU_ENTRY_CHILD("Mouse Clicky", audio_mouse_clicky),
+#    endif
 };
 #endif // POINTING_DEVICE_ENABLE
 

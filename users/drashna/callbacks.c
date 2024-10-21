@@ -391,7 +391,16 @@ void                       housekeeping_task_user(void) {
         // we check if audio is enabled as it's only ran on master
 #ifdef AUDIO_ENABLE
         user_runtime_state.audio.enable        = is_audio_on();
+#    ifdef AUDIO_CLICKY
         user_runtime_state.audio.clicky_enable = is_clicky_on();
+        extern float clicky_freq;
+        extern float clicky_rand;
+        user_runtime_state.audio.clicky_freq = clicky_freq;
+        user_runtime_state.audio.clicky_rand = clicky_rand;
+#    endif // AUDIO_CLICKY
+#    ifdef MUSIC_ENABLE
+        user_runtime_state.audio.music_enable = is_music_on();
+#    endif
 #endif // AUDIO_ENABLE
     }
 

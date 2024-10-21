@@ -93,6 +93,9 @@ typedef struct PACKED {
     struct {
         bool enable        : 1;
         bool clicky_enable : 1;
+        bool  music_enable  : 1;
+        float clicky_freq;
+        float clicky_rand;
     } audio;
     struct {
         bool tap_toggling         : 1;

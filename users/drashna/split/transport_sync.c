@@ -177,6 +177,28 @@ void user_transport_update(void) {
         user_runtime_state.keymap_config = keymap_config;
         user_runtime_state.debug_config  = debug_config;
     } else {
+        // sync settings on slave side
+
+#ifdef AUDIO_ENABLE
+        if (user_runtime_state.audio.enable != is_audio_on()) {
+            audio_config.enable = user_runtime_state.audio.enable;
+        }
+#    ifdef AUDIO_CLICKY
+        if (user_runtime_state.audio.clicky_enable != is_clicky_on()) {
+            audio_config.clicky_enable = user_runtime_state.audio.clicky_enable;
+        }
+        extern float clicky_freq;
+        extern float clicky_rand;
+        clicky_freq = user_runtime_state.audio.clicky_freq;
+        clicky_rand = user_runtime_state.audio.clicky_rand;
+#    endif // AUDIO_CLICK
+#    ifdef MUSIC_ENABLE
+        if (user_runtime_state.audio.music_enable != is_music_on()) {
+            user_runtime_state.audio.music_enable ? music_on() : music_off();
+        }
+#    endif // MUSIC_ENABLE
+#endif     // AUDIO_ENABLE
+
 #ifdef UNICODE_COMMON_ENABLE
         unicode_config.input_mode = user_runtime_state.unicode.mode;
 #endif // UNICODE_COMMON_ENABLE

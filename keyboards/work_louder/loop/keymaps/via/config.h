@@ -3,7 +3,7 @@
 #pragma once
 
 // #define MIDI_BASIC
-// #define NO_ACTION_ONESHOT
+#define NO_ACTION_ONESHOT
 
 #define USB_SUSPEND_WAKEUP_DELAY 200
 

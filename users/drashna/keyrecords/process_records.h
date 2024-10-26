@@ -188,6 +188,11 @@ We use custom codes here, so we can substitute the right stuff
 #define US_MSRP US_MATRIX_SCAN_RATE_PRINT
 #define US_SELW US_SELECT_WORD
 #define PD_JIGG PD_JIGGLER
+#define PD_ACTG PD_ACCEL_TOGGLE
+#define PD_ACTO PD_ACCEL_TAKEOFF
+#define PD_ACRG PD_ACCEL_GROWTH_RATE
+#define PD_ACOF PD_ACCEL_OFFSET
+#define PD_ACLM PD_ACCEL_LIMIT
 
 #define OM_U    KC_MS_U
 #define OM_D    KC_MS_D

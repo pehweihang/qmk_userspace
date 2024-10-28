@@ -78,4 +78,6 @@ ifeq ($(strip $(OVERLOAD_FEATURES)), yes)
     SENTENCE_CASE_ENABLE             = yes
     DISPLAY_KEYLOGGER_ENABLE         = yes
     CLAP_TRAP_ENABLE                 = yes
+    LTO_ENABLE                       = yes
+    OPT                              = fast
 endif

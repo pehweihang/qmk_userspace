@@ -3,6 +3,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "drashna_runtime.h"
 #include "drashna_util.h"
 #include "action_util.h"

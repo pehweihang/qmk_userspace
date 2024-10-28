@@ -64,11 +64,11 @@ ifeq ($(strip $(DEBUG_MATRIX_SCAN_RATE_ENABLE)), yes)
     OPT_DEFS += -DDEBUG_MATRIX_SCAN_RATE_ENABLE
 endif
 
-include $(USER_PATH)/display/rules.mk
-include $(USER_PATH)/pointing/rules.mk
-include $(USER_PATH)/split/rules.mk
-include $(USER_PATH)/rgb/rules.mk
-include $(USER_PATH)/keyrecords/rules.mk
-include $(USER_PATH)/features/rules.mk
+include $(USER_PATH)/display/display.mk
+include $(USER_PATH)/pointing/pointing.mk
+include $(USER_PATH)/split/split.mk
+include $(USER_PATH)/rgb/rgb.mk
+include $(USER_PATH)/keyrecords/keyrecords.mk
+include $(USER_PATH)/features/common.mk
 # Ignore if not found
 -include $(KEYMAP_PATH)/post_rules.mk

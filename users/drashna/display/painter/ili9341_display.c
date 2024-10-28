@@ -54,6 +54,20 @@ painter_image_handle_t screen_saver;
 uint8_t     menu_buffer[SURFACE_REQUIRED_BUFFER_BYTE_SIZE(SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT, 16)];
 static bool has_run = false, forced_reinit = false;
 
+painter_image_array_t screen_saver_image[] = {
+    [__COUNTER__] = {gfx_samurai_cyberpunk_minimal_dark_8k_b3_240x320, "Samurai Cyberpunk"},
+    [__COUNTER__] = {gfx_anime_girl_jacket_240x320, "Anime Girl"},
+    [__COUNTER__] = {gfx_asuka_240x320, "Asuka"},
+    [__COUNTER__] = {gfx_neon_genesis_evangelion_initial_machine_00_240x320, "Eva Unit 00"},
+    [__COUNTER__] = {gfx_neon_genesis_evangelion_initial_machine_01_240x320, "Eva Unit 01"},
+    [__COUNTER__] = {gfx_neon_genesis_evangelion_initial_machine_02_240x320, "Eva Unit 02"},
+    [__COUNTER__] = {gfx_neon_genesis_evangelion_initial_machine_03_240x320, "Eva Unit 03"},
+    [__COUNTER__] = {gfx_neon_genesis_evangelion_initial_machine_04_240x320, "Eva Unit 04"},
+    [__COUNTER__] = {gfx_neon_genesis_evangelion_initial_machine_05_240x320, "Eva Unit 05"},
+    [__COUNTER__] = {gfx_neon_genesis_evangelion_initial_machine_06_240x320, "Eva Unit 06"},
+};
+uint8_t screensaver_image_size = __COUNTER__;
+
 /**
  * @brief Renders RTC Time to display
  *
@@ -446,38 +460,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
         if (display_mode != userspace_config.painter.display_mode || screen_saver_redraw == false) {
             display_mode        = userspace_config.painter.display_mode;
             screen_saver_redraw = true;
-            switch (userspace_config.painter.display_logo) {
-                case 0:
-                    screen_saver = qp_load_image_mem(gfx_samurai_cyberpunk_minimal_dark_8k_b3_240x320);
-                    break;
-                case 1:
-                    screen_saver = qp_load_image_mem(gfx_anime_girl_jacket_240x320);
-                    break;
-                case 2:
-                    screen_saver = qp_load_image_mem(gfx_asuka_240x320);
-                    break;
-                case 3:
-                    screen_saver = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_00_240x320);
-                    break;
-                case 4:
-                    screen_saver = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_01_240x320);
-                    break;
-                case 5:
-                    screen_saver = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_02_240x320);
-                    break;
-                case 6:
-                    screen_saver = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_03_240x320);
-                    break;
-                case 7:
-                    screen_saver = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_04_240x320);
-                    break;
-                case 8:
-                    screen_saver = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_05_240x320);
-                    break;
-                case 9:
-                    screen_saver = qp_load_image_mem(gfx_neon_genesis_evangelion_initial_machine_06_240x320);
-                    break;
-            }
+            screen_saver        = qp_load_image_mem(screen_saver_image[userspace_config.painter.display_logo].data);
             if (screen_saver != NULL) {
                 qp_drawimage(display, 0, 0, screen_saver);
                 qp_close_image(screen_saver);

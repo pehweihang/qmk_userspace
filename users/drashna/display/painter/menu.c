@@ -36,6 +36,8 @@ static float cg_swap_song[][2] = CG_SWAP_SONG;
 #    define DISPLAY_MENU_TIMEOUT 30000
 #endif // !DISPLAY_MENU_TIMEOUT
 deferred_token menu_deferred_token = INVALID_DEFERRED_TOKEN;
+extern painter_image_array_t screen_saver_image[];
+extern uint8_t               screensaver_image_size;
 
 #define MENU_ENTRY_CHILD(display_text, name)             \
     {                                                    \
@@ -109,15 +111,17 @@ void display_handler_display(char *text_buffer, size_t buffer_len) {
 static bool menu_handler_display_image(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            userspace_config.painter.display_logo = (userspace_config.painter.display_logo - 1) % 10;
-            if (userspace_config.painter.display_logo > 9) {
-                userspace_config.painter.display_logo = 9;
+            userspace_config.painter.display_logo =
+                (userspace_config.painter.display_logo - 1) % screensaver_image_size;
+            if (userspace_config.painter.display_logo > (screensaver_image_size - 1)) {
+                userspace_config.painter.display_logo = (screensaver_image_size - 1);
             }
             eeconfig_update_user_datablock(&userspace_config);
             return false;
         case menu_input_right:
-            userspace_config.painter.display_logo = (userspace_config.painter.display_logo + 1) % 10;
-            if (userspace_config.painter.display_logo > 9) {
+            userspace_config.painter.display_logo =
+                (userspace_config.painter.display_logo + 1) % screensaver_image_size;
+            if (userspace_config.painter.display_logo > (screensaver_image_size - 1)) {
                 userspace_config.painter.display_logo = 0;
             }
             eeconfig_update_user_datablock(&userspace_config);
@@ -128,40 +132,7 @@ static bool menu_handler_display_image(menu_input_t input) {
 }
 
 void display_handler_display_image(char *text_buffer, size_t buffer_len) {
-    switch (userspace_config.painter.display_logo) {
-        case 0:
-            strncpy(text_buffer, "Samurai", buffer_len - 1);
-            return;
-        case 1:
-            strncpy(text_buffer, "Anime Girl", buffer_len - 1);
-            return;
-        case 2:
-            strncpy(text_buffer, "Asuka", buffer_len - 1);
-            return;
-        case 3:
-            strncpy(text_buffer, "Eva Unit 00", buffer_len - 1);
-            return;
-        case 4:
-            strncpy(text_buffer, "Eva Unit 01", buffer_len - 1);
-            return;
-        case 5:
-            strncpy(text_buffer, "Eva Unit 02", buffer_len - 1);
-            return;
-        case 6:
-            strncpy(text_buffer, "Eva Unit 03", buffer_len - 1);
-            return;
-        case 7:
-            strncpy(text_buffer, "Eva Unit 04", buffer_len - 1);
-            return;
-        case 8:
-            strncpy(text_buffer, "Eva Unit 05", buffer_len - 1);
-            return;
-        case 9:
-            strncpy(text_buffer, "Eva Unit 06", buffer_len - 1);
-            return;
-    }
-
-    strncpy(text_buffer, "Unknown", buffer_len);
+    strncpy(text_buffer, screen_saver_image[userspace_config.painter.display_logo].name, buffer_len - 1);
 }
 
 static bool menu_handler_display_rotation(menu_input_t input) {

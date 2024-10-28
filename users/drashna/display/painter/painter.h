@@ -10,6 +10,11 @@
 #include "display/painter/graphics/assets.h"
 #include "display/display.h"
 
+typedef struct {
+    const uint8_t* data;
+    const char*    name;
+} painter_image_array_t;
+
 void housekeeping_task_quantum_painter(void);
 void keyboard_post_init_quantum_painter(void);
 void suspend_power_down_quantum_painter(void);

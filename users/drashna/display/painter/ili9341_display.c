@@ -68,6 +68,10 @@ painter_image_array_t screen_saver_image[] = {
 };
 uint8_t screensaver_image_size = __COUNTER__;
 
+bool render_painter_side(void) {
+    return is_keyboard_master();
+}
+
 /**
  * @brief Renders RTC Time to display
  *
@@ -338,7 +342,7 @@ void render_frame(painter_device_t device) {
     // caps lock horizontal line
     qp_line(device, 208, 16, 208, 54, hsv.h, hsv.s, hsv.v);
 
-    if (is_keyboard_master()) {
+    if (render_painter_side()) {
         // vertical lines next to scan rate + wpm + pointing
         qp_line(device, 80, 16, 80, 106, hsv.h, hsv.s, hsv.v);
         // horizontal line below scan rate + wpm
@@ -560,7 +564,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
         painter_render_scan_rate(display, font_oled, xpos, ypos, hue_redraw, &curr_hsv);
         ypos += font_oled->line_height + 4;
-        if (is_keyboard_master()) {
+        if (render_painter_side()) {
 #ifdef WPM_ENABLE
             painter_render_wpm(display, font_oled, 5, ypos, hue_redraw, &curr_hsv);
 #endif // WPM_ENABLE

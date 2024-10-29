@@ -135,17 +135,17 @@ void painter_render_console(painter_device_t device, painter_font_handle_t font,
         console_log_needs_redraw = false;
     }
 }
+
 /**
- * @brief Render the pointing device to the display
+ * @brief Render the matrix scan rate to the display
  *
  * @param device device to render to
  * @param font font to render with
  * @param x x position to start rendering
  * @param y y position to start rendering
- * @param force_redraw do we forcibly redraw the pointing device
+ * @param force_redraw do we forcibly redraw the scan rate
  * @param curr_hsv painter colors
  */
-
 void painter_render_scan_rate(painter_device_t device, painter_font_handle_t font, uint16_t x, uint16_t y,
                               bool force_redraw, dual_hsv_t *curr_hsv) {
     static uint32_t last_scan_rate = 0;
@@ -235,6 +235,7 @@ void painter_render_lock_state(painter_device_t device, painter_font_handle_t fo
                             last_led_state.num_lock ? curr_hsv->primary.v : disabled_val, 0, 0, 0);
     }
 }
+
 /**
  * @brief Render the current wpm count to the display
  *
@@ -259,6 +260,59 @@ void painter_render_wpm(painter_device_t device, painter_font_handle_t font, uin
                             curr_hsv->secondary.v, 0, 0, 0);
     }
 #endif // WPM_ENABLE
+}
+
+/**
+ * @brief Render the haptic feedback settings to the display
+ *
+ * @param device screen to render to
+ * @param font font to render with
+ * @param x x position to start rendering
+ * @param y y position to start rendering
+ * @param force_redraw do we forcibly redraw the haptic feedback settings
+ * @param curr_hsv colors to render with
+ */
+void painter_render_haptic(painter_device_t device, painter_font_handle_t font, uint16_t x, uint16_t y,
+                           bool force_redraw, dual_hsv_t *curr_hsv) {
+#if defined(HAPTIC_ENABLE)
+    char                   buf[22]     = {0};
+    static haptic_config_t temp_config = {0};
+    extern haptic_config_t haptic_config;
+    if (force_redraw || haptic_config.raw != temp_config.raw) {
+        temp_config.raw = haptic_config.raw;
+        uint8_t temp_x  = x;
+        temp_x += qp_drawtext_recolor(device, temp_x, y, font, "Haptic Feedback: ", curr_hsv->primary.h,
+                                      curr_hsv->primary.s, curr_hsv->primary.v, 0, 0, 0) +
+                  4;
+        if (haptic_get_enable()) {
+            switch (haptic_get_feedback()) {
+                case 0:
+                    snprintf(buf, sizeof(buf), "%8s", "Press");
+                    break;
+                case 1:
+                    snprintf(buf, sizeof(buf), "%8s", "Both");
+                    break;
+                case 2:
+                    snprintf(buf, sizeof(buf), "%8s", "Release");
+                    break;
+            }
+        } else {
+            snprintf(buf, sizeof(buf), "%8s", "Off");
+        }
+        qp_drawtext_recolor(device, temp_x, y, font, buf, curr_hsv->secondary.h, curr_hsv->secondary.s,
+                            curr_hsv->secondary.v, 0, 0, 0);
+
+        y += font->line_height + 4;
+        temp_x = x +
+                 qp_drawtext_recolor(device, x, y, font, "Mode:", curr_hsv->primary.h, curr_hsv->primary.s,
+                                     curr_hsv->primary.v, 0, 0, 0) +
+                 4;
+        snprintf(buf, sizeof(buf), "%20s",
+                 truncate_text(get_haptic_drv2605l_effect_name(haptic_get_mode()), 120, font, true, false));
+        qp_drawtext_recolor(device, temp_x, y, font, buf, curr_hsv->secondary.h, curr_hsv->secondary.s,
+                            curr_hsv->secondary.v, 0, 0, 0);
+    }
+#endif // defined(HAPTIC_ENABLE)
 }
 
 /**
@@ -303,9 +357,12 @@ void render_frame(painter_device_t device) {
         qp_line(device, 186, 122, 186, 171, hsv.h, hsv.s, hsv.v);
     } else {
         // horizontal line below scan rate + wpm
-        qp_line(device, 2, 43, 80, 43, hsv.h, hsv.s, hsv.v);
+        qp_line(device, 2, 31, 80, 31, hsv.h, hsv.s, hsv.v);
         // vertical line next to pointing device block
-        qp_line(device, 80, 16, 80, 54, hsv.h, hsv.s, hsv.v);
+        qp_line(device, 80, 16, 80, 80, hsv.h, hsv.s, hsv.v);
+
+        // lines for unicode typing mode and mode
+        qp_line(device, 80, 80, width - 3, 80, hsv.h, hsv.s, hsv.v);
     }
     // line above menu block
     qp_line(device, 2, 171, width - 3, 171, hsv.h, hsv.s, hsv.v);
@@ -503,11 +560,10 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
         painter_render_scan_rate(display, font_oled, xpos, ypos, hue_redraw, &curr_hsv);
         ypos += font_oled->line_height + 4;
-#ifdef WPM_ENABLE
-        painter_render_wpm(display, font_oled, 5, ypos, hue_redraw, &curr_hsv);
-#endif // WPM_ENABLE
-
         if (is_keyboard_master()) {
+#ifdef WPM_ENABLE
+            painter_render_wpm(display, font_oled, 5, ypos, hue_redraw, &curr_hsv);
+#endif // WPM_ENABLE
             ypos = 20;
             xpos = 83;
 #if defined(RGB_MATRIX_ENABLE)
@@ -1085,7 +1141,9 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                                "RGB Light Config:", rgblight_get_effect_name, rgblight_get_hsv, rgblight_is_enabled(),
                                RGBLIGHT_LIMIT_VAL);
 #    endif // RGBLIGHT_ENABLE
-
+#    if defined(HAPTIC_ENABLE)
+            painter_render_haptic(display, font_oled, 83, 58, hue_redraw, &curr_hsv);
+#    endif // HAPTIC_ENABLE
             if (render_menu(menu_surface, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT)) {
                 force_full_block_redraw = true;
             } else {

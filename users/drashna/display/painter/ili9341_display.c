@@ -363,7 +363,7 @@ void render_frame(painter_device_t device) {
         // horizontal line below scan rate + wpm
         qp_line(device, 2, 31, 80, 31, hsv.h, hsv.s, hsv.v);
         // vertical line next to pointing device block
-        qp_line(device, 80, 16, 80, 80, hsv.h, hsv.s, hsv.v);
+        qp_line(device, 80, 16, 80, 170, hsv.h, hsv.s, hsv.v);
 
         // lines for unicode typing mode and mode
         qp_line(device, 80, 80, width - 3, 80, hsv.h, hsv.s, hsv.v);

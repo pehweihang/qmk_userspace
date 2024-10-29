@@ -174,28 +174,31 @@ void painter_render_scan_rate(painter_device_t device, painter_font_handle_t fon
  * @param matrix
  */
 void painter_render_rgb(painter_device_t device, painter_font_handle_t font, uint16_t x, uint16_t y, bool force_redraw,
-                        dual_hsv_t *curr_hsv, const char *(*get_rgb_mode)(void), hsv_t (*get_rgb_hsv)(void),
-                        bool        matrix) {
+                        dual_hsv_t *curr_hsv, const char *title, const char *(*get_rgb_mode)(void),
+                        hsv_t (*get_rgb_hsv)(void), bool is_enabled, uint8_t max_val) {
 #if defined(RGB_MATRIX_ENABLE) || defined(RGBLIGHT_ENABLE)
     char buf[22] = {0};
     if (force_redraw) {
         hsv_t rgb_hsv = get_rgb_hsv();
-        qp_drawtext_recolor(device, x, y, font,
-                            matrix ? "RGB Matrix Config:" : "RGB Light Config:", curr_hsv->primary.h,
-                            curr_hsv->primary.s, curr_hsv->primary.v, 0, 0, 0);
+        qp_drawtext_recolor(device, x, y, font, title, curr_hsv->primary.h, curr_hsv->primary.s, curr_hsv->primary.v, 0,
+                            0, 0);
         y += font->line_height + 4;
-        snprintf(buf, sizeof(buf), "%21s", truncate_text(get_rgb_mode(), 125, font, false, false));
+        snprintf(buf, sizeof(buf), "%21s", truncate_text(is_enabled ? get_rgb_mode() : "Off", 125, font, false, false));
         qp_drawtext_recolor(device, x + 125 - qp_textwidth(font, buf), y, font, buf, curr_hsv->secondary.h,
                             curr_hsv->secondary.s, curr_hsv->secondary.v, 0, 0, 0);
 
         y += font->line_height + 4;
         x += qp_drawtext_recolor(device, x, y, font, "HSV: ", curr_hsv->primary.h, curr_hsv->primary.s,
                                  curr_hsv->primary.v, 0, 0, 0);
-        snprintf(buf, sizeof(buf), "%3d, %3d, %3d", rgb_hsv.h, rgb_hsv.s, rgb_hsv.v);
-        qp_drawtext_recolor(device, x, y, font, buf, curr_hsv->secondary.h, curr_hsv->secondary.s,
-                            curr_hsv->secondary.v, 0, 0, 0);
-        qp_rect(device, 197, 43, 207, 53, rgb_hsv.h, rgb_hsv.s,
-                (uint8_t)(rgb_hsv.v * 0xFF / (matrix ? RGB_MATRIX_MAXIMUM_BRIGHTNESS : RGBLIGHT_LIMIT_VAL)), true);
+        if (is_enabled) {
+            snprintf(buf, sizeof(buf), "%3d, %3d, %3d", rgb_hsv.h, rgb_hsv.s, rgb_hsv.v);
+        } else {
+            snprintf(buf, sizeof(buf), "%13s", "Off");
+        }
+        x += qp_drawtext_recolor(device, x, y, font, buf, curr_hsv->secondary.h, curr_hsv->secondary.s,
+                                 curr_hsv->secondary.v, 0, 0, 0);
+        qp_rect(device, x + 6, y - 1, x + 6 + 10, y + 9, rgb_hsv.h, rgb_hsv.s,
+                is_enabled ? (uint8_t)(rgb_hsv.v * 0xFF / max_val) : 0, true);
     }
 #endif // defined(RGB_MATRIX_ENABLE)
 }
@@ -509,7 +512,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             xpos = 83;
 #if defined(RGB_MATRIX_ENABLE)
             painter_render_rgb(display, font_oled, xpos, ypos, hue_redraw || rgb_redraw, &curr_hsv,
-                               rgb_matrix_get_effect_name, rgb_matrix_get_hsv, true);
+                               "RGB Matrix Config:", rgb_matrix_get_effect_name, rgb_matrix_get_hsv,
+                               rgb_matrix_is_enabled(), RGB_MATRIX_MAXIMUM_BRIGHTNESS);
 #endif // RGB_MATRIX_ENABLE
 
             //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1078,7 +1082,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             ypos = 20;
             xpos = 83;
             painter_render_rgb(display, font_oled, xpos, ypos, hue_redraw || rgb_redraw, &curr_hsv,
-                               rgblight_get_effect_name, rgblight_get_hsv, false);
+                               "RGB Light Config:", rgblight_get_effect_name, rgblight_get_hsv, rgblight_is_enabled(),
+                               RGBLIGHT_LIMIT_VAL);
 #    endif // RGBLIGHT_ENABLE
 
             if (render_menu(menu_surface, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT)) {

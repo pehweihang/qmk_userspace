@@ -46,6 +46,7 @@ painter_image_handle_t shift_icon, control_icon, alt_icon, command_icon, windows
 painter_image_handle_t mouse_icon;
 painter_image_handle_t gamepad_icon;
 painter_image_handle_t qmk_banner;
+painter_image_handle_t akira_explosion;
 painter_image_handle_t screen_saver;
 
 #define SURFACE_MENU_WIDTH  236
@@ -442,6 +443,7 @@ void init_display_ili9341(void) {
     mouse_icon   = qp_load_image_mem(gfx_mouse_icon);
     gamepad_icon = qp_load_image_mem(gfx_gamepad_24x24);
     qmk_banner   = qp_load_image_mem(gfx_qmk_powered_by);
+    akira_explosion = qp_load_image_mem(gfx_akira_explosion);
 
     display =
         qp_ili9341_make_spi_device(240, 320, DISPLAY_CS_PIN, DISPLAY_DC_PIN, DISPLAY_RST_PIN, DISPLAY_SPI_DIVIDER, 0);
@@ -1145,6 +1147,15 @@ __attribute__((weak)) void ili9341_draw_user(void) {
                                "RGB Light Config:", rgblight_get_effect_name, rgblight_get_hsv, rgblight_is_enabled(),
                                RGBLIGHT_LIMIT_VAL);
 #    endif // RGBLIGHT_ENABLE
+            static bool is_showing_nuke = true;
+            if (is_showing_nuke != userspace_config.nuke_switch || screen_saver_redraw) {
+                is_showing_nuke = userspace_config.nuke_switch;
+                if (is_showing_nuke) {
+                    qp_rect(display, 2, 32, 79, 170, 0, 0, 0, true);
+                } else {
+                    qp_drawimage(display, 2, 32, akira_explosion);
+                }
+            }
 #    if defined(HAPTIC_ENABLE)
             painter_render_haptic(display, font_oled, 83, 58, hue_redraw, &curr_hsv);
 #    endif // HAPTIC_ENABLE

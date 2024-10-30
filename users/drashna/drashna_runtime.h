@@ -115,6 +115,9 @@ typedef struct PACKED {
     uint8_t         wpm_count;
     keymap_config_t keymap_config;
     debug_config_t  debug_config;
+    struct {
+        bool mouse_jiggler_enable : 1;
+    } pointing;
 } user_runtime_config_t;
 
 extern user_runtime_config_t user_runtime_state;

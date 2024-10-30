@@ -43,7 +43,6 @@ static float accel_off_song[][2] = POINTING_ACCEL_OFF_SONG;
 #define CONSTRAIN_REPORT(val)      (mouse_xy_report_t) _CONSTRAIN(val, XY_REPORT_MIN, XY_REPORT_MAX)
 
 uint16_t            mouse_jiggler_timer = 0;
-bool                mouse_jiggler       = false;
 static const int8_t deltas[32]          = {0, -1, -2, -2, -3, -3, -4, -4, -4, -4, -3, -3, -2, -2, -1, 0,
                                            0, 1,  2,  2,  3,  3,  4,  4,  4,  4,  3,  3,  2,  2,  1,  0};
 typedef struct {
@@ -106,10 +105,11 @@ bool mouse_movement_threshold_check(report_mouse_t* mouse_report, mouse_movement
 void mouse_jiggler_check(report_mouse_t* mouse_report) {
     static mouse_movement_t jiggler_threshold = {0, 0, 0, 0};
     if (mouse_movement_threshold_check(mouse_report, &jiggler_threshold, MOUSE_JIGGLER_THRESHOLD)) {
-        mouse_jiggler     = false;
-        jiggler_threshold = (mouse_movement_t){.x = 0, .y = 0, .h = 0, .v = 0};
+        user_runtime_state.pointing.mouse_jiggler_enable = false;
+        jiggler_threshold                                = (mouse_movement_t){.x = 0, .y = 0, .h = 0, .v = 0};
     }
-    if (mouse_jiggler && timer_elapsed(mouse_jiggler_timer) > MOUSE_JIGGLER_INTERVAL_MS) {
+    if (user_runtime_state.pointing.mouse_jiggler_enable &&
+        timer_elapsed(mouse_jiggler_timer) > MOUSE_JIGGLER_INTERVAL_MS) {
         static uint8_t phase = 0;
         mouse_report->x += deltas[phase];
         mouse_report->y += deltas[(phase + 8) & 31];
@@ -201,8 +201,8 @@ bool process_record_pointing(uint16_t keycode, keyrecord_t* record) {
     switch (keycode) {
         case PD_JIGGLER:
             if (record->event.pressed) {
-                mouse_jiggler_timer = timer_read();
-                mouse_jiggler       = !mouse_jiggler;
+                mouse_jiggler_timer                              = timer_read();
+                user_runtime_state.pointing.mouse_jiggler_enable = !user_runtime_state.pointing.mouse_jiggler_enable;
             }
             break;
         case PD_ACCEL_TOGGLE:
@@ -250,8 +250,8 @@ bool process_record_pointing(uint16_t keycode, keyrecord_t* record) {
             break;
         default:
             mouse_debounce_timer = timer_read();
-            if (mouse_jiggler) {
-                mouse_jiggler = false;
+            if (user_runtime_state.pointing.mouse_jiggler_enable && record->event.pressed) {
+                user_runtime_state.pointing.mouse_jiggler_enable = false;
             }
             break;
     }

@@ -35,7 +35,7 @@ static float cg_swap_song[][2] = CG_SWAP_SONG;
 #ifndef DISPLAY_MENU_TIMEOUT
 #    define DISPLAY_MENU_TIMEOUT 30000
 #endif // !DISPLAY_MENU_TIMEOUT
-deferred_token menu_deferred_token = INVALID_DEFERRED_TOKEN;
+deferred_token               menu_deferred_token = INVALID_DEFERRED_TOKEN;
 extern painter_image_array_t screen_saver_image[];
 extern uint8_t               screensaver_image_size;
 
@@ -1036,15 +1036,14 @@ void display_handler_auto_mouse_layer(char *text_buffer, size_t buffer_len) {
     snprintf(text_buffer, buffer_len - 1, "%s", layer_name(get_auto_mouse_layer()));
 }
 
-extern bool     mouse_jiggler;
 extern uint16_t mouse_jiggler_timer;
 
 static bool menu_handler_mouse_jiggler(menu_input_t input) {
     switch (input) {
         case menu_input_left:
         case menu_input_right:
-            mouse_jiggler       = !mouse_jiggler;
-            mouse_jiggler_timer = timer_read();
+            user_runtime_state.pointing.mouse_jiggler_enable = !user_runtime_state.pointing.mouse_jiggler_enable;
+            mouse_jiggler_timer                              = timer_read();
             return false;
         default:
             return true;
@@ -1052,7 +1051,7 @@ static bool menu_handler_mouse_jiggler(menu_input_t input) {
 }
 
 void display_handler_mouse_jiggler(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%s", mouse_jiggler ? "on" : "off");
+    snprintf(text_buffer, buffer_len - 1, "%s", user_runtime_state.pointing.mouse_jiggler_enable ? "on" : "off");
 }
 
 #    if defined(KEYBOARD_handwired_tractyl_manuform) || defined(KEYBOARD_bastardkb_charybdis)

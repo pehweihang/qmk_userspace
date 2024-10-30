@@ -126,6 +126,10 @@ __attribute__((weak)) report_mouse_t pointing_device_task_keymap(report_mouse_t 
 report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
     mouse_jiggler_check(&mouse_report);
 
+    if (timer_elapsed(mouse_debounce_timer) < TAP_CHECK) {
+        mouse_report.x = 0;
+        mouse_report.y = 0;
+    }
     // rounding carry to recycle dropped floats from int mouse reports, to smoothen low speed movements (credit
     // @ankostis)
     static float rounding_carry_x = 0;
@@ -249,9 +253,11 @@ bool process_record_pointing(uint16_t keycode, keyrecord_t* record) {
             }
             break;
         default:
-            mouse_debounce_timer = timer_read();
-            if (user_runtime_state.pointing.mouse_jiggler_enable && record->event.pressed) {
-                user_runtime_state.pointing.mouse_jiggler_enable = false;
+            if (!IS_MOUSE_KEYCODE(keycode)) {
+                mouse_debounce_timer = timer_read();
+                if (user_runtime_state.pointing.mouse_jiggler_enable && record->event.pressed) {
+                    user_runtime_state.pointing.mouse_jiggler_enable = false;
+                }
             }
             break;
     }

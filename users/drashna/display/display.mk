@@ -33,6 +33,7 @@ ifeq ($(strip $(QUANTUM_PAINTER_ENABLE)), yes)
         $(USER_PATH)/display/painter/graphics/anime-girl-jacket-240x320.qgf.c \
         $(USER_PATH)/display/painter/graphics/neon-genesis-evangelion-initial-machine-240x320.qgf.c \
         $(USER_PATH)/display/painter/graphics/samurai-cyberpunk-minimal-dark-8k-b3-240x320.qgf.c \
+        $(USER_PATH)/display/painter/graphics/nyan_cat.qgf.c \
         $(USER_PATH)/display/painter/graphics/frame_top.qgf.c \
         $(USER_PATH)/display/painter/graphics/frame_bottom.qgf.c \
         $(USER_PATH)/display/painter/graphics/frame.qgf.c

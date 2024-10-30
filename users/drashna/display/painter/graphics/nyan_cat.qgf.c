@@ -7,8 +7,8 @@
 
 // Image's metadata
 // ----------------
-// Width: 9
-// Height: 9
+// Width: 91
+// Height: 68
 // Single frame
 
 #include <qp.h>

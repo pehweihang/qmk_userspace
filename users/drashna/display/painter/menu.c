@@ -1837,9 +1837,7 @@ bool menu_handle_input(menu_input_t input) {
                         break;
                     }
                 }
-            }
-            if (selected->flags & menu_flag_is_value) {
-            if (selected->flags & menu_flag_is_value && !(selected->flags & menu_flag_is_parent)) {
+            } else if (selected->flags & menu_flag_is_value) {
                 user_runtime_state.menu_state.dirty = true;
                 return selected->child.menu_handler(menu_input_right);
             }

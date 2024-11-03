@@ -55,14 +55,14 @@ extern uint8_t               screensaver_image_size;
         .parent.child_count = ARRAY_SIZE(child),   \
     }
 
-#define MENU_ENTRY_MULTI(display_text, child, name)                        \
+#define MENU_ENTRY_MULTI(display_text, child_item, name)                   \
     {                                                                      \
         .flags                 = menu_flag_is_parent | menu_flag_is_value, \
         .text                  = display_text,                             \
         .child.menu_handler    = menu_handler_##name,                      \
         .child.display_handler = display_handler_##name,                   \
-        .parent.children       = child,                                    \
-        .parent.child_count    = ARRAY_SIZE(child),                        \
+        .parent.children       = child_item,                               \
+        .parent.child_count    = ARRAY_SIZE(child_item),                   \
     }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1839,6 +1839,7 @@ bool menu_handle_input(menu_input_t input) {
                 }
             }
             if (selected->flags & menu_flag_is_value) {
+            if (selected->flags & menu_flag_is_value && !(selected->flags & menu_flag_is_parent)) {
                 user_runtime_state.menu_state.dirty = true;
                 return selected->child.menu_handler(menu_input_right);
             }

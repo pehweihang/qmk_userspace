@@ -1739,13 +1739,13 @@ menu_entry_t root_entries[] = {
     MENU_ENTRY_PARENT("RGB Light Settings", rgb_light_entries),
 #endif // RGBLIGHT_ENABLE
 #ifdef BACKLIGHT_ENABLE
-    MENU_ENTRY_MULTI("Backlight Settings", backlight_entries, bl_level),
+    MENU_ENTRY_PARENT("Backlight Settings", backlight_entries),
 #endif // BACKLIGHT_ENABLE
 #ifdef AUDIO_ENABLE
     MENU_ENTRY_MULTI("Audio Settings", audio_entries, audio_enabled),
 #endif // AUDIO_ENABLE
 #ifdef POINTING_DEVICE_ENABLE
-    MENU_ENTRY_MULTI("Pointing Device Settings", pointing_entries, mouse_jiggler),
+    MENU_ENTRY_PARENT("Pointing Device Settings", pointing_entries),
 #endif // POINTING_DEVICE_ENABLE
 #if defined(HAPTIC_ENABLE)
     MENU_ENTRY_MULTI("Haptic Settings", haptic_entries, haptic_enabled),

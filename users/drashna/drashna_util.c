@@ -113,7 +113,7 @@ void center_text(const char *text, char *output, uint8_t width) {
  * @return false
  */
 bool is_device_suspended(void) {
-    return user_runtime_state.internals.is_device_suspended;
+    return userspace_runtime_state.internals.is_device_suspended;
 }
 
 /**

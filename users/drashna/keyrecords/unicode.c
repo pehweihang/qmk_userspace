@@ -363,10 +363,10 @@ bool process_record_unicode(uint16_t keycode, keyrecord_t *record) {
             break;
         case KC_NOMODE ... KC_COMIC:
             if (record->event.pressed) {
-                if (user_runtime_state.unicode.typing_mode != keycode - KC_NOMODE) {
-                    user_runtime_state.unicode.typing_mode = keycode - KC_NOMODE;
+                if (userspace_runtime_state.unicode.typing_mode != keycode - KC_NOMODE) {
+                    userspace_runtime_state.unicode.typing_mode = keycode - KC_NOMODE;
                 } else {
-                    user_runtime_state.unicode.typing_mode = UCTM_NO_MODE;
+                    userspace_runtime_state.unicode.typing_mode = UCTM_NO_MODE;
                 }
             }
             break;
@@ -383,19 +383,19 @@ bool process_record_unicode(uint16_t keycode, keyrecord_t *record) {
         keycode = QK_LAYER_TAP_GET_TAP_KEYCODE(keycode);
     }
 
-    if (user_runtime_state.unicode.typing_mode == UCTM_WIDE) {
+    if (userspace_runtime_state.unicode.typing_mode == UCTM_WIDE) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
             return process_record_glyph_replacement(keycode, record, unicode_range_translator_wide);
         }
-    } else if (user_runtime_state.unicode.typing_mode == UCTM_SCRIPT) {
+    } else if (userspace_runtime_state.unicode.typing_mode == UCTM_SCRIPT) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
             return process_record_glyph_replacement(keycode, record, unicode_range_translator_script);
         }
-    } else if (user_runtime_state.unicode.typing_mode == UCTM_BLOCKS) {
+    } else if (userspace_runtime_state.unicode.typing_mode == UCTM_BLOCKS) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
             return process_record_glyph_replacement(keycode, record, unicode_range_translator_boxes);
         }
-    } else if (user_runtime_state.unicode.typing_mode == UCTM_REGIONAL) {
+    } else if (userspace_runtime_state.unicode.typing_mode == UCTM_REGIONAL) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
             if (!process_record_glyph_replacement(keycode, record, unicode_range_translator_regional)) {
                 wait_us(500);
@@ -403,25 +403,25 @@ bool process_record_unicode(uint16_t keycode, keyrecord_t *record) {
                 return false;
             }
         }
-    } else if (user_runtime_state.unicode.typing_mode == UCTM_FRAKTUR) {
+    } else if (userspace_runtime_state.unicode.typing_mode == UCTM_FRAKTUR) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
             return process_record_glyph_replacement(keycode, record, unicode_range_translator_fraktur);
         }
-    } else if (user_runtime_state.unicode.typing_mode == UCTM_DOUBLE_STRUCK) {
+    } else if (userspace_runtime_state.unicode.typing_mode == UCTM_DOUBLE_STRUCK) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
             return process_record_glyph_replacement(keycode, record, unicode_range_translator_double_struck);
         }
-    } else if (user_runtime_state.unicode.typing_mode == UCTM_SUPER) {
+    } else if (userspace_runtime_state.unicode.typing_mode == UCTM_SUPER) {
         if (((KC_A <= keycode) && (keycode <= KC_0))) {
             return process_record_glyph_replacement(keycode, record, unicode_lut_translator_super);
         }
-    } else if (user_runtime_state.unicode.typing_mode == UCTM_COMIC) {
+    } else if (userspace_runtime_state.unicode.typing_mode == UCTM_COMIC) {
         if (((KC_A <= keycode) && (keycode <= KC_0))) {
             return process_record_glyph_replacement(keycode, record, unicode_lut_translator_comic);
         }
-    } else if (user_runtime_state.unicode.typing_mode == UCTM_AUSSIE) {
+    } else if (userspace_runtime_state.unicode.typing_mode == UCTM_AUSSIE) {
         return process_record_aussie(keycode, record);
-    } else if (user_runtime_state.unicode.typing_mode == UCTM_ZALGO) {
+    } else if (userspace_runtime_state.unicode.typing_mode == UCTM_ZALGO) {
         return process_record_zalgo(keycode, record);
     }
     return true;

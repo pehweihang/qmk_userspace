@@ -121,7 +121,7 @@ void keyboard_post_init_display_driver(void) {
     }
 #endif // DISPLAY_KEYLOGGER_ENABLE
 #if defined(QUANTUM_PAINTER_ENABLE)
-    user_runtime_state.menu_state = (menu_state_t){
+    userspace_runtime_state.menu_state = (menu_state_t){
 #    ifdef DISPLAY_MENU_ENABLED_DEFAULT
         .dirty      = true,
         .is_in_menu = true,

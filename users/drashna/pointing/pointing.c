@@ -105,10 +105,10 @@ bool mouse_movement_threshold_check(report_mouse_t* mouse_report, mouse_movement
 void mouse_jiggler_check(report_mouse_t* mouse_report) {
     static mouse_movement_t jiggler_threshold = {0, 0, 0, 0};
     if (mouse_movement_threshold_check(mouse_report, &jiggler_threshold, MOUSE_JIGGLER_THRESHOLD)) {
-        user_runtime_state.pointing.mouse_jiggler_enable = false;
+        userspace_runtime_state.pointing.mouse_jiggler_enable = false;
         jiggler_threshold                                = (mouse_movement_t){.x = 0, .y = 0, .h = 0, .v = 0};
     }
-    if (user_runtime_state.pointing.mouse_jiggler_enable &&
+    if (userspace_runtime_state.pointing.mouse_jiggler_enable &&
         timer_elapsed(mouse_jiggler_timer) > MOUSE_JIGGLER_INTERVAL_MS) {
         static uint8_t phase = 0;
         mouse_report->x += deltas[phase];
@@ -206,7 +206,8 @@ bool process_record_pointing(uint16_t keycode, keyrecord_t* record) {
         case PD_JIGGLER:
             if (record->event.pressed) {
                 mouse_jiggler_timer                              = timer_read();
-                user_runtime_state.pointing.mouse_jiggler_enable = !user_runtime_state.pointing.mouse_jiggler_enable;
+                userspace_runtime_state.pointing.mouse_jiggler_enable =
+                    !userspace_runtime_state.pointing.mouse_jiggler_enable;
             }
             break;
         case PD_ACCEL_TOGGLE:
@@ -255,8 +256,8 @@ bool process_record_pointing(uint16_t keycode, keyrecord_t* record) {
         default:
             if (!IS_MOUSE_KEYCODE(keycode)) {
                 mouse_debounce_timer = timer_read();
-                if (user_runtime_state.pointing.mouse_jiggler_enable && record->event.pressed) {
-                    user_runtime_state.pointing.mouse_jiggler_enable = false;
+                if (userspace_runtime_state.pointing.mouse_jiggler_enable && record->event.pressed) {
+                    userspace_runtime_state.pointing.mouse_jiggler_enable = false;
                 }
             }
             break;

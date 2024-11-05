@@ -442,11 +442,13 @@ void render_user_status(uint8_t col, uint8_t line) {
 #endif
 #ifdef AUDIO_ENABLE
     static const char PROGMEM audio_status[2][3] = {{0xE0, 0xE1, 0}, {0xE2, 0xE3, 0}};
-    oled_write_P(audio_status[user_runtime_state.audio.enable], false);
+    oled_write_P(audio_status[userspace_runtime_state.audio.enable], false);
 
 #    ifdef AUDIO_CLICKY
     static const char PROGMEM audio_clicky_status[2][3] = {{0xF4, 0xF5, 0}, {0xF6, 0xF7, 0}};
-    oled_write_P(audio_clicky_status[user_runtime_state.audio.clicky_enable && user_runtime_state.audio.enable], false);
+    oled_write_P(
+        audio_clicky_status[userspace_runtime_state.audio.clicky_enable && userspace_runtime_state.audio.enable],
+        false);
 #        if !defined(OLED_DISPLAY_VERBOSE)
     oled_write_P(PSTR(" "), false);
 #        endif
@@ -684,7 +686,7 @@ void render_unicode_mode(uint8_t col, uint8_t line) {
     oled_set_cursor(col, line);
     oled_write_P(PSTR("Unicode:"), false);
     char buf[13] = {0};
-    snprintf(buf, sizeof(buf), "%12s", unicode_typing_mode(user_runtime_state.unicode.typing_mode));
+    snprintf(buf, sizeof(buf), "%12s", unicode_typing_mode(userspace_runtime_state.unicode.typing_mode));
     oled_write(buf, false);
 #endif
 }
@@ -694,7 +696,7 @@ void render_unicode_mode_small(uint8_t col, uint8_t line, bool invert) {
     oled_set_cursor(col, line);
     oled_write_P(PSTR("UC"), invert);
     char buf[13] = {0};
-    snprintf(buf, sizeof(buf), "%12s", unicode_typing_mode(user_runtime_state.unicode.typing_mode));
+    snprintf(buf, sizeof(buf), "%12s", unicode_typing_mode(userspace_runtime_state.unicode.typing_mode));
     oled_write(buf, invert);
 #endif
 }

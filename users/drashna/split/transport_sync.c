@@ -45,17 +45,17 @@ _Static_assert(sizeof(user_runtime_config_t) <= RPC_M2S_BUFFER_SIZE,
  * @param target2initiator_buffer_size
  * @param target2initiator_buffer
  */
-void user_runtime_state_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
-                             uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
-    if (initiator2target_buffer_size == sizeof(user_runtime_state)) {
-        bool dirty = user_runtime_state.menu_state.dirty;
-        memcpy(&user_runtime_state, initiator2target_buffer, initiator2target_buffer_size);
+void userspace_runtime_state_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer,
+                                  uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
+    if (initiator2target_buffer_size == sizeof(userspace_runtime_state)) {
+        bool dirty = userspace_runtime_state.menu_state.dirty;
+        memcpy(&userspace_runtime_state, initiator2target_buffer, initiator2target_buffer_size);
         if (dirty) {
-            user_runtime_state.menu_state.dirty = true;
+            userspace_runtime_state.menu_state.dirty = true;
         }
         static bool suspend_state = false;
-        if (user_runtime_state.internals.is_device_suspended != suspend_state) {
-            suspend_state = user_runtime_state.internals.is_device_suspended;
+        if (userspace_runtime_state.internals.is_device_suspended != suspend_state) {
+            suspend_state = userspace_runtime_state.internals.is_device_suspended;
             set_is_device_suspended(suspend_state);
         }
     }
@@ -121,8 +121,9 @@ void keylogger_string_sync(uint8_t initiator2target_buffer_size, const void* ini
  */
 void send_device_suspend_state(bool status) {
     if (is_device_suspended() != status && is_keyboard_master()) {
-        user_runtime_state.internals.is_device_suspended = status;
-        transaction_rpc_send(RPC_ID_USER_RUNTIME_STATE_SYNC, sizeof(user_runtime_state), &user_runtime_state);
+        userspace_runtime_state.internals.is_device_suspended = status;
+        transaction_rpc_send(RPC_ID_userspace_runtime_state_SYNC, sizeof(userspace_runtime_state),
+                             &userspace_runtime_state);
         wait_ms(5);
     }
 }
@@ -133,7 +134,7 @@ void send_device_suspend_state(bool status) {
  */
 void keyboard_post_init_transport_sync(void) {
     // Register keyboard state sync split transaction
-    transaction_register_rpc(RPC_ID_USER_RUNTIME_STATE_SYNC, user_runtime_state_sync);
+    transaction_register_rpc(RPC_ID_userspace_runtime_state_SYNC, userspace_runtime_state_sync);
     transaction_register_rpc(RPC_ID_USER_CONFIG_SYNC, user_config_sync);
     transaction_register_rpc(RPC_ID_USER_AUTOCORRECT_STR, autocorrect_string_sync);
     transaction_register_rpc(RPC_ID_USER_DISPLAY_KEYLOG_STR, keylogger_string_sync);
@@ -145,20 +146,20 @@ void keyboard_post_init_transport_sync(void) {
  */
 void user_transport_update(void) {
     if (is_keyboard_master()) {
-        user_runtime_state.internals.host_driver_disabled = get_keyboard_lock();
+        userspace_runtime_state.internals.host_driver_disabled = get_keyboard_lock();
 #if defined(POINTING_DEVICE_ENABLE) && defined(POINTING_DEVICE_AUTO_MOUSE_ENABLE)
-        user_runtime_state.internals.tap_toggling = get_auto_mouse_toggle();
+        userspace_runtime_state.internals.tap_toggling = get_auto_mouse_toggle();
 #endif // POINTING_DEVICE_ENABLE && POINTING_DEVICE_AUTO_MOUSE_ENABLE
 #ifdef UNICODE_COMMON_ENABLE
-        user_runtime_state.unicode.mode = get_unicode_input_mode();
+        userspace_runtime_state.unicode.mode = get_unicode_input_mode();
 #endif // UNICODE_COMMON_ENABLE
 #ifdef SWAP_HANDS_ENABLE
-        user_runtime_state.internals.swap_hands = swap_hands;
+        userspace_runtime_state.internals.swap_hands = swap_hands;
 #endif // SWAP_HANDS_ENABLE
 #ifdef CAPS_WORD_ENABLE
-        user_runtime_state.internals.is_caps_word = is_caps_word_on();
+        userspace_runtime_state.internals.is_caps_word = is_caps_word_on();
 #endif // CAPS_WORD_ENABLE
-        user_runtime_state.mods = (sync_mods_t){
+        userspace_runtime_state.mods = (sync_mods_t){
             .mods      = get_mods(),
             .weak_mods = get_weak_mods(),
 #ifndef NO_ACTION_ONESHOT
@@ -166,95 +167,95 @@ void user_transport_update(void) {
             .oneshot_locked_mods = get_oneshot_locked_mods(),
 #endif // NO_ACTION_ONESHOT
         };
-        user_runtime_state.layers = (sync_layer_t){
+        userspace_runtime_state.layers = (sync_layer_t){
             .layer_state         = layer_state,
             .default_layer_state = default_layer_state,
         };
-        user_runtime_state.leds = host_keyboard_led_state();
+        userspace_runtime_state.leds = host_keyboard_led_state();
 #ifdef WPM_ENABLE
-        user_runtime_state.wpm_count = get_current_wpm();
+        userspace_runtime_state.wpm_count = get_current_wpm();
 #endif // WPM_ENABLE
-        user_runtime_state.keymap_config = keymap_config;
-        user_runtime_state.debug_config  = debug_config;
+        userspace_runtime_state.keymap_config = keymap_config;
+        userspace_runtime_state.debug_config  = debug_config;
     } else {
         // sync settings on slave side
 
 #ifdef AUDIO_ENABLE
-        if (user_runtime_state.audio.enable != is_audio_on()) {
-            audio_config.enable = user_runtime_state.audio.enable;
+        if (userspace_runtime_state.audio.enable != is_audio_on()) {
+            audio_config.enable = userspace_runtime_state.audio.enable;
         }
 #    ifdef AUDIO_CLICKY
-        if (user_runtime_state.audio.clicky_enable != is_clicky_on()) {
-            audio_config.clicky_enable = user_runtime_state.audio.clicky_enable;
+        if (userspace_runtime_state.audio.clicky_enable != is_clicky_on()) {
+            audio_config.clicky_enable = userspace_runtime_state.audio.clicky_enable;
         }
         extern float clicky_freq;
         extern float clicky_rand;
-        clicky_freq = user_runtime_state.audio.clicky_freq;
-        clicky_rand = user_runtime_state.audio.clicky_rand;
+        clicky_freq = userspace_runtime_state.audio.clicky_freq;
+        clicky_rand = userspace_runtime_state.audio.clicky_rand;
 #    endif // AUDIO_CLICK
 #    ifdef MUSIC_ENABLE
-        if (user_runtime_state.audio.music_enable != is_music_on()) {
-            user_runtime_state.audio.music_enable ? music_on() : music_off();
+        if (userspace_runtime_state.audio.music_enable != is_music_on()) {
+            userspace_runtime_state.audio.music_enable ? music_on() : music_off();
         }
 #    endif // MUSIC_ENABLE
 #endif     // AUDIO_ENABLE
 
 #ifdef UNICODE_COMMON_ENABLE
-        unicode_config.input_mode = user_runtime_state.unicode.mode;
+        unicode_config.input_mode = userspace_runtime_state.unicode.mode;
 #endif // UNICODE_COMMON_ENABLE
 #if defined(POINTING_DEVICE_ENABLE) && defined(POINTING_DEVICE_AUTO_MOUSE_ENABLE)
-        if (get_auto_mouse_toggle() != user_runtime_state.internals.tap_toggling) {
+        if (get_auto_mouse_toggle() != userspace_runtime_state.internals.tap_toggling) {
             auto_mouse_toggle();
         }
 #endif // POINTING_DEVICE_ENABLE && POINTING_DEVICE_AUTO_MOUSE_ENABLE
 #ifdef SWAP_HANDS_ENABLE
-        swap_hands = user_runtime_state.internals.swap_hands;
+        swap_hands = userspace_runtime_state.internals.swap_hands;
 #endif // SWAP_HANDS_ENABLE
 #ifdef CAPS_WORD_ENABLE
-        if (user_runtime_state.internals.is_caps_word) {
+        if (userspace_runtime_state.internals.is_caps_word) {
             caps_word_on();
         } else {
             caps_word_off();
         }
 #endif // CAPS_WORD_ENABLE
-        set_keyboard_lock(user_runtime_state.internals.host_driver_disabled);
+        set_keyboard_lock(userspace_runtime_state.internals.host_driver_disabled);
 
-        if (get_mods() != user_runtime_state.mods.mods) {
-            set_mods(user_runtime_state.mods.mods);
+        if (get_mods() != userspace_runtime_state.mods.mods) {
+            set_mods(userspace_runtime_state.mods.mods);
         }
-        if (get_weak_mods() != user_runtime_state.mods.weak_mods) {
-            set_weak_mods(user_runtime_state.mods.weak_mods);
+        if (get_weak_mods() != userspace_runtime_state.mods.weak_mods) {
+            set_weak_mods(userspace_runtime_state.mods.weak_mods);
         }
 #ifndef NO_ACTION_ONESHOT
-        if (get_oneshot_mods() != user_runtime_state.mods.oneshot_mods) {
-            set_oneshot_mods(user_runtime_state.mods.oneshot_mods);
+        if (get_oneshot_mods() != userspace_runtime_state.mods.oneshot_mods) {
+            set_oneshot_mods(userspace_runtime_state.mods.oneshot_mods);
         }
-        if (get_oneshot_locked_mods() != user_runtime_state.mods.oneshot_locked_mods) {
-            set_oneshot_locked_mods(user_runtime_state.mods.oneshot_locked_mods);
+        if (get_oneshot_locked_mods() != userspace_runtime_state.mods.oneshot_locked_mods) {
+            set_oneshot_locked_mods(userspace_runtime_state.mods.oneshot_locked_mods);
         }
 #endif // NO_ACTION_ONESHOT
 
-        if (layer_state != user_runtime_state.layers.layer_state) {
-            layer_state = user_runtime_state.layers.layer_state;
+        if (layer_state != userspace_runtime_state.layers.layer_state) {
+            layer_state = userspace_runtime_state.layers.layer_state;
         }
-        if (default_layer_state != user_runtime_state.layers.default_layer_state) {
-            default_layer_state = user_runtime_state.layers.default_layer_state;
+        if (default_layer_state != userspace_runtime_state.layers.default_layer_state) {
+            default_layer_state = userspace_runtime_state.layers.default_layer_state;
         }
 
         void set_split_host_keyboard_leds(uint8_t led_state);
-        if (host_keyboard_led_state().raw != user_runtime_state.leds.raw) {
-            set_split_host_keyboard_leds(user_runtime_state.leds.raw);
+        if (host_keyboard_led_state().raw != userspace_runtime_state.leds.raw) {
+            set_split_host_keyboard_leds(userspace_runtime_state.leds.raw);
         }
 #ifdef WPM_ENABLE
-        if (get_current_wpm() != user_runtime_state.wpm_count) {
-            set_current_wpm(user_runtime_state.wpm_count);
+        if (get_current_wpm() != userspace_runtime_state.wpm_count) {
+            set_current_wpm(userspace_runtime_state.wpm_count);
         }
 #endif // WPM_ENABLE
-        if (keymap_config.raw != user_runtime_state.keymap_config.raw) {
-            keymap_config = user_runtime_state.keymap_config;
+        if (keymap_config.raw != userspace_runtime_state.keymap_config.raw) {
+            keymap_config = userspace_runtime_state.keymap_config;
         }
-        if (debug_config.raw != user_runtime_state.debug_config.raw) {
-            debug_config = user_runtime_state.debug_config;
+        if (debug_config.raw != userspace_runtime_state.debug_config.raw) {
+            debug_config = userspace_runtime_state.debug_config;
         }
 #if defined(QUANTUM_PAINTER_ENABLE) && defined(QUANTUM_PAINTER_ILI9341_ENABLE)
         static bool    last_inverted = false;
@@ -287,9 +288,9 @@ void user_transport_sync(void) {
         static char temp_autocorrected_str[2][22] = {0};
 #endif // AUTOCORRECT_ENABLE
        // Check if the state values are different
-        if (memcmp(&user_runtime_state, &last_user_state, sizeof(user_runtime_state))) {
+        if (memcmp(&userspace_runtime_state, &last_user_state, sizeof(userspace_runtime_state))) {
             needs_sync = true;
-            memcpy(&last_user_state, &user_runtime_state, sizeof(user_runtime_state));
+            memcpy(&last_user_state, &userspace_runtime_state, sizeof(userspace_runtime_state));
         }
         // Send to slave every FORCED_SYNC_THROTTLE_MS regardless of state change
         if (timer_elapsed32(last_sync[0]) > FORCED_SYNC_THROTTLE_MS) {
@@ -298,7 +299,8 @@ void user_transport_sync(void) {
 
         // Perform the sync if requested
         if (needs_sync) {
-            if (transaction_rpc_send(RPC_ID_USER_RUNTIME_STATE_SYNC, sizeof(user_runtime_state), &user_runtime_state)) {
+            if (transaction_rpc_send(RPC_ID_userspace_runtime_state_SYNC, sizeof(userspace_runtime_state),
+                                     &userspace_runtime_state)) {
                 last_sync[0] = timer_read32();
             }
             needs_sync = false;

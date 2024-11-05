@@ -366,15 +366,17 @@ void display_handler_unicode(char *text_buffer, size_t buffer_len) {
 static bool menu_handler_unicode_typing(menu_input_t input) {
     switch (input) {
         case menu_input_left:
-            user_runtime_state.unicode.typing_mode = (user_runtime_state.unicode.typing_mode - 1) % UNCODES_MODE_END;
-            if (user_runtime_state.unicode.typing_mode >= UNCODES_MODE_END) {
-                user_runtime_state.unicode.typing_mode = UNCODES_MODE_END - 1;
+            userspace_runtime_state.unicode.typing_mode =
+                (userspace_runtime_state.unicode.typing_mode - 1) % UNCODES_MODE_END;
+            if (userspace_runtime_state.unicode.typing_mode >= UNCODES_MODE_END) {
+                userspace_runtime_state.unicode.typing_mode = UNCODES_MODE_END - 1;
             }
             return false;
         case menu_input_right:
-            user_runtime_state.unicode.typing_mode = (user_runtime_state.unicode.typing_mode + 1) % UNCODES_MODE_END;
-            if (user_runtime_state.unicode.typing_mode >= UNCODES_MODE_END) {
-                user_runtime_state.unicode.typing_mode = 0;
+            userspace_runtime_state.unicode.typing_mode =
+                (userspace_runtime_state.unicode.typing_mode + 1) % UNCODES_MODE_END;
+            if (userspace_runtime_state.unicode.typing_mode >= UNCODES_MODE_END) {
+                userspace_runtime_state.unicode.typing_mode = 0;
             }
             return false;
         default:
@@ -382,7 +384,7 @@ static bool menu_handler_unicode_typing(menu_input_t input) {
     }
 }
 void display_handler_unicode_typing(char *text_buffer, size_t buffer_len) {
-    strncpy(text_buffer, unicode_typing_mode(user_runtime_state.unicode.typing_mode), buffer_len);
+    strncpy(text_buffer, unicode_typing_mode(userspace_runtime_state.unicode.typing_mode), buffer_len);
 }
 
 menu_entry_t unicode_entries[] = {
@@ -1042,7 +1044,8 @@ static bool menu_handler_mouse_jiggler(menu_input_t input) {
     switch (input) {
         case menu_input_left:
         case menu_input_right:
-            user_runtime_state.pointing.mouse_jiggler_enable = !user_runtime_state.pointing.mouse_jiggler_enable;
+            userspace_runtime_state.pointing.mouse_jiggler_enable =
+                !userspace_runtime_state.pointing.mouse_jiggler_enable;
             mouse_jiggler_timer                              = timer_read();
             return false;
         default:
@@ -1051,7 +1054,7 @@ static bool menu_handler_mouse_jiggler(menu_input_t input) {
 }
 
 void display_handler_mouse_jiggler(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%s", user_runtime_state.pointing.mouse_jiggler_enable ? "on" : "off");
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_runtime_state.pointing.mouse_jiggler_enable ? "on" : "off");
 }
 
 #    if defined(KEYBOARD_handwired_tractyl_manuform) || defined(KEYBOARD_bastardkb_charybdis)
@@ -1766,23 +1769,23 @@ menu_entry_t root = {
 };
 
 menu_entry_t *get_current_menu(void) {
-    if (user_runtime_state.menu_state.menu_stack[0] == 0xFF) {
+    if (userspace_runtime_state.menu_state.menu_stack[0] == 0xFF) {
         return &root;
     }
 
     menu_entry_t *entry = &root;
-    for (int i = 0; i < sizeof(user_runtime_state.menu_state.menu_stack); ++i) {
-        if (user_runtime_state.menu_state.menu_stack[i] == 0xFF) {
+    for (int i = 0; i < sizeof(userspace_runtime_state.menu_state.menu_stack); ++i) {
+        if (userspace_runtime_state.menu_state.menu_stack[i] == 0xFF) {
             return entry;
         }
-        entry = &entry->parent.children[user_runtime_state.menu_state.menu_stack[i]];
+        entry = &entry->parent.children[userspace_runtime_state.menu_state.menu_stack[i]];
     }
 
     return entry;
 }
 
 menu_entry_t *get_selected_menu_item(void) {
-    return &(get_current_menu()->parent.children[user_runtime_state.menu_state.selected_child]);
+    return &(get_current_menu()->parent.children[userspace_runtime_state.menu_state.selected_child]);
 }
 
 uint32_t display_menu_timeout_handler(uint32_t trigger_time, void *cb_arg) {
@@ -1799,30 +1802,31 @@ bool menu_handle_input(menu_input_t input) {
     }
     switch (input) {
         case menu_input_exit:
-            user_runtime_state.menu_state.is_in_menu = false;
-            memset(user_runtime_state.menu_state.menu_stack, 0xFF, sizeof(user_runtime_state.menu_state.menu_stack));
-            user_runtime_state.menu_state.selected_child = 0xFF;
+            userspace_runtime_state.menu_state.is_in_menu = false;
+            memset(userspace_runtime_state.menu_state.menu_stack, 0xFF,
+                   sizeof(userspace_runtime_state.menu_state.menu_stack));
+            userspace_runtime_state.menu_state.selected_child = 0xFF;
             if (cancel_deferred_exec(menu_deferred_token)) {
                 menu_deferred_token = INVALID_DEFERRED_TOKEN;
             }
             return false;
         case menu_input_back:
             // Iterate backwards through the stack and remove the last entry
-            for (uint8_t i = 0; i < sizeof(user_runtime_state.menu_state.menu_stack); ++i) {
-                if (user_runtime_state.menu_state
-                        .menu_stack[sizeof(user_runtime_state.menu_state.menu_stack) - 1 - i] != 0xFF) {
-                    user_runtime_state.menu_state.selected_child =
-                        user_runtime_state.menu_state
-                            .menu_stack[sizeof(user_runtime_state.menu_state.menu_stack) - 1 - i];
-                    user_runtime_state.menu_state.menu_stack[sizeof(user_runtime_state.menu_state.menu_stack) - 1 - i] =
-                        0xFF;
+            for (uint8_t i = 0; i < sizeof(userspace_runtime_state.menu_state.menu_stack); ++i) {
+                if (userspace_runtime_state.menu_state
+                        .menu_stack[sizeof(userspace_runtime_state.menu_state.menu_stack) - 1 - i] != 0xFF) {
+                    userspace_runtime_state.menu_state.selected_child =
+                        userspace_runtime_state.menu_state
+                            .menu_stack[sizeof(userspace_runtime_state.menu_state.menu_stack) - 1 - i];
+                    userspace_runtime_state.menu_state
+                        .menu_stack[sizeof(userspace_runtime_state.menu_state.menu_stack) - 1 - i] = 0xFF;
                     break;
                 }
 
                 // If we've dropped out of the last entry in the stack, exit the menu
-                if (i == sizeof(user_runtime_state.menu_state.menu_stack) - 1) {
-                    user_runtime_state.menu_state.is_in_menu     = false;
-                    user_runtime_state.menu_state.selected_child = 0xFF;
+                if (i == sizeof(userspace_runtime_state.menu_state.menu_stack) - 1) {
+                    userspace_runtime_state.menu_state.is_in_menu     = false;
+                    userspace_runtime_state.menu_state.selected_child = 0xFF;
                 }
             }
             return false;
@@ -1830,33 +1834,34 @@ bool menu_handle_input(menu_input_t input) {
             // Only attempt to enter the next menu if we're a parent object
             if (selected->flags & menu_flag_is_parent) {
                 // Iterate forwards through the stack and add the selected entry
-                for (uint8_t i = 0; i < sizeof(user_runtime_state.menu_state.menu_stack); ++i) {
-                    if (user_runtime_state.menu_state.menu_stack[i] == 0xFF) {
-                        user_runtime_state.menu_state.menu_stack[i]  = user_runtime_state.menu_state.selected_child;
-                        user_runtime_state.menu_state.selected_child = 0;
+                for (uint8_t i = 0; i < sizeof(userspace_runtime_state.menu_state.menu_stack); ++i) {
+                    if (userspace_runtime_state.menu_state.menu_stack[i] == 0xFF) {
+                        userspace_runtime_state.menu_state.menu_stack[i] =
+                            userspace_runtime_state.menu_state.selected_child;
+                        userspace_runtime_state.menu_state.selected_child = 0;
                         break;
                     }
                 }
             } else if (selected->flags & menu_flag_is_value) {
-                user_runtime_state.menu_state.dirty = true;
+                userspace_runtime_state.menu_state.dirty = true;
                 return selected->child.menu_handler(menu_input_right);
             }
 
             return false;
         case menu_input_up:
-            user_runtime_state.menu_state.selected_child =
-                (user_runtime_state.menu_state.selected_child + menu->parent.child_count - 1) %
+            userspace_runtime_state.menu_state.selected_child =
+                (userspace_runtime_state.menu_state.selected_child + menu->parent.child_count - 1) %
                 menu->parent.child_count;
             return false;
         case menu_input_down:
-            user_runtime_state.menu_state.selected_child =
-                (user_runtime_state.menu_state.selected_child + menu->parent.child_count + 1) %
+            userspace_runtime_state.menu_state.selected_child =
+                (userspace_runtime_state.menu_state.selected_child + menu->parent.child_count + 1) %
                 menu->parent.child_count;
             return false;
         case menu_input_left:
         case menu_input_right:
             if (selected->flags & menu_flag_is_value) {
-                user_runtime_state.menu_state.dirty = true;
+                userspace_runtime_state.menu_state.dirty = true;
                 return selected->child.menu_handler(input);
             }
             return false;
@@ -1947,9 +1952,9 @@ __attribute__((weak)) bool process_record_menu_user(uint16_t keycode, bool keep_
 }
 
 bool process_record_menu(uint16_t keycode, keyrecord_t *record) {
-    if (keycode == DISPLAY_MENU && record->event.pressed && !user_runtime_state.menu_state.is_in_menu) {
-        user_runtime_state.menu_state.is_in_menu     = true;
-        user_runtime_state.menu_state.selected_child = 0;
+    if (keycode == DISPLAY_MENU && record->event.pressed && !userspace_runtime_state.menu_state.is_in_menu) {
+        userspace_runtime_state.menu_state.is_in_menu     = true;
+        userspace_runtime_state.menu_state.selected_child = 0;
         menu_deferred_token = defer_exec(DISPLAY_MENU_TIMEOUT, display_menu_timeout_handler, NULL);
         return false;
     }
@@ -1994,7 +1999,7 @@ bool process_record_menu(uint16_t keycode, keyrecord_t *record) {
             break;
 #endif // POINTING_DEVICE_ENABLE
     }
-    if (user_runtime_state.menu_state.is_in_menu) {
+    if (userspace_runtime_state.menu_state.is_in_menu) {
         if (record->event.pressed) {
             return process_record_menu_user(keycode, keep_processing);
         }
@@ -2009,16 +2014,16 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
     static menu_state_t last_state;
     static uint8_t      scroll_offset = 0;
 
-    if (memcmp(&last_state, &user_runtime_state.menu_state, sizeof(menu_state_t)) == 0) {
-        return user_runtime_state.menu_state.is_in_menu;
+    if (memcmp(&last_state, &userspace_runtime_state.menu_state, sizeof(menu_state_t)) == 0) {
+        return userspace_runtime_state.menu_state.is_in_menu;
     }
 
-    user_runtime_state.menu_state.dirty = false;
-    memcpy(&last_state, &user_runtime_state.menu_state, sizeof(menu_state_t));
+    userspace_runtime_state.menu_state.dirty = false;
+    memcpy(&last_state, &userspace_runtime_state.menu_state, sizeof(menu_state_t));
 
     uint16_t render_width = width - start_x;
 
-    if (user_runtime_state.menu_state.is_in_menu) {
+    if (userspace_runtime_state.menu_state.is_in_menu) {
         qp_rect(display, start_x, start_y, render_width - 1, height - 1, 0, 0, 0, true);
 
         menu_entry_t *menu     = get_current_menu();
@@ -2034,16 +2039,16 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
 
         uint8_t visible_entries = (height - y) / (font_oled->line_height + 5);
         if (menu->parent.child_count > visible_entries) {
-            if (user_runtime_state.menu_state.selected_child >= scroll_offset + visible_entries &&
-                user_runtime_state.menu_state.selected_child < menu->parent.child_count - 1) {
-                scroll_offset = user_runtime_state.menu_state.selected_child - visible_entries + 1;
-            } else if (user_runtime_state.menu_state.selected_child < scroll_offset + 1) {
-                if (user_runtime_state.menu_state.selected_child != 0) {
-                    scroll_offset = user_runtime_state.menu_state.selected_child - 1;
+            if (userspace_runtime_state.menu_state.selected_child >= scroll_offset + visible_entries &&
+                userspace_runtime_state.menu_state.selected_child < menu->parent.child_count - 1) {
+                scroll_offset = userspace_runtime_state.menu_state.selected_child - visible_entries + 1;
+            } else if (userspace_runtime_state.menu_state.selected_child < scroll_offset + 1) {
+                if (userspace_runtime_state.menu_state.selected_child != 0) {
+                    scroll_offset = userspace_runtime_state.menu_state.selected_child - 1;
                 } else {
                     scroll_offset = 0;
                 }
-            } else if (user_runtime_state.menu_state.selected_child == menu->parent.child_count - 1) {
+            } else if (userspace_runtime_state.menu_state.selected_child == menu->parent.child_count - 1) {
                 scroll_offset = menu->parent.child_count - visible_entries - 1;
             }
         } else {
@@ -2103,5 +2108,5 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
 }
 
 void display_menu_set_dirty(void) {
-    user_runtime_state.menu_state.dirty = true;
+    userspace_runtime_state.menu_state.dirty = true;
 }

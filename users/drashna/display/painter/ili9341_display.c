@@ -622,8 +622,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
             ypos += font_oled->line_height + 4;
             static user_runtime_config_t last_user_state = {0};
-            if (hue_redraw || memcmp(&user_runtime_state, &last_user_state, sizeof(user_runtime_state))) {
-                memcpy(&last_user_state, &user_runtime_state, sizeof(user_runtime_state));
+            if (hue_redraw || memcmp(&userspace_runtime_state, &last_user_state, sizeof(userspace_runtime_state))) {
+                memcpy(&last_user_state, &userspace_runtime_state, sizeof(userspace_runtime_state));
                 xpos = 80 + 4 + windows_logo->width + 5;
                 xpos += qp_drawtext_recolor(display, xpos, ypos, font_oled, "AUDIO",
                                             last_user_state.audio.enable ? curr_hsv.secondary.h : curr_hsv.primary.h,
@@ -767,8 +767,8 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
             ypos                                    = 80 + 4;
             static uint8_t last_unicode_typing_mode = 0;
-            if (hue_redraw || last_unicode_typing_mode != user_runtime_state.unicode.typing_mode) {
-                last_unicode_typing_mode = user_runtime_state.unicode.typing_mode;
+            if (hue_redraw || last_unicode_typing_mode != userspace_runtime_state.unicode.typing_mode) {
+                last_unicode_typing_mode = userspace_runtime_state.unicode.typing_mode;
                 xpos                     = 149 + 4;
                 qp_drawtext_recolor(display, xpos, ypos, font_oled, "Typing Mode:", curr_hsv.primary.h,
                                     curr_hsv.primary.s, curr_hsv.primary.v, 0, 0, 0);
@@ -1019,7 +1019,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             } else
 #else
             // force set the dirty flag to false since we aren't actually rendering the menu on this side.
-            user_runtime_state.menu_state.dirty = false;
+            userspace_runtime_state.menu_state.dirty = false;
 #endif
             {
                 bool     block_redraw = false;

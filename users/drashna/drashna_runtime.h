@@ -6,7 +6,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <util.h>
-#include <eeconfig.h>
 #include <quantum/color.h>
 #include <action_layer.h>
 #include <keycode_config.h>
@@ -120,4 +119,4 @@ typedef struct PACKED {
     } pointing;
 } user_runtime_config_t;
 
-extern user_runtime_config_t user_runtime_state;
+extern user_runtime_config_t userspace_runtime_state;

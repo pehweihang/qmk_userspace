@@ -55,7 +55,7 @@ void keyboard_post_init_unicode(void);
 #    include "orbital_mouse.h"
 #endif // ORBITAL_MOUSE_ENABLE
 
-user_runtime_config_t user_runtime_state;
+user_runtime_config_t userspace_runtime_state;
 
 /**
  * @brief Keyboard Pre-Initialization
@@ -383,23 +383,23 @@ void                       matrix_slave_scan_user(void) {
 /**
  * @brief Housekeyping task
  *
- * sets user_runtime_state config to be synced later or just used. Also runs other "every tick" tasks
+ * sets userspace_runtime_state config to be synced later or just used. Also runs other "every tick" tasks
  */
 __attribute__((weak)) void housekeeping_task_keymap(void) {}
 void                       housekeeping_task_user(void) {
     if (is_keyboard_master()) {
         // we check if audio is enabled as it's only ran on master
 #ifdef AUDIO_ENABLE
-        user_runtime_state.audio.enable        = is_audio_on();
+        userspace_runtime_state.audio.enable = is_audio_on();
 #    ifdef AUDIO_CLICKY
-        user_runtime_state.audio.clicky_enable = is_clicky_on();
+        userspace_runtime_state.audio.clicky_enable = is_clicky_on();
         extern float clicky_freq;
         extern float clicky_rand;
-        user_runtime_state.audio.clicky_freq = clicky_freq;
-        user_runtime_state.audio.clicky_rand = clicky_rand;
+        userspace_runtime_state.audio.clicky_freq = clicky_freq;
+        userspace_runtime_state.audio.clicky_rand = clicky_rand;
 #    endif // AUDIO_CLICKY
 #    ifdef MUSIC_ENABLE
-        user_runtime_state.audio.music_enable = is_music_on();
+        userspace_runtime_state.audio.music_enable = is_music_on();
 #    endif
 #endif // AUDIO_ENABLE
     }

@@ -23,8 +23,8 @@
 #    undef SPLIT_LAYER_STATE_ENABLE
 #    undef SPLIT_LED_STATE_ENABLE
 #    undef SPLIT_MODS_ENABLE
-#    define SPLIT_TRANSACTION_IDS_USER                                                        \
-        RPC_ID_USER_RUNTIME_STATE_SYNC, RPC_ID_USER_CONFIG_SYNC, RPC_ID_USER_AUTOCORRECT_STR, \
+#    define SPLIT_TRANSACTION_IDS_USER                                                             \
+        RPC_ID_userspace_runtime_state_SYNC, RPC_ID_USER_CONFIG_SYNC, RPC_ID_USER_AUTOCORRECT_STR, \
             RPC_ID_USER_DISPLAY_KEYLOG_STR
 #else
 #    define SPLIT_WPM_ENABLE

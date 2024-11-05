@@ -1180,7 +1180,7 @@ menu_entry_t pointing_acceleration_entries[] = {
 };
 
 menu_entry_t pointing_entries[] = {
-    MENU_ENTRY_PARENT("Mouse Acceleration", pointing_acceleration_entries),
+    MENU_ENTRY_MULTI("Mouse Acceleration", pointing_acceleration_entries, mouse_accel_toggle),
 #    if defined(KEYBOARD_handwired_tractyl_manuform) || defined(KEYBOARD_bastardkb_charybdis)
     MENU_ENTRY_CHILD("DPI Config", dpi_config),
 #    endif // KEYBOARD_handwired_tractyl_manuform || KEYBOARD_bastardkb_charybdis
@@ -1728,9 +1728,9 @@ menu_entry_t debug_entries[] = {
 // Root menu
 
 menu_entry_t root_entries[] = {
-    MENU_ENTRY_PARENT("Display Option", display_option_entries),
+    MENU_ENTRY_MULTI("Display Option", display_option_entries, display),
 #ifdef UNICODE_COMMON_ENABLE
-    MENU_ENTRY_PARENT("Unicode Settings", unicode_entries),
+    MENU_ENTRY_MULTI("Unicode Settings", unicode_entries, unicode_typing),
 #endif // UNICODE_COMMON_ENABLE
 #ifdef RGB_MATRIX_ENABLE
     MENU_ENTRY_PARENT("RGB Matrix Settings", rgb_matrix_entries),
@@ -1739,16 +1739,16 @@ menu_entry_t root_entries[] = {
     MENU_ENTRY_PARENT("RGB Light Settings", rgb_light_entries),
 #endif // RGBLIGHT_ENABLE
 #ifdef BACKLIGHT_ENABLE
-    MENU_ENTRY_PARENT("Backlight Settings", backlight_entries),
+    MENU_ENTRY_MULTI("Backlight Settings", backlight_entries, bl_level),
 #endif // BACKLIGHT_ENABLE
 #ifdef AUDIO_ENABLE
-    MENU_ENTRY_PARENT("Audio Settings", audio_entries),
+    MENU_ENTRY_MULTI("Audio Settings", audio_entries, audio_enabled),
 #endif // AUDIO_ENABLE
 #ifdef POINTING_DEVICE_ENABLE
-    MENU_ENTRY_PARENT("Pointing Device Settings", pointing_entries),
+    MENU_ENTRY_MULTI("Pointing Device Settings", pointing_entries, mouse_jiggler),
 #endif // POINTING_DEVICE_ENABLE
 #if defined(HAPTIC_ENABLE)
-    MENU_ENTRY_PARENT("Haptic Settings", haptic_entries),
+    MENU_ENTRY_MULTI("Haptic Settings", haptic_entries, haptic_enabled),
 #endif // HAPTIC_ENABLE
     MENU_ENTRY_PARENT("Keymap Settings", keymap_config_entries),
 #if defined(RTC_ENABLE)

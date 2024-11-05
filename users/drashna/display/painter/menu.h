@@ -28,16 +28,14 @@ typedef enum _menu_input_t {
 typedef struct _menu_entry_t {
     menu_flags_t flags;
     const char  *text;
-    union {
-        struct {
-            struct _menu_entry_t *children;
-            size_t                child_count;
-        } parent;
-        struct {
-            bool (*menu_handler)(menu_input_t input);
-            void (*display_handler)(char *text_buffer, size_t buffer_len);
-        } child;
-    };
+    struct {
+        struct _menu_entry_t *children;
+        size_t                child_count;
+    } parent;
+    struct {
+        bool (*menu_handler)(menu_input_t input);
+        void (*display_handler)(char *text_buffer, size_t buffer_len);
+    } child;
 } menu_entry_t;
 
 menu_entry_t *get_current_menu(void);

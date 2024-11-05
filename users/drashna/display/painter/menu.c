@@ -1733,13 +1733,13 @@ menu_entry_t root_entries[] = {
     MENU_ENTRY_MULTI("Unicode Settings", unicode_entries, unicode_typing),
 #endif // UNICODE_COMMON_ENABLE
 #ifdef RGB_MATRIX_ENABLE
-    MENU_ENTRY_PARENT("RGB Matrix Settings", rgb_matrix_entries),
+    MENU_ENTRY_MULTI("RGB Matrix Settings", rgb_matrix_entries, rm_enabled),
 #endif // RGB_MATRIX_ENABLE
 #ifdef RGBLIGHT_ENABLE
-    MENU_ENTRY_PARENT("RGB Light Settings", rgb_light_entries),
+    MENU_ENTRY_MULTI("RGB Light Settings", rgb_light_entries, rgbenabled),
 #endif // RGBLIGHT_ENABLE
 #ifdef BACKLIGHT_ENABLE
-    MENU_ENTRY_PARENT("Backlight Settings", backlight_entries),
+    MENU_ENTRY_MULTI("Backlight Settings", backlight_entries, bl_level),
 #endif // BACKLIGHT_ENABLE
 #ifdef AUDIO_ENABLE
     MENU_ENTRY_MULTI("Audio Settings", audio_entries, audio_enabled),

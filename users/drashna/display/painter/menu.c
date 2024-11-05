@@ -2089,7 +2089,12 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
             if (child->flags & menu_flag_is_value) {
                 char buf[32] = {0}, val[29] = {0};
                 child->child.display_handler(val, sizeof(val));
-                snprintf(buf, sizeof(buf), ": %s", val);
+
+                if (child->flags & menu_flag_is_parent) {
+                    snprintf(buf, sizeof(buf), " [%s]", val);
+                } else {
+                    snprintf(buf, sizeof(buf), ": %s", val);
+                }
                 if (child == selected) {
                     qp_drawtext_recolor(display, x, y, font_oled, buf, 0, 0, 0, hsv.secondary.h, hsv.secondary.s,
                                         hsv.secondary.v);

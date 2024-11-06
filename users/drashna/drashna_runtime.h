@@ -39,12 +39,16 @@ typedef union PACKED {
             bool matrix_scan_print  : 1;
         } debug;
         struct {
-            bool  enable_acceleration     : 1;
-            bool  auto_mouse_layer_enable : 1;
-            float growth_rate;
-            float offset;
-            float limit;
-            float takeoff;
+            bool auto_mouse_layer_enable : 1;
+            bool mouse_jiggler_interrupt : 1;
+            bool audio_mouse_clicky      : 1;
+            struct {
+                bool  enabled : 1;
+                float growth_rate;
+                float offset;
+                float limit;
+                float takeoff;
+            } accel;
         } pointing;
         struct {
             uint8_t    display_mode : 3;
@@ -59,8 +63,6 @@ typedef union PACKED {
             int8_t timezone   : 6;
         } rtc;
         bool nuke_switch : 1;
-        // because lazy
-        bool audio_mouse_clicky : 1;
         bool check       : 1;
     };
 } userspace_config_t;
@@ -90,8 +92,8 @@ typedef struct PACKED {
 
 typedef struct PACKED {
     struct {
-        bool enable        : 1;
-        bool clicky_enable : 1;
+        bool  enable        : 1;
+        bool  clicky_enable : 1;
         bool  music_enable  : 1;
         float clicky_freq;
         float clicky_rand;

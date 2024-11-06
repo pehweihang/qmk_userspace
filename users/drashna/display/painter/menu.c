@@ -804,7 +804,7 @@ static bool menu_handler_audio_mouse_clicky(menu_input_t input) {
     switch (input) {
         case menu_input_left:
         case menu_input_right:
-            userspace_config.audio_mouse_clicky = !userspace_config.audio_mouse_clicky;
+            userspace_config.pointing.audio_mouse_clicky = !userspace_config.pointing.audio_mouse_clicky;
             eeconfig_update_user_datablock(&userspace_config);
             return false;
         default:
@@ -813,7 +813,7 @@ static bool menu_handler_audio_mouse_clicky(menu_input_t input) {
 }
 
 void display_handler_audio_mouse_clicky(char *text_buffer, size_t buffer_len) {
-    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.audio_mouse_clicky ? "enabled" : "disabled");
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.pointing.audio_mouse_clicky ? "enabled" : "disabled");
 }
 
 menu_entry_t audio_entries[] = {
@@ -1046,7 +1046,7 @@ static bool menu_handler_mouse_jiggler(menu_input_t input) {
         case menu_input_right:
             userspace_runtime_state.pointing.mouse_jiggler_enable =
                 !userspace_runtime_state.pointing.mouse_jiggler_enable;
-            mouse_jiggler_timer                              = timer_read();
+            mouse_jiggler_timer = timer_read();
             return false;
         default:
             return true;
@@ -1055,6 +1055,22 @@ static bool menu_handler_mouse_jiggler(menu_input_t input) {
 
 void display_handler_mouse_jiggler(char *text_buffer, size_t buffer_len) {
     snprintf(text_buffer, buffer_len - 1, "%s", userspace_runtime_state.pointing.mouse_jiggler_enable ? "on" : "off");
+}
+
+static bool menu_handler_mouse_jiggler_interrupt(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            userspace_config.pointing.mouse_jiggler_interrupt = !userspace_config.pointing.mouse_jiggler_interrupt;
+            mouse_jiggler_timer                               = timer_read();
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_mouse_jiggler_interrupt(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", userspace_config.pointing.mouse_jiggler_interrupt ? "on" : "off");
 }
 
 #    if defined(KEYBOARD_handwired_tractyl_manuform) || defined(KEYBOARD_bastardkb_charybdis)
@@ -1187,6 +1203,7 @@ menu_entry_t pointing_entries[] = {
     MENU_ENTRY_CHILD("Auto Mouse", auto_mouse_enable),
     MENU_ENTRY_CHILD("Auto Mouse Layer", auto_mouse_layer),
     MENU_ENTRY_CHILD("Mouse Jiggler", mouse_jiggler),
+    MENU_ENTRY_CHILD("Allow Jiggler Interrupt", mouse_jiggler_interrupt),
 #    ifdef AUDIO_ENABLE
     MENU_ENTRY_CHILD("Mouse Clicky", audio_mouse_clicky),
 #    endif

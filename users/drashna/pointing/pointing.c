@@ -70,7 +70,7 @@ uint8_t pointing_device_handle_buttons(uint8_t buttons, bool pressed, pointing_d
     uint8_t button_mask = 1 << button;
 
     if ((buttons & button_mask) != (pressed ? button_mask : 0) && pressed && button <= ARRAY_SIZE(fp_mouse_sounds) &&
-        !is_clicky_on() && userspace_config.audio_mouse_clicky) {
+        !is_clicky_on() && userspace_config.pointing.audio_mouse_clicky) {
         PLAY_SONG(fp_mouse_sounds[button]);
     }
 
@@ -106,7 +106,7 @@ void mouse_jiggler_check(report_mouse_t* mouse_report) {
     static mouse_movement_t jiggler_threshold = {0, 0, 0, 0};
     if (mouse_movement_threshold_check(mouse_report, &jiggler_threshold, MOUSE_JIGGLER_THRESHOLD)) {
         userspace_runtime_state.pointing.mouse_jiggler_enable = false;
-        jiggler_threshold                                = (mouse_movement_t){.x = 0, .y = 0, .h = 0, .v = 0};
+        jiggler_threshold                                     = (mouse_movement_t){.x = 0, .y = 0, .h = 0, .v = 0};
     }
     if (userspace_runtime_state.pointing.mouse_jiggler_enable &&
         timer_elapsed(mouse_jiggler_timer) > MOUSE_JIGGLER_INTERVAL_MS) {
@@ -137,7 +137,7 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
     // time since last mouse report:
     const uint16_t delta_time = timer_elapsed32(pointing_device_accel_timer);
     // skip maccel maths if report = 0, or if maccel not enabled.
-    if ((mouse_report.x == 0 && mouse_report.y == 0) || !userspace_config.pointing.enable_acceleration) {
+    if ((mouse_report.x == 0 && mouse_report.y == 0) || !userspace_config.pointing.accel.enabled) {
         return pointing_device_task_keymap(mouse_report);
     }
     // reset timer:
@@ -164,10 +164,10 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
     // correct raw velocity for dpi
     const float velocity = dpi_correction * velocity_raw;
     // letter variables for readability of maths:
-    const float k = userspace_config.pointing.takeoff;
-    const float g = userspace_config.pointing.growth_rate;
-    const float s = userspace_config.pointing.offset;
-    const float m = userspace_config.pointing.limit;
+    const float k = userspace_config.pointing.accel.takeoff;
+    const float g = userspace_config.pointing.accel.growth_rate;
+    const float s = userspace_config.pointing.accel.offset;
+    const float m = userspace_config.pointing.accel.limit;
     // acceleration factor: f(v) = 1 - (1 - M) / {1 + e^[K(v - S)]}^(G/K):
     // Generalised Sigmoid Function, see https://www.desmos.com/calculator/k9vr0y2gev
     const float pointing_device_accel_factor =
@@ -205,7 +205,7 @@ bool process_record_pointing(uint16_t keycode, keyrecord_t* record) {
     switch (keycode) {
         case PD_JIGGLER:
             if (record->event.pressed) {
-                mouse_jiggler_timer                              = timer_read();
+                mouse_jiggler_timer = timer_read();
                 userspace_runtime_state.pointing.mouse_jiggler_enable =
                     !userspace_runtime_state.pointing.mouse_jiggler_enable;
             }
@@ -220,9 +220,11 @@ bool process_record_pointing(uint16_t keycode, keyrecord_t* record) {
                 pointing_device_accel_set_takeoff(
                     pointing_device_accel_get_takeoff() +
                     pointing_device_accel_get_mod_step(POINTING_DEVICE_ACCEL_TAKEOFF_STEP));
-                printf("MACCEL:keycode: TKO: %.3f gro: %.3f ofs: %.3f lmt: %.3f\n", userspace_config.pointing.takeoff,
-                       userspace_config.pointing.growth_rate, userspace_config.pointing.offset,
-                       userspace_config.pointing.limit);
+#ifdef POINTING_DEVICE_ACCEL_DEBUG
+                printf("MACCEL:keycode: TKO: %.3f gro: %.3f ofs: %.3f lmt: %.3f\n",
+                       userspace_config.pointing.accel.takeoff, userspace_config.pointing.accel.growth_rate,
+                       userspace_config.pointing.accel.offset, userspace_config.pointing.accel.limit);
+#endif // POINTING_DEVICE_ACCEL_DEBUG
             }
             break;
         case PD_ACCEL_GROWTH_RATE:
@@ -230,33 +232,40 @@ bool process_record_pointing(uint16_t keycode, keyrecord_t* record) {
                 pointing_device_accel_set_growth_rate(
                     pointing_device_accel_get_growth_rate() +
                     pointing_device_accel_get_mod_step(POINTING_DEVICE_ACCEL_GROWTH_RATE_STEP));
-                printf("MACCEL:keycode: tko: %.3f GRO: %.3f ofs: %.3f lmt: %.3f\n", userspace_config.pointing.takeoff,
-                       userspace_config.pointing.growth_rate, userspace_config.pointing.offset,
-                       userspace_config.pointing.limit);
+#ifdef POINTING_DEVICE_ACCEL_DEBUG
+                printf("MACCEL:keycode: tko: %.3f GRO: %.3f ofs: %.3f lmt: %.3f\n",
+                       userspace_config.pointing.accel.takeoff, userspace_config.pointing.accel.growth_rate,
+                       userspace_config.pointing.accel.offset, userspace_config.pointing.accel.limit);
+#endif // POINTING_DEVICE_ACCEL_DEBUG
             }
             break;
         case PD_ACCEL_OFFSET:
             if (record->event.pressed) {
                 pointing_device_accel_set_offset(pointing_device_accel_get_offset() +
                                                  pointing_device_accel_get_mod_step(POINTING_DEVICE_ACCEL_OFFSET_STEP));
-                printf("MACCEL:keycode: tko: %.3f gro: %.3f OFS: %.3f lmt: %.3f\n", userspace_config.pointing.takeoff,
-                       userspace_config.pointing.growth_rate, userspace_config.pointing.offset,
-                       userspace_config.pointing.limit);
+#ifdef POINTING_DEVICE_ACCEL_DEBUG
+                printf("MACCEL:keycode: tko: %.3f gro: %.3f OFS: %.3f lmt: %.3f\n",
+                       userspace_config.pointing.accel.takeoff, userspace_config.pointing.accel.growth_rate,
+                       userspace_config.pointing.accel.offset, userspace_config.pointing.accel.limit);
+#endif // POINTING_DEVICE_ACCEL_DEBUG
             }
             break;
         case PD_ACCEL_LIMIT:
             if (record->event.pressed) {
                 pointing_device_accel_set_limit(pointing_device_accel_get_limit() +
                                                 pointing_device_accel_get_mod_step(POINTING_DEVICE_ACCEL_LIMIT_STEP));
-                printf("MACCEL:keycode: tko: %.3f gro: %.3f ofs: %.3f LMT: %.3f\n", userspace_config.pointing.takeoff,
-                       userspace_config.pointing.growth_rate, userspace_config.pointing.offset,
-                       userspace_config.pointing.limit);
+#ifdef POINTING_DEVICE_ACCEL_DEBUG
+                printf("MACCEL:keycode: tko: %.3f gro: %.3f ofs: %.3f LMT: %.3f\n",
+                       userspace_config.pointing.accel.takeoff, userspace_config.pointing.accel.growth_rate,
+                       userspace_config.pointing.accel.offset, userspace_config.pointing.accel.limit);
+#endif // POINTING_DEVICE_ACCEL_DEBUG
             }
             break;
         default:
             if (!IS_MOUSE_KEYCODE(keycode)) {
                 mouse_debounce_timer = timer_read();
-                if (userspace_runtime_state.pointing.mouse_jiggler_enable && record->event.pressed) {
+                if (userspace_runtime_state.pointing.mouse_jiggler_enable && record->event.pressed &&
+                    !userspace_config.pointing.mouse_jiggler_interrupt) {
                     userspace_runtime_state.pointing.mouse_jiggler_enable = false;
                 }
             }
@@ -312,7 +321,7 @@ bool is_mouse_record_user(uint16_t keycode, keyrecord_t* record) {
  * @return float
  */
 float pointing_device_accel_get_takeoff(void) {
-    return userspace_config.pointing.takeoff;
+    return userspace_config.pointing.accel.takeoff;
 }
 
 /**
@@ -321,7 +330,7 @@ float pointing_device_accel_get_takeoff(void) {
  * @return float
  */
 float pointing_device_accel_get_growth_rate(void) {
-    return userspace_config.pointing.growth_rate;
+    return userspace_config.pointing.accel.growth_rate;
 }
 
 /**
@@ -330,7 +339,7 @@ float pointing_device_accel_get_growth_rate(void) {
  * @return float
  */
 float pointing_device_accel_get_offset(void) {
-    return userspace_config.pointing.offset;
+    return userspace_config.pointing.accel.offset;
 }
 
 /**
@@ -339,7 +348,7 @@ float pointing_device_accel_get_offset(void) {
  * @return float
  */
 float pointing_device_accel_get_limit(void) {
-    return userspace_config.pointing.limit;
+    return userspace_config.pointing.accel.limit;
 }
 
 /**
@@ -349,7 +358,7 @@ float pointing_device_accel_get_limit(void) {
  */
 void pointing_device_accel_set_takeoff(float val) {
     if (val >= 0.5) { // value less than 0.5 leads to nonsensical results
-        userspace_config.pointing.takeoff = val;
+        userspace_config.pointing.accel.takeoff = val;
     }
     eeconfig_update_user_datablock(&userspace_config);
 }
@@ -361,7 +370,7 @@ void pointing_device_accel_set_takeoff(float val) {
  */
 void pointing_device_accel_set_growth_rate(float val) {
     if (val >= 0) { // value less 0 leads to nonsensical results
-        userspace_config.pointing.growth_rate = val;
+        userspace_config.pointing.accel.growth_rate = val;
     }
     eeconfig_update_user_datablock(&userspace_config);
 }
@@ -372,7 +381,7 @@ void pointing_device_accel_set_growth_rate(float val) {
  * @param val
  */
 void pointing_device_accel_set_offset(float val) {
-    userspace_config.pointing.offset = val;
+    userspace_config.pointing.accel.offset = val;
     eeconfig_update_user_datablock(&userspace_config);
 }
 
@@ -383,7 +392,7 @@ void pointing_device_accel_set_offset(float val) {
  */
 void pointing_device_accel_set_limit(float val) {
     if (val >= 0) {
-        userspace_config.pointing.limit = val;
+        userspace_config.pointing.accel.limit = val;
     }
     eeconfig_update_user_datablock(&userspace_config);
 }
@@ -394,10 +403,10 @@ void pointing_device_accel_set_limit(float val) {
  * @param enable
  */
 void pointing_device_accel_enabled(bool enable) {
-    userspace_config.pointing.enable_acceleration = enable;
+    userspace_config.pointing.accel.enabled = enable;
     eeconfig_update_user_datablock(&userspace_config);
 #ifdef POINTING_DEVICE_ACCEL_DEBUG
-    printf("maccel: enabled: %d\n", userspace_config.pointing.enabled);
+    printf("maccel: enabled: %d\n", userspace_config.pointing.accel.enabled);
 #endif
 #ifdef AUDIO_ENABLE
     if (enable) {
@@ -413,7 +422,7 @@ void pointing_device_accel_enabled(bool enable) {
  *
  */
 bool pointing_device_accel_get_enabled(void) {
-    return userspace_config.pointing.enable_acceleration;
+    return userspace_config.pointing.accel.enabled;
 }
 
 /**

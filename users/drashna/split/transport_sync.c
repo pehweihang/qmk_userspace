@@ -258,8 +258,7 @@ void user_transport_update(void) {
             debug_config = userspace_runtime_state.debug_config;
         }
 #if defined(QUANTUM_PAINTER_ENABLE) && defined(QUANTUM_PAINTER_ILI9341_ENABLE)
-        static bool    last_inverted = false;
-        static uint8_t last_rotation = 0;
+        static uint8_t last_inverted = 0xFF, last_rotation = 0xFF;
         if (userspace_config.painter.inverted != last_inverted || userspace_config.painter.rotation != last_rotation) {
             last_inverted = userspace_config.painter.inverted;
             last_rotation = userspace_config.painter.rotation;

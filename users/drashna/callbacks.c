@@ -322,10 +322,10 @@ void                       eeconfig_init_user(void) {
     userspace_config.pointing.accel.limit       = POINTING_DEVICE_ACCEL_LIMIT;
     userspace_config.pointing.accel.takeoff     = POINTING_DEVICE_ACCEL_TAKEOFF;
 #else
-    userspace_config.pointing.growth_rate = 0.25;
-    userspace_config.pointing.offset      = 2.2;
-    userspace_config.pointing.limit       = 0.2;
-    userspace_config.pointing.takeoff     = 2.0;
+    userspace_config.pointing.accel.growth_rate = 0.25;
+    userspace_config.pointing.accel.offset      = 2.2;
+    userspace_config.pointing.accel.limit       = 0.2;
+    userspace_config.pointing.accel.takeoff     = 2.0;
 #endif // POINTING_DEVICE_ENABLE
     userspace_config.pointing.auto_mouse_layer_enable = true;
     userspace_config.pointing.mouse_jiggler_interrupt = true;

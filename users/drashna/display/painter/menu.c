@@ -2054,7 +2054,7 @@ bool render_menu(painter_device_t display, painter_font_handle_t font, uint16_t 
                             hsv.primary.v);
         y += font->line_height + 11;
 
-        uint8_t visible_entries = (height - y) / (font->line_height + 5);
+        uint8_t visible_entries = (height - y) / (font->line_height + 5) - 1;
         if (menu->parent.child_count > visible_entries) {
             if (userspace_runtime_state.menu_state.selected_child >= scroll_offset + visible_entries &&
                 userspace_runtime_state.menu_state.selected_child < menu->parent.child_count - 1) {

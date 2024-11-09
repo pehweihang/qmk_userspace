@@ -2054,25 +2054,35 @@ bool render_menu(painter_device_t display, painter_font_handle_t font, uint16_t 
                             hsv.primary.v);
         y += font->line_height + 11;
 
-        uint8_t visible_entries = (height - y) / (font->line_height + 5) - 1;
+        uint8_t visible_entries = (height - y) / (font->line_height + 5);
+
+        // If the number of entries exceeds the number of visible entries, we need to scroll
         if (menu->parent.child_count > visible_entries) {
-            if (userspace_runtime_state.menu_state.selected_child >= scroll_offset + visible_entries &&
+            // If the selected child is is at the end of the visible list but we still have entries to scroll from,
+            // don't actually select the last one and increase the scroll offset
+            if (userspace_runtime_state.menu_state.selected_child >= scroll_offset + visible_entries - 1 &&
                 userspace_runtime_state.menu_state.selected_child < menu->parent.child_count - 1) {
-                scroll_offset = userspace_runtime_state.menu_state.selected_child - visible_entries + 1;
+                scroll_offset = userspace_runtime_state.menu_state.selected_child - visible_entries + 2;
             } else if (userspace_runtime_state.menu_state.selected_child < scroll_offset + 1) {
+                // If the selected child is at the start of the visible list but we still have entries to scroll to,
+                // don't actually select the first one and decrease the scroll offset
                 if (userspace_runtime_state.menu_state.selected_child != 0) {
                     scroll_offset = userspace_runtime_state.menu_state.selected_child - 1;
                 } else {
+                    // if first entry is selected, reset scroll offset
                     scroll_offset = 0;
                 }
+                // If the selected child is at the end of the visible list and we don't have any more entries to scroll
+                // to, then don't increase, but ensure ofset is at the end (for wrapping)
             } else if (userspace_runtime_state.menu_state.selected_child == menu->parent.child_count - 1) {
-                scroll_offset = menu->parent.child_count - visible_entries - 1;
+                scroll_offset = menu->parent.child_count - visible_entries;
             }
         } else {
             scroll_offset = 0;
         }
 
-        for (uint8_t i = scroll_offset; i < menu->parent.child_count && i <= (scroll_offset + visible_entries); ++i) {
+        for (uint8_t i = scroll_offset; i < menu->parent.child_count && i <= (scroll_offset + visible_entries - 1);
+             i++) {
             menu_entry_t *child = &menu->parent.children[i];
             uint16_t      x     = start_x + 2 + qp_textwidth(font, ">");
             if (child == selected) {
@@ -2085,8 +2095,8 @@ bool render_menu(painter_device_t display, painter_font_handle_t font, uint16_t 
                                          hsv.secondary.h, hsv.secondary.s, hsv.secondary.v);
             } else {
                 if ((i == scroll_offset && scroll_offset > 0) ||
-                    (i == scroll_offset + visible_entries &&
-                     scroll_offset + visible_entries + 1 < menu->parent.child_count)) {
+                    (i == scroll_offset + visible_entries - 1 &&
+                     scroll_offset + visible_entries < menu->parent.child_count)) {
                     qp_drawtext_recolor(display, start_x + 1, y, font, "+", hsv.primary.h, hsv.primary.s, hsv.primary.v,
                                         0, 255, 0);
                 }

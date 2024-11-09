@@ -2026,8 +2026,8 @@ bool process_record_menu(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
-extern painter_font_handle_t font_thintel, font_mono, font_oled;
-bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, uint16_t width, uint16_t height) {
+bool render_menu(painter_device_t display, painter_font_handle_t font, uint16_t start_x, uint16_t start_y,
+                 uint16_t width, uint16_t height) {
     static menu_state_t last_state;
     static uint8_t      scroll_offset = 0;
 
@@ -2048,13 +2048,13 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
         dual_hsv_t    hsv      = painter_get_dual_hsv();
 
         uint16_t y = start_y;
-        qp_rect(display, start_x, y, render_width, y + 6 + font_oled->line_height + 2, hsv.primary.h, hsv.primary.s,
+        qp_rect(display, start_x, y, render_width, y + 6 + font->line_height + 2, hsv.primary.h, hsv.primary.s,
                 hsv.primary.v, true);
-        qp_drawtext_recolor(display, start_x + 4, y + 4, font_oled, menu->text, 0, 0, 0, hsv.primary.h, hsv.primary.s,
+        qp_drawtext_recolor(display, start_x + 4, y + 4, font, menu->text, 0, 0, 0, hsv.primary.h, hsv.primary.s,
                             hsv.primary.v);
-        y += font_oled->line_height + 11;
+        y += font->line_height + 11;
 
-        uint8_t visible_entries = (height - y) / (font_oled->line_height + 5);
+        uint8_t visible_entries = (height - y) / (font->line_height + 5);
         if (menu->parent.child_count > visible_entries) {
             if (userspace_runtime_state.menu_state.selected_child >= scroll_offset + visible_entries &&
                 userspace_runtime_state.menu_state.selected_child < menu->parent.child_count - 1) {
@@ -2074,32 +2074,32 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
 
         for (uint8_t i = scroll_offset; i < menu->parent.child_count && i <= (scroll_offset + visible_entries); ++i) {
             menu_entry_t *child = &menu->parent.children[i];
-            uint16_t      x     = start_x + 2 + qp_textwidth(font_oled, ">");
+            uint16_t      x     = start_x + 2 + qp_textwidth(font, ">");
             if (child == selected) {
-                qp_rect(display, start_x, y - 2, render_width, y + font_oled->line_height + 1, hsv.secondary.h,
+                qp_rect(display, start_x, y - 2, render_width, y + font->line_height + 1, hsv.secondary.h,
                         hsv.secondary.s, hsv.secondary.v, true);
-                qp_drawtext_recolor(display, start_x + 1, y, font_oled, ">", 0, 0, 0, hsv.secondary.h, hsv.secondary.s,
+                qp_drawtext_recolor(display, start_x + 1, y, font, ">", 0, 0, 0, hsv.secondary.h, hsv.secondary.s,
                                     hsv.secondary.v);
-                x += qp_drawtext_recolor(display, x, y, font_oled,
-                                         truncate_text(child->text, render_width, font_oled, false, true), 0, 0, 0,
+                x += qp_drawtext_recolor(display, x, y, font,
+                                         truncate_text(child->text, render_width, font, false, true), 0, 0, 0,
                                          hsv.secondary.h, hsv.secondary.s, hsv.secondary.v);
             } else {
                 if ((i == scroll_offset && scroll_offset > 0) ||
                     (i == scroll_offset + visible_entries &&
                      scroll_offset + visible_entries + 1 < menu->parent.child_count)) {
-                    qp_drawtext_recolor(display, start_x + 1, y, font_oled, "+", hsv.primary.h, hsv.primary.s,
-                                        hsv.primary.v, 0, 255, 0);
+                    qp_drawtext_recolor(display, start_x + 1, y, font, "+", hsv.primary.h, hsv.primary.s, hsv.primary.v,
+                                        0, 255, 0);
                 }
-                x += qp_drawtext_recolor(display, x, y, font_oled,
-                                         truncate_text(child->text, render_width, font_oled, false, true),
-                                         hsv.primary.h, hsv.primary.s, hsv.primary.v, 0, 255, 0);
+                x += qp_drawtext_recolor(display, x, y, font,
+                                         truncate_text(child->text, render_width, font, false, true), hsv.primary.h,
+                                         hsv.primary.s, hsv.primary.v, 0, 255, 0);
             }
             if (child->flags & menu_flag_is_parent) {
                 if (child == selected) {
-                    qp_drawtext_recolor(display, render_width - (qp_textwidth(font_oled, ">") + 2), y, font_oled, ">",
-                                        0, 0, 0, hsv.secondary.h, hsv.secondary.s, hsv.secondary.v);
+                    qp_drawtext_recolor(display, render_width - (qp_textwidth(font, ">") + 2), y, font, ">", 0, 0, 0,
+                                        hsv.secondary.h, hsv.secondary.s, hsv.secondary.v);
                 } else {
-                    qp_drawtext_recolor(display, render_width - (qp_textwidth(font_oled, ">") + 2), y, font_oled, ">",
+                    qp_drawtext_recolor(display, render_width - (qp_textwidth(font, ">") + 2), y, font, ">",
                                         hsv.primary.h, hsv.primary.s, hsv.primary.v, 0, 0, 0);
                 }
             }
@@ -2113,14 +2113,13 @@ bool render_menu(painter_device_t display, uint16_t start_x, uint16_t start_y, u
                     snprintf(buf, sizeof(buf), ": %s", val);
                 }
                 if (child == selected) {
-                    qp_drawtext_recolor(display, x, y, font_oled, buf, 0, 0, 0, hsv.secondary.h, hsv.secondary.s,
+                    qp_drawtext_recolor(display, x, y, font, buf, 0, 0, 0, hsv.secondary.h, hsv.secondary.s,
                                         hsv.secondary.v);
                 } else {
-                    qp_drawtext_recolor(display, x, y, font_oled, buf, hsv.primary.h, hsv.primary.s, hsv.primary.v, 0,
-                                        0, 0);
+                    qp_drawtext_recolor(display, x, y, font, buf, hsv.primary.h, hsv.primary.s, hsv.primary.v, 0, 0, 0);
                 }
             }
-            y += font_oled->line_height + 2;
+            y += font->line_height + 2;
             qp_rect(display, start_x, y, render_width, y, hsv.primary.h, hsv.primary.s, hsv.primary.v, true);
             y += 3;
         }

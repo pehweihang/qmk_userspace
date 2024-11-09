@@ -1014,7 +1014,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
             static bool force_full_block_redraw = false;
             ypos                                = 172;
 #if !defined(SPLIT_KEYBOARD)
-            if (render_menu(menu_surface, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT)) {
+            if (render_menu(menu_surface, font_oled, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT)) {
                 force_full_block_redraw = true;
             } else
 #else
@@ -1159,7 +1159,7 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 #    if defined(HAPTIC_ENABLE)
             painter_render_haptic(display, font_oled, 83, 58, hue_redraw, &curr_hsv);
 #    endif // HAPTIC_ENABLE
-            if (render_menu(menu_surface, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT)) {
+            if (render_menu(menu_surface, font_oled, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT)) {
                 force_full_block_redraw = true;
             } else {
                 ypos = 3;

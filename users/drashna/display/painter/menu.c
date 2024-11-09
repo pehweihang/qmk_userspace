@@ -2052,7 +2052,7 @@ bool render_menu(painter_device_t display, painter_font_handle_t font, uint16_t 
                 hsv.primary.v, true);
         qp_drawtext_recolor(display, start_x + 4, y + 4, font, menu->text, 0, 0, 0, hsv.primary.h, hsv.primary.s,
                             hsv.primary.v);
-        y += font->line_height + 11;
+        y += font->line_height + 8;
 
         uint8_t visible_entries = (height - y) / (font->line_height + 5);
 
@@ -2083,6 +2083,7 @@ bool render_menu(painter_device_t display, painter_font_handle_t font, uint16_t 
 
         for (uint8_t i = scroll_offset; i < menu->parent.child_count && i <= (scroll_offset + visible_entries - 1);
              i++) {
+            y += 3;
             menu_entry_t *child = &menu->parent.children[i];
             uint16_t      x     = start_x + 2 + qp_textwidth(font, ">");
             if (child == selected) {
@@ -2131,7 +2132,6 @@ bool render_menu(painter_device_t display, painter_font_handle_t font, uint16_t 
             }
             y += font->line_height + 2;
             qp_rect(display, start_x, y, render_width, y, hsv.primary.h, hsv.primary.s, hsv.primary.v, true);
-            y += 3;
         }
         return true;
     }

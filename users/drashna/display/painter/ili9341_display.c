@@ -67,7 +67,7 @@ painter_image_array_t screen_saver_image[] = {
     [__COUNTER__] = {gfx_neon_genesis_evangelion_initial_machine_05_240x320, "Eva Unit 05"},
     [__COUNTER__] = {gfx_neon_genesis_evangelion_initial_machine_06_240x320, "Eva Unit 06"},
 };
-uint8_t screensaver_image_size = __COUNTER__;
+const uint8_t screensaver_image_size = __COUNTER__;
 
 bool render_painter_side(void) {
     return is_keyboard_master();

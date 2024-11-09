@@ -37,7 +37,7 @@ static float cg_swap_song[][2] = CG_SWAP_SONG;
 #endif // !DISPLAY_MENU_TIMEOUT
 deferred_token               menu_deferred_token = INVALID_DEFERRED_TOKEN;
 extern painter_image_array_t screen_saver_image[];
-extern uint8_t               screensaver_image_size;
+extern const uint8_t         screensaver_image_size;
 
 #define MENU_ENTRY_CHILD(display_text, name)             \
     {                                                    \

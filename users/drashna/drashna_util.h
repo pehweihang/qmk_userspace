@@ -4,7 +4,7 @@
 #pragma once
 
 bool     mod_key_press_timer(uint16_t code, uint16_t mod_code, bool pressed);
-bool     mod_key_press(uint16_t code, uint16_t mod_code, bool pressed, uint16_t this_timer);
+bool     mod_key_press(uint16_t code, uint16_t mod_code, bool pressed, uint16_t *this_timer);
 bool     hasAllBitsInMask(uint8_t value, uint8_t mask);
 void     tap_code16_nomods(uint16_t kc);
 void     center_text(const char *text, char *output, uint8_t width);

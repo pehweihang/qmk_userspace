@@ -22,8 +22,8 @@ void tap_code16_delay(uint16_t code, uint16_t delay);
  * @return false exits function
  */
 bool mod_key_press_timer(uint16_t code, uint16_t mod_code, bool pressed) {
-    static uint16_t this_timer;
-    mod_key_press(code, mod_code, pressed, this_timer);
+    static uint16_t this_timer = 0;
+    mod_key_press(code, mod_code, pressed, &this_timer);
     return false;
 }
 
@@ -37,11 +37,11 @@ bool mod_key_press_timer(uint16_t code, uint16_t mod_code, bool pressed) {
  * @return true
  * @return false
  */
-bool mod_key_press(uint16_t code, uint16_t mod_code, bool pressed, uint16_t this_timer) {
+bool mod_key_press(uint16_t code, uint16_t mod_code, bool pressed, uint16_t *this_timer) {
     if (pressed) {
-        this_timer = timer_read();
+        *this_timer = timer_read();
     } else {
-        if (timer_elapsed(this_timer) < TAPPING_TERM) {
+        if (timer_elapsed(*this_timer) < TAPPING_TERM) {
             tap_code(code);
         } else {
             register_code(mod_code);
@@ -55,9 +55,9 @@ bool mod_key_press(uint16_t code, uint16_t mod_code, bool pressed, uint16_t this
 /**
  * @brief Performs exact match for modifier values
  *
- * @param value the modifer varible (get_mods/get_oneshot_mods/get_weak_mods)
+ * @param value the modifier variable (get_mods/get_oneshot_mods/get_weak_mods)
  * @param mask the modifier mask to check for
- * @return true Has the exact modifiers specifed
+ * @return true Has the exact modifiers specified
  * @return false Does not have the exact modifiers specified
  */
 bool hasAllBitsInMask(uint8_t value, uint8_t mask) {
@@ -97,13 +97,15 @@ void center_text(const char *text, char *output, uint8_t width) {
     /* If string is bigger than the available width, trim it */
     if (strlen(text) > width) {
         memcpy(output, text, width);
+        output[width] = '\0';
         return;
     }
 
     /* Try to center the TEXT, TODO: Handle Even lengths*/
     uint8_t padlen_l = (width - strlen(text)) / 2;
     uint8_t padlen_r = (padlen_l * 2) + strlen(text) == width ? padlen_l : padlen_l + 1;
-    snprintf_nowarn(output, width, "%*s%s%*s", padlen_l, " ", text, padlen_r, " ");
+    snprintf_nowarn(output, width + 1, "%*s%s%*s", padlen_l, " ", text, padlen_r, " ");
+    output[width] = '\0';
 }
 
 /**

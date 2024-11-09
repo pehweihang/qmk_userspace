@@ -149,6 +149,12 @@ __attribute__((unused)) static const char *layer_name_pretty(const char *input) 
     return buffer;
 }
 
+/**
+ * Returns the name of the given layer.
+ *
+ * @param layer The layer number to get the name for.
+ * @return A pointer to a string containing the name of the layer.
+ */
 const char *layer_name(uint8_t layer) {
     static char buffer[16];
     switch (layer) {
@@ -181,11 +187,16 @@ const char *layer_name(uint8_t layer) {
     }
 
     const char *n = get_numeric_str(buffer, sizeof(buffer), layer, ' ');
-    while (*n == ' ')
-        ++n;
+    n += strspn(n, " ");
     return n;
 }
 
+/**
+ * Returns the name of the modifier key based on the given modifier code.
+ *
+ * @param mod The modifier code.
+ * @return The name of the modifier key as a string.
+ */
 const char *mod_name(uint16_t mod) {
     static char buffer[16];
     static struct {
@@ -204,6 +215,13 @@ const char *mod_name(uint16_t mod) {
     return buffer;
 }
 
+/**
+ * Returns the name of the given keycode.
+ *
+ * @param keycode The keycode to get the name for.
+ * @param shifted Whether the keycode is shifted.
+ * @return A pointer to a string containing the name of the keycode.
+ */
 const char *keycode_name(uint16_t keycode, bool shifted) {
     static char buffer[32];
     char        buf1[16];
@@ -506,6 +524,21 @@ const char *get_haptic_drv2605l_effect_name(drv2605l_effect_t effect) {
 #endif // HAPTIC_ENABLE && HAPTIC_DRV2605L
 
 #ifdef OS_DETECTION_ENABLE
+/**
+ * Converts the given OS variant to its corresponding string representation.
+ *
+ * @param os_detected The detected OS variant of type `os_variant_t`.
+ * @return A string representing the name of the OS variant.
+ *         Possible return values are:
+ *         - "Windows" for OS_WINDOWS
+ *         - "MacOS" for OS_MACOS
+ *         - "iOS" for OS_IOS
+ *         - "Linux" for OS_LINUX
+ *         - "Unknown" for any other value
+ *
+ * Note: Some cases are conditionally compiled and may not be included
+ *       depending on the compilation flags.
+ */
 const char *os_variant_to_string(os_variant_t os_detected) {
     switch (os_detected) {
         case OS_WINDOWS:
@@ -533,6 +566,12 @@ const char *os_variant_to_string(os_variant_t os_detected) {
 #endif // OS_DETECTION_ENABLE
 
 #ifdef CUSTOM_UNICODE_ENABLE
+/**
+ * Returns a string representing the Unicode typing mode.
+ *
+ * @param mode The mode to be converted to a string.
+ * @return A constant character pointer to the string representing the Unicode typing mode.
+ */
 const char *unicode_typing_mode(uint8_t mode) {
     switch (mode) {
         case UCTM_NO_MODE:

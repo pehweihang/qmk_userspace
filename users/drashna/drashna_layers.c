@@ -27,7 +27,7 @@ void format_layer_bitmap_string(char *buffer, layer_state_t state, layer_state_t
         }
         ++buffer;
     }
-    *buffer = 0;
+    *buffer = '\0';
 }
 
 /**
@@ -78,5 +78,5 @@ const char *get_layer_name_string(layer_state_t state, bool alt_name, bool is_de
  */
 
 bool is_gaming_layer_active(layer_state_t state) {
-    return (state & (1 << _GAMEPAD)) || (state & (1 << _DIABLO)) || (state & (1 << _DIABLOII));
+    return ((state & (1 << _GAMEPAD)) != 0) || ((state & (1 << _DIABLO)) != 0) || ((state & (1 << _DIABLOII)) != 0);
 }

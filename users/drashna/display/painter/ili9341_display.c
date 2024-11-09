@@ -12,7 +12,7 @@
 #include "qp_comms.h"
 #include "display/painter/painter.h"
 #include "display/painter/ili9341_display.h"
-#include "display/painter/menu.h"
+#include "display/menu/menu.h"
 #include "lib/lib8tion/lib8tion.h"
 #ifdef SPLIT_KEYBOARD
 #    include "split_util.h"
@@ -1013,14 +1013,14 @@ __attribute__((weak)) void ili9341_draw_user(void) {
 
             static bool force_full_block_redraw = false;
             ypos                                = 172;
-#if !defined(SPLIT_KEYBOARD)
+            // #if !defined(SPLIT_KEYBOARD)
             if (render_menu(menu_surface, font_oled, 0, 0, SURFACE_MENU_WIDTH, SURFACE_MENU_HEIGHT)) {
                 force_full_block_redraw = true;
             } else
-#else
-            // force set the dirty flag to false since we aren't actually rendering the menu on this side.
-            userspace_runtime_state.menu_state.dirty = false;
-#endif
+            // #else
+            // // force set the dirty flag to false since we aren't actually rendering the menu on this side.
+            // userspace_runtime_state.menu_state.dirty = false;
+            // #endif
             {
                 bool     block_redraw = false;
                 uint16_t surface_ypos = 2, surface_xpos = 3;

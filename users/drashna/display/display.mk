@@ -15,7 +15,8 @@ ifeq ($(strip $(CUSTOM_QUANTUM_PAINTER_ENABLE)), yes)
 
         SRC += $(USER_PATH)/display/painter/painter.c \
                $(USER_PATH)/display/painter/graphics.qgf.c \
-               $(USER_PATH)/display/painter/menu.c
+               $(USER_PATH)/display/painter/qp_render_menu.c \
+               $(USER_PATH)/display/menu/menu.c
 
         ifeq ($(strip $(DISPLAY_MENU_ENABLED_DEFAULT)), yes)
             OPT_DEFS += -DDISPLAY_MENU_ENABLED_DEFAULT

@@ -1,17 +1,3 @@
-// Copyright 2018-2024 Nick Brassel (@tzarc)
-// Copyright 2024 Drashna (@drashna)
-// SPDX-License-Identifier: GPL-2.0-or-later
-
-#include "drashna_runtime.h"
-#include "drashna_names.h"
-#include "drashna_layers.h"
-#include <printf.h>
-#include "display/painter/menu.h"
-#include "display/painter/painter.h"
-#include "keyrecords/process_records.h"
-#include "process_keycode/process_unicode_common.h"
-#include "unicode.h"
-
 #ifdef AUDIO_ENABLE
 #    include "audio.h"
 
@@ -35,9 +21,7 @@ static float cg_swap_song[][2] = CG_SWAP_SONG;
 #ifndef DISPLAY_MENU_TIMEOUT
 #    define DISPLAY_MENU_TIMEOUT 30000
 #endif // !DISPLAY_MENU_TIMEOUT
-deferred_token               menu_deferred_token = INVALID_DEFERRED_TOKEN;
-extern painter_image_array_t screen_saver_image[];
-extern const uint8_t         screensaver_image_size;
+deferred_token menu_deferred_token = INVALID_DEFERRED_TOKEN;
 
 #define MENU_ENTRY_CHILD(display_text, name)             \
     {                                                    \
@@ -67,6 +51,11 @@ extern const uint8_t         screensaver_image_size;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Display options
+
+#ifdef QUANTUM_PAINTER_ENABLE
+#    include "display/painter/painter.h"
+extern painter_image_array_t screen_saver_image[];
+extern const uint8_t         screensaver_image_size;
 
 static bool menu_handler_display(menu_input_t input) {
     switch (input) {
@@ -101,7 +90,7 @@ void display_handler_display(char *text_buffer, size_t buffer_len) {
             strncpy(text_buffer, "Fonts", buffer_len - 1);
             return;
         case 3:
-            strncpy(text_buffer, "QMK Banner", buffer_len - 1);
+            strncpy(text_buffer, "QMK Info", buffer_len - 1);
             return;
     }
 
@@ -134,9 +123,15 @@ static bool menu_handler_display_image(menu_input_t input) {
 void display_handler_display_image(char *text_buffer, size_t buffer_len) {
     strncpy(text_buffer, screen_saver_image[userspace_config.painter.display_logo].name, buffer_len - 1);
 }
+#endif // QUANTUM_PAINTER_ENABLE
 
 static bool menu_handler_display_rotation(menu_input_t input) {
+#ifdef QUANTUM_PAINTER_ILI9341_ENABLE
     void init_display_ili9341_rotation(void);
+#endif // QUANTUM_PAINTER_ILI9341_ENABLE
+#ifdef QUANTUM_PAINTER_ILI9488_ENABLE
+    void init_display_ili9488_rotation(void);
+#endif // QUANTUM_PAINTER_ILI9341_ENABLE
     switch (input) {
 #ifdef DISPLAY_FULL_ROTATION_ENABLE
         case menu_input_left:
@@ -152,14 +147,24 @@ static bool menu_handler_display_rotation(menu_input_t input) {
                 userspace_config.painter.rotation = 0;
             }
             eeconfig_update_user_datablock(&userspace_config);
+#    ifdef QUANTUM_PAINTER_ILI9341_ENABLE
             init_display_ili9341_rotation();
+#    endif // QUANTUM_PAINTER_ILI9341_ENABLE
+#    ifdef QUANTUM_PAINTER_ILI9488_ENABLE
+            init_display_ili9488_rotation();
+#    endif // QUANTUM_PAINTER_ILI9341_ENABLE
             return false;
 #else
         case menu_input_left:
         case menu_input_right:
             userspace_config.painter.rotation ^= 1;
             eeconfig_update_user_datablock(&userspace_config);
+#    ifdef QUANTUM_PAINTER_ILI9341_ENABLE
             init_display_ili9341_rotation();
+#    endif // QUANTUM_PAINTER_ILI9341_ENABLE
+#    ifdef QUANTUM_PAINTER_ILI9488_ENABLE
+            init_display_ili9488_rotation();
+#    endif // QUANTUM_PAINTER_ILI9341_ENABLE
             return false;
 #endif
         default:
@@ -192,13 +197,23 @@ void display_handler_display_rotation(char *text_buffer, size_t buffer_len) {
 }
 
 static bool menu_handler_display_inverted(menu_input_t input) {
+#ifdef QUANTUM_PAINTER_ILI9341_ENABLE
     void init_display_ili9341_inversion(void);
+#endif // QUANTUM_PAINTER_ILI9341_ENABLE
+#ifdef QUANTUM_PAINTER_ILI9488_ENABLE
+    void init_display_ili9488_inversion(void);
+#endif // QUANTUM_PAINTER_ILI9341_ENABLE
     switch (input) {
         case menu_input_left:
         case menu_input_right:
             userspace_config.painter.inverted = !userspace_config.painter.inverted;
             eeconfig_update_user_datablock(&userspace_config);
+#ifdef QUANTUM_PAINTER_ILI9341_ENABLE
             init_display_ili9341_inversion();
+#endif // QUANTUM_PAINTER_ILI9341_ENABLE
+#ifdef QUANTUM_PAINTER_ILI9488_ENABLE
+            init_display_ili9488_inversion();
+#endif // QUANTUM_PAINTER_ILI9341_ENABLE
             return false;
         default:
             return true;
@@ -221,6 +236,9 @@ static bool menu_handler_display_hue(menu_input_t input, bool painter_is_primary
             return true;
     }
 }
+
+#ifdef QUANTUM_PAINTER_ENABLE
+
 void display_handler_display_hue(char *text_buffer, size_t buffer_len, bool painter_is_primary) {
     snprintf(text_buffer, buffer_len - 1, "%d", painter_get_hue(painter_is_primary));
 }
@@ -306,18 +324,23 @@ static bool menu_handler_display_val_secondary(menu_input_t input) {
 void display_handler_display_val_secondary(char *text_buffer, size_t buffer_len) {
     display_handler_display_val(text_buffer, buffer_len, false);
 }
+#endif // QUANTUM_PAINTER_ENABLE
 
 menu_entry_t display_option_entries[] = {
+#ifdef QUANTUM_PAINTER_ENABLE
     MENU_ENTRY_CHILD("Display Option", display),
     MENU_ENTRY_CHILD("Image", display_image),
+#endif // QUANTUM_PAINTER_ENABLE
     MENU_ENTRY_CHILD("Rotation", display_rotation),
     MENU_ENTRY_CHILD("Inverted", display_inverted),
+#ifdef QUANTUM_PAINTER_ENABLE
     MENU_ENTRY_CHILD("Primary Hue", display_hue_primary),
     MENU_ENTRY_CHILD("Primary Saturation", display_sat_primary),
     MENU_ENTRY_CHILD("Primary Value", display_val_primary),
     MENU_ENTRY_CHILD("Secondary Hue", display_hue_secondary),
     MENU_ENTRY_CHILD("Secondary Saturation", display_sat_secondary),
     MENU_ENTRY_CHILD("Secondary Value", display_val_secondary),
+#endif // QUANTUM_PAINTER_ENABLE
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1732,11 +1755,75 @@ void display_handler_mouse_debugging(char *text_buffer, size_t buffer_len) {
     snprintf(text_buffer, buffer_len - 1, "%s", debug_mouse ? "enabled" : "disabled");
 }
 
+static bool menu_handler_pointing_debugging(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            debug_pointing = !debug_pointing;
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_pointing_debugging(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", debug_pointing ? "enabled" : "disabled");
+}
+
+static bool menu_handler_action_debugging(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            debug_action = !debug_action;
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_action_debugging(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", debug_action ? "enabled" : "disabled");
+}
+
+static bool menu_handler_split_serial_debugging(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            debug_serial = !debug_serial;
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_split_serial_debugging(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", debug_serial ? "enabled" : "disabled");
+}
+
+static bool menu_handler_quantum_painter_debugging(menu_input_t input) {
+    switch (input) {
+        case menu_input_left:
+        case menu_input_right:
+            debug_quantum_painter = !debug_quantum_painter;
+            return false;
+        default:
+            return true;
+    }
+}
+
+void display_handler_quantum_painter_debugging(char *text_buffer, size_t buffer_len) {
+    snprintf(text_buffer, buffer_len - 1, "%s", debug_quantum_painter ? "enabled" : "disabled");
+}
+
 menu_entry_t debug_entries[] = {
     MENU_ENTRY_CHILD("Debugging", debugging_enable), // force formatting
     MENU_ENTRY_CHILD("Keyboard Debugging", keyboard_debugging),
     MENU_ENTRY_CHILD("Matrix Debugging", matrix_debugging),
     MENU_ENTRY_CHILD("Mouse Debugging", mouse_debugging),
+    MENU_ENTRY_CHILD("Pointing Device Debugging", pointing_debugging),
+    MENU_ENTRY_CHILD("Action Debugging", action_debugging),
+    MENU_ENTRY_CHILD("Split Serial Debugging", split_serial_debugging),
+    MENU_ENTRY_CHILD("Quantum Painter Debugging", quantum_painter_debugging),
     MENU_ENTRY_CHILD("I2C Scanner", i2c_scanner),
     MENU_ENTRY_CHILD("Matrix Scan Rate Print", scan_rate),
 };
@@ -1784,360 +1871,3 @@ menu_entry_t root = {
     .parent.children    = root_entries,
     .parent.child_count = ARRAY_SIZE(root_entries),
 };
-
-menu_entry_t *get_current_menu(void) {
-    if (userspace_runtime_state.menu_state.menu_stack[0] == 0xFF) {
-        return &root;
-    }
-
-    menu_entry_t *entry = &root;
-    for (int i = 0; i < sizeof(userspace_runtime_state.menu_state.menu_stack); ++i) {
-        if (userspace_runtime_state.menu_state.menu_stack[i] == 0xFF) {
-            return entry;
-        }
-        entry = &entry->parent.children[userspace_runtime_state.menu_state.menu_stack[i]];
-    }
-
-    return entry;
-}
-
-menu_entry_t *get_selected_menu_item(void) {
-    return &(get_current_menu()->parent.children[userspace_runtime_state.menu_state.selected_child]);
-}
-
-uint32_t display_menu_timeout_handler(uint32_t trigger_time, void *cb_arg) {
-    /* do something */
-    menu_handle_input(menu_input_exit);
-    return 0;
-}
-
-bool menu_handle_input(menu_input_t input) {
-    menu_entry_t *menu     = get_current_menu();
-    menu_entry_t *selected = get_selected_menu_item();
-    if (menu_deferred_token != INVALID_DEFERRED_TOKEN && input != menu_input_exit) {
-        extend_deferred_exec(menu_deferred_token, DISPLAY_MENU_TIMEOUT);
-    }
-    switch (input) {
-        case menu_input_exit:
-            userspace_runtime_state.menu_state.is_in_menu = false;
-            memset(userspace_runtime_state.menu_state.menu_stack, 0xFF,
-                   sizeof(userspace_runtime_state.menu_state.menu_stack));
-            userspace_runtime_state.menu_state.selected_child = 0xFF;
-            if (cancel_deferred_exec(menu_deferred_token)) {
-                menu_deferred_token = INVALID_DEFERRED_TOKEN;
-            }
-            return false;
-        case menu_input_back:
-            // Iterate backwards through the stack and remove the last entry
-            for (uint8_t i = 0; i < sizeof(userspace_runtime_state.menu_state.menu_stack); ++i) {
-                if (userspace_runtime_state.menu_state
-                        .menu_stack[sizeof(userspace_runtime_state.menu_state.menu_stack) - 1 - i] != 0xFF) {
-                    userspace_runtime_state.menu_state.selected_child =
-                        userspace_runtime_state.menu_state
-                            .menu_stack[sizeof(userspace_runtime_state.menu_state.menu_stack) - 1 - i];
-                    userspace_runtime_state.menu_state
-                        .menu_stack[sizeof(userspace_runtime_state.menu_state.menu_stack) - 1 - i] = 0xFF;
-                    break;
-                }
-
-                // If we've dropped out of the last entry in the stack, exit the menu
-                if (i == sizeof(userspace_runtime_state.menu_state.menu_stack) - 1) {
-                    userspace_runtime_state.menu_state.is_in_menu     = false;
-                    userspace_runtime_state.menu_state.selected_child = 0xFF;
-                }
-            }
-            return false;
-        case menu_input_enter:
-            // Only attempt to enter the next menu if we're a parent object
-            if (selected->flags & menu_flag_is_parent) {
-                // Iterate forwards through the stack and add the selected entry
-                for (uint8_t i = 0; i < sizeof(userspace_runtime_state.menu_state.menu_stack); ++i) {
-                    if (userspace_runtime_state.menu_state.menu_stack[i] == 0xFF) {
-                        userspace_runtime_state.menu_state.menu_stack[i] =
-                            userspace_runtime_state.menu_state.selected_child;
-                        userspace_runtime_state.menu_state.selected_child = 0;
-                        break;
-                    }
-                }
-            } else if (selected->flags & menu_flag_is_value) {
-                userspace_runtime_state.menu_state.dirty = true;
-                return selected->child.menu_handler(menu_input_right);
-            }
-
-            return false;
-        case menu_input_up:
-            userspace_runtime_state.menu_state.selected_child =
-                (userspace_runtime_state.menu_state.selected_child + menu->parent.child_count - 1) %
-                menu->parent.child_count;
-            return false;
-        case menu_input_down:
-            userspace_runtime_state.menu_state.selected_child =
-                (userspace_runtime_state.menu_state.selected_child + menu->parent.child_count + 1) %
-                menu->parent.child_count;
-            return false;
-        case menu_input_left:
-        case menu_input_right:
-            if (selected->flags & menu_flag_is_value) {
-                userspace_runtime_state.menu_state.dirty = true;
-                return selected->child.menu_handler(input);
-            }
-            return false;
-        default:
-            return false;
-    }
-}
-
-__attribute__((weak)) bool process_record_menu_user(uint16_t keycode, bool keep_processing) {
-    const bool is_qwerty  = get_highest_layer(default_layer_state) == _QWERTY,
-               is_dvorak  = get_highest_layer(default_layer_state) == _DVORAK,
-               is_colemak = get_highest_layer(default_layer_state) == _COLEMAK ||
-                            get_highest_layer(default_layer_state) == _COLEMAK_DH;
-
-    switch (keycode) {
-        case KC_D:
-            if (is_qwerty) {
-                return menu_handle_input(menu_input_down);
-            }
-            return keep_processing;
-        case KC_E:
-            if (is_qwerty) {
-                return menu_handle_input(menu_input_up);
-            } else if (is_dvorak) {
-                return menu_handle_input(menu_input_down);
-            }
-            return keep_processing;
-        case KC_F:
-            if (is_qwerty) {
-                return menu_handle_input(menu_input_right);
-            } else if (is_colemak) {
-                return menu_handle_input(menu_input_up);
-            }
-            return keep_processing;
-        case KC_O:
-            if (is_dvorak) {
-                return menu_handle_input(menu_input_left);
-            }
-            return keep_processing;
-        case KC_R:
-            if (is_colemak) {
-                return menu_handle_input(menu_input_left);
-            }
-            return keep_processing;
-        case KC_S:
-            if (is_qwerty) {
-                return menu_handle_input(menu_input_left);
-            } else if (is_colemak) {
-                return menu_handle_input(menu_input_down);
-            }
-            return keep_processing;
-        case KC_T:
-            if (is_colemak) {
-                return menu_handle_input(menu_input_right);
-            }
-            return keep_processing;
-        case KC_U:
-            if (is_dvorak) {
-                return menu_handle_input(menu_input_right);
-            }
-            return keep_processing;
-        case KC_DOT:
-            if (is_dvorak) {
-                return menu_handle_input(menu_input_right);
-            }
-            return keep_processing;
-        case DISPLAY_MENU:
-            return menu_handle_input(menu_input_exit);
-        case KC_ESC:
-        case KC_BSPC:
-        case KC_DEL:
-            return menu_handle_input(menu_input_back);
-        case KC_SPACE:
-        case KC_ENTER:
-        case KC_RETURN:
-            return menu_handle_input(menu_input_enter);
-        case KC_UP:
-            return menu_handle_input(menu_input_up);
-        case KC_DOWN:
-            return menu_handle_input(menu_input_down);
-        case KC_LEFT:
-            return menu_handle_input(menu_input_left);
-        case KC_RIGHT:
-            return menu_handle_input(menu_input_right);
-        default:
-            return keep_processing;
-    }
-}
-
-bool process_record_menu(uint16_t keycode, keyrecord_t *record) {
-    if (keycode == DISPLAY_MENU && record->event.pressed && !userspace_runtime_state.menu_state.is_in_menu) {
-        userspace_runtime_state.menu_state.is_in_menu     = true;
-        userspace_runtime_state.menu_state.selected_child = 0;
-        menu_deferred_token = defer_exec(DISPLAY_MENU_TIMEOUT, display_menu_timeout_handler, NULL);
-        return false;
-    }
-
-    bool keep_processing = false;
-
-    switch (keycode) {
-        case QK_TO ... QK_TO_MAX:
-        case QK_MOMENTARY ... QK_MOMENTARY_MAX:
-        case QK_DEF_LAYER ... QK_DEF_LAYER_MAX:
-        case QK_TOGGLE_LAYER ... QK_TOGGLE_LAYER_MAX:
-        case QK_ONE_SHOT_LAYER ... QK_ONE_SHOT_LAYER_MAX:
-        case QK_LAYER_TAP_TOGGLE ... QK_LAYER_TAP_TOGGLE_MAX:
-        case QK_SWAP_HANDS ... QK_SWAP_HANDS_MAX:
-            keep_processing = true;
-            break;
-        case QK_LAYER_TAP ... QK_LAYER_TAP_MAX:
-            // Exclude hold keycode
-            if (!record->tap.count) {
-                keep_processing = true;
-                break;
-            }
-            keycode = QK_LAYER_TAP_GET_TAP_KEYCODE(keycode);
-            break;
-        case QK_MOD_TAP ... QK_MOD_TAP_MAX:
-            // Exclude hold keycode
-            if (!record->tap.count) {
-                keep_processing = false;
-                break;
-            }
-            keycode = QK_MOD_TAP_GET_TAP_KEYCODE(keycode);
-            break;
-#if defined(POINTING_DEVICE_ENABLE)
-        default:
-#    if defined(POINTING_DEVICE_AUTO_MOUSE_ENABLE)
-            if (IS_MOUSE_KEYCODE(keycode) || is_mouse_record_kb(keycode, record)) {
-                keep_processing = true;
-            }
-#    else  // POINTING_DEVICE_AUTO_MOUSE_ENABLE
-            keep_processing = IS_MOUSE_KEYCODE(keycode);
-#    endif // POINTING_DEVICE_AUTO_MOUSE_ENABLE
-            break;
-#endif // POINTING_DEVICE_ENABLE
-    }
-    if (userspace_runtime_state.menu_state.is_in_menu) {
-        if (record->event.pressed) {
-            return process_record_menu_user(keycode, keep_processing);
-        }
-        return keep_processing;
-    }
-
-    return true;
-}
-
-bool render_menu(painter_device_t display, painter_font_handle_t font, uint16_t start_x, uint16_t start_y,
-                 uint16_t width, uint16_t height) {
-    static menu_state_t last_state;
-    static uint8_t      scroll_offset = 0;
-
-    if (memcmp(&last_state, &userspace_runtime_state.menu_state, sizeof(menu_state_t)) == 0) {
-        return userspace_runtime_state.menu_state.is_in_menu;
-    }
-
-    userspace_runtime_state.menu_state.dirty = false;
-    memcpy(&last_state, &userspace_runtime_state.menu_state, sizeof(menu_state_t));
-
-    uint16_t render_width = width - start_x;
-
-    if (userspace_runtime_state.menu_state.is_in_menu) {
-        qp_rect(display, start_x, start_y, render_width - 1, height - 1, 0, 0, 0, true);
-
-        menu_entry_t *menu     = get_current_menu();
-        menu_entry_t *selected = get_selected_menu_item();
-        dual_hsv_t    hsv      = painter_get_dual_hsv();
-
-        uint16_t y = start_y;
-        qp_rect(display, start_x, y, render_width, y + 6 + font->line_height + 2, hsv.primary.h, hsv.primary.s,
-                hsv.primary.v, true);
-        qp_drawtext_recolor(display, start_x + 4, y + 4, font, menu->text, 0, 0, 0, hsv.primary.h, hsv.primary.s,
-                            hsv.primary.v);
-        y += font->line_height + 8;
-
-        uint8_t visible_entries = (height - y) / (font->line_height + 5);
-
-        // If the number of entries exceeds the number of visible entries, we need to scroll
-        if (menu->parent.child_count > visible_entries) {
-            // If the selected child is is at the end of the visible list but we still have entries to scroll from,
-            // don't actually select the last one and increase the scroll offset
-            if (userspace_runtime_state.menu_state.selected_child >= scroll_offset + visible_entries - 1 &&
-                userspace_runtime_state.menu_state.selected_child < menu->parent.child_count - 1) {
-                scroll_offset = userspace_runtime_state.menu_state.selected_child - visible_entries + 2;
-            } else if (userspace_runtime_state.menu_state.selected_child < scroll_offset + 1) {
-                // If the selected child is at the start of the visible list but we still have entries to scroll to,
-                // don't actually select the first one and decrease the scroll offset
-                if (userspace_runtime_state.menu_state.selected_child != 0) {
-                    scroll_offset = userspace_runtime_state.menu_state.selected_child - 1;
-                } else {
-                    // if first entry is selected, reset scroll offset
-                    scroll_offset = 0;
-                }
-                // If the selected child is at the end of the visible list and we don't have any more entries to scroll
-                // to, then don't increase, but ensure ofset is at the end (for wrapping)
-            } else if (userspace_runtime_state.menu_state.selected_child == menu->parent.child_count - 1) {
-                scroll_offset = menu->parent.child_count - visible_entries;
-            }
-        } else {
-            scroll_offset = 0;
-        }
-
-        for (uint8_t i = scroll_offset; i < menu->parent.child_count && i <= (scroll_offset + visible_entries - 1);
-             i++) {
-            y += 3;
-            menu_entry_t *child = &menu->parent.children[i];
-            uint16_t      x     = start_x + 2 + qp_textwidth(font, ">");
-            if (child == selected) {
-                qp_rect(display, start_x, y - 2, render_width, y + font->line_height + 1, hsv.secondary.h,
-                        hsv.secondary.s, hsv.secondary.v, true);
-                qp_drawtext_recolor(display, start_x + 1, y, font, ">", 0, 0, 0, hsv.secondary.h, hsv.secondary.s,
-                                    hsv.secondary.v);
-                x += qp_drawtext_recolor(display, x, y, font,
-                                         truncate_text(child->text, render_width, font, false, true), 0, 0, 0,
-                                         hsv.secondary.h, hsv.secondary.s, hsv.secondary.v);
-            } else {
-                if ((i == scroll_offset && scroll_offset > 0) ||
-                    (i == scroll_offset + visible_entries - 1 &&
-                     scroll_offset + visible_entries < menu->parent.child_count)) {
-                    qp_drawtext_recolor(display, start_x + 1, y, font, "+", hsv.primary.h, hsv.primary.s, hsv.primary.v,
-                                        0, 255, 0);
-                }
-                x += qp_drawtext_recolor(display, x, y, font,
-                                         truncate_text(child->text, render_width, font, false, true), hsv.primary.h,
-                                         hsv.primary.s, hsv.primary.v, 0, 255, 0);
-            }
-            if (child->flags & menu_flag_is_parent) {
-                if (child == selected) {
-                    qp_drawtext_recolor(display, render_width - (qp_textwidth(font, ">") + 2), y, font, ">", 0, 0, 0,
-                                        hsv.secondary.h, hsv.secondary.s, hsv.secondary.v);
-                } else {
-                    qp_drawtext_recolor(display, render_width - (qp_textwidth(font, ">") + 2), y, font, ">",
-                                        hsv.primary.h, hsv.primary.s, hsv.primary.v, 0, 0, 0);
-                }
-            }
-            if (child->flags & menu_flag_is_value) {
-                char buf[32] = {0}, val[29] = {0};
-                child->child.display_handler(val, sizeof(val));
-
-                if (child->flags & menu_flag_is_parent) {
-                    snprintf(buf, sizeof(buf), " [%s]", val);
-                } else {
-                    snprintf(buf, sizeof(buf), ": %s", val);
-                }
-                if (child == selected) {
-                    qp_drawtext_recolor(display, x, y, font, buf, 0, 0, 0, hsv.secondary.h, hsv.secondary.s,
-                                        hsv.secondary.v);
-                } else {
-                    qp_drawtext_recolor(display, x, y, font, buf, hsv.primary.h, hsv.primary.s, hsv.primary.v, 0, 0, 0);
-                }
-            }
-            y += font->line_height + 2;
-            qp_rect(display, start_x, y, render_width, y, hsv.primary.h, hsv.primary.s, hsv.primary.v, true);
-        }
-        return true;
-    }
-    return false;
-}
-
-void display_menu_set_dirty(void) {
-    userspace_runtime_state.menu_state.dirty = true;
-}

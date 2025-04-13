@@ -10,3 +10,14 @@
 #undef MASTER_RIGHT
 #define EE_HANDS
 #define TAPPING_TERM 150
+
+#if defined (KEYBOARD_bastardkb_charybdis_3x5)
+    #define MIRYOKU_LAYER_MOUSE \
+    TD(U_TD_BOOT),     TD(U_TD_U_TAP),    TD(U_TD_U_EXTRA),  TD(U_TD_U_BASE),   U_NA,              U_RDO,             U_PST,             U_CPY,             U_CUT,             U_UND,             \
+    KC_LGUI,           KC_LALT,           KC_LCTL,           KC_LSFT,           U_NA,              U_NA,              KC_BTN1,           KC_BTN2,           KC_BTN3,           DRGSCRL,              \
+    U_NA,              KC_ALGR,           TD(U_TD_U_SYM),    TD(U_TD_U_MOUSE),  U_NA,              U_NA,              U_NA,              U_NA,              U_NA,              SNIPING,              \
+    U_NP,              U_NP,              U_NA,              U_NA,              U_NA,              DPI_MOD,           DPI_RMOD,          U_NA,              U_NP,              U_NP
+
+    #define CHARYBDIS_DRAGSCROLL_REVERSE_X
+    #define CHARYBDIS_DRAGSCROLL_REVERSE_Y
+#endif

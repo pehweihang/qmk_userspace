@@ -18,7 +18,6 @@
     U_NA,              KC_ALGR,           TD(U_TD_U_SYM),    TD(U_TD_U_MOUSE),  U_NA,              U_NA,              U_NA,              U_NA,              U_NA,              SNIPING,              \
     U_NP,              U_NP,              U_NA,              U_NA,              U_NA,              DPI_MOD,           DPI_RMOD,          U_NA,              U_NP,              U_NP
 
-    #define CHARYBDIS_DRAGSCROLL_REVERSE_X
     #define CHARYBDIS_DRAGSCROLL_REVERSE_Y
     #define MACCEL_TAKEOFF 2.0      // lower/higher value = curve takes off more smoothly/abruptly
     #define MACCEL_GROWTH_RATE 0.25 // lower/higher value = curve reaches its upper limit slower/faster

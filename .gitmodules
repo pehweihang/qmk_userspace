@@ -1,0 +1,6 @@
+[submodule "users/miryoku/features/maccel"]
+	path = users/miryoku/features/maccel
+	url = https://github.com/burkfers/qmk_userspace_features.git
+[submodule "submodules/maccel"]
+	path = submodules/maccel
+	url = https://github.com/burkfers/qmk_userspace_features.git

@@ -16,13 +16,14 @@
     TD(U_TD_BOOT),     TD(U_TD_U_TAP),    TD(U_TD_U_EXTRA),  TD(U_TD_U_BASE),   U_NA,              U_RDO,             U_PST,             U_CPY,             U_CUT,             U_UND,             \
     KC_LGUI,           KC_LALT,           KC_LCTL,           KC_LSFT,           U_NA,              U_NA,              KC_BTN1,           KC_BTN2,           KC_BTN3,           DRGSCRL,              \
     U_NA,              KC_ALGR,           TD(U_TD_U_SYM),    TD(U_TD_U_MOUSE),  U_NA,              U_NA,              U_NA,              U_NA,              U_NA,              SNIPING,              \
-    U_NP,              U_NP,              U_NA,              U_NA,              U_NA,              DPI_MOD,           DPI_RMOD,          U_NA,              U_NP,              U_NP
+    U_NP,              U_NP,              U_NA,              U_NA,              U_NA,              U_NA,              U_NA,              U_NA,              U_NP,              U_NP
 
-    #define CHARYBDIS_MINIMUM_DEFAULT_DPI 200
+    #define CHARYBDIS_MINIMUM_DEFAULT_DPI 1500
     #define CHARYBDIS_DRAGSCROLL_REVERSE_Y
-    #define MACCEL_TAKEOFF 2.0      // lower/higher value = curve takes off more smoothly/abruptly
-    #define MACCEL_GROWTH_RATE 0.25 // lower/higher value = curve reaches its upper limit slower/faster
-    #define MACCEL_OFFSET 2.2       // lower/higher value = acceleration kicks in earlier/later
-    #define MACCEL_LIMIT 0.2        // lower limit of accel curve (minimum acceleration factor)
+    #define MACCEL_TAKEOFF 1.0       // lower/higher value = curve takes off more smoothly/abruptly
+    #define MACCEL_GROWTH_RATE 0.17  // lower/higher value = curve reaches its upper limit slower/faster
+    #define MACCEL_OFFSET 2.5        // lower/higher value = acceleration kicks in earlier/later
+    #define MACCEL_LIMIT 0.15         // lower limit of accel curve (minimum acceleration factor)
+
     #define MOUSE_EXTENDED_REPORT
 #endif

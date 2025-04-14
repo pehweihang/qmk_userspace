@@ -2,3 +2,4 @@
 # https://github.com/manna-harbour/miryoku
 
 MIRYOKU_KLUDGE_THUMBCOMBOS=yes
+MACCEL_ENABLE=yes
